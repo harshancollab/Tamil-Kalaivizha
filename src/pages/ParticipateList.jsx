@@ -9,12 +9,10 @@ const ParticipateList = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Get search params from URL
   const queryParams = new URLSearchParams(location.search);
   const searchParam = queryParams.get("search") || "";
   const genderParam = queryParams.get("gender") || "";
   
-  // State for participant data
   const [participants, setParticipants] = useState([
     { id: 1, regNo: 100, adNo: 1000, class: "Class 1", name: "Participant 1", gender: "Girl", eventCode: 100 },
     { id: 2, regNo: 200, adNo: 2000, class: "Class 2", name: "Participant 2", gender: "Boy", eventCode: 200 },
@@ -34,6 +32,7 @@ const ParticipateList = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState(null);
+  const [addButtonClicked, setAddButtonClicked] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -45,6 +44,14 @@ const ParticipateList = () => {
       search: params.toString()
     }, { replace: true });
   }, [searchkey, genderFilter, navigate, location.pathname]);
+
+  
+  useEffect(() => {
+    if (addButtonClicked) {
+      setIsAddModalOpen(true);
+      setAddButtonClicked(false); 
+    }
+  }, [addButtonClicked]);
 
   const filteredParticipants = participants.filter(participant => {
     const nameMatch = participant.name.toLowerCase().includes(searchkey.toLowerCase());
@@ -65,9 +72,12 @@ const ParticipateList = () => {
     setSearchkey(e.target.value);
   };
 
-
   const handleGenderChange = (e) => {
     setGenderFilter(e.target.value);
+  };
+
+  const handleAddButtonClick = () => {
+    setAddButtonClicked(true);
   };
 
   return (
@@ -88,7 +98,7 @@ const ParticipateList = () => {
               <h3 className="text-xl font-semibold">Participants List</h3>
               <button
                 className="border-2 bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-4 py-2 rounded-full text-sm w-full md:w-auto mt-2 md:mt-0"
-                onClick={() => setIsAddModalOpen(true)}
+                onClick={handleAddButtonClick}
               >
                 <i className="fa-solid fa-user-plus mr-1"></i> Add Participant
               </button>
@@ -174,4 +184,4 @@ const ParticipateList = () => {
   );
 };
 
-export default ParticipateList
+export default ParticipateList;
