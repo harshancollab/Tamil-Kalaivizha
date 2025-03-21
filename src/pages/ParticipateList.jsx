@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Addparticipat from "../components/Addparticipat";
 import Editparticipate from "../components/Editparticipate";
 import Dash from "../components/Dash";
+import { allparticipateAPI } from "../services/allAPI";
 
 const ParticipateList = () => {
   const navigate = useNavigate();
@@ -33,6 +34,29 @@ const ParticipateList = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [addButtonClicked, setAddButtonClicked] = useState(false);
+  const [allParticipate,setAllParticipate] = useState([])
+  console.log(allParticipate);
+
+  useEffect(()=>{
+    getAllParticipate()
+  },[])
+  const getAllParticipate = async()=>{
+    const token = sessionStorage.getItem("token")
+    if(token){
+      const reqHeader = {
+         "Authorization": `Bearer ${token}`
+      }
+      try{
+        const result = await allparticipateAPI(reqHeader)
+        if(result.status==200){
+          setAllParticipate(result.data)
+        }
+      }catch(err){
+        console.log(err);
+        
+      }
+    }
+  }
 
   useEffect(() => {
     const params = new URLSearchParams();

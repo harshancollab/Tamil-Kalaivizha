@@ -5,6 +5,8 @@ import Addparticipat from "../components/Addparticipat"
 import Editparticipate from "../components/Editparticipate"
 import { Link, useNavigate } from "react-router-dom"
 import Dash from "../components/Dash"
+import { userSchooldetailsAPI } from "../services/allAPI"
+import SchoolDetails from "./SchoolDetails"
 
 const Dashboard = () => {
   const [showSearchBar, setShowSearchBar] = useState(false);
@@ -13,6 +15,40 @@ const Dashboard = () => {
   const [isReportCreated, setIsReportCreated] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [isConfirmButtonDisabled, setIsConfirmButtonDisabled] = useState(false);
+  const [SchDetails,setSchDetails] = useState ([])
+
+
+  useEffect(()=>{
+  getSchooldetails
+},[])
+console.log(SchDetails);
+
+const getSchooldetails = async()=>{
+  const token = sessionStorage.getItem("token")
+  if(token){
+    const reqHeader = {
+       "Authorization": `Bearer ${token}`
+    }
+    try{
+      const result = await userSchooldetailsAPI(reqHeader)
+      console.log(result);
+      
+      if(result.status==200){
+        setSchDetails(result.data)
+      }
+      
+    }catch(err){
+      console.log(err);
+      
+    }
+  }
+}
+
+const handleEditSchool = () => {
+
+  sessionStorage.setItem("editSchoolData", JSON.stringify(SchoolDetails));
+  navigate("/Schooldetails");
+};
 
   const handleCreateReport = () => {
     navigate('/report')
@@ -115,7 +151,7 @@ const Dashboard = () => {
             <div className="relative w-full md:w-40 h-40 flex items-center justify-center sm:text-left">
               <div className="mb-10">
                 <button
-                  onClick={() => navigate("/Schooldetails")}
+                  onClick={handleEditSchool}
                   className="absolute -top-0 right-2 md:right-6 px-3 py-2 w-20 border text-white bg-gradient-to-r from-[#003566] to-[#05B9F4] border-blue-500 rounded-full hover:border-black text-sm font-medium flex items-center"
                 >
                   <i className="fa-solid fa-pen mr-1"></i> Edit

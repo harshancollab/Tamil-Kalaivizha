@@ -127,6 +127,8 @@ const SchoolDetails = () => {
     return isValid;
   };
 
+
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
@@ -430,3 +432,5 @@ const SchoolDetails = () => {
 };
 
 export default SchoolDetails
+
+

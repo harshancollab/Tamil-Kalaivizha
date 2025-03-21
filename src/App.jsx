@@ -20,7 +20,6 @@ import ParticipateList from './pages/ParticipateList'
 import SchoolDetails from './pages/SchoolDetails'
 import ItemWise from './pages/ItemWise'
 import TopSchool from './pages/TopSchool'
-import ButtonGroup from './pages/ButtonGroup'
 
 function App() {
 
@@ -42,13 +41,11 @@ function App() {
         <Route path="/conformpwd" element={<ChangePassword/>} />
         <Route path="/b-grade-list" element={<Bgrade/>} />
         <Route path="/report" element={<Report/>} />
-
         <Route path="/c-grade-list" element={<Cgrade/>} />
         <Route path="/participatelist" element={<ParticipateList/>} />
         <Route path="/Schooldetails" element={<SchoolDetails/>} />
         <Route path="/item" element={<ItemWise/>} />
         <Route path="/top" element={<TopSchool/>} />
-        <Route path="/button" element={<ButtonGroup/>} />
 
 
 

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react"
+import { addparticipateAPI } from "../services/allAPI"
 
-const Addparticipat = ({ onClose }) => {
+const AddParticipant = ({ onClose }) => {
   const [showEventDropdown, setShowEventDropdown] = useState(false);
   const [showPinnaryDropdown, setShowPinnaryDropdown] = useState(false);
   const [selectedEvents, setSelectedEvents] = useState([]);
@@ -16,7 +17,7 @@ const Addparticipat = ({ onClose }) => {
     regNo: "",
     participantName: "",
     adNo: "",
-    class: "",
+    classField: "", 
     gender: "",
   });
 
@@ -24,7 +25,7 @@ const Addparticipat = ({ onClose }) => {
     regNo: "",
     participantName: "",
     adNo: "",
-    class: "",
+    classField: "",
     gender: "",
     events: "",
     pinnary: "",
@@ -35,7 +36,7 @@ const Addparticipat = ({ onClose }) => {
     regNo: false,
     participantName: false,
     adNo: false,
-    class: false,
+    classField: false,
     gender: false,
     events: false,
     pinnary: false,
@@ -47,7 +48,7 @@ const Addparticipat = ({ onClose }) => {
   const handleFileChange = (event) => {
     if (event.target.files.length > 0) {
       const file = event.target.files[0];
-      setSelectedFile(file.name);
+      setSelectedFile(file); 
       validateField("image", file);
     }
   };
@@ -58,10 +59,11 @@ const Addparticipat = ({ onClose }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    console.log(`Input changed: ${name} = ${value}`); 
+    setFormData(prevState => ({
+      ...prevState,
       [name]: value,
-    });
+    }));
     validateField(name, value);
   };
 
@@ -88,7 +90,7 @@ const Addparticipat = ({ onClose }) => {
       case "adNo":
         if (!value) errorMessage = "Admission number is required";
         break;
-      case "class":
+      case "classField": 
         if (!value) errorMessage = "Class is required";
         break;
       case "gender":
@@ -105,7 +107,7 @@ const Addparticipat = ({ onClose }) => {
           const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
           if (!allowedTypes.includes(value.type)) {
             errorMessage = "Please upload a valid image file (JPEG, PNG, GIF)";
-          } else if (value.size > 5 * 1024 * 1024) { 
+          } else if (value.size > 5 * 1024 * 1024) {
             errorMessage = "Image size should be less than 5MB";
           }
         }
@@ -143,7 +145,7 @@ const Addparticipat = ({ onClose }) => {
       regNo: validateField("regNo", formData.regNo),
       participantName: validateField("participantName", formData.participantName),
       adNo: validateField("adNo", formData.adNo),
-      class: validateField("class", formData.class),
+      classField: validateField("classField", formData.classField),
       gender: validateField("gender", formData.gender),
       events: validateField("events", selectedEvents),
       pinnary: validateField("pinnary", selectedPinnary),
@@ -153,7 +155,7 @@ const Addparticipat = ({ onClose }) => {
       regNo: true,
       participantName: true,
       adNo: true,
-      class: true,
+      classField: true,
       gender: true,
       events: true,
       pinnary: true,
@@ -162,9 +164,9 @@ const Addparticipat = ({ onClose }) => {
     return Object.values(fieldValidations).every(Boolean);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    console.log("Form submitted with data:", formData);
     if (validateForm()) {
       console.log("Form submitted successfully", {
         ...formData,
@@ -172,12 +174,50 @@ const Addparticipat = ({ onClose }) => {
         pinnary: selectedPinnary,
         image: selectedFile,
       });
-      alert("Form submitted successfully!");
-      onClose();
+      
+      const reqBody = new FormData();
+      reqBody.append("regNo", formData.regNo);
+      reqBody.append("participantName", formData.participantName);
+      reqBody.append("adNo", formData.adNo);
+      reqBody.append("classField", formData.classField);
+      reqBody.append("gender", formData.gender);
+      reqBody.append("events", JSON.stringify(selectedEvents));
+      reqBody.append("pinnary", JSON.stringify(selectedPinnary)); 
+      
+      if (selectedFile) {
+        reqBody.append("image", selectedFile);
+      }
+      
+      const token = sessionStorage.getItem("token");
+      if (token) {
+        const reqHeader = {
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${token}`
+        };
+        
+        try {
+          const result = await addparticipateAPI(reqBody, reqHeader);
+          if (result.status === 200) {
+            alert("Participant added successfully");
+            onClose();
+          } else {
+            alert(result.response.data);
+          }
+        } catch (err) {
+          console.log(err);
+          alert("Error adding participant. Please try again.");
+        }
+      } else {
+        alert("Authentication token missing. Please log in again.");
+      }
     } else {
       console.log("Form has errors");
     }
   };
+
+  useEffect(() => {
+    console.log("Current form data:", formData);
+  }, [formData]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -202,7 +242,7 @@ const Addparticipat = ({ onClose }) => {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 sm:p-6 z-8">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 sm:p-6 z-20">
         <div className="relative bg-white p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl min-h-[550px]">
           <button className="absolute top-3 right-3 text-red-600" onClick={onClose}>
             <i className="fas fa-times text-2xl"></i>
@@ -231,7 +271,7 @@ const Addparticipat = ({ onClose }) => {
               />
             </div>
             {selectedFile && (
-              <p className="text-sm text-gray-600 mt-1 text-center">{selectedFile}</p>
+              <p className="text-sm text-gray-600 mb-10">{selectedFile.name}</p>
             )}
             {errors.image && (
               <p className="text-sm text-red-500 mt-1 text-center">{errors.image}</p>
@@ -239,17 +279,16 @@ const Addparticipat = ({ onClose }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-blue-900 mb-1">Reg No</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="regNo"
                   value={formData.regNo}
                   onChange={handleInputChange}
                   onBlur={() => handleBlur("regNo")}
-                  className={`w-full border px-4 py-2 rounded-full ${
-                    touched.regNo && errors.regNo 
-                      ? "border-red-500 focus:outline-red-500" 
+                  className={`w-full border px-4 py-2 rounded-full ${touched.regNo && errors.regNo
+                      ? "border-red-500 focus:outline-red-500"
                       : "border-blue-900 focus:outline-blue-900"
-                  }`} 
+                    }`}
                 />
                 {touched.regNo && errors.regNo && (
                   <p className="text-sm text-red-500 mt-1">{errors.regNo}</p>
@@ -258,17 +297,16 @@ const Addparticipat = ({ onClose }) => {
 
               <div>
                 <label className="block text-sm font-medium text-blue-900 mb-1">Participant Name</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="participantName"
                   value={formData.participantName}
                   onChange={handleInputChange}
                   onBlur={() => handleBlur("participantName")}
-                  className={`w-full border px-4 py-2 rounded-full ${
-                    touched.participantName && errors.participantName 
-                      ? "border-red-500 focus:outline-red-500" 
+                  className={`w-full border px-4 py-2 rounded-full ${touched.participantName && errors.participantName
+                      ? "border-red-500 focus:outline-red-500"
                       : "border-blue-900 focus:outline-blue-900"
-                  }`}
+                    }`}
                 />
                 {touched.participantName && errors.participantName && (
                   <p className="text-sm text-red-500 mt-1">{errors.participantName}</p>
@@ -276,17 +314,16 @@ const Addparticipat = ({ onClose }) => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-blue-900 mb-1">Ad No</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   name="adNo"
                   value={formData.adNo}
                   onChange={handleInputChange}
                   onBlur={() => handleBlur("adNo")}
-                  className={`w-full border px-4 py-2 rounded-full ${
-                    touched.adNo && errors.adNo 
-                      ? "border-red-500 focus:outline-red-500" 
+                  className={`w-full border px-4 py-2 rounded-full ${touched.adNo && errors.adNo
+                      ? "border-red-500 focus:outline-red-500"
                       : "border-blue-900 focus:outline-blue-900"
-                  }`}
+                    }`}
                 />
                 {touched.adNo && errors.adNo && (
                   <p className="text-sm text-red-500 mt-1">{errors.adNo}</p>
@@ -294,20 +331,19 @@ const Addparticipat = ({ onClose }) => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-blue-900 mb-1">Class</label>
-                <input 
-                  type="text" 
-                  name="class"
-                  value={formData.class}
+                <input
+                  type="text"
+                  name="classField" 
+                  value={formData.classField}
                   onChange={handleInputChange}
-                  onBlur={() => handleBlur("class")}
-                  className={`w-full border px-4 py-2 rounded-full ${
-                    touched.class && errors.class 
-                      ? "border-red-500 focus:outline-red-500" 
+                  onBlur={() => handleBlur("classField")}
+                  className={`w-full border px-4 py-2 rounded-full ${touched.classField && errors.classField
+                      ? "border-red-500 focus:outline-red-500"
                       : "border-blue-900 focus:outline-blue-900"
-                  }`}
+                    }`}
                 />
-                {touched.class && errors.class && (
-                  <p className="text-sm text-red-500 mt-1">{errors.class}</p>
+                {touched.classField && errors.classField && (
+                  <p className="text-sm text-red-500 mt-1">{errors.classField}</p>
                 )}
               </div>
               <div>
@@ -317,11 +353,10 @@ const Addparticipat = ({ onClose }) => {
                   value={formData.gender}
                   onChange={handleInputChange}
                   onBlur={() => handleBlur("gender")}
-                  className={`w-full border px-4 py-2 rounded-full ${
-                    touched.gender && errors.gender 
-                      ? "border-red-500 focus:outline-red-500" 
+                  className={`w-full border px-4 py-2 rounded-full ${touched.gender && errors.gender
+                      ? "border-red-500 focus:outline-red-500"
                       : "border-blue-900 focus:outline-blue-900"
-                  }`}
+                    }`}
                 >
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
@@ -332,15 +367,14 @@ const Addparticipat = ({ onClose }) => {
                   <p className="text-sm text-red-500 mt-1">{errors.gender}</p>
                 )}
               </div>
-              {/* item  */}
+              {/* Event Selection */}
               <div className="relative" ref={eventDropdownRef}>
                 <label className="block text-sm font-medium text-blue-900 mb-1">Item code</label>
                 <div
-                  className={`w-full h-10 px-4 py-2 border rounded-full cursor-pointer flex items-center gap-2 overflow-hidden ${
-                    touched.events && errors.events 
-                      ? "border-red-500" 
+                  className={`w-full h-10 px-4 py-2 border rounded-full cursor-pointer flex items-center gap-2 overflow-hidden ${touched.events && errors.events
+                      ? "border-red-500"
                       : "border-blue-900"
-                  }`}
+                    }`}
                   onClick={() => {
                     setShowEventDropdown(!showEventDropdown);
                     if (!touched.events) {
@@ -402,15 +436,14 @@ const Addparticipat = ({ onClose }) => {
                   </div>
                 )}
               </div>
-              {/* Pinnary*/}
+              {/* Pinnary Selection */}
               <div className="relative" ref={pinnaryDropdownRef}>
                 <label className="block text-sm font-medium text-blue-900 mb-1">Pinnary code</label>
                 <div
-                  className={`w-full border px-4 py-2 rounded-full cursor-pointer flex flex-wrap items-center gap-2 ${
-                    touched.pinnary && errors.pinnary 
-                      ? "border-red-500" 
+                  className={`w-full border px-4 py-2 rounded-full cursor-pointer flex flex-wrap items-center gap-2 ${touched.pinnary && errors.pinnary
+                      ? "border-red-500"
                       : "border-blue-900"
-                  }`}
+                    }`}
                   onClick={() => {
                     setShowPinnaryDropdown(!showPinnaryDropdown);
                     if (!touched.pinnary) {
@@ -467,7 +500,7 @@ const Addparticipat = ({ onClose }) => {
               </div>
             </div>
             <div className="flex justify-center sm:justify-end mt-6">
-              <button 
+              <button
                 type="submit"
                 className="w-full sm:w-40 px-6 py-3 bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white rounded-full shadow-lg"
               >
@@ -481,4 +514,4 @@ const Addparticipat = ({ onClose }) => {
   );
 };
 
-export default Addparticipat
+export default AddParticipant

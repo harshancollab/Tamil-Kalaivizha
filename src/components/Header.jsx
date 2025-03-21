@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 const Header = ({ insideHome }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -10,6 +10,12 @@ const Header = ({ insideHome }) => {
   const [tempName, setTempName] = useState("Username");
   const nameInputRef = useRef(null);
   const mobileDropdownRef = useRef(null);
+
+const navigate = useNavigate()
+  const logout = ()=>{
+    sessionStorage.clear()
+    navigate("/login")
+  }
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -152,9 +158,9 @@ const Header = ({ insideHome }) => {
                   <a href="/conformpwd" className="block px-4 py-2 hover:bg-gray-200 flex items-center">
                     <i className="fas fa-key mr-2"></i> Change Password
                   </a>
-                  <a href="#" className="block px-4 py-2 hover:bg-gray-200 flex items-center">
+                  <button onClick={logout} className="block px-4 py-2 hover:bg-gray-200 flex items-center">
                     <i className="fas fa-sign-out-alt mr-2"></i> Log out
-                  </a>
+                  </button>
                 </div>
               )}
             </div>
@@ -197,7 +203,7 @@ const Header = ({ insideHome }) => {
                   </button>
                   <input
                     type="file"
-                    className="hidden"
+                    className="hidden" style={{display:"none"}}
                   />
                 </div>
                 <div className="mb-3 ml-6">
