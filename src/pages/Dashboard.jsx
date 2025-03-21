@@ -97,7 +97,6 @@ const Dashboard = () => {
           )}
 
           <div className="bg-gray-200 shadow-md p-3 sm:p-4 md:p-1 rounded-lg mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-4 relative">
-            {/* Edit button positioned absolutely to maintain consistent positioning across screen sizes */}
             <div className="absolute top-3 right-3 md:top-3 md:right-3 z-10">
               <button
                 onClick={handleEditSchool}
