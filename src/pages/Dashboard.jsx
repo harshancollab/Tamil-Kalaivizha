@@ -19,36 +19,35 @@ const Dashboard = () => {
 
 
   useEffect(()=>{
-  getSchooldetails
-},[])
-console.log(SchDetails);
+    getSchooldetails()
+  },[])
+  console.log(SchDetails);
 
-const getSchooldetails = async()=>{
-  const token = sessionStorage.getItem("token")
-  if(token){
-    const reqHeader = {
-       "Authorization": `Bearer ${token}`
-    }
-    try{
-      const result = await userSchooldetailsAPI(reqHeader)
-      console.log(result);
-      
-      if(result.status==200){
-        setSchDetails(result.data)
+  const getSchooldetails = async()=>{
+    const token = sessionStorage.getItem("token")
+    if(token){
+      const reqHeader = {
+         "Authorization": `Bearer ${token}`
       }
-      
-    }catch(err){
-      console.log(err);
-      
+      try{
+        const result = await userSchooldetailsAPI(reqHeader)
+        console.log(result);
+        
+        if(result.status==200){
+          setSchDetails(result.data)
+        }
+        
+      }catch(err){
+        console.log(err);
+        
+      }
     }
   }
-}
 
-const handleEditSchool = () => {
-
-  sessionStorage.setItem("editSchoolData", JSON.stringify(SchoolDetails));
-  navigate("/Schooldetails");
-};
+  const handleEditSchool = () => {
+    sessionStorage.setItem("editSchoolData", JSON.stringify(SchoolDetails));
+    navigate("/Schooldetails");
+  };
 
   const handleCreateReport = () => {
     navigate('/report')
@@ -97,7 +96,17 @@ const handleEditSchool = () => {
          
           )}
 
-          <div className="bg-gray-200 shadow-md p-3 sm:p-4 md:p-1 rounded-lg mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-4">
+          <div className="bg-gray-200 shadow-md p-3 sm:p-4 md:p-1 rounded-lg mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-4 relative">
+            {/* Edit button positioned absolutely to maintain consistent positioning across screen sizes */}
+            <div className="absolute top-3 right-3 md:top-3 md:right-3 z-10">
+              <button
+                onClick={handleEditSchool}
+                className=" px-3 py-2 w-20 border z-1 text-white bg-gradient-to-r from-[#003566] to-[#05B9F4] border-blue-500 rounded-full hover:border-black text-sm font-medium flex items-center"
+              >
+                <i className="fa-solid fa-pen mr-1"></i> Edit
+              </button>
+            </div>
+            
             <div className="w-full md:w-auto">
               <h2 className="text-lg px-5 py-3  font-bold text-gray-800 mb-2 md:mb-6 lg:mb-10">
                 School Details
@@ -149,15 +158,6 @@ const handleEditSchool = () => {
             </div>
 
             <div className="relative w-full md:w-40 h-40 flex items-center justify-center sm:text-left">
-              <div className="mb-10">
-                <button
-                  onClick={handleEditSchool}
-                  className="absolute -top-0 right-2 md:right-6 px-3 py-2 w-20 border text-white bg-gradient-to-r from-[#003566] to-[#05B9F4] border-blue-500 rounded-full hover:border-black text-sm font-medium flex items-center"
-                >
-                  <i className="fa-solid fa-pen mr-1"></i> Edit
-                </button>
-              </div>
-
               <div className="mt-12">
                 <PieChart width={140} height={140}>
                   <Pie

@@ -26,7 +26,7 @@ const Dash = () => {
         </button>
       )}
       <aside
-        className={`fixed md:sticky top-0 h-full min-h-screen z-10 transform ${
+        className={`fixed  md:sticky top-0 h-full min-h-screen z-20 transform  ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } md:translate-x-0 transition-transform duration-300 ease-in-out w-64 md:w-[250px] bg-[#003566] text-white p-4 flex flex-col`}
       >
