@@ -10,7 +10,7 @@ export default defineConfig({
           srcDir: "src",
           filename: "service-worker.js", // Service worker source
           workbox: {
-            swSrc: "src/service-worker.js", // Custom service worker
+            swSrc: "src/services-worker.js", // Custom service worker
             swDest: "sw.js", // Output service worker to root
           },
           devOptions: {

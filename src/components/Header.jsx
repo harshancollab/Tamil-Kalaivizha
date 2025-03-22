@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import logo from "../assets/Kalaivizha.png"
 
 const Header = ({ insideHome }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -11,8 +12,9 @@ const Header = ({ insideHome }) => {
   const nameInputRef = useRef(null);
   const mobileDropdownRef = useRef(null);
 
-const navigate = useNavigate()
-  const logout = ()=>{
+
+  const navigate = useNavigate()
+  const logout = () => {
     sessionStorage.clear()
     navigate("/login")
   }
@@ -51,14 +53,14 @@ const navigate = useNavigate()
     setIsEditingName(false);
   };
 
-  // Close mobile dropdown when clicking outside
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (mobileDropdownRef.current && !mobileDropdownRef.current.contains(event.target)) {
         setMobileDropdownOpen(false);
       }
     }
-    
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -72,19 +74,19 @@ const navigate = useNavigate()
   }, [isEditingName]);
 
   return (
-   <>
+    <>
       <div className="relative w-full">
         <nav className="bg-[#46A2FF] text-white px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center space-x-3 ml-2 sm:ml-10 ml-8">
             <img
-              src=""
+              src={logo}
               alt="logo"
               className="h-8 w-auto sm:h-10"
             />
             <Link to={'/'} className="text-lg sm:text-xl font-bold truncate max-w-[150px] sm:max-w-full">
               Tamil Kalaivizha
             </Link>
-  
+
             {insideHome && (
               <div className="hidden md:flex items-center flex-grow max-w-md relative">
                 <input
@@ -96,7 +98,7 @@ const navigate = useNavigate()
               </div>
             )}
           </div>
-          
+
           <div className="sm:hidden relative" ref={mobileDropdownRef}>
             <img
               src="https://play-lh.googleusercontent.com/jInS55DYPnTZq8GpylyLmK2L2cDmUoahVacfN_Js_TsOkBEoizKmAl5-p8iFeLiNjtE=w526-h296-rw"
@@ -104,7 +106,7 @@ const navigate = useNavigate()
               className="w-10 h-10 rounded-full border cursor-pointer"
               onClick={toggleMobileDropdown}
             />
-            
+
             {mobileDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white text-black shadow-md rounded-lg overflow-hidden z-50">
                 <button
@@ -125,7 +127,7 @@ const navigate = useNavigate()
               </div>
             )}
           </div>
-            
+
           <div className="hidden sm:flex items-center space-x-4">
             <div className="text-xl cursor-pointer">
               <i className="fas fa-bell"></i>
@@ -166,7 +168,7 @@ const navigate = useNavigate()
             </div>
           </div>
         </nav>
-        
+
         {insideHome && (
           <div className="md:hidden px-4 py-2">
             <div className="relative">
@@ -179,7 +181,7 @@ const navigate = useNavigate()
             </div>
           </div>
         )}
-                {isProfileModalOpen && (
+        {isProfileModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 ">
             <div className="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-6 my-8 sm:mx-auto sm:my-auto flex flex-col justify-between h-[400px]">
               <div>
@@ -189,9 +191,9 @@ const navigate = useNavigate()
                 >
                   <i className="fas fa-times text-xl"></i>
                 </button>
-  
+
                 <h2 className="text-xl font-semibold ml-5 mb-4">Profile</h2>
-  
+
                 <div className="flex flex-col sm:flex-row items-center mb-6 gap-4 ml-5 ">
                   <div className="w-16 h-16 bg-gray-200 rounded-full flex justify-center items-center">
                     <i className="fas fa-user text-gray-500 text-3xl"></i>
@@ -202,14 +204,17 @@ const navigate = useNavigate()
                     Upload Image
                   </button>
                   <input
-                    type="file"
-                    className="hidden" style={{display:"none"}}
-                  />
+                type="file"
+              
+                className="hidden"
+               
+              
+              />
                 </div>
                 <div className="mb-3 ml-6">
                   <div className="mt-10">
                     <label className="block text-sm font-medium text-blue-900 mb-1">Name</label>
-                    <div className="relative mb-5">
+                    <div className="relative mb-5"> 
                       {isEditingName ? (
                         <input
                           type="text"
@@ -244,7 +249,7 @@ const navigate = useNavigate()
                   </div>
                 </div>
               </div>
-  
+
               {isEditingName && (
                 <div className="flex justify-end gap-2 mt-2">
                   <button
@@ -265,7 +270,7 @@ const navigate = useNavigate()
           </div>
         )}
       </div>
-   </>
+    </>
   );
 };
 

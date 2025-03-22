@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { updateparticipateAPI } from "../services/allAPI"; 
+import { updateparticipateAPI } from "../services/allAPI";
 
 const EditParticipate = ({ onClose, participantData }) => {
   const [showEventDropdown, setShowEventDropdown] = useState(false);
@@ -17,7 +17,7 @@ const EditParticipate = ({ onClose, participantData }) => {
     regNo: participantData?.regNo || "",
     participantName: participantData?.participantName || "",
     adNo: participantData?.adNo || "",
-    classField: participantData?.classField || "", 
+    classField: participantData?.classField || "",
     gender: participantData?.gender || "",
   });
 
@@ -25,7 +25,7 @@ const EditParticipate = ({ onClose, participantData }) => {
     regNo: "",
     participantName: "",
     adNo: "",
-    classField: "", 
+    classField: "",
     gender: "",
     events: "",
     pinnary: "",
@@ -36,7 +36,7 @@ const EditParticipate = ({ onClose, participantData }) => {
     regNo: false,
     participantName: false,
     adNo: false,
-    classField: false, 
+    classField: false,
     gender: false,
     events: false,
     pinnary: false,
@@ -59,7 +59,7 @@ const EditParticipate = ({ onClose, participantData }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log(`Input changed: ${name} = ${value}`); 
+    console.log(`Input changed: ${name} = ${value}`);
     setFormData(prevState => ({
       ...prevState,
       [name]: value,
@@ -90,7 +90,7 @@ const EditParticipate = ({ onClose, participantData }) => {
       case "adNo":
         if (!value) errorMessage = "Admission number is required";
         break;
-      case "classField": 
+      case "classField":
         if (!value) errorMessage = "Class is required";
         break;
       case "gender":
@@ -164,7 +164,7 @@ const EditParticipate = ({ onClose, participantData }) => {
     return Object.values(fieldValidations).every(Boolean);
   };
 
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Form submitted with data:", formData);
@@ -175,7 +175,7 @@ const EditParticipate = ({ onClose, participantData }) => {
         pinnary: selectedPinnary,
         image: selectedFile,
       });
-      
+
       const reqBody = new FormData();
       reqBody.append("id", participantData._id);
       reqBody.append("regNo", formData.regNo);
@@ -183,20 +183,20 @@ const EditParticipate = ({ onClose, participantData }) => {
       reqBody.append("adNo", formData.adNo);
       reqBody.append("classField", formData.classField);
       reqBody.append("gender", formData.gender);
-      reqBody.append("events", JSON.stringify(selectedEvents)); 
-      reqBody.append("pinnary", JSON.stringify(selectedPinnary)); 
-      
+      reqBody.append("events", JSON.stringify(selectedEvents));
+      reqBody.append("pinnary", JSON.stringify(selectedPinnary));
+
       if (selectedFile) {
         reqBody.append("image", selectedFile);
       }
-      
+
       const token = sessionStorage.getItem("token");
       if (token) {
         const reqHeader = {
           "Content-Type": "multipart/form-data",
           "Authorization": `Bearer ${token}`
         };
-        
+
         try {
           const result = await updateparticipateAPI(reqBody, reqHeader);
           if (result.status === 200) {
@@ -288,8 +288,8 @@ const EditParticipate = ({ onClose, participantData }) => {
                   onChange={handleInputChange}
                   onBlur={() => handleBlur("regNo")}
                   className={`w-full border px-4 py-2 rounded-full ${touched.regNo && errors.regNo
-                      ? "border-red-500 focus:outline-red-500"
-                      : "border-blue-900 focus:outline-blue-900"
+                    ? "border-red-500 focus:outline-red-500"
+                    : "border-blue-900 focus:outline-blue-900"
                     }`}
                 />
                 {touched.regNo && errors.regNo && (
@@ -306,8 +306,8 @@ const EditParticipate = ({ onClose, participantData }) => {
                   onChange={handleInputChange}
                   onBlur={() => handleBlur("participantName")}
                   className={`w-full border px-4 py-2 rounded-full ${touched.participantName && errors.participantName
-                      ? "border-red-500 focus:outline-red-500"
-                      : "border-blue-900 focus:outline-blue-900"
+                    ? "border-red-500 focus:outline-red-500"
+                    : "border-blue-900 focus:outline-blue-900"
                     }`}
                 />
                 {touched.participantName && errors.participantName && (
@@ -323,8 +323,8 @@ const EditParticipate = ({ onClose, participantData }) => {
                   onChange={handleInputChange}
                   onBlur={() => handleBlur("adNo")}
                   className={`w-full border px-4 py-2 rounded-full ${touched.adNo && errors.adNo
-                      ? "border-red-500 focus:outline-red-500"
-                      : "border-blue-900 focus:outline-blue-900"
+                    ? "border-red-500 focus:outline-red-500"
+                    : "border-blue-900 focus:outline-blue-900"
                     }`}
                 />
                 {touched.adNo && errors.adNo && (
@@ -340,8 +340,8 @@ const EditParticipate = ({ onClose, participantData }) => {
                   onChange={handleInputChange}
                   onBlur={() => handleBlur("classField")}
                   className={`w-full border px-4 py-2 rounded-full ${touched.classField && errors.classField
-                      ? "border-red-500 focus:outline-red-500"
-                      : "border-blue-900 focus:outline-blue-900"
+                    ? "border-red-500 focus:outline-red-500"
+                    : "border-blue-900 focus:outline-blue-900"
                     }`}
                 />
                 {touched.classField && errors.classField && (
@@ -356,8 +356,8 @@ const EditParticipate = ({ onClose, participantData }) => {
                   onChange={handleInputChange}
                   onBlur={() => handleBlur("gender")}
                   className={`w-full border px-4 py-2 rounded-full ${touched.gender && errors.gender
-                      ? "border-red-500 focus:outline-red-500"
-                      : "border-blue-900 focus:outline-blue-900"
+                    ? "border-red-500 focus:outline-red-500"
+                    : "border-blue-900 focus:outline-blue-900"
                     }`}
                 >
                   <option value="">Select Gender</option>
@@ -374,8 +374,8 @@ const EditParticipate = ({ onClose, participantData }) => {
                 <label className="block text-sm font-medium text-blue-900 mb-1">Item code</label>
                 <div
                   className={`w-full h-10 px-4 py-2 border rounded-full cursor-pointer flex items-center gap-2 overflow-hidden ${touched.events && errors.events
-                      ? "border-red-500"
-                      : "border-blue-900"
+                    ? "border-red-500"
+                    : "border-blue-900"
                     }`}
                   onClick={() => {
                     setShowEventDropdown(!showEventDropdown);
@@ -443,8 +443,8 @@ const EditParticipate = ({ onClose, participantData }) => {
                 <label className="block text-sm font-medium text-blue-900 mb-1">Pinnary code</label>
                 <div
                   className={`w-full border px-4 py-2 rounded-full cursor-pointer flex flex-wrap items-center gap-2 ${touched.pinnary && errors.pinnary
-                      ? "border-red-500"
-                      : "border-blue-900"
+                    ? "border-red-500"
+                    : "border-blue-900"
                     }`}
                   onClick={() => {
                     setShowPinnaryDropdown(!showPinnaryDropdown);

@@ -1,14 +1,27 @@
 import { useState, useRef, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { verifyOtpAPI, resendOtpAPI } from "../services/allAPI" // You'll need to create these API functions
 
 const OTPVerification = () => {
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [timer, setTimer] = useState(60); 
   const [isResendDisabled, setIsResendDisabled] = useState(true);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const inputRefs = useRef([]);
   const navigate = useNavigate();
 
+ 
+  const email = sessionStorage.getItem("resetEmail");
+
   useEffect(() => {
+  
+    if (!email) {
+      // navigate("/reset-password");
+      return;
+    }
+
     if (timer > 0) {
       const interval = setInterval(() => {
         setTimer((prev) => prev - 1);
@@ -17,7 +30,7 @@ const OTPVerification = () => {
     } else {
       setIsResendDisabled(false); 
     }
-  }, [timer]);
+  }, [timer, email, navigate]);
 
   const handleChange = (index, value) => {
     if (!/^\d*$/.test(value)) return;
@@ -36,19 +49,57 @@ const OTPVerification = () => {
     }
   };
 
-  const handleSubmit = () => {
-    if (otp.join("").length === 4) {
-      alert("OTP Verified!");
-      navigate("/reset-password");
-    } else {
-      alert("Please enter a valid 4-digit OTP.");
+  const handleSubmit = async () => {
+    const otpCode = otp.join("");
+    
+    if (otpCode.length !== 4) {
+      setError("Please enter a valid 4-digit OTP.");
+      return;
+    }
+    
+    setError("");
+    setIsLoading(true);
+    
+    try {
+      const result = await verifyOtpAPI({ 
+        email: email, 
+        otp: otpCode 
+      });
+      
+      if (result.status === 200) {
+        sessionStorage.setItem("otpVerified", "true");
+        navigate("/reset-password");
+      } else {
+        setError(result.data.message || "Invalid OTP. Please try again.");
+      }
+    } catch (err) {
+      console.log(err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleResendOTP = () => {
-    setTimer(60); 
-    setIsResendDisabled(true); 
-    alert("A new OTP has been sent to your email.");
+  const handleResendOTP = async () => {
+    setIsResending(true);
+    
+    try {
+      const result = await resendOtpAPI({ email: email });
+      
+      if (result.status === 200) {
+        setTimer(60);
+        setIsResendDisabled(true);
+        setError("");
+        alert("A new OTP has been sent to your email.");
+      } else {
+        setError(result.data.message || "Failed to resend OTP. Please try again.");
+      }
+    } catch (err) {
+      console.log(err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsResending(false);
+    }
   };
 
   return (
@@ -67,7 +118,7 @@ const OTPVerification = () => {
               Enter OTP 
             </h2>
             <p className="text-gray-600 text-center mt-2">
-              Enter the 4-digit verification code sent to your email.
+              Enter the 4-digit verification code sent to <span className="font-medium">{email}</span>
             </p>
             <div className="flex justify-center gap-3 mt-6">
               {otp.map((digit, index) => (
@@ -83,17 +134,19 @@ const OTPVerification = () => {
                 />
               ))}
             </div>
+            
+            {error && <p className="text-red-500 text-sm text-center mt-2">{error}</p>}
 
             <p className="text-center text-gray-600 mt-3">
-              Didn’t receive a code?{" "}
+              Didn't receive a code?{" "}
               <button
                 onClick={handleResendOTP}
-                disabled={isResendDisabled}
+                disabled={isResendDisabled || isResending}
                 className={`text-yellow-500 font-semibold ${
-                  isResendDisabled ? "opacity-50 cursor-not-allowed" : "hover:underline cursor-pointer"
+                  isResendDisabled || isResending ? "opacity-50 cursor-not-allowed" : "hover:underline cursor-pointer"
                 }`}
               >
-                Resend Code
+                {isResending ? "Resending..." : "Resend Code"}
               </button>
             </p>
             {isResendDisabled && (
@@ -104,9 +157,10 @@ const OTPVerification = () => {
 
             <button
               onClick={handleSubmit}
-              className="w-full  mt-6 py-3 text-white font-semibold bg-gradient-to-r from-[#003566] to-[#05B9F4]  rounded-full hover:opacity-90 transition"
+              disabled={isLoading}
+              className="w-full mt-6 py-3 text-white font-semibold bg-gradient-to-r from-[#003566] to-[#05B9F4] rounded-full hover:opacity-90 transition"
             >
-              Next
+              {isLoading ? "Verifying..." : "Next"}
             </button>
           </div>
         </div>

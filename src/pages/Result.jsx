@@ -12,16 +12,29 @@ const Result = () => {
     const searchParam = queryParams.get("search") || "";
     
     const [searchTerm, setSearchTerm] = useState(searchParam);
-    const [participants, setParticipants] = useState([
-        { id: 1, regNo: 200, adNo: 3010, name: "Jayam Deva", eventCode: 504, grade: "A Grade", points: 5 },
-        { id: 2, regNo: 201, adNo: 3011, name: "Priya Sharma", eventCode: 505, grade: "A Grade", points: 7 },
-        { id: 3, regNo: 202, adNo: 3012, name: "Rajan Verma", eventCode: 506, grade: "A Grade", points: 6 },
-        { id: 4, regNo: 203, adNo: 3013, name: "Sunita Khan", eventCode: 507, grade: "A Grade", points: 8 },
-        { id: 5, regNo: 204, adNo: 3014, name: "Arun Mehta", eventCode: 508, grade: "A Grade", points: 4 },
-        { id: 6, regNo: 205, adNo: 3015, name: "Kavita Das", eventCode: 509, grade: "A Grade", points: 9 },
-        { id: 7, regNo: 206, adNo: 3016, name: "Vikram Roy", eventCode: 510, grade: "A Grade", points: 3 },
-        { id: 8, regNo: 207, adNo: 3017, name: "Neha Patel", eventCode: 511, grade: "A Grade", points: 6 }
-    ]);
+    const [aGradeResults, setAGradeResults] = useState([])
+    console.log(aGradeResults);
+
+    useEffect(() => {
+        getAGradeResults()
+    }, [])
+
+    const getAGradeResults = async () => {
+        const token = sessionStorage.getItem("token")
+        if (token) {
+            const reqHeader = {
+                "Authorization": `Bearer ${token}`
+            }
+            try {
+                const result = await getAGradeResults(reqHeader)
+                if (result.status === 200) {
+                    setAGradeResults(result.data)
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        }
+    }
 
     useEffect(() => {
         const params = new URLSearchParams();
@@ -33,7 +46,7 @@ const Result = () => {
         }, { replace: true });
     }, [searchTerm, navigate, location.pathname]);
 
-    const filteredParticipants = participants.filter(participant => 
+    const filteredParticipants = aGradeResults.filter(participant => 
         participant.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -47,8 +60,8 @@ const Result = () => {
             <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
                 <Dash/>
 
-                <div className="flex-1 p-4 md:p-6">
-                    <div className="bg-gray-100 p-4 md:p-6 rounded-lg">
+                <div className="flex-1 ">
+                    <div className="bg-gray-100 p-1 md:p-1 rounded-lg">
                         <h2 className="font-bold text-lg mb-4">Points</h2>
                         <Result1 />
                     </div>
@@ -88,7 +101,7 @@ const Result = () => {
                                 </thead>
                                 <tbody>
                                     {filteredParticipants.map((participant, index) => (
-                                        <tr key={participant.id} className="border-b hover:bg-gray-100 text-sm md:text-base">
+                                        <tr key={participant._id} className="border-b hover:bg-gray-100 text-sm md:text-base">
                                             <td className="p-2 md:p-3 text-center">{index + 1}</td>
                                             <td className="p-2 md:p-3 flex justify-center">
                                                 <i className="fa-solid fa-user"></i>

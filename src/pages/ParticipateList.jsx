@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import Header from "../components/Header";
-import Addparticipat from "../components/Addparticipat";
-import Editparticipate from "../components/Editparticipate";
-import Dash from "../components/Dash";
-import { allparticipateAPI } from "../services/allAPI";
+import React, { useState, useEffect } from "react"
+import { useNavigate, useLocation } from "react-router-dom"
+import Header from "../components/Header"
+import Addparticipat from "../components/Addparticipat"
+import Editparticipate from "../components/Editparticipate"
+import Dash from "../components/Dash"
+import { allparticipateAPI } from "../services/allAPI"
 
 const ParticipateList = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const queryParams = new URLSearchParams(location.search);
   const searchParam = queryParams.get("search") || "";
   const genderParam = queryParams.get("gender") || "";
-  
+  const showAddModal = queryParams.get("addModal") === "true";
+  const editParticipantId = queryParams.get("editId");
+
   const [participants, setParticipants] = useState([
     { id: 1, regNo: 100, adNo: 1000, class: "Class 1", name: "Participant 1", gender: "Girl", eventCode: 100 },
     { id: 2, regNo: 200, adNo: 2000, class: "Class 2", name: "Participant 2", gender: "Boy", eventCode: 200 },
@@ -26,34 +28,45 @@ const ParticipateList = () => {
     { id: 9, regNo: 900, adNo: 9000, class: "Class 9", name: "Participant 9", gender: "Girl", eventCode: 900 },
     { id: 10, regNo: 1000, adNo: 10000, class: "Class 10", name: "Participant 10", gender: "Boy", eventCode: 1000 },
   ]);
-  
+
   const [searchkey, setSearchkey] = useState(searchParam);
   const [genderFilter, setGenderFilter] = useState(genderParam);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(showAddModal);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(!!editParticipantId);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState(null);
-  const [addButtonClicked, setAddButtonClicked] = useState(false);
-  const [allParticipate,setAllParticipate] = useState([])
+  const [allParticipate, setAllParticipate] = useState([])
   console.log(allParticipate);
 
-  useEffect(()=>{
-    getAllParticipate()
-  },[])
-  const getAllParticipate = async()=>{
-    const token = sessionStorage.getItem("token")
-    if(token){
-      const reqHeader = {
-         "Authorization": `Bearer ${token}`
+  useEffect(() => {
+    if (editParticipantId) {
+      const participant = participants.find(p => p.id.toString() === editParticipantId);
+      if (participant) {
+        setSelectedParticipant(participant);
+        setIsEditModalOpen(true);
       }
-      try{
+    } else {
+      setIsEditModalOpen(false);
+    }
+  }, [editParticipantId, participants]);
+
+  useEffect(() => {
+    getAllParticipate()
+  }, [])
+
+  const getAllParticipate = async () => {
+    const token = sessionStorage.getItem("token")
+    if (token) {
+      const reqHeader = {
+        "Authorization": `Bearer ${token}`
+      }
+      try {
         const result = await allparticipateAPI(reqHeader)
-        if(result.status==200){
+        if (result.status == 200) {
           setAllParticipate(result.data)
         }
-      }catch(err){
+      } catch (err) {
         console.log(err);
-        
       }
     }
   }
@@ -62,20 +75,18 @@ const ParticipateList = () => {
     const params = new URLSearchParams();
     if (searchkey) params.append("search", searchkey);
     if (genderFilter) params.append("gender", genderFilter);
-    
+    if (isAddModalOpen) params.append("addModal", "true");
+
     navigate({
       pathname: location.pathname,
       search: params.toString()
     }, { replace: true });
-  }, [searchkey, genderFilter, navigate, location.pathname]);
+  }, [searchkey, genderFilter, isAddModalOpen, navigate, location.pathname]);
 
-  
   useEffect(() => {
-    if (addButtonClicked) {
-      setIsAddModalOpen(true);
-      setAddButtonClicked(false); 
-    }
-  }, [addButtonClicked]);
+    const addModalParam = queryParams.get("addModal");
+    setIsAddModalOpen(addModalParam === "true");
+  }, [queryParams]);
 
   const filteredParticipants = participants.filter(participant => {
     const nameMatch = participant.name.toLowerCase().includes(searchkey.toLowerCase());
@@ -88,8 +99,24 @@ const ParticipateList = () => {
   };
 
   const handleEdit = (participant) => {
-    setSelectedParticipant(participant);
-    setIsEditModalOpen(true);
+    const params = new URLSearchParams(location.search);
+    params.set("editId", participant.id.toString());
+
+    params.delete("addModal");
+    navigate({
+      pathname: location.pathname,
+      search: params.toString()
+    });
+  };
+
+  const handleCloseEditModal = () => {
+
+    const params = new URLSearchParams(location.search);
+    params.delete("editId");
+    navigate({
+      pathname: location.pathname,
+      search: params.toString()
+    });
   };
 
   const handleSearchChange = (e) => {
@@ -101,17 +128,34 @@ const ParticipateList = () => {
   };
 
   const handleAddButtonClick = () => {
-    setAddButtonClicked(true);
+
+    const params = new URLSearchParams(location.search);
+    params.set("addModal", "true");
+    params.delete("editId");
+    navigate({
+      pathname: location.pathname,
+      search: params.toString()
+    });
+  };
+
+  const handleCloseAddModal = () => {
+
+    const params = new URLSearchParams(location.search);
+    params.delete("addModal");
+    navigate({
+      pathname: location.pathname,
+      search: params.toString()
+    });
   };
 
   return (
     <>
       <Header />
       <div className="flex flex-col md:flex-row h-full min-h-screen bg-gray-100 relative">
-        <Dash/>
+        <Dash />
         {isSidebarOpen && (
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-0 md:hidden" 
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-0 md:hidden"
             onClick={toggleSidebar}
           ></div>
         )}
@@ -129,7 +173,7 @@ const ParticipateList = () => {
             </div>
             <div className="flex flex-col sm:flex-row gap-2 mb-4">
               <div className="relative flex items-center w-full sm:w-64 h-10 border border-blue-800 rounded-full px-4">
-                <input 
+                <input
                   type="text"
                   value={searchkey}
                   onChange={handleSearchChange}
@@ -141,7 +185,7 @@ const ParticipateList = () => {
                 </button>
               </div>
               <div className="relative flex items-center w-full sm:w-48 h-10 border border-blue-800 rounded-full px-4 bg-white">
-                <select 
+                <select
                   className="w-full bg-transparent outline-none text-sm appearance-none cursor-pointer"
                   value={genderFilter}
                   onChange={handleGenderChange}
@@ -202,10 +246,12 @@ const ParticipateList = () => {
         </div>
       </div>
 
-      {isAddModalOpen && <Addparticipat onClose={() => setIsAddModalOpen(false)} />}
-      {isEditModalOpen && <Editparticipate participant={selectedParticipant} onClose={() => setIsEditModalOpen(false)} />}
+      {isAddModalOpen && <Addparticipat onClose={handleCloseAddModal} />}
+      {isEditModalOpen && selectedParticipant && (
+        <Editparticipate participant={selectedParticipant} onClose={handleCloseEditModal} />
+      )}
     </>
   );
 };
 
-export default ParticipateList;
+export default ParticipateList

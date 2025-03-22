@@ -47,7 +47,7 @@ const Bgrade = () => {
             <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
                 <Dash />
 
-                <div className="flex-1 p-4 md:p-6">
+                <div className="flex-1 ">
                     <div className="bg-gray-100 p-4 md:p-6 rounded-lg">
                         <h2 className="font-bold text-lg mb-4">Points</h2>
                         <Result1 />
@@ -94,7 +94,7 @@ const Bgrade = () => {
                                         <tr key={participant.id} className="border-b hover:bg-gray-100 text-sm md:text-base">
                                             <td className="p-2 md:p-3 text-center">{index + 1}</td>
                                             <td className="p-2 md:p-3 flex justify-center">
-                                                <i className="fa-solid fa-user"></i>
+                                               <img src="" alt="" />
                                             </td>
                                             <td className="p-2 text-gray-600 md:p-3 text-center">{participant.regNo}</td>
                                             <td className="p-2 text-gray-600 md:p-3 text-center">{participant.adNo}</td>

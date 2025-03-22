@@ -1,22 +1,41 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { resetPasswordAPI } from "../services/allAPI" 
 
 const ResetPassword = () => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
-
+    
     if (!email) {
       setError("Email is required.");
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       setError("Invalid email format.");
     } else {
       setError("");
-      alert('verification code sent ')
-      navigate("/otp-verification");
+      setIsLoading(true);
+      
+      try {
+        const result = await resetPasswordAPI({ email });
+        
+        if (result.status === 200) {
+          
+          sessionStorage.setItem("resetEmail", email);
+          alert('Verification code sent successfully!');
+          navigate("/otp-verification");
+        } else {
+          setError(result.data.message || "Failed to send verification code. Please try again.");
+        }
+      } catch (err) {
+        console.log(err);
+        setError("Something went wrong. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -42,28 +61,29 @@ const ResetPassword = () => {
             <form onSubmit={handleSend}>
               <div className="mt-6">
                 <label htmlFor="email" className="block text-blue-900 font-medium mb-1 ml-4">
-                  <i class="fa-regular fa-user"></i> Enter Email
+                  <i className="fa-regular fa-user"></i> Enter Email
                 </label>
-                <input 
+                <input
                   id="email"
                   type="email"
                   placeholder="Example@gmail.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`w-full px-4 py-3 border border-black rounded-full  shadow-sm focus:outline-none focus:ring-2 ${error ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-dark-500"
-                    }`}
+                  className={`w-full px-4 py-3 border border-black rounded-full shadow-sm focus:outline-none focus:ring-2 ${
+                    error ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-dark-500"
+                  }`}
                 />
                 {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
               </div>
-
+            
               <button
                 type="submit"
+                disabled={isLoading}
                 className="w-full mt-6 py-3 text-white font-semibold bg-gradient-to-r from-[#003566] to-[#05B9F4] rounded-full hover:opacity-90 transition"
               >
-                Send
+                {isLoading ? "Sending..." : "Send"}
               </button>
             </form>
-
           </div>
         </div>
       </div>

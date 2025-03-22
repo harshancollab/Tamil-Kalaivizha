@@ -1,15 +1,28 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { newPasswordAPI } from "../services/allAPI" 
 
 const Newpass = () => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    
+    const email = sessionStorage.getItem("resetEmail");
+    const isOtpVerified = sessionStorage.getItem("otpVerified");
 
+    useEffect(() => {
+       
+        if (!email || isOtpVerified !== "true") {
+            // navigate("/otp-verification");
+            return;
+        }
+    }, [email, isOtpVerified, navigate]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
         if (password.length < 6) {
             setError("Password must be at least 6 characters.");
@@ -21,10 +34,31 @@ const Newpass = () => {
             return;
         }
 
-
         setError("");
-        alert("Password successfully reset! Please Login");
-        navigate("/login");
+        setIsLoading(true);
+        
+        try {
+            const result = await newPasswordAPI({
+                email: email,
+                newPassword: password
+            });
+            
+            if (result.status === 200) {
+              
+                sessionStorage.removeItem("resetEmail");
+                sessionStorage.removeItem("otpVerified");
+                
+                alert("Password successfully reset! Please Login");
+                navigate("/login");
+            } else {
+                setError(result.data.message || "Failed to reset password. Please try again.");
+            }
+        } catch (err) {
+            console.log(err);
+            setError("Something went wrong. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -43,14 +77,15 @@ const Newpass = () => {
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3">
                             <label htmlFor="new-password" className="block text-blue-900 font-medium mb-1 ml-3">
-                                <i class="fa-solid fa-lock"></i> New Password
+                                <i className="fa-solid fa-lock"></i> New Password
                             </label>
                             <input
                                 id="new-password"
                                 type="password"
                                 placeholder="Enter New Password"
-                                className={`w-full p-3 border border-black  rounded-full focus:ring-2 ${error ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-800"
-                                    }`}
+                                className={`w-full p-3 border border-black  rounded-full focus:ring-2 ${
+                                    error ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-800"
+                                }`}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
@@ -59,14 +94,15 @@ const Newpass = () => {
 
                         <div className="mb-3">
                             <label htmlFor="confirm-password" className="block text-blue-900 font-medium mb-1 ml-3">
-                                <i class="fa-solid fa-lock"></i> Confirm Password
+                                <i className="fa-solid fa-lock"></i> Confirm Password
                             </label>
                             <input
                                 id="confirm-password"
                                 type="password"
                                 placeholder="Re-enter Password"
-                                className={`w-full p-3 border border-black rounded-full focus:ring-2 ${error ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-400"
-                                    }`}
+                                className={`w-full p-3 border border-black rounded-full focus:ring-2 ${
+                                    error ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-400"
+                                }`}
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
@@ -77,12 +113,12 @@ const Newpass = () => {
 
                         <button
                             type="submit"
-                            className="w-full bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white py-2 rounded-full hover:bg-blue-600 transition"
+                            disabled={isLoading}
+                            className="w-full bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white py-2 rounded-full hover:bg-blue-600 transition disabled:opacity-70"
                         >
-                            Save Password
+                            {isLoading ? "Resetting..." : "Save Password"}
                         </button>
                     </form>
-
                 </div>
             </div>
         </div>
