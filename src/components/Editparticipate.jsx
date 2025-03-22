@@ -247,7 +247,7 @@ const EditParticipate = ({ onClose, participantData }) => {
       <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 sm:p-6 z-20">
         <div className="relative bg-white p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl min-h-[550px]">
           <button className="absolute top-3 right-3 text-red-600" onClick={onClose}>
-            <i className="fas fa-times text-2xl"></i> <img src="" alt="" />
+            <i className="fas fa-times text-2xl"></i> 
           </button>
           <h3 className="text-xl sm:text-2xl text-blue-900 font-bold mb-6 text-left">
             Update Participant
