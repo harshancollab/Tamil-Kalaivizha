@@ -94,7 +94,7 @@ const Bgrade = () => {
                                         <tr key={participant.id} className="border-b hover:bg-gray-100 text-sm md:text-base">
                                             <td className="p-2 md:p-3 text-center">{index + 1}</td>
                                             <td className="p-2 md:p-3 flex justify-center">
-                                            <i className="fa-solid fa-user"></i>
+                                           <img className="w-10" src="https://static.vecteezy.com/system/resources/previews/042/332/098/non_2x/default-avatar-profile-icon-grey-photo-placeholder-female-no-photo-images-for-unfilled-user-profile-greyscale-illustration-for-socail-media-web-vector.jpg" alt="" />
                                             </td>
                                             <td className="p-2 text-gray-600 md:p-3 text-center">{participant.regNo}</td>
                                             <td className="p-2 text-gray-600 md:p-3 text-center">{participant.adNo}</td>

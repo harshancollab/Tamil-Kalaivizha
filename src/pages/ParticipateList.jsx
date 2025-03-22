@@ -220,7 +220,7 @@ const ParticipateList = () => {
                       <td className="text-black p-2 md:p-3">{index + 1}</td>
                       <td className="p-2 md:p-3 flex justify-center">
                         <div className="w-8 h-8 flex items-center justify-center border rounded-full bg-gray-200">
-                          <i className="fa-solid fa-user text-gray-500"></i>
+                          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9UPSnSMoN3AHPpBU2m4qqXRvX-rIDa-TsFXT68oEdGdlwumKyDnc4Vq2ZE4hAbD0w090&usqp=CAU" alt="" />
                         </div>
                       </td>
                       <td className="p-2 md:p-3">{participant.regNo}</td>
