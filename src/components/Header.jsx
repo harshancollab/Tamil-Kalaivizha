@@ -29,6 +29,7 @@ const Header = ({ insideHome }) => {
     }
   };
   const navigate = useNavigate()
+  
   const logout = () => {
     sessionStorage.clear()
     navigate("/login")
@@ -130,9 +131,9 @@ const Header = ({ insideHome }) => {
                 >
                   <i className="fas fa-user mr-2"></i> Profile
                 </button>
-                <a href="/conformpwd" className="block px-4 py-2 hover:bg-gray-200 flex items-center">
+                <Link href="/conformpwd" className="block px-4 py-2 hover:bg-gray-200 flex items-center">
                   <i className="fas fa-key mr-2"></i> Change Password
-                </a>
+                </Link>
                 <div className="block px-4 py-2 hover:bg-gray-200 flex items-center">
                   <i className="fas fa-bell mr-2"></i> Notifications
                 </div>

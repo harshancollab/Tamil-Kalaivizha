@@ -113,7 +113,7 @@ const SchoolDetails = () => {
         newErrors[`escortingTeacherName_${index}`] = `Escorting Teacher ${index + 1} Name must be more than 3 characters`;
         isValid = false;
       }
-      
+
       if (!teacher.phone) {
         newErrors[`escortingTeacherPhone_${index}`] = `Escorting Teacher ${index + 1} Phone is required`;
         isValid = false;
@@ -127,8 +127,6 @@ const SchoolDetails = () => {
     return isValid;
   };
 
-
-  
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
@@ -140,35 +138,35 @@ const SchoolDetails = () => {
     <>
       <Header />
       <div className="flex flex-col md:flex-row bg-gray-200 min-h-screen">
-        <Dash/>
-        <div className="flex-1 p-4 md:p-8">
-          <form onSubmit={handleSubmit} className="bg-white p-4 md:p-6 rounded-lg shadow-md">
+        <Dash />
+        <div className="flex-1 p-4 md:p-6 lg:p-8">
+          <form onSubmit={handleSubmit} className="bg-white p-4 md:p-5 lg:p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-semibold mb-4">School Details</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[#003566]">
               <div className="flex flex-col md:flex-row items-start md:space-x-4">
                 <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">School Code</label>
-                <div className="flex flex-col flex-1 w-full">
+                <div className="flex flex-col w-full">
                   <input
                     type="text"
                     name="schoolCode"
                     value={schoolDetails.schoolCode}
                     onChange={handleInputChange}
-                    className={`border ${errors.schoolCode ? "border-red-500" : "border-blue-900"} px-2 py-1 border rounded-full w-full`}
+                    className={`border ${errors.schoolCode ? "border-red-500" : "border-blue-900"} px-2 py-1 md:py-2 rounded-full w-full`}
                   />
                   {errors.schoolCode && <p className="text-red-500 text-sm mt-1">{errors.schoolCode}</p>}
                 </div>
               </div>
 
-              <div className="flex flex-col md:flex-row items-start md:space-x-4 md:pl-10">
+              <div className="flex flex-col md:flex-row items-start md:space-x-4 md:pl-4 lg:pl-10">
                 <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">School Name</label>
-                <div className="flex flex-col flex-1 w-full">
+                <div className="flex flex-col w-full">
                   <input
                     type="text"
                     name="schoolName"
                     value={schoolDetails.schoolName}
                     onChange={handleInputChange}
-                    className={`border ${errors.schoolName ? "border-red-500" : "border-blue-900"} px-2 py-1 border rounded-full w-full md:mr-10 lg:mr-1`}
+                    className={`border ${errors.schoolName ? "border-red-500" : "border-blue-900"} px-2 py-1 md:py-2 rounded-full w-full md:w-full`}
                   />
                   {errors.schoolName && <p className="text-red-500 text-sm mt-1">{errors.schoolName}</p>}
                 </div>
@@ -176,27 +174,27 @@ const SchoolDetails = () => {
 
               <div className="flex flex-col md:flex-row items-start md:space-x-4">
                 <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">School Type</label>
-                <div className="flex flex-col flex-1 w-full">
+                <div className="flex flex-col w-full">
                   <input
                     type="text"
                     name="schoolType"
                     value={schoolDetails.schoolType}
                     onChange={handleInputChange}
-                    className={`border ${errors.schoolType ? "border-red-500" : "border-blue-900"} px-2 py-1 border rounded-full w-full`}
+                    className={`border ${errors.schoolType ? "border-red-500" : "border-blue-900"} px-2 py-1 md:py-2 rounded-full w-full`}
                   />
                   {errors.schoolType && <p className="text-red-500 text-sm mt-1">{errors.schoolType}</p>}
                 </div>
               </div>
 
-              <div className="flex flex-col md:flex-row items-start md:space-x-4 md:pl-10">
+              <div className="flex flex-col md:flex-row items-start md:space-x-4 md:pl-4 lg:pl-10">
                 <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Email</label>
-                <div className="flex flex-col flex-1 w-full">
+                <div className="flex flex-col w-full">
                   <input
                     type="email"
                     name="email"
                     value={schoolDetails.email}
                     onChange={handleInputChange}
-                    className={`border ${errors.email ? "border-red-500" : "border-blue-900"} px-2 py-1 border rounded-full w-full md:mr-10 lg:mr-1`}
+                    className={`border ${errors.email ? "border-red-500" : "border-blue-900"} px-2 py-1 md:py-2 rounded-full w-full md:w-full`}
                   />
                   {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                 </div>
@@ -209,18 +207,18 @@ const SchoolDetails = () => {
                   name="standardFrom"
                   value={schoolDetails.standardFrom}
                   onChange={handleInputChange}
-                  className="flex-1 w-full border border-blue-900 px-2 py-1 border rounded-full"
+                  className="w-full md:w-full border border-blue-900 px-2 py-1 md:py-2 rounded-full"
                 />
               </div>
-              <div className="flex flex-col md:flex-row items-start md:space-x-4 md:pl-10">
+              <div className="flex flex-col md:flex-row items-start md:space-x-4 md:pl-4 lg:pl-10">
                 <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Standard To</label>
                 <input
                   type="text"
                   name="standardTo"
                   value={schoolDetails.standardTo}
                   onChange={handleInputChange}
-                  className="flex-1 w-full border border-blue-900 px-2 py-1 border rounded-full md:mr-10 lg:mr-1"
-                  readOnly
+                  className="w-full  md:w-full border border-blue-900 px-2 py-1 md:py-2 rounded-full"
+
                 />
               </div>
             </div>
@@ -232,27 +230,27 @@ const SchoolDetails = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-[#003566]">
               <div className="flex flex-col md:flex-row items-start md:space-x-4">
                 <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Principal</label>
-                <div className="flex flex-col flex-1 w-full">
+                <div className="flex flex-col w-full">
                   <input
                     type="text"
                     name="principalName"
                     value={schoolDetails.principalName}
                     onChange={handleInputChange}
-                    className={`border ${errors.principalName ? "border-red-500" : "border-blue-900"} px-2 py-1 border rounded-full w-full`}
+                    className={`border ${errors.principalName ? "border-red-500" : "border-blue-900"} px-2 py-1 md:py-2 rounded-full w-full`}
                   />
                   {errors.principalName && <p className="text-red-500 text-sm mt-1">{errors.principalName}</p>}
                 </div>
               </div>
 
-              <div className="flex flex-col md:flex-row items-start md:space-x-4 md:pl-10">
+              <div className="flex flex-col md:flex-row items-start md:space-x-4 md:pl-4 lg:pl-10">
                 <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Phone No</label>
-                <div className="flex flex-col flex-1 w-full">
+                <div className="flex flex-col w-full">
                   <input
                     type="text"
                     name="principalPhone"
                     value={schoolDetails.principalPhone}
                     onChange={handleInputChange}
-                    className={`border ${errors.principalPhone ? "border-red-500" : "border-blue-900"} px-2 py-1 border rounded-full w-full md:mr-10 lg:mr-1`}
+                    className={`border ${errors.principalPhone ? "border-red-500" : "border-blue-900"} px-2 py-1 md:py-2 rounded-full w-full md:w-full`}
                   />
                   {errors.principalPhone && <p className="text-red-500 text-sm mt-1">{errors.principalPhone}</p>}
                 </div>
@@ -260,52 +258,52 @@ const SchoolDetails = () => {
 
               <div className="flex flex-col md:flex-row items-start md:space-x-4">
                 <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Headmaster</label>
-                <div className="flex flex-col flex-1 w-full">
+                <div className="flex flex-col w-full">
                   <input
                     type="text"
                     name="headmasterName"
                     value={schoolDetails.headmasterName}
                     onChange={handleInputChange}
-                    className={`border ${errors.headmasterName ? "border-red-500" : "border-blue-900"} px-2 py-1 border rounded-full w-full`}
+                    className={`border ${errors.headmasterName ? "border-red-500" : "border-blue-900"} px-2 py-1 md:py-2 rounded-full w-full`}
                   />
                   {errors.headmasterName && <p className="text-red-500 text-sm mt-1">{errors.headmasterName}</p>}
                 </div>
               </div>
-              <div className="flex flex-col md:flex-row items-start md:space-x-4 md:pl-10">
+              <div className="flex flex-col md:flex-row items-start md:space-x-4 md:pl-4 lg:pl-10">
                 <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Phone No</label>
-                <div className="flex flex-col flex-1 w-full">
+                <div className="flex flex-col w-full">
                   <input
                     type="text"
                     name="headmasterPhone"
                     value={schoolDetails.headmasterPhone}
                     onChange={handleInputChange}
-                    className={`flex-1 border ${errors.headmasterPhone ? "border-red-500" : "border-blue-900"} px-2 py-1 border rounded-full w-full md:mr-10 lg:mr-1`}
+                    className={`border ${errors.headmasterPhone ? "border-red-500" : "border-blue-900"} px-2 py-1 md:py-2 rounded-full w-full md:w-full`}
                   />
                   {errors.headmasterPhone && <p className="text-red-500 text-sm mt-1">{errors.headmasterPhone}</p>}
                 </div>
               </div>
               <div className="flex flex-col md:flex-row items-start md:space-x-4">
                 <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Team Manager</label>
-                <div className="flex flex-col flex-1 w-full">
+                <div className="flex flex-col w-full">
                   <input
                     type="text"
                     name="teamManagerName"
                     value={schoolDetails.teamManagerName}
                     onChange={handleInputChange}
-                    className={`border ${errors.teamManagerName ? "border-red-500" : "border-blue-900"} px-2 py-1 border rounded-full w-full`}
+                    className={`border ${errors.teamManagerName ? "border-red-500" : "border-blue-900"} px-2 py-1 md:py-2 rounded-full w-full`}
                   />
                   {errors.teamManagerName && <p className="text-red-500 text-sm mt-1">{errors.teamManagerName}</p>}
                 </div>
               </div>
-              <div className="flex flex-col md:flex-row items-start md:space-x-4 md:pl-10">
+              <div className="flex flex-col md:flex-row items-start md:space-x-4 md:pl-4 lg:pl-10">
                 <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Phone No</label>
-                <div className="flex flex-col flex-1 w-full">
+                <div className="flex flex-col w-full">
                   <input
                     type="text"
                     name="teamManagerPhone"
                     value={schoolDetails.teamManagerPhone}
                     onChange={handleInputChange}
-                    className={`flex-1 border ${errors.teamManagerPhone ? "border-red-500" : "border-blue-900"} px-2 py-1 border rounded-full w-full md:mr-10 lg:mr-1`}
+                    className={`border ${errors.teamManagerPhone ? "border-red-500" : "border-blue-900"} px-2 py-1 md:py-2 rounded-full w-full md:w-full`}
                   />
                   {errors.teamManagerPhone && <p className="text-red-500 text-sm mt-1">{errors.teamManagerPhone}</p>}
                 </div>
@@ -315,26 +313,26 @@ const SchoolDetails = () => {
                 <React.Fragment key={index}>
                   <div className="flex flex-col md:flex-row items-start md:space-x-4">
                     <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Escorting Teacher</label>
-                    <div className="flex flex-col flex-1 w-full">
+                    <div className="flex flex-col w-full">
                       <input
                         type="text"
                         value={teacher.name}
                         onChange={(e) => handleEscortingTeacherChange(index, "name", e.target.value)}
-                        className={`border ${errors[`escortingTeacherName_${index}`] ? "border-red-500" : "border-blue-900"} px-2 py-1 border rounded-full w-full`}
+                        className={`border ${errors[`escortingTeacherName_${index}`] ? "border-red-500" : "border-blue-900"} px-2 py-1 md:py-2 rounded-full w-full`}
                       />
                       {errors[`escortingTeacherName_${index}`] && (
                         <p className="text-red-500 text-sm mt-1">{errors[`escortingTeacherName_${index}`]}</p>
                       )}
                     </div>
                   </div>
-                  <div className="flex flex-col md:flex-row items-start md:space-x-4 md:pl-10">
+                  <div className="flex flex-col md:flex-row items-start md:space-x-4 md:pl-4 lg:pl-10">
                     <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Phone No</label>
-                    <div className="flex flex-col flex-1 w-full">
+                    <div className="flex flex-col w-full">
                       <input
                         type="text"
                         value={teacher.phone}
                         onChange={(e) => handleEscortingTeacherChange(index, "phone", e.target.value)}
-                        className={`flex-1 border ${errors[`escortingTeacherPhone_${index}`] ? "border-red-500" : "border-blue-900"} px-2 py-1 border rounded-full w-full md:mr-10 lg:mr-1`}
+                        className={`border ${errors[`escortingTeacherPhone_${index}`] ? "border-red-500" : "border-blue-900"} px-2 py-1 md:py-2 rounded-full w-full md:w-full`}
                       />
                       {errors[`escortingTeacherPhone_${index}`] && (
                         <p className="text-red-500 text-sm mt-1">{errors[`escortingTeacherPhone_${index}`]}</p>
@@ -343,8 +341,7 @@ const SchoolDetails = () => {
                   </div>
                 </React.Fragment>
               ))}
-
-              <div className="flex justify-end mr-10">
+              <div className="flex justify-center mr-16 md:col-span-2 md:pr-6 lg:pr-10">
                 <button
                   type="button"
                   className="border border-blue-900 text-[#003566] px-4 py-1 rounded-full"
@@ -365,7 +362,7 @@ const SchoolDetails = () => {
                   name="upperPrimaryStudents"
                   value={schoolDetails.upperPrimaryStudents}
                   onChange={handleInputChange}
-                  className="border-blue-700 border rounded-full w-16 ml-2"
+                  className="border-blue-700 border rounded-full w-16 md:w-20 ml-2 px-2 py-1"
                 />
               </div>
 
@@ -376,7 +373,7 @@ const SchoolDetails = () => {
                   name="hsStudents"
                   value={schoolDetails.hsStudents}
                   onChange={handleInputChange}
-                  className="border-blue-700 border rounded-full w-16 ml-2"
+                  className="border-blue-700 border rounded-full w-16 md:w-20 ml-2 px-2 py-1"
                 />
               </div>
 
@@ -387,7 +384,7 @@ const SchoolDetails = () => {
                   name="hssStudents"
                   value={schoolDetails.hssStudents}
                   onChange={handleInputChange}
-                  className="border-blue-700 border rounded-full w-16 ml-2"
+                  className="border-blue-700 border rounded-full w-16 md:w-20 ml-2 px-2 py-1"
                 />
               </div>
 
@@ -398,13 +395,13 @@ const SchoolDetails = () => {
                   name="vhseStudents"
                   value={schoolDetails.vhseStudents}
                   onChange={handleInputChange}
-                  className="border-blue-700 border rounded-full w-16 ml-2"
+                  className="border-blue-700 border rounded-full w-16 md:w-20 ml-2 px-2 py-1"
                 />
               </div>
             </div>
 
-            <div className="mt-16 flex items-center w-full px-4">
-              <div className="flex-1 text-center">
+            <div className="mt-16 flex flex-col md:flex-row items-center w-full px-4">
+              <div className="flex-1 mb-10 text-center mb-4 md:mb-0 ">
                 <h3 className="text-lg text-blue-900 font-semibold inline-block">
                   Total no of students
                   <input
@@ -412,17 +409,18 @@ const SchoolDetails = () => {
                     name="totalStudents"
                     value={schoolDetails.totalStudents}
                     onChange={handleInputChange}
-                    className="border-blue-700 border rounded-full w-16 ml-2"
+                    className="border-blue-700 border rounded-full w-16 md:w-20 ml-2 px-2 py-1"
                   />
                 </h3>
               </div>
-
-              <button
-                type="submit"
-                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-6 py-2 rounded-full ml-auto"
-              >
-                Save Details
-              </button>
+              <div className="flex justify-center md:col-span-2 mt-6">
+                <button
+                  type="submit"
+                  className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-6 py-2 rounded-full"
+                >
+                  Save Details
+                </button>
+              </div>
             </div>
           </form>
         </div>
@@ -432,5 +430,3 @@ const SchoolDetails = () => {
 };
 
 export default SchoolDetails
-
-
