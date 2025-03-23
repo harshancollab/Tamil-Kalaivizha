@@ -242,12 +242,12 @@ const AddParticipant = ({ onClose }) => {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 sm:p-6 z-20">
-        <div className="relative bg-white p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl min-h-[550px]">
-          <button className="absolute top-3 right-3 text-red-600" onClick={onClose}>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 sm:p-6 z-20 overflow-auto">
+        <div className="relative bg-white p-6 sm:p-8 rounded-lg shadow-lg w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl max-h-[90vh] overflow-y-auto">
+          <button className="absolute top-3 right-3 text-red-600 z-10" onClick={onClose}>
             <i className="fas fa-times text-2xl"></i>
           </button>
-          <h3 className="text-xl sm:text-2xl text-blue-900 font-bold mb-6 text-left">
+          <h3 className="text-xl sm:text-2xl text-blue-900 font-bold mb-6 text-left top-0 bg-white pt-2">
             Add Participant
           </h3>
           <form onSubmit={handleSubmit}>
@@ -414,10 +414,10 @@ const AddParticipant = ({ onClose }) => {
                   <p className="text-sm text-red-500 mt-1">{errors.events}</p>
                 )}
                 {showEventDropdown && (
-                  <div className="absolute z-10 mt-2 w-full bg-white border border-blue-600 rounded-lg shadow-lg p-3">
+                  <div className="absolute z-10 mt-2 w-full bg-white border border-blue-600 rounded-lg shadow-lg p-3 max-h-48 overflow-y-auto">
                     <input
                       type="text"
-                      className="w-full p-2 border rounded"
+                      className="w-full p-2 border rounded sticky top-0 bg-white"
                       placeholder="Search Event..."
                       value={searchEvent}
                       onChange={(e) => setSearchEvent(e.target.value)}
@@ -476,10 +476,10 @@ const AddParticipant = ({ onClose }) => {
                   <p className="text-sm text-red-500 mt-1">{errors.pinnary}</p>
                 )}
                 {showPinnaryDropdown && (
-                  <div className="absolute z-10 mt-2 w-full bg-white border border-blue-600 rounded-lg shadow-lg p-3">
+                  <div className="absolute z-10 mt-2 w-full bg-white border border-blue-600 rounded-lg shadow-lg p-3 max-h-48 overflow-y-auto">
                     <input
                       type="text"
-                      className="w-full p-2 border rounded"
+                      className="w-full p-2 border rounded sticky top-0 bg-white"
                       placeholder="Search Pinnary..."
                       value={searchPinnary}
                       onChange={(e) => setSearchPinnary(e.target.value)}
@@ -499,7 +499,7 @@ const AddParticipant = ({ onClose }) => {
                 )}
               </div>
             </div>
-            <div className="flex justify-center sm:justify-end mt-6">
+            <div className="flex justify-center sm:justify-end mt-6 sticky bottom-0 bg-white py-4">
               <button
                 type="submit"
                 className="w-full sm:w-40 px-6 py-3 bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white rounded-full shadow-lg"

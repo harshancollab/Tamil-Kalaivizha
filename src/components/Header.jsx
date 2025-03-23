@@ -11,8 +11,23 @@ const Header = ({ insideHome }) => {
   const [tempName, setTempName] = useState("Username");
   const nameInputRef = useRef(null);
   const mobileDropdownRef = useRef(null);
+  const fileInputRef = useRef(null);
 
 
+
+  const handleUploadClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+
+      console.log("File selected:", file);
+
+
+    }
+  };
   const navigate = useNavigate()
   const logout = () => {
     sessionStorage.clear()
@@ -196,25 +211,27 @@ const Header = ({ insideHome }) => {
 
                 <div className="flex flex-col sm:flex-row items-center mb-6 gap-4 ml-5 ">
                   <div className="w-16 h-16 bg-gray-200 rounded-full flex justify-center items-center">
-                    <i className="fas fa-user text-gray-500 text-3xl"></i>
+                  
+                  <img className="w-10" src="https://static.vecteezy.com/system/resources/previews/042/332/098/non_2x/default-avatar-profile-icon-grey-photo-placeholder-female-no-photo-images-for-unfilled-user-profile-greyscale-illustration-for-socail-media-web-vector.jpg" alt="" />
                   </div>
                   <button
                     className="px-4 py-2 bg-blue-900 text-white rounded-full shadow-md text-sm focus:outline-none"
+                    onClick={handleUploadClick}
                   >
                     Upload Image
                   </button>
                   <input
-                type="file"
-              
-                className="hidden"
-               
-              
-              />
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                  />
                 </div>
                 <div className="mb-3 ml-6">
                   <div className="mt-10">
                     <label className="block text-sm font-medium text-blue-900 mb-1">Name</label>
-                    <div className="relative mb-5"> 
+                    <div className="relative mb-5">
                       {isEditingName ? (
                         <input
                           type="text"
