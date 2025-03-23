@@ -7,6 +7,8 @@ import { Link, useNavigate } from "react-router-dom"
 import Dash from "../components/Dash"
 import { userSchooldetailsAPI } from "../services/allAPI"
 import SchoolDetails from "./SchoolDetails"
+import MultiStep from "../components/Multistep"
+
 
 const Dashboard = () => {
   const [showSearchBar, setShowSearchBar] = useState(false);
@@ -16,14 +18,24 @@ const Dashboard = () => {
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [isConfirmButtonDisabled, setIsConfirmButtonDisabled] = useState(false);
   const [SchDetails,setSchDetails] = useState ([])
+  const [showMultiStepModal, setShowMultiStepModal] = useState(false);
 
 
   useEffect(()=>{
+    const isFirstLogin = !localStorage.getItem("hasLoggedInBefore");
+    
+    if (isFirstLogin) {
+      
+      setShowMultiStepModal(true);
+
+      localStorage.setItem("hasLoggedInBefore", "true");
+    }
     getSchooldetails()
   },[])
   console.log(SchDetails);
 
-  const getSchooldetails = async()=>{
+  
+  const getSchooldetails = async() => {
     const token = sessionStorage.getItem("token")
     if(token){
       const reqHeader = {
@@ -33,16 +45,28 @@ const Dashboard = () => {
         const result = await userSchooldetailsAPI(reqHeader)
         console.log(result);
         
-        if(result.status==200){
+        if(result.status == 200){
           setSchDetails(result.data)
+          
+        
+          if (result.data.length === 0) {
+            setShowMultiStepModal(true);
+          }
         }
         
       }catch(err){
         console.log(err);
         
+        setShowMultiStepModal(true);
       }
     }
   }
+
+  const closeMultiStepModal = () => {
+    setShowMultiStepModal(false);
+    
+    getSchooldetails();
+  };
 
   const handleEditSchool = () => {
     sessionStorage.setItem("editSchoolData", JSON.stringify(SchoolDetails));
@@ -75,6 +99,7 @@ const Dashboard = () => {
   return (
     <>
       <Header insideHome={true} />
+      
       <div className="flex flex-col  md:flex-row h-full min-h-screen   bg-gray-100 relative">
       <Dash/>
 

@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
-import { addSchooldetailsAPI } from "../services/allAPI";
+import React, { useEffect, useState, useRef } from "react"
+import { addSchooldetailsAPI } from "../services/allAPI"
 
 const MultiStep = ({ onClose }) => {
   const [schoolDetails, setSchoolDetails] = useState({
@@ -235,7 +235,6 @@ const MultiStep = ({ onClose }) => {
     const updatedTeachers = [...escortingTeachers];
     updatedTeachers[index][field] = value;
     
-    // Clear validation error when user starts typing
     if (updatedTeachers[index].errors && updatedTeachers[index].errors[field]) {
       updatedTeachers[index].errors[field] = "";
     }
@@ -247,7 +246,6 @@ const MultiStep = ({ onClose }) => {
     const { name, value } = event.target;
     setSchoolDetails({ ...schoolDetails, [name]: value });
     
-    // Clear validation error when user starts typing
     if (errors[name]) {
       setErrors({ ...errors, [name]: "" });
     }
@@ -275,12 +273,10 @@ const MultiStep = ({ onClose }) => {
     try {
       const reqBody = new FormData();
       
-      // Append all school details to FormData
       Object.entries(schoolDetails).forEach(([key, value]) => {
         reqBody.append(key, value);
       });
       
-      // Append escorting teachers data
       escortingTeachers.forEach((teacher, index) => {
         reqBody.append(`EscortingTeacherName[${index}]`, teacher.name);
         reqBody.append(`EscortingTeacherPhoneNumber[${index}]`, teacher.phone);
@@ -310,7 +306,7 @@ const MultiStep = ({ onClose }) => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-black p-2 sm:p-4">
+    <div className="flex justify-center items-center min-h-screen p-2 sm:p-4">
       <div className="bg-white p-3 sm:p-6 md:p-8 rounded-lg shadow-lg w-full max-w-4xl relative">
         <button
           className="absolute top-2 right-3 text-red-500 text-xl sm:text-2xl font-bold"
@@ -319,7 +315,6 @@ const MultiStep = ({ onClose }) => {
           &times;
         </button>
         
-        {/* Progress Indicators - Improved for mobile */}
         <div className="flex flex-col sm:flex-row items-center justify-between mb-4 sm:mb-6 w-full gap-2">
           {[
             { stepNum: 1, label: "School Details" },
@@ -769,4 +764,4 @@ const MultiStep = ({ onClose }) => {
   );
 };
 
-export default MultiStep;
+export default MultiStep
