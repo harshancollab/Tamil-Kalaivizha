@@ -131,7 +131,7 @@ const Header = ({ insideHome }) => {
                 >
                   <i className="fas fa-user mr-2"></i> Profile
                 </button>
-                <Link href="/conformpwd" className="block px-4 py-2 hover:bg-gray-200 flex items-center">
+                <Link to={'/conformpwd'}  className="block px-4 py-2 hover:bg-gray-200 flex items-center">
                   <i className="fas fa-key mr-2"></i> Change Password
                 </Link>
                 <div className="block px-4 py-2 hover:bg-gray-200 flex items-center">
@@ -173,9 +173,9 @@ const Header = ({ insideHome }) => {
                   >
                     <i className="fas fa-user mr-2"></i> Profile
                   </button>
-                  <a href="/conformpwd" className="block px-4 py-2 hover:bg-gray-200 flex items-center">
+                  <Link to={'/conformpwd'}   className="block px-4 py-2 hover:bg-gray-200 flex items-center">
                     <i className="fas fa-key mr-2"></i> Change Password
-                  </a>
+                  </Link>
                   <button onClick={logout} className="block px-4 py-2 hover:bg-gray-200 flex items-center">
                     <i className="fas fa-sign-out-alt mr-2"></i> Log out
                   </button>

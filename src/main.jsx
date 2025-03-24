@@ -11,3 +11,10 @@ createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </StrictMode>,
 )
+// This should be in your main.jsx or a separate registration file
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js', { 
+    scope: '/', 
+    type: 'module' 
+  });
+}

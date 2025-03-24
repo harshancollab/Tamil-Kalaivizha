@@ -12,7 +12,6 @@ import Result from './pages/Result'
 import MultiStep from './components/Multistep'
 import Resetpwd from './pages/Resetpwd'
 import Otp from './pages/Otp'
-import ChangePassword from './pages/ChangePassword'
 import Report from './pages/Report'
 import Bgrade from './pages/Bgrade'
 import Cgrade from './pages/Cgrade'
@@ -20,6 +19,8 @@ import ParticipateList from './pages/ParticipateList'
 import SchoolDetails from './pages/SchoolDetails'
 import ItemWise from './pages/ItemWise'
 import TopSchool from './pages/TopSchool'
+import ChangePassword from './pages/ChangePassword'
+
 
 function App() {
 
