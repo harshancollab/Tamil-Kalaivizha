@@ -413,7 +413,7 @@ const AddParticipant = ({ onClose }) => {
                     <input
                       type="text"
                       className="w-full p-2 border rounded sticky top-0 bg-white"
-                      placeholder="Search Event Code (e.g., 301)"
+                      placeholder="Search Event "
                       value={searchEvent}
                       onChange={(e) => setSearchEvent(e.target.value)}
                     />
