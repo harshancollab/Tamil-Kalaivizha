@@ -356,7 +356,7 @@ const AddParticipant = ({ onClose }) => {
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
-                  <option value="Other">Other</option>
+                  
                 </select>
                 {touched.gender && errors.gender && (
                   <p className="text-sm text-red-500 mt-1">{errors.gender}</p>
