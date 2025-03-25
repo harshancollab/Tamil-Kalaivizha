@@ -91,8 +91,8 @@ const Header = ({ insideHome }) => {
 
   return (
     <>
-      <div className="relative w-full">
-        <nav className="bg-[#46A2FF] text-white px-4 sm:px-6 py-3 flex items-center justify-between">
+      <div className="relative  w-full">
+        <nav className=" bg-[#46A2FF] text-white px-4   sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center space-x-3 ml-2 sm:ml-10 ml-8">
             <img
               src={logo}
@@ -219,7 +219,7 @@ const Header = ({ insideHome }) => {
                     className="px-4 py-2 bg-blue-900 text-white rounded-full shadow-md text-sm focus:outline-none"
                     onClick={handleUploadClick}
                   >
-                    Upload Image
+                    Upload Logo
                   </button>
                   <input
                     type="file"

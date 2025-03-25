@@ -1,3 +1,6 @@
+
+
+
 import React, { useEffect, useState } from "react"
 import Header from "../components/Header"
 import Dash from "../components/Dash"
@@ -6,14 +9,35 @@ import { allItemWiseAPI } from "../services/allAPI";
 const ItemWise = () => {
     const [showSearchBar, setShowSearchBar] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10; 
+    const itemsPerPage = 10;
     const [itemData, setItemData] = useState([]);
+    const [expandedCaptain, setExpandedCaptain] = useState(null);
 
+    // Expanded team members data with consistent captain names
+    const teamMembersData = {
+        "Captain1": [
+            { id: 101, name: "Member 1", class: "Class 5" },
+            { id: 102, name: "Member 2", class: "Class 5" }
+        ],
+        "Captain2": [
+            { id: 201, name: "Member 3", class: "Class 2" },
+            { id: 202, name: "Member 4", class: "Class 2" }
+        ],
+        "Captain3": [
+            { id: 301, name: "Member 5", class: "Class 1" },
+            { id: 302, name: "Member 6", class: "Class 1" }
+        ],
+        "Captain4": [
+            { id: 401, name: "Member 7", class: "Class 3" },
+            { id: 402, name: "Member 8", class: "Class 3" }
+        ]
+    };
 
+    // ... (previous code remains the same)
     useEffect(() => {
         getAllItemWise();
     }, []);
-    
+
     const getAllItemWise = async () => {
         const token = sessionStorage.getItem("token");
         if (token) {
@@ -37,6 +61,7 @@ const ItemWise = () => {
         itemName: `Item Name ${index + 1}`,
         participants: 2,
         pinnany: 2,
+        captain: `Captain${(index % 11) + 1}` // Cycles through Captain1, Captain2, Captain3, Captain4
     }));
 
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -67,6 +92,20 @@ const ItemWise = () => {
         return pages;
     };
 
+    // Function to check if a captain has team members
+    const hasCaptainTeamMembers = (captainId) => {
+        return teamMembersData[captainId] && teamMembersData[captainId].length > 0;
+    };
+
+    // Function to toggle captain team members
+    const toggleCaptainTeamMembers = (captainId) => {
+        if (expandedCaptain === captainId) {
+            setExpandedCaptain(null);
+        } else {
+            setExpandedCaptain(captainId);
+        }
+    };
+
     return (
         <div>
             <Header />
@@ -74,17 +113,30 @@ const ItemWise = () => {
                 <Dash />
                 <div className="flex-1 p-6">
                     <div className="bg-white p-6 rounded-lg shadow-md">
-                        <h1 className="font-bold text-lg mb-4">Item Wise Participants </h1>
+                        <h1 className="font-bold text-lg mb-4 ml-4">Item Wise Participants </h1>
+                        <div className="relative flex ml-5 items-center w-full sm:w-64 h-10 border border-blue-800 rounded-full px-4">
+                            <input
+                                type="text"
+
+
+                                placeholder="Search Participants Name..."
+                                className="w-full bg-transparent outline-none text-sm"
+                            />
+                            <button className="text-gray-500 hover:text-gray-700">
+                                <i className="fa-solid fa-magnifying-glass"></i>
+                            </button>
+                        </div>
 
                         <div className="overflow-x-auto p-4">
-                            <table className="min-w-full bg-white  ">
+                            <table className="min-w-full bg-white">
                                 <thead>
                                     <tr className="text-sm bg-gray-100">
-                                        <th className="py-2 px-4 ">Sl.no</th>
-                                        <th className="py-2 px-4 ">Item Code</th>
-                                        <th className="py-2 px-4 ">Item Name</th>
-                                        <th className="py-2 px-4 ">Number of Participants</th>
-                                        <th className="py-2 px-4 ">No of Pinnany</th>
+                                        <th className="py-2 px-4">Sl.no</th>
+                                        <th className="py-2 px-4">Item Code</th>
+                                        <th className="py-2 px-4">Item Name</th>
+                                        <th className="py-2 px-4">Number of Participants</th>
+                                        <th className="py-2 px-4">Captain</th>
+                                        <th className="py-2 px-4">No of Pinnany</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -94,6 +146,40 @@ const ItemWise = () => {
                                             <td className="p-3 text-center">{item.itemCode}</td>
                                             <td className="p-3 text-center">{item.itemName}</td>
                                             <td className="p-3 text-center">{item.participants}</td>
+                                            <td className="p-3 text-center relative">
+                                                <div
+                                                    className={`inline-flex items-center justify-center w-full ${hasCaptainTeamMembers(item.captain) ? 'cursor-pointer' : ''}`}
+                                                    onClick={() => hasCaptainTeamMembers(item.captain) && toggleCaptainTeamMembers(item.captain)}
+                                                >
+                                                    <span className="text-center">{item.captain}</span>
+                                                    {/* Only show chevron if team members exist */}
+                                                    {hasCaptainTeamMembers(item.captain) && (
+                                                        <i
+                                                            className={`ml-2 fa-solid ${expandedCaptain === item.captain ? 'fa-chevron-up' : 'fa-chevron-down'} text-gray-400 text-xs`}
+                                                        ></i>
+                                                    )}
+                                                </div>
+                                                {/* Team members dropdown with improved alignment */}
+                                                {hasCaptainTeamMembers(item.captain) && expandedCaptain === item.captain && (
+                                                    <div className="absolute z-10 left-1/2 transform -translate-x-1/2 mt-2 w-40 bg-white rounded-md shadow-lg border border-blue-100">
+                                                        <div className="p-2">
+                                                            <div className="space-y-2">
+                                                                {teamMembersData[item.captain].map(member => (
+                                                                    <div
+                                                                        key={member.id}
+                                                                        className="p-2 rounded-md flex items-center justify-between"
+                                                                    >
+                                                                        <div className="flex-grow">
+                                                                            <p className="font-medium text-sm text-left truncate">{member.name}</p>
+
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </td>
                                             <td className="p-3 text-center">{item.pinnany}</td>
                                         </tr>
                                     ))}
@@ -101,7 +187,7 @@ const ItemWise = () => {
                             </table>
                         </div>
 
-                        {/* Pagination */}
+                        {/* Pagination remains the same */}
                         <div className="flex flex-col sm:flex-row justify-between items-center mt-4">
                             <div className="text-sm text-gray-600 mb-2 sm:mb-0 text-center sm:text-left">
                                 {indexOfFirstItem + 1} of {dummyData.length} rows selected
@@ -142,4 +228,4 @@ const ItemWise = () => {
     );
 };
 
-export default ItemWise
+export default ItemWise;

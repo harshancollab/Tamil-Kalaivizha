@@ -42,8 +42,18 @@ const AddParticipant = ({ onClose }) => {
     pinnary: false,
   });
 
-  const events = ["Event Name1", "Event Name2", "Event Name3", "Event Name4", "Event Name5"];
-  const pinnary = ["Pinnary1", "Pinnary2", "Pinnary3"];
+  const events = ["Event 301", "Event 303", "Event 304", "Event 305", "Event 400"];
+  const pinnary = ["Pinnary 299", "Pinnary 333", "Pinnary 88"];
+
+
+  const filterEventCodes = (searchTerm) => {
+    return events.filter(event => {
+     
+
+      const code = event.split(' ')[1];
+      return code.includes(searchTerm);
+    });
+  };
 
   const handleFileChange = (event) => {
     if (event.target.files.length > 0) {
@@ -125,8 +135,9 @@ const AddParticipant = ({ onClose }) => {
   };
 
   const selectItem = (setState, value, field) => {
+    const code = value.split(' ')[1]; 
     setState((prev) => {
-      const newValue = prev.includes(value) ? prev : [...prev, value];
+      const newValue = prev.includes(code) ? prev : [...prev, code];
       validateField(field, newValue);
       return newValue;
     });
@@ -278,20 +289,20 @@ const AddParticipant = ({ onClose }) => {
             )}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-blue-900 mb-1">Reg No</label>
+                <label className="block text-sm font-medium text-blue-900 mb-1">Ad No</label>
                 <input
                   type="text"
-                  name="regNo"
-                  value={formData.regNo}
+                  name="adNo"
+                  value={formData.adNo}
                   onChange={handleInputChange}
-                  onBlur={() => handleBlur("regNo")}
-                  className={`w-full border px-4 py-2 rounded-full ${touched.regNo && errors.regNo
+                  onBlur={() => handleBlur("adNo")}
+                  className={`w-full border px-4 py-2 rounded-full ${touched.adNo && errors.adNo
                       ? "border-red-500 focus:outline-red-500"
                       : "border-blue-900 focus:outline-blue-900"
                     }`}
                 />
-                {touched.regNo && errors.regNo && (
-                  <p className="text-sm text-red-500 mt-1">{errors.regNo}</p>
+                {touched.adNo && errors.adNo && (
+                  <p className="text-sm text-red-500 mt-1">{errors.adNo}</p>
                 )}
               </div>
 
@@ -312,23 +323,7 @@ const AddParticipant = ({ onClose }) => {
                   <p className="text-sm text-red-500 mt-1">{errors.participantName}</p>
                 )}
               </div>
-              <div>
-                <label className="block text-sm font-medium text-blue-900 mb-1">Ad No</label>
-                <input
-                  type="text"
-                  name="adNo"
-                  value={formData.adNo}
-                  onChange={handleInputChange}
-                  onBlur={() => handleBlur("adNo")}
-                  className={`w-full border px-4 py-2 rounded-full ${touched.adNo && errors.adNo
-                      ? "border-red-500 focus:outline-red-500"
-                      : "border-blue-900 focus:outline-blue-900"
-                    }`}
-                />
-                {touched.adNo && errors.adNo && (
-                  <p className="text-sm text-red-500 mt-1">{errors.adNo}</p>
-                )}
-              </div>
+             
               <div>
                 <label className="block text-sm font-medium text-blue-900 mb-1">Class</label>
                 <input
@@ -418,21 +413,23 @@ const AddParticipant = ({ onClose }) => {
                     <input
                       type="text"
                       className="w-full p-2 border rounded sticky top-0 bg-white"
-                      placeholder="Search Event..."
+                      placeholder="Search Event Code (e.g., 301)"
                       value={searchEvent}
                       onChange={(e) => setSearchEvent(e.target.value)}
                     />
-                    {events
-                      .filter((event) => event.toLowerCase().includes(searchEvent.toLowerCase()))
-                      .map((event) => (
-                        <p
-                          key={event}
-                          className="cursor-pointer p-1 hover:bg-blue-100"
-                          onClick={() => selectItem(setSelectedEvents, event, "events")}
-                        >
-                          {event}
-                        </p>
-                      ))}
+                    {filterEventCodes(searchEvent)
+                      .map((event) => {
+                        const code = event; 
+                        return (
+                          <p
+                            key={event}
+                            className="cursor-pointer p-1 hover:bg-blue-100"
+                            onClick={() => selectItem(setSelectedEvents, event, "events")}
+                          >
+                            {code}
+                          </p>
+                        );
+                      })}
                   </div>
                 )}
               </div>
@@ -492,7 +489,7 @@ const AddParticipant = ({ onClose }) => {
                           className="cursor-pointer p-1 hover:bg-blue-100"
                           onClick={() => selectItem(setSelectedPinnary, item, "pinnary")}
                         >
-                          {item}
+                          {item.split(' ')}
                         </p>
                       ))}
                   </div>

@@ -17,16 +17,16 @@ const ParticipateList = () => {
   const editParticipantId = queryParams.get("editId");
 
   const [participants, setParticipants] = useState([
-    { id: 1, regNo: 100, adNo: 1000, class: "Class 1", name: "Participant 1", gender: "Girl", eventCode: 100 },
-    { id: 2, regNo: 200, adNo: 2000, class: "Class 2", name: "Participant 2", gender: "Boy", eventCode: 200 },
-    { id: 3, regNo: 300, adNo: 3000, class: "Class 3", name: "Participant 3", gender: "Girl", eventCode: 300 },
-    { id: 4, regNo: 400, adNo: 4000, class: "Class 4", name: "Participant 4", gender: "Boy", eventCode: 400 },
-    { id: 5, regNo: 500, adNo: 5000, class: "Class 5", name: "Participant 5", gender: "Girl", eventCode: 500 },
-    { id: 6, regNo: 600, adNo: 6000, class: "Class 6", name: "Participant 6", gender: "Boy", eventCode: 600 },
-    { id: 7, regNo: 700, adNo: 7000, class: "Class 7", name: "Participant 7", gender: "Girl", eventCode: 700 },
-    { id: 8, regNo: 800, adNo: 8000, class: "Class 8", name: "Participant 8", gender: "Boy", eventCode: 800 },
-    { id: 9, regNo: 900, adNo: 9000, class: "Class 9", name: "Participant 9", gender: "Girl", eventCode: 900 },
-    { id: 10, regNo: 1000, adNo: 10000, class: "Class 10", name: "Participant 10", gender: "Boy", eventCode: 1000 },
+    { id: 1, regNo: 100, adNo: 1000, class: "Class 1", name: "Participant 1", gender: "Girl", eventCode: 100, additionalEventCodes: [200, 300], captain: "captain3" },
+    { id: 2, regNo: 200, adNo: 2000, class: "Class 2", name: "Participant 2", gender: "Boy", eventCode: 200, additionalEventCodes: [100, 400], captain: "captain2" },
+    { id: 3, regNo: 300, adNo: 3000, class: "Class 3", name: "Participant 3", gender: "Girl", eventCode: 300, additionalEventCodes: [500, 600], captain: "captain4" },
+    { id: 4, regNo: 400, adNo: 4000, class: "Class 4", name: "Participant 4", gender: "Boy", eventCode: 400, additionalEventCodes: [200, 600], captain: "captain1" },
+    { id: 5, regNo: 500, adNo: 5000, class: "Class 5", name: "Participant 5", gender: "Girl", eventCode: 500, additionalEventCodes: [300, 700], captain: "captain6" },
+    { id: 6, regNo: 600, adNo: 6000, class: "Class 6", name: "Participant 6", gender: "Boy", eventCode: 600, additionalEventCodes: [400, 800], captain: "captain7" },
+    { id: 7, regNo: 700, adNo: 7000, class: "Class 7", name: "Participant 7", gender: "Girl", eventCode: 700, additionalEventCodes: [500, 900], captain: "captain9" },
+    { id: 8, regNo: 800, adNo: 8000, class: "Class 8", name: "Participant 8", gender: "Boy", eventCode: 800, additionalEventCodes: [600, 1000], captain: "captain8" },
+    { id: 9, regNo: 900, adNo: 9000, class: "Class 9", name: "Participant 9", gender: "Girl", eventCode: 900, additionalEventCodes: [700, 100], captain: "captain0" },
+    { id: 10, regNo: 1000, adNo: 10000, class: "Class 10", name: "Participant 10", gender: "Boy", eventCode: 1000, additionalEventCodes: [800, 200], captain: "captain" },
   ]);
 
   const [searchkey, setSearchkey] = useState(searchParam);
@@ -36,6 +36,8 @@ const ParticipateList = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [allParticipate, setAllParticipate] = useState([])
+  const [expandedCaptain, setExpandedCaptain] = useState(null);
+  const [hoveredEventCode, setHoveredEventCode] = useState(null);
   console.log(allParticipate);
 
   useEffect(() => {
@@ -110,7 +112,6 @@ const ParticipateList = () => {
   };
 
   const handleCloseEditModal = () => {
-
     const params = new URLSearchParams(location.search);
     params.delete("editId");
     navigate({
@@ -128,7 +129,6 @@ const ParticipateList = () => {
   };
 
   const handleAddButtonClick = () => {
-
     const params = new URLSearchParams(location.search);
     params.set("addModal", "true");
     params.delete("editId");
@@ -139,7 +139,6 @@ const ParticipateList = () => {
   };
 
   const handleCloseAddModal = () => {
-
     const params = new URLSearchParams(location.search);
     params.delete("addModal");
     navigate({
@@ -184,18 +183,12 @@ const ParticipateList = () => {
                   <i className="fa-solid fa-magnifying-glass"></i>
                 </button>
               </div>
-              <div className="relative flex items-center w-full sm:w-48 h-10 border border-blue-800 rounded-full px-4 bg-white">
-                <select
-                  className="w-full bg-transparent outline-none text-sm appearance-none cursor-pointer"
-                  value={genderFilter}
-                  onChange={handleGenderChange}
-                >
-                  <option value="">Select Gender</option>
-                  <option value="boy">Boy</option>
-                  <option value="girl">Girl</option>
-                </select>
-                <div className="text-gray-500">
-                  <i className="fa-solid fa-chevron-down"></i>
+              <div className="flex ml-5">
+                <div className="relative font-normal text-sm flex items-center w-24 h-10 border border-blue-800 rounded-full px-2 bg-white mr-5">
+                  <p className="ml-2 text-gray-500"> Boys: <span className="">40</span></p>
+                </div>
+                <div className="relative font-normal text-sm flex items-center w-24 h-10 border border-blue-800 rounded-full px-2 bg-white">
+                  <p className="ml-3 text-gray-500"> Girls: <span className="">40</span></p>
                 </div>
               </div>
             </div>
@@ -205,7 +198,6 @@ const ParticipateList = () => {
                   <tr className="text-left border-b text-sm text-gray-800">
                     <th className="p-2 md:p-3">Sl.no</th>
                     <th className="p-2 md:p-3">Picture</th>
-                    <th className="p-2 md:p-3">Reg No</th>
                     <th className="p-2 md:p-3">Ad No</th>
                     <th className="p-2 md:p-3">Class</th>
                     <th className="p-2 md:p-3">Participants Name</th>
@@ -216,19 +208,40 @@ const ParticipateList = () => {
                 </thead>
                 <tbody>
                   {filteredParticipants.map((participant, index) => (
-                    <tr key={participant.id} className="text-gray-600 odd:bg-white even:bg-gray-50 hover:bg-gray-100">
+                    <tr
+                      key={participant.id}
+                      className="text-gray-600 odd:bg-white even:bg-gray-50 hover:bg-gray-100"
+                    >
                       <td className="text-black p-2 md:p-3">{index + 1}</td>
                       <td className="p-2 md:p-3 flex justify-center">
                         <div className="w-8 h-8 flex items-center justify-center border rounded-full bg-gray-200">
-                          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9UPSnSMoN3AHPpBU2m4qqXRvX-rIDa-TsFXT68oEdGdlwumKyDnc4Vq2ZE4hAbD0w090&usqp=CAU" alt="" />
+                          <img
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9UPSnSMoN3AHPpBU2m4qqXRvX-rIDa-TsFXT68oEdGdlwumKyDnc4Vq2ZE4hAbD0w090&usqp=CAU"
+                            alt=""
+                            className="rounded-full w-full h-full object-cover"
+                          />
                         </div>
                       </td>
-                      <td className="p-2 md:p-3">{participant.regNo}</td>
                       <td className="p-2 md:p-3">{participant.adNo}</td>
                       <td className="p-2 md:p-3">{participant.class}</td>
                       <td className="p-2 md:p-3 font-semibold">{participant.name}</td>
                       <td className="p-2 md:p-3">{participant.gender}</td>
-                      <td className="p-2 md:p-3">{participant.eventCode}</td>
+                      <td
+                        className="p-2 md:p-3 relative"
+                        onMouseEnter={() => setHoveredEventCode(participant.id)}
+                        onMouseLeave={() => setHoveredEventCode(null)}
+                      >
+                        {participant.eventCode}...
+                        {hoveredEventCode === participant.id && participant.additionalEventCodes && (
+                          <div className="absolute z-10 bg-blue-100 border border-blue-200 rounded-md shadow-lg p-2 ml-5 top-0 ">
+                            {participant.additionalEventCodes.map((code, idx) => (
+                              <div key={idx} className="text-xs text-gray-700">
+                                {code}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
                       <td className="p-2 md:p-3">
                         <button
                           className="text-blue-500 hover:text-blue-700"
@@ -255,3 +268,6 @@ const ParticipateList = () => {
 };
 
 export default ParticipateList
+
+
+

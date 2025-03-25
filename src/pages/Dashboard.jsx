@@ -17,46 +17,42 @@ const Dashboard = () => {
   const [isReportCreated, setIsReportCreated] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [isConfirmButtonDisabled, setIsConfirmButtonDisabled] = useState(false);
-  const [SchDetails,setSchDetails] = useState ([])
+  const [SchDetails, setSchDetails] = useState([])
   const [showMultiStepModal, setShowMultiStepModal] = useState(false);
 
 
-  useEffect(()=>{
+  useEffect(() => {
     const isFirstLogin = !localStorage.getItem("hasLoggedInBefore");
-    
-    if (isFirstLogin) {
-      
-      setShowMultiStepModal(true);
 
+    if (isFirstLogin) {
+      setShowMultiStepModal(true);
       localStorage.setItem("hasLoggedInBefore", "true");
     }
     getSchooldetails()
-  },[])
+  }, [])
   console.log(SchDetails);
 
-  
-  const getSchooldetails = async() => {
+
+  const getSchooldetails = async () => {
     const token = sessionStorage.getItem("token")
-    if(token){
+    if (token) {
       const reqHeader = {
-         "Authorization": `Bearer ${token}`
+        "Authorization": `Bearer ${token}`
       }
-      try{
+      try {
         const result = await userSchooldetailsAPI(reqHeader)
         console.log(result);
-        
-        if(result.status == 200){
+
+        if (result.status == 200) {
           setSchDetails(result.data)
-          
-        
+
           if (result.data.length === 0) {
             setShowMultiStepModal(true);
           }
         }
-        
-      }catch(err){
+
+      } catch (err) {
         console.log(err);
-        
         setShowMultiStepModal(true);
       }
     }
@@ -64,7 +60,6 @@ const Dashboard = () => {
 
   const closeMultiStepModal = () => {
     setShowMultiStepModal(false);
-    
     getSchooldetails();
   };
 
@@ -81,10 +76,9 @@ const Dashboard = () => {
   const handleConfirm = () => {
     setIsConfirmed(true);
     setIsConfirmButtonDisabled(true);
-   
+
     setTimeout(() => {
       setIsConfirmed(false);
-      
     }, 4000);
   };
 
@@ -99,43 +93,55 @@ const Dashboard = () => {
   return (
     <>
       <Header insideHome={true} />
-      
+
       <div className="flex flex-col  md:flex-row h-full min-h-screen   bg-gray-100 relative">
-      <Dash/>
+        <Dash />
 
         <div className="flex-1 p-6 sm:p-4  md:p-1 mt-2 md:px-3 md:py-2 ">
           {isConfirmed && (
-           <div
-           className="fixed top-4 right-4 z-50 bg-green-50 border-l-4 border-green-500 text-green-700 px-5 py-4 rounded-lg shadow-lg max-w-md
+            <div
+              className="fixed top-4 right-4 z-50 bg-green-50 border-l-4 border-green-500 text-green-700 px-5 py-4 rounded-lg shadow-lg max-w-md
            transform transition-transform duration-500 ease-in-out translate-x-0 hover:scale-105 flex items-center justify-between"
-           role="alert"
-         >
-           <div className="flex items-center">
-             
-             <div>
-               <p className="font-semibold">Entry Confirmed Successfully!</p>
-               <p className="text-sm">The details cannot be modified now.</p>
-             </div>
-           </div>
-         </div>
-         
+              role="alert"
+            >
+              <div className="flex items-center">
+                <div>
+                  <p className="font-semibold">Entry Confirmed Successfully!</p>
+                  <p className="text-sm">The details cannot be modified now.</p>
+                </div>
+              </div>
+            </div>
           )}
 
           <div className="bg-gray-200 shadow-md p-3 sm:p-4 md:p-1 rounded-lg mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-4 relative">
-            <div className="absolute top-3 right-3 md:top-3 md:right-3 z-10">
+
+            <div className="absolute top-3 right-3 md:top-3 md:right-3 z-10 flex items-center ">
+              {/* New div for boys and girls count */}
+              <div className="mr-36 flex space-x-4">
+                <div className="flex items-center ">
+                 
+                  <p className="font-semibold text-gray-600 mr-5 ">Number of  Boys:<span> 40</span></p>
+                </div>
+                <div className="flex items-center">
+                 
+                  <p className="font-semibold text-gray-600">Number of Girls:<span> 45</span></p>
+                </div>
+              </div>
+
               <button
                 onClick={handleEditSchool}
-                className=" px-3 py-2 w-20 border z-1 text-white bg-gradient-to-r from-[#003566] to-[#05B9F4] border-blue-500 rounded-full hover:border-black text-sm font-medium flex items-center"
+                className=" mr-2 px-3 py-2 w-20 border z-1 text-white bg-gradient-to-r from-[#003566] to-[#05B9F4] border-blue-500 rounded-full hover:border-black text-sm font-medium flex items-center"
               >
                 <i className="fa-solid fa-pen mr-1"></i> Edit
               </button>
             </div>
-            
-            <div className="w-full md:w-auto">
+
+            <div className="w-full md:w-auto mt-4">
               <h2 className="text-lg px-5 py-3  font-bold text-gray-800 mb-2 md:mb-6 lg:mb-10">
                 School Details
               </h2>
-            <div className="ml-5">
+            
+              <div className="ml-5">
                 <h3 className="text-base md:text-lg lg:text-xl font-semibold flex items-center flex-wrap">
                   <i className="fa-solid fa-graduation-cap mr-2"></i>
                   G. H. S. S. Vaguvuvarai -{" "}
@@ -145,7 +151,7 @@ const Dashboard = () => {
                 <p className="text-blue-500 mt-2 break-words mb-2">
                   ghsvaguvuvarai@gmail.com
                 </p>
-            </div>
+              </div>
             </div>
 
             <div className="flex flex-col space-y-4 w-full md:w-auto">
@@ -263,11 +269,10 @@ const Dashboard = () => {
                       <button
                         onClick={handleConfirm}
                         disabled={isConfirmButtonDisabled}
-                        className={`w-full xs:w-auto sm:w-28 py-2 sm:py-3 border border-blue-400 rounded-lg ${
-                          isConfirmButtonDisabled 
-                            ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                        className={`w-full xs:w-auto sm:w-28 py-2 sm:py-3 border border-blue-400 rounded-lg ${isConfirmButtonDisabled
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                             : "text-gray-700 hover:bg-gray-200 cursor-pointer"
-                        } transition`}
+                          } transition`}
                       >
                         Confirm
                       </button>
