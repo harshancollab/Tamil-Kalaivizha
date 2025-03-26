@@ -262,7 +262,7 @@ const EditParticipate = ({ onClose, participantData }) => {
                 onClick={handleUploadClick}
                 className="px-4 py-2 ml-24 bg-blue-900 text-white rounded-full shadow-md"
               >
-                Update Image
+                Update Logo
               </button>
               <input
                 type="file"
