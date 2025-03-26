@@ -38,7 +38,6 @@ const ParticipateList = () => {
   const [allParticipate, setAllParticipate] = useState([])
   const [expandedCaptain, setExpandedCaptain] = useState(null);
   const [hoveredEventCode, setHoveredEventCode] = useState(null);
-  console.log(allParticipate);
 
   useEffect(() => {
     if (editParticipantId) {
@@ -193,67 +192,75 @@ const ParticipateList = () => {
               </div>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse rounded-lg shadow-md min-w-[600px]">
-                <thead className="bg-gray-100">
-                  <tr className="text-left border-b text-sm text-gray-800">
-                    <th className="p-2 md:p-3">Sl.no</th>
-                    <th className="p-2 md:p-3">Picture</th>
-                    <th className="p-2 md:p-3">Ad No</th>
-                    <th className="p-2 md:p-3">Class</th>
-                    <th className="p-2 md:p-3">Participants Name</th>
-                    <th className="p-2 md:p-3">Gender</th>
-                    <th className="p-2 md:p-3">Event Code</th>
-                    <th className="p-2 md:p-3">Edit</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredParticipants.map((participant, index) => (
-                    <tr
-                      key={participant.id}
-                      className="text-gray-600 odd:bg-white even:bg-gray-50 hover:bg-gray-100"
-                    >
-                      <td className="text-black p-2 md:p-3">{index + 1}</td>
-                      <td className="p-2 md:p-3 flex justify-center">
-                        <div className="w-8 h-8 flex items-center justify-center border rounded-full bg-gray-200">
-                          <img
-                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9UPSnSMoN3AHPpBU2m4qqXRvX-rIDa-TsFXT68oEdGdlwumKyDnc4Vq2ZE4hAbD0w090&usqp=CAU"
-                            alt=""
-                            className="rounded-full w-full h-full object-cover"
-                          />
-                        </div>
-                      </td>
-                      <td className="p-2 md:p-3">{participant.adNo}</td>
-                      <td className="p-2 md:p-3">{participant.class}</td>
-                      <td className="p-2 md:p-3 font-semibold">{participant.name}</td>
-                      <td className="p-2 md:p-3">{participant.gender}</td>
-                      <td
-                        className="p-2 md:p-3 relative"
-                        onMouseEnter={() => setHoveredEventCode(participant.id)}
-                        onMouseLeave={() => setHoveredEventCode(null)}
-                      >
-                        {participant.eventCode}...
-                        {hoveredEventCode === participant.id && participant.additionalEventCodes && (
-                          <div className="absolute z-10 bg-blue-100 border border-blue-200 rounded-md shadow-lg p-2 ml-5 top-0 ">
-                            {participant.additionalEventCodes.map((code, idx) => (
-                              <div key={idx} className="text-xs text-gray-700">
-                                {code}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </td>
-                      <td className="p-2 md:p-3">
-                        <button
-                          className="text-blue-500 hover:text-blue-700"
-                          onClick={() => handleEdit(participant)}
-                        >
-                          <i className="fa-solid fa-pen-to-square"></i>
-                        </button>
-                      </td>
+              {filteredParticipants.length > 0 ? (
+                <table className="w-full border-collapse rounded-lg shadow-md min-w-[600px]">
+                  <thead className="bg-gray-100">
+                    <tr className="text-left border-b text-sm text-gray-800">
+                      <th className="p-2 md:p-3">Sl.no</th>
+                      <th className="p-2 md:p-3">Picture</th>
+                      <th className="p-2 md:p-3">Ad No</th>
+                      <th className="p-2 md:p-3">Class</th>
+                      <th className="p-2 md:p-3">Participants Name</th>
+                      <th className="p-2 md:p-3">Gender</th>
+                      <th className="p-2 md:p-3">Event Code</th>
+                      <th className="p-2 md:p-3">Edit</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {filteredParticipants.map((participant, index) => (
+                      <tr
+                        key={participant.id}
+                        className="text-gray-600 odd:bg-white even:bg-gray-50 hover:bg-gray-100"
+                      >
+                        <td className="text-black p-2 md:p-3">{index + 1}</td>
+                        <td className="p-2 md:p-3 ">
+                          <div className="w-8 h-8 flex items-center justify-center border rounded-full bg-gray-200">
+                            <img
+                              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9UPSnSMoN3AHPpBU2m4qqXRvX-rIDa-TsFXT68oEdGdlwumKyDnc4Vq2ZE4hAbD0w090&usqp=CAU"
+                              alt=""
+                              className="rounded-full w-full h-full object-cover"
+                            />
+                          </div>
+                        </td>
+                        <td className="p-2 md:p-3">{participant.adNo}</td>
+                        <td className="p-2 md:p-3">{participant.class}</td>
+                        <td className="p-2 md:p-3 font-semibold">{participant.name}</td>
+                        <td className="p-2 md:p-3">{participant.gender}</td>
+                        <td
+                          className="p-2 md:p-3 relative"
+                          onMouseEnter={() => setHoveredEventCode(participant.id)}
+                          onMouseLeave={() => setHoveredEventCode(null)}
+                        >
+                          {participant.eventCode}...
+                          {hoveredEventCode === participant.id && participant.additionalEventCodes && (
+                            <div className="absolute z-10 bg-blue-100 border border-blue-200 rounded-md shadow-lg p-2 ml-5 top-0 ">
+                              {participant.additionalEventCodes.map((code, idx) => (
+                                <div key={idx} className="text-xs text-gray-700">
+                                  {code}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </td>
+                        <td className="p-2 md:p-3">
+                          <button
+                            className="text-blue-500 hover:text-blue-700"
+                            onClick={() => handleEdit(participant)}
+                          >
+                            <i className="fa-solid fa-pen-to-square"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="flex justify-center items-center p-6 bg-white rounded-lg shadow-md">
+                  <p className="text-gray-600 text-lg">
+                    No participants found for "{searchkey}"
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -267,7 +274,4 @@ const ParticipateList = () => {
   );
 };
 
-export default ParticipateList
-
-
-
+export default ParticipateList;

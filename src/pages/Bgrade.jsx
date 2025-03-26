@@ -75,42 +75,49 @@ const Bgrade = () => {
                             </div>
                         </div>
 
-                        <div className="overflow-x-auto p-4">
-                            <table className="min-w-full">
-                                <thead>
-                                    <tr className="text-gray-700 text-sm md:text-base">
-                                        <th className="p-2 md:p-3 ">Sl No</th>
-                                        <th className="p-2 md:p-3 ">Picture</th>
-                                        <th className="p-2 md:p-3 ">Reg No</th>
-                                        <th className="p-2 md:p-3">Ad No</th>
-                                        <th className="p-2 md:p-3 ">Participants Name</th>
-                                        <th className="p-2 md:p-3 ">Event Code</th>
-                                        <th className="p-2 md:p-3 ">Grade</th>
-                                        <th className="p-2 md:p-3 ">Points</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredParticipants.map((participant, index) => (
-                                        <tr key={participant.id} className="border-b hover:bg-gray-100 text-sm md:text-base">
-                                            <td className="p-2 md:p-3 text-center">{index + 1}</td>
-                                            <td className="p-2 md:p-3 flex justify-center">
-                                           <img className="w-10" src="https://static.vecteezy.com/system/resources/previews/042/332/098/non_2x/default-avatar-profile-icon-grey-photo-placeholder-female-no-photo-images-for-unfilled-user-profile-greyscale-illustration-for-socail-media-web-vector.jpg" alt="" />
-                                            </td>
-                                            <td className="p-2 text-gray-600 md:p-3 text-center">{participant.regNo}</td>
-                                            <td className="p-2 text-gray-600 md:p-3 text-center">{participant.adNo}</td>
-                                            <td className="p-2 md:p-3 font-semibold text-gray-800 text-center">
-                                                {participant.name}
-                                            </td>
-                                            <td className="p-2 md:p-3 text-gray-600 text-center">{participant.eventCode}</td>
-                                            <td className="p-2 md:p-3 text-center font-semibold ">{participant.grade}</td>
-                                            <td className="p-2 md:p-3 text-center text-blue-500 font-semibold cursor-pointer">
-                                                {participant.points.toString().padStart(2, '0')}
-                                            </td>
+                        {filteredParticipants.length === 0 ? (
+                            <div className="text-center py-6 text-gray-500">
+                                <p className="text-lg">No participants found for "{searchTerm}"</p>
+                                <p className="text-sm mt-2">Try a different search term</p>
+                            </div>
+                        ) : (
+                            <div className="overflow-x-auto p-4">
+                                <table className="min-w-full">
+                                    <thead>
+                                        <tr className="text-gray-700 text-sm md:text-base">
+                                            <th className="p-2 md:p-3 ">Sl No</th>
+                                            <th className="p-2 md:p-3 ">Picture</th>
+                                            <th className="p-2 md:p-3 ">Reg No</th>
+                                            <th className="p-2 md:p-3">Ad No</th>
+                                            <th className="p-2 md:p-3 ">Participants Name</th>
+                                            <th className="p-2 md:p-3 ">Event Code</th>
+                                            <th className="p-2 md:p-3 ">Grade</th>
+                                            <th className="p-2 md:p-3 ">Points</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                    </thead>
+                                    <tbody>
+                                        {filteredParticipants.map((participant, index) => (
+                                            <tr key={participant.id} className="border-b hover:bg-gray-100 text-sm md:text-base">
+                                                <td className="p-2 md:p-3 text-center">{index + 1}</td>
+                                                <td className="p-2 md:p-3 flex justify-center">
+                                                <img className="w-10" src="https://static.vecteezy.com/system/resources/previews/042/332/098/non_2x/default-avatar-profile-icon-grey-photo-placeholder-female-no-photo-images-for-unfilled-user-profile-greyscale-illustration-for-socail-media-web-vector.jpg" alt="" />
+                                                </td>
+                                                <td className="p-2 text-gray-600 md:p-3 text-center">{participant.regNo}</td>
+                                                <td className="p-2 text-gray-600 md:p-3 text-center">{participant.adNo}</td>
+                                                <td className="p-2 md:p-3 font-semibold text-gray-800 text-center">
+                                                    {participant.name}
+                                                </td>
+                                                <td className="p-2 md:p-3 text-gray-600 text-center">{participant.eventCode}</td>
+                                                <td className="p-2 md:p-3 text-center font-semibold ">{participant.grade}</td>
+                                                <td className="p-2 md:p-3 text-center text-blue-500 font-semibold cursor-pointer">
+                                                    {participant.points.toString().padStart(2, '0')}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

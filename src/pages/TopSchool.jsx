@@ -43,13 +43,11 @@ const TopSchool = () => {
   };
 
   const handleAggregation = () => {
-    
     setSelectedItem("");
     setSelectedType("normal");
     setSearchKey("");
     setSchoolType("");
     setStudentType("");
-
 
     navigate({
       pathname: location.pathname,
@@ -71,7 +69,6 @@ const TopSchool = () => {
       search: params.toString()
     }, { replace: true });
 
-    
     if (studentType !== "Item wise") {
       setSelectedItem("");
       setSelectedType("normal");
@@ -128,7 +125,6 @@ const TopSchool = () => {
     const newStudentType = e.target.value;
     setStudentType(newStudentType);
     
-   
     if (newStudentType !== "Item wise") {
       setSelectedItem("");
       setSelectedType("normal");
@@ -164,7 +160,7 @@ const TopSchool = () => {
               </div>
 
               {studentType === "Item wise" && (
-                <div className="relative w-full sm:w-40 mt-2 sm:mt-0">
+                <div className="relative w-full sm:w-40 mt-2 sm:mt-0 order-first">
                   <select
                     className="border-blue-800 border text-gray-500 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
                     value={selectedItem}
@@ -224,39 +220,45 @@ const TopSchool = () => {
           </div>
 
           <div className="bg-white shadow rounded-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-separate border-spacing-y-2">
-                <thead>
-                  <tr className="text-gray-700 border border-gradient">
-                    <th className="p-2 md:p-3">Rank</th>
-                    <th className="p-2 md:p-3">School Code</th>
-                    <th className="p-2 md:p-3">School Name</th>
-                    <th className="p-2 md:p-3">School Type</th>
-                    <th className="p-2 md:p-3">A Grade</th>
-                    <th className="p-2 md:p-3">B Grade</th>
-                    <th className="p-2 md:p-3">C Grade</th>
-                    <th className="p-2 md:p-3">Total Points</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredData.map((item, index) => (
-                    <tr 
-                      key={`${item.rank}-${index}`} 
-                      className="border border-gradient odd:bg-white even:bg-gray-50 hover:bg-[#C6DEF5]"
-                    >
-                      <td className="p-2 md:p-3">{item.rank}</td>
-                      <td className="p-2 md:p-3">{item.code}</td>
-                      <td className="p-2 md:p-3">{item.name}</td>
-                      <td className="p-2 md:p-3">{item.type}</td>
-                      <td className="p-2 md:p-3">{item.a}</td>
-                      <td className="p-2 md:p-3">{item.b}</td>
-                      <td className="p-2 md:p-3">{item.c}</td>
-                      <td className="p-2 md:p-3 font-bold text-blue-500">{item.total}</td>
+            {filteredData.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-separate border-spacing-y-2">
+                  <thead>
+                    <tr className="text-gray-700 border border-gradient">
+                      <th className="p-2 md:p-3">Rank</th>
+                      <th className="p-2 md:p-3">School Code</th>
+                      <th className="p-2 md:p-3">School Name</th>
+                      <th className="p-2 md:p-3">School Type</th>
+                      <th className="p-2 md:p-3">A Grade</th>
+                      <th className="p-2 md:p-3">B Grade</th>
+                      <th className="p-2 md:p-3">C Grade</th>
+                      <th className="p-2 md:p-3">Total Points</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {filteredData.map((item, index) => (
+                      <tr 
+                        key={`${item.rank}-${index}`} 
+                        className="border border-gradient odd:bg-white even:bg-gray-50 hover:bg-[#C6DEF5]"
+                      >
+                        <td className="p-2 md:p-3">{item.rank}</td>
+                        <td className="p-2 md:p-3">{item.code}</td>
+                        <td className="p-2 md:p-3">{item.name}</td>
+                        <td className="p-2 md:p-3">{item.type}</td>
+                        <td className="p-2 md:p-3">{item.a}</td>
+                        <td className="p-2 md:p-3">{item.b}</td>
+                        <td className="p-2 md:p-3">{item.c}</td>
+                        <td className="p-2 md:p-3 font-bold text-blue-500">{item.total}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="p-4 text-center text-gray-500">
+                No results found for "{searchKey}"
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -264,4 +266,4 @@ const TopSchool = () => {
   );
 };
 
-export default TopSchool;
+export default TopSchool
