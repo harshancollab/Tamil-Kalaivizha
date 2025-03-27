@@ -3,16 +3,16 @@ import Dash from '../components/Dash';
 import Header from '../components/Header';
 
 const EditKalsvmDetails = () => {
-  // State to manage form inputs
+ 
   const [formData, setFormData] = useState({
-    logo: '', // This will store the selected image
+    logo: '',
     kalolsavamYear: '',
     venue: 'SGHSS KATTAPPANA',
     startDate: '',
     endDate: ''
   });
 
-  // Ref for file input
+ 
   const fileInputRef = useRef(null);
 
   // Handler to update form fields
@@ -51,7 +51,7 @@ const EditKalsvmDetails = () => {
     // Here you would typically send the data to a backend API
   };
 
-  // Handler for cancelling the form
+  
   const handleCancel = () => {
     // Reset form to initial state
     setFormData({
