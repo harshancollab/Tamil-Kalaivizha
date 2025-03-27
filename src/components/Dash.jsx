@@ -5,7 +5,9 @@ import { useAuth } from '../contexts/AuthContex';
 const Dash = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSettingsSubMenuOpen, setIsSettingsSubMenuOpen] = useState(false);
-  const [isSettingsClicked, setIsSettingsClicked] = useState(false); // New state
+  const [isStageSettingsSubMenuOpen, setIsStageSettingsSubMenuOpen] = useState(false); // New state for Stage Settings
+  const [isSettingsClicked, setIsSettingsClicked] = useState(false);
+  const [isStageSettingsClicked, setIsStageSettingsClicked] = useState(false); // New state for Stage Settings click
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth(); // Get user from Auth context
@@ -14,7 +16,9 @@ const Dash = () => {
     setIsSidebarOpen(!isSidebarOpen);
     if (isSidebarOpen) {
       setIsSettingsSubMenuOpen(false);
-      setIsSettingsClicked(false); // Reset clicked state when sidebar closes
+      setIsStageSettingsSubMenuOpen(false); // Close Stage Settings on sidebar close
+      setIsSettingsClicked(false);
+      setIsStageSettingsClicked(false); // Reset Stage Settings clicked state
     }
   };
 
@@ -22,12 +26,21 @@ const Dash = () => {
     navigate('/');
     setIsSidebarOpen(false);
     setIsSettingsSubMenuOpen(false);
-    setIsSettingsClicked(false); // Reset clicked state
+    setIsStageSettingsSubMenuOpen(false); // Close Stage Settings on dashboard click
+    setIsSettingsClicked(false);
+    setIsStageSettingsClicked(false); // Reset Stage Settings clicked state
   };
 
   const toggleSettingsSubMenu = () => {
     setIsSettingsSubMenuOpen(!isSettingsSubMenuOpen);
-    setIsSettingsClicked(true); // Set clicked state when settings is clicked
+    setIsStageSettingsSubMenuOpen(false); // Close Stage Settings when main settings toggles
+    setIsSettingsClicked(true);
+    setIsStageSettingsClicked(false); // Reset Stage Settings clicked state
+  };
+
+  const toggleStageSettingsSubMenu = () => {
+    setIsStageSettingsSubMenuOpen(!isStageSettingsSubMenuOpen);
+    setIsStageSettingsClicked(true);
   };
 
   return (
@@ -62,12 +75,12 @@ const Dash = () => {
           </button>
         </div>
 
-        {/* Show Settings button only for "sub dist admin" */}
+
         {user?.role === 'sub district admin' && (
           <div className="mb-4">
             <div
               className={`flex justify-between items-center w-full cursor-pointer ${
-                isSettingsClicked ? 'bg-[#00284d]' : '' // Highlight background
+                isSettingsClicked ? 'bg-[#00284d]' : ''
               } p-2 rounded`}
               onClick={toggleSettingsSubMenu}
             >
@@ -94,7 +107,7 @@ const Dash = () => {
                 <Link
                   to="/edit-kalolsavam/:id"
                   className={`block py-2 text-gray-300 hover:text-white ${
-                    location.pathname === '/KalolsavamDetails' ? 'font-semibold' : ''
+                    location.pathname.startsWith('/edit-kalolsavam') ? 'font-semibold' : ''
                   }`}
                   onClick={() => setIsSidebarOpen(false)}
                 >
@@ -103,7 +116,7 @@ const Dash = () => {
                 <Link
                   to="/schlentry"
                   className={`block py-2 text-gray-300 hover:text-white ${
-                    location.pathname === '/KalolsavamDetails' ? 'font-semibold' : ''
+                    location.pathname === '/schlentry' ? 'font-semibold' : ''
                   }`}
                   onClick={() => setIsSidebarOpen(false)}
                 >
@@ -112,21 +125,58 @@ const Dash = () => {
                 <Link
                   to="/All-schools"
                   className={`block py-2 text-gray-300 hover:text-white ${
-                    location.pathname === '/KalolsavamDetails' ? 'font-semibold' : ''
+                    location.pathname === '/All-schools' ? 'font-semibold' : ''
                   }`}
                   onClick={() => setIsSidebarOpen(false)}
                 >
-                 Cluster School
+                  Cluster School
                 </Link>
                 <Link
                   to="/Spl-entry"
                   className={`block py-2 text-gray-300 hover:text-white ${
-                    location.pathname === '/KalolsavamDetails' ? 'font-semibold' : ''
+                    location.pathname === '/Spl-entry' ? 'font-semibold' : ''
                   }`}
                   onClick={() => setIsSidebarOpen(false)}
                 >
-                 Special Order Entry
+                  Special Order Entry
                 </Link>
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer mt-2 ${
+                    isStageSettingsClicked ? 'bg-[#00284d]' : ''
+                  } p-2 rounded`}
+                  onClick={toggleStageSettingsSubMenu}
+                >
+                  <h3 className="text-base font-semibold text-gray-300 flex items-center">
+                    <i className="fa-solid fa-sliders mr-2"></i> Stage Settings
+                  </h3>
+                  <i
+                    className={`fa-solid fa-chevron-${
+                      isStageSettingsSubMenuOpen ? 'up' : 'down'
+                    } text-sm text-gray-300`}
+                  ></i>
+                </div>
+                {isStageSettingsSubMenuOpen && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/stage-duration"
+                      className={`block py-2 text-gray-400 hover:text-white ${
+                        location.pathname === '/stage-duration' ? 'font-semibold' : ''
+                      }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Stage Duration
+                    </Link>
+                    <Link
+                      to="/stage-duration-list"
+                      className={`block py-2 text-gray-400 hover:text-white ${
+                        location.pathname === '/stage-duration-list' ? 'font-semibold' : ''
+                      }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Stage Duration List
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
           </div>

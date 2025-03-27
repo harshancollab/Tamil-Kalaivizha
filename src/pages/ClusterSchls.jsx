@@ -100,7 +100,7 @@ const ClusterSchls = () => {
             </h2>
             <button 
               onClick={handlePrint}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full"
+              className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full"
             >
               Print
             </button>

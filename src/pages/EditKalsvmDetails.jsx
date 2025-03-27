@@ -68,13 +68,9 @@ const EditKalsvmDetails = () => {
       <div className="bg-white min-h-screen">
         <Header />
         <div className="flex">
-          {/* Sidebar */}
           <Dash />
-          {/* Main Content */}
           <div className="flex-1 ml-6 p-8">
             <h2 className="text-xl font-bold mb-6">Kalolsavam Details</h2>
-
-            {/* Hidden file input */}
             <input 
               type="file" 
               ref={fileInputRef}
@@ -101,7 +97,7 @@ const EditKalsvmDetails = () => {
                   <button
                     type="button"
                     onClick={handleLogoUpload}
-                    className="bg-blue-500 mr-[22rem] hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full focus:outline-none focus:shadow-outline text-sm"
+                    className="bg-blue-900 mr-[22rem] hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full focus:outline-none focus:shadow-outline text-sm"
                   >
                     Upload Logo
                   </button>
@@ -171,14 +167,14 @@ const EditKalsvmDetails = () => {
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="bg-white hover:bg-gray-100 border border-blue-600 text-gray-700 font-bold py-3 px-14 rounded-full focus:outline-none focus:shadow-outline"
+                  className="bg-white  border border-blue-500 text-blue-500 font-bold py-3 px-14 rounded-full focus:outline-none focus:shadow-outline"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleUpdate}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-14 rounded-full focus:outline-none focus:shadow-outline"
+                  className="bg-gradient-to-r from-[#003566] to-[#05B9F4]  text-white font-bold py-3 px-14 rounded-full focus:outline-none focus:shadow-outline"
                 >
                   Update
                 </button>
