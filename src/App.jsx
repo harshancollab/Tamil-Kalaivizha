@@ -20,6 +20,8 @@ import SchoolDetails from './pages/SchoolDetails'
 import ItemWise from './pages/ItemWise'
 import TopSchool from './pages/TopSchool'
 import ChangePassword from './pages/ChangePassword'
+import AllKalolsavam from './pages/AllKalolsavam'
+import EditKalsvmDetails from './pages/EditKalsvmDetails'
 
 
 function App() {
@@ -47,6 +49,9 @@ function App() {
         <Route path="/Schooldetails" element={<SchoolDetails/>} />
         <Route path="/item" element={<ItemWise/>} />
         <Route path="/top" element={<TopSchool/>} />
+        {/*  */}
+        <Route path="/AllKalolsavam" element={<AllKalolsavam/>} />
+        <Route path="/EditKalolsavam" element={<EditKalsvmDetails/>} />
 
 
 

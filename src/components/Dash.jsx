@@ -44,6 +44,23 @@ const Dash = () => {
           >
             <i className="fa-solid fa-xmark"></i>
           </button>
+          
+        </div>
+        <div className="flex justify-between items-center w-full mb-6">
+        <h2
+            className="text-lg font-semibold flex items-center cursor-pointer"
+            onClick={handleDashboardClick} 
+          >
+            <i className="fa-solid fa-table mr-2"></i> Settings
+          </h2>
+          <button
+            className="md:hidden text-white"
+            onClick={toggleSidebar}
+            aria-label="Close sidebar"
+          >
+            <i className="fa-solid fa-xmark"></i>
+          </button>
+          
         </div>
         
       

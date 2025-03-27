@@ -42,8 +42,22 @@ const EditParticipate = ({ onClose, participantData }) => {
     pinnary: false,
   });
 
-  const events = ["Event Name1", "Event Name2", "Event Name3", "Event Name4", "Event Name5"];
-  const pinnary = ["Pinnary1", "Pinnary2", "Pinnary3"];
+  const events = ["Event 301", "Event 303", "Event 304", "Event 305", "Event 400"];
+  const pinnary = ["Pinnary 299", "Pinnary 333", "Pinnary 88", "Pinnary 85", "Pinnary 80"];
+
+  const filterEventCodes = (searchTerm) => {
+    return events.filter(event => {
+      const code = event.split(' ')[1];
+      return code.includes(searchTerm);
+    });
+  };
+
+  const filterPinnaryCodes = (searchTerm) => {
+    return pinnary.filter(pin => {
+      const code = pin.split(' ')[1];
+      return code.includes(searchTerm);
+    });
+  };
 
   const handleFileChange = (event) => {
     if (event.target.files.length > 0) {
@@ -125,8 +139,9 @@ const EditParticipate = ({ onClose, participantData }) => {
   };
 
   const selectItem = (setState, value, field) => {
+    const code = value.split(' ')[1]; 
     setState((prev) => {
-      const newValue = prev.includes(value) ? prev : [...prev, value];
+      const newValue = prev.includes(code) ? prev : [...prev, code];
       validateField(field, newValue);
       return newValue;
     });
@@ -163,7 +178,6 @@ const EditParticipate = ({ onClose, participantData }) => {
 
     return Object.values(fieldValidations).every(Boolean);
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -361,9 +375,8 @@ const EditParticipate = ({ onClose, participantData }) => {
                     }`}
                 >
                   <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
+                  <option value="Boy">Boy</option>
+                  <option value="Girl">Girl</option>
                 </select>
                 {touched.gender && errors.gender && (
                   <p className="text-sm text-red-500 mt-1">{errors.gender}</p>
@@ -420,21 +433,23 @@ const EditParticipate = ({ onClose, participantData }) => {
                     <input
                       type="text"
                       className="w-full p-2 border rounded sticky top-0 bg-white"
-                      placeholder="Search Event..."
+                      placeholder="Search Event "
                       value={searchEvent}
                       onChange={(e) => setSearchEvent(e.target.value)}
                     />
-                    {events
-                      .filter((event) => event.toLowerCase().includes(searchEvent.toLowerCase()))
-                      .map((event) => (
-                        <p
-                          key={event}
-                          className="cursor-pointer p-1 hover:bg-blue-100"
-                          onClick={() => selectItem(setSelectedEvents, event, "events")}
-                        >
-                          {event}
-                        </p>
-                      ))}
+                    {filterEventCodes(searchEvent)
+                      .map((event) => {
+                        const code = event; 
+                        return (
+                          <p
+                            key={event}
+                            className="cursor-pointer p-1 hover:bg-blue-100"
+                            onClick={() => selectItem(setSelectedEvents, event, "events")}
+                          >
+                            {code}
+                          </p>
+                        );
+                      })}
                   </div>
                 )}
               </div>
@@ -442,7 +457,7 @@ const EditParticipate = ({ onClose, participantData }) => {
               <div className="relative" ref={pinnaryDropdownRef}>
                 <label className="block text-sm font-medium text-blue-900 mb-1">Pinnary code</label>
                 <div
-                  className={`w-full border px-4 py-2 rounded-full cursor-pointer flex flex-wrap items-center gap-2 ${touched.pinnary && errors.pinnary
+                  className={`w-full h-10 px-4 py-2 border rounded-full cursor-pointer flex items-center gap-2 overflow-hidden ${touched.pinnary && errors.pinnary
                     ? "border-red-500"
                     : "border-blue-900"
                     }`}
@@ -455,23 +470,30 @@ const EditParticipate = ({ onClose, participantData }) => {
                   }}
                 >
                   {selectedPinnary.length === 0 ? (
-                    <span className="text-gray-400">Select Pinnary</span>
+                    <span className="text-gray-400 whitespace-nowrap">Select Pinnary</span>
                   ) : (
-                    selectedPinnary.map((item, index) => (
-                      <span key={index} className="bg-blue-500 text-white px-2 py-1 rounded-full flex items-center">
-                        {item}
-                        <button
-                          type="button"
-                          className="ml-2 text-white font-bold"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeItem(setSelectedPinnary, item, "pinnary");
-                          }}
-                        >
-                          <i className="fa-solid fa-xmark"></i>
-                        </button>
-                      </span>
-                    ))
+                    <div className="flex items-center gap-2 w-full overflow-hidden">
+                      <div className="flex gap-1 overflow-auto max-w-[80%]">
+                        {selectedPinnary.map((pin, index) => (
+                          <span
+                            key={index}
+                            className="bg-blue-500 text-white px-2 py-1 rounded-full flex items-center text-sm"
+                          >
+                            {pin}
+                            <button
+                              type="button"
+                              className="ml-2 text-white font-bold"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeItem(setSelectedPinnary, pin, "pinnary");
+                              }}
+                            >
+                              <i className="fa-solid fa-xmark"></i>
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
                 {touched.pinnary && errors.pinnary && (
@@ -482,26 +504,28 @@ const EditParticipate = ({ onClose, participantData }) => {
                     <input
                       type="text"
                       className="w-full p-2 border rounded sticky top-0 bg-white"
-                      placeholder="Search Pinnary..."
+                      placeholder="Search Pinnary"
                       value={searchPinnary}
                       onChange={(e) => setSearchPinnary(e.target.value)}
                     />
-                    {pinnary
-                      .filter((item) => item.toLowerCase().includes(searchPinnary.toLowerCase()))
-                      .map((item) => (
-                        <p
-                          key={item}
-                          className="cursor-pointer p-1 hover:bg-blue-100"
-                          onClick={() => selectItem(setSelectedPinnary, item, "pinnary")}
-                        >
-                          {item}
-                        </p>
-                      ))}
+                    {filterPinnaryCodes(searchPinnary)
+                      .map((pin) => {
+                        const code = pin; 
+                        return (
+                          <p
+                            key={pin}
+                            className="cursor-pointer p-1 hover:bg-blue-100"
+                            onClick={() => selectItem(setSelectedPinnary, pin, "pinnary")}
+                          >
+                            {code}
+                          </p>
+                        );
+                      })}
                   </div>
                 )}
               </div>
             </div>
-            <div className="flex justify-center sm:justify-end mt-6 pb-4">
+            <div className="flex justify-center sm:justify-end mt-6 sticky bottom-0 bg-white py-4">
               <button
                 type="submit"
                 className="w-full sm:w-40 px-6 py-3 bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white rounded-full shadow-lg"
