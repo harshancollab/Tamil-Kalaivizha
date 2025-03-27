@@ -23,8 +23,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import MultiStep from './components/Multistep';
 import SchlEntry from './pages/SchlEntry';
 import ClusterSchls from './pages/ClusterSchls';
-
+import StageDuration from './pages/StageDuration';
 import SplEntry from './pages/SplEntry';
+import StageDurationList from './pages/StageDurationList';
 
 function App() {
   return (
@@ -65,8 +66,8 @@ function App() {
           <Route path="/schlentry" element={<SchlEntry />} />
           <Route path="/All-schools" element={<ClusterSchls />} />
           <Route path="/Spl-entry" element={<SplEntry />} />
-
-
+          <Route path="/stage-duration" element={<StageDuration />} />
+          <Route path="/stage-duration-list" element={<StageDurationList />} />
 
         </Route>
 

@@ -67,9 +67,9 @@ const EditKalsvmDetails = () => {
     <>
       <div className="bg-white min-h-screen">
         <Header />
-        <div className="flex">
+        <div className="flex flex-col md:flex-row">
           <Dash />
-          <div className="flex-1 ml-6 p-8">
+          <div className="flex-1 md:ml-6 p-4 md:p-8">
             <h2 className="text-xl font-bold mb-6">Kalolsavam Details</h2>
             <input 
               type="file" 
@@ -79,11 +79,11 @@ const EditKalsvmDetails = () => {
               onChange={handleFileSelect}
             />
 
-            <div className="ml-16 mt-10">
-              <div className="flex items-center mb-4">
-                <h4 className="w-40 font-semibold">Kalolsavam Logo</h4>
-                <div className="ml-4 flex items-center justify-between w-full">
-                  <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mt-1 ml-20">
+            <div className="md:ml-16 mt-10">
+              <div className="flex flex-col md:flex-row items-start md:items-center mb-4">
+                <h4 className="w-full md:w-40 font-semibold mb-2 md:mb-0">Kalolsavam Logo</h4>
+                <div className="flex flex-col md:flex-row items-center justify-between w-full">
+                  <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mt-1 md:ml-20 mb-2 md:mb-0">
                     {formData.logo ? (
                       <img 
                         src={formData.logo} 
@@ -97,84 +97,84 @@ const EditKalsvmDetails = () => {
                   <button
                     type="button"
                     onClick={handleLogoUpload}
-                    className="bg-blue-900 mr-[22rem] hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full focus:outline-none focus:shadow-outline text-sm"
+                    className="bg-blue-900 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full focus:outline-none focus:shadow-outline text-sm"
                   >
                     Upload Logo
                   </button>
                 </div>
               </div>
               
-              <div className="flex items-center mb-6 mt-6">
-                <h4 className="w-40 font-semibold">Kalolsavam Name</h4>
+              <div className="flex flex-col md:flex-row items-start md:items-center mb-6 mt-6">
+                <h4 className="w-full md:w-40 font-semibold mb-2 md:mb-0">Kalolsavam Name</h4>
                 <input
                   readOnly
                   type="text"
                   name="kalolsavamName"
-                  className="ml-20 border border-blue-600 px-6 py-1 rounded-full w-full md:w-[30rem] bg-gray-100"
+                  className="w-full border border-blue-600 px-6 py-1 rounded-full bg-gray-100 md:w-[30rem]"
                   value="Idukki District Kalolsavam"
                 />
               </div>
 
-              <div className="flex items-center mb-6">
-                <h4 className="w-40 font-semibold">Kalolsavam year</h4>
+              <div className="flex flex-col md:flex-row items-start md:items-center mb-6">
+                <h4 className="w-full md:w-40 font-semibold mb-2 md:mb-0">Kalolsavam year</h4>
                 <input
                   type="text"
                   name="kalolsavamYear"
-                  className="ml-20 border border-blue-600 rounded-full px-6 py-1 w-full md:w-[30rem]"
+                  className="w-full border border-blue-600 rounded-full px-6 py-1 md:w-[30rem]"
                   value={formData.kalolsavamYear}
                   onChange={handleInputChange}
                 />
               </div>
               
-              <div className="flex items-center mb-6">
-                <h4 className="w-40 font-semibold">Venue</h4>
+              <div className="flex flex-col md:flex-row items-start md:items-center mb-6">
+                <h4 className="w-full md:w-40 font-semibold mb-2 md:mb-0">Venue</h4>
                 <input
                   type="text"
                   name="venue"
-                  className="ml-20 border border-blue-600 rounded-full px-6 py-1  w-full md:w-[30rem]"
+                  className="w-full border border-blue-600 rounded-full px-6 py-1 md:w-[30rem]"
                   value={formData.venue}
                   onChange={handleInputChange}
                 />
               </div>
               
-              <div className="flex items-center mb-6">
-                <h4 className="w-40 font-semibold">Start Date</h4>
-                <div className="ml-20 relative">
+              <div className="flex flex-col md:flex-row items-start md:items-center mb-6">
+                <h4 className="w-full md:w-40 font-semibold mb-2 md:mb-0">Start Date</h4>
+                <div className="w-full md:ml-20 relative">
                   <input
                     type="date"
                     name="startDate"
-                    className="border border-blue-600 rounded-full px-6 py-1 w-full md:w-[30rem] pr-10"
+                    className="w-full border border-blue-600 rounded-full px-6 py-1 md:w-[30rem] pr-10"
                     value={formData.startDate}
                     onChange={handleInputChange}
                   />
                 </div>
               </div>
               
-              <div className="flex items-center mb-6">
-                <h4 className="w-40 font-semibold">End Date</h4>
-                <div className="ml-20 relative">
+              <div className="flex flex-col md:flex-row items-start md:items-center mb-6">
+                <h4 className="w-full md:w-40 font-semibold mb-2 md:mb-0">End Date</h4>
+                <div className="w-full md:ml-20 relative">
                   <input
                     type="date"
                     name="endDate"
-                    className="border border-blue-600 rounded-full px-6 py-1 w-full md:w-[30rem] pr-10"
+                    className="w-full border border-blue-600 rounded-full px-6 py-1 md:w-[30rem] pr-10"
                     value={formData.endDate}
                     onChange={handleInputChange}
                   />
                 </div>
               </div>
               
-              <div className="flex justify-center mr-12 mt-32 space-x-4">
+              <div className="flex flex-col md:flex-row justify-center mr-0 md:mr-12 mt-32 space-y-4 md:space-y-0 md:space-x-4">
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="bg-white  border border-blue-500 text-blue-500 font-bold py-3 px-14 rounded-full focus:outline-none focus:shadow-outline"
+                  className="bg-white border border-blue-500 text-blue-500 font-bold py-3 px-14 rounded-full focus:outline-none focus:shadow-outline"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleUpdate}
-                  className="bg-gradient-to-r from-[#003566] to-[#05B9F4]  text-white font-bold py-3 px-14 rounded-full focus:outline-none focus:shadow-outline"
+                  className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-3 px-14 rounded-full focus:outline-none focus:shadow-outline"
                 >
                   Update
                 </button>
