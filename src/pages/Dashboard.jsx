@@ -97,14 +97,14 @@ const Dashboard = () => {
     <>
       <Header insideHome={true} />
 
-      <div className="flex flex-col  md:flex-row h-full min-h-screen bg-gray-100 relative">
+      <div className="flex flex-col md:flex-row h-full min-h-screen bg-gray-100 relative">
         <Dash />
 
-        <div className="flex-1 p-6 sm:p-4  md:p-1 mt-2 md:px-3 md:py-2 ">
+        <div className="flex-1 p-6 sm:p-4  md:p-1 mt-2 md:px-1 md:py-1 ">
           {isConfirmed && (
             <div
               className="fixed top-4 right-4 z-50 bg-green-50 border-l-4 border-green-500 text-green-700 px-5 py-4 rounded-lg shadow-lg max-w-md
-   transform transition-transform duration-500 ease-in-out translate-x-0 hover:scale-105 flex items-center justify-between"
+              transform transition-transform duration-500 ease-in-out translate-x-0 hover:scale-105 flex items-center justify-between"
               role="alert"
             >
               <div className="flex items-center">
@@ -272,8 +272,8 @@ const Dashboard = () => {
                         onClick={handleConfirm}
                         disabled={isConfirmButtonDisabled}
                         className={`w-full xs:w-auto sm:w-28 py-2 sm:py-3 border border-blue-400 rounded-lg ${isConfirmButtonDisabled
-                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            : "text-gray-700 hover:bg-gray-200 cursor-pointer"
+                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          : "text-gray-700 hover:bg-gray-200 cursor-pointer"
                           } transition`}
                       >
                         Confirm
