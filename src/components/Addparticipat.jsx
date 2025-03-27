@@ -17,7 +17,7 @@ const AddParticipant = ({ onClose }) => {
     regNo: "",
     participantName: "",
     adNo: "",
-    classField: "", 
+    classField: "",
     gender: "",
   });
 
@@ -43,7 +43,7 @@ const AddParticipant = ({ onClose }) => {
   });
 
   const events = ["Event 301", "Event 303", "Event 304", "Event 305", "Event 400"];
-  const pinnary = ["Pinnary 299", "Pinnary 333", "Pinnary 88" ,"Pinnary 85", "Pinnary 80"];
+  const pinnary = ["Pinnary 299", "Pinnary 333", "Pinnary 88", "Pinnary 85", "Pinnary 80"];
 
 
 
@@ -58,7 +58,7 @@ const AddParticipant = ({ onClose }) => {
 
   const filterEventCodes = (searchTerm) => {
     return events.filter(event => {
-     
+
 
       const code = event.split(' ')[1];
       return code.includes(searchTerm);
@@ -68,7 +68,7 @@ const AddParticipant = ({ onClose }) => {
   const handleFileChange = (event) => {
     if (event.target.files.length > 0) {
       const file = event.target.files[0];
-      setSelectedFile(file); 
+      setSelectedFile(file);
       validateField("image", file);
     }
   };
@@ -79,7 +79,7 @@ const AddParticipant = ({ onClose }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log(`Input changed: ${name} = ${value}`); 
+    console.log(`Input changed: ${name} = ${value}`);
     setFormData(prevState => ({
       ...prevState,
       [name]: value,
@@ -110,7 +110,7 @@ const AddParticipant = ({ onClose }) => {
       case "adNo":
         if (!value) errorMessage = "Admission number is required";
         break;
-      case "classField": 
+      case "classField":
         if (!value) errorMessage = "Class is required";
         break;
       case "gender":
@@ -118,9 +118,6 @@ const AddParticipant = ({ onClose }) => {
         break;
       case "events":
         if (!value || value.length === 0) errorMessage = "At least one event must be selected";
-        break;
-      case "pinnary":
-        if (!value || value.length === 0) errorMessage = "At least one pinnary code must be selected";
         break;
       case "image":
         if (value) {
@@ -145,7 +142,7 @@ const AddParticipant = ({ onClose }) => {
   };
 
   const selectItem = (setState, value, field) => {
-    const code = value.split(' ')[1]; 
+    const code = value.split(' ')[1];
     setState((prev) => {
       const newValue = prev.includes(code) ? prev : [...prev, code];
       validateField(field, newValue);
@@ -195,7 +192,7 @@ const AddParticipant = ({ onClose }) => {
         pinnary: selectedPinnary,
         image: selectedFile,
       });
-      
+
       const reqBody = new FormData();
       reqBody.append("regNo", formData.regNo);
       reqBody.append("participantName", formData.participantName);
@@ -203,19 +200,19 @@ const AddParticipant = ({ onClose }) => {
       reqBody.append("classField", formData.classField);
       reqBody.append("gender", formData.gender);
       reqBody.append("events", JSON.stringify(selectedEvents));
-      reqBody.append("pinnary", JSON.stringify(selectedPinnary)); 
-      
+      reqBody.append("pinnary", JSON.stringify(selectedPinnary));
+
       if (selectedFile) {
         reqBody.append("image", selectedFile);
       }
-      
+
       const token = sessionStorage.getItem("token");
       if (token) {
         const reqHeader = {
           "Content-Type": "multipart/form-data",
           "Authorization": `Bearer ${token}`
         };
-        
+
         try {
           const result = await addparticipateAPI(reqBody, reqHeader);
           if (result.status === 200) {
@@ -281,7 +278,7 @@ const AddParticipant = ({ onClose }) => {
                 onClick={handleUploadClick}
                 className="px-4 py-2 ml-24 bg-blue-900 text-white rounded-full shadow-md"
               >
-                Upload Logo
+                Upload Photo
               </button>
               <input
                 type="file"
@@ -307,8 +304,8 @@ const AddParticipant = ({ onClose }) => {
                   onChange={handleInputChange}
                   onBlur={() => handleBlur("adNo")}
                   className={`w-full border px-4 py-2 rounded-full ${touched.adNo && errors.adNo
-                      ? "border-red-500 focus:outline-red-500"
-                      : "border-blue-900 focus:outline-blue-900"
+                    ? "border-red-500 focus:outline-red-500"
+                    : "border-blue-900 focus:outline-blue-900"
                     }`}
                 />
                 {touched.adNo && errors.adNo && (
@@ -325,26 +322,26 @@ const AddParticipant = ({ onClose }) => {
                   onChange={handleInputChange}
                   onBlur={() => handleBlur("participantName")}
                   className={`w-full border px-4 py-2 rounded-full ${touched.participantName && errors.participantName
-                      ? "border-red-500 focus:outline-red-500"
-                      : "border-blue-900 focus:outline-blue-900"
+                    ? "border-red-500 focus:outline-red-500"
+                    : "border-blue-900 focus:outline-blue-900"
                     }`}
                 />
                 {touched.participantName && errors.participantName && (
                   <p className="text-sm text-red-500 mt-1">{errors.participantName}</p>
                 )}
               </div>
-             
+
               <div>
                 <label className="block text-sm font-medium text-blue-900 mb-1">Class</label>
                 <input
                   type="text"
-                  name="classField" 
+                  name="classField"
                   value={formData.classField}
                   onChange={handleInputChange}
                   onBlur={() => handleBlur("classField")}
                   className={`w-full border px-4 py-2 rounded-full ${touched.classField && errors.classField
-                      ? "border-red-500 focus:outline-red-500"
-                      : "border-blue-900 focus:outline-blue-900"
+                    ? "border-red-500 focus:outline-red-500"
+                    : "border-blue-900 focus:outline-blue-900"
                     }`}
                 />
                 {touched.classField && errors.classField && (
@@ -359,14 +356,14 @@ const AddParticipant = ({ onClose }) => {
                   onChange={handleInputChange}
                   onBlur={() => handleBlur("gender")}
                   className={`w-full border px-4 py-2 rounded-full ${touched.gender && errors.gender
-                      ? "border-red-500 focus:outline-red-500"
-                      : "border-blue-900 focus:outline-blue-900"
+                    ? "border-red-500 focus:outline-red-500"
+                    : "border-blue-900 focus:outline-blue-900"
                     }`}
                 >
                   <option value="">Select Gender</option>
                   <option value="Boy">Boy</option>
                   <option value="Girl">Girl</option>
-                  
+
                 </select>
                 {touched.gender && errors.gender && (
                   <p className="text-sm text-red-500 mt-1">{errors.gender}</p>
@@ -377,8 +374,8 @@ const AddParticipant = ({ onClose }) => {
                 <label className="block text-sm font-medium text-blue-900 mb-1">Item code</label>
                 <div
                   className={`w-full h-10 px-4 py-2 border rounded-full cursor-pointer flex items-center gap-2 overflow-hidden ${touched.events && errors.events
-                      ? "border-red-500"
-                      : "border-blue-900"
+                    ? "border-red-500"
+                    : "border-blue-900"
                     }`}
                   onClick={() => {
                     setShowEventDropdown(!showEventDropdown);
@@ -429,7 +426,7 @@ const AddParticipant = ({ onClose }) => {
                     />
                     {filterEventCodes(searchEvent)
                       .map((event) => {
-                        const code = event; 
+                        const code = event;
                         return (
                           <p
                             key={event}
@@ -445,75 +442,75 @@ const AddParticipant = ({ onClose }) => {
               </div>
               {/* Pinnary Selection */}
               <div className="relative" ref={pinnaryDropdownRef}>
-    <label className="block text-sm font-medium text-blue-900 mb-1">Pinnary code</label>
-    <div
-      className={`w-full h-10 px-4 py-2 border rounded-full cursor-pointer flex items-center gap-2 overflow-hidden ${touched.pinnary && errors.pinnary
-          ? "border-red-500"
-          : "border-blue-900"
-        }`}
-      onClick={() => {
-        setShowPinnaryDropdown(!showPinnaryDropdown);
-        if (!touched.pinnary) {
-          setTouched({ ...touched, pinnary: true });
-          validateField("pinnary", selectedPinnary);
-        }
-      }}
-    >
-      {selectedPinnary.length === 0 ? (
-        <span className="text-gray-400 whitespace-nowrap">Select Pinnary</span>
-      ) : (
-        <div className="flex items-center gap-2 w-full overflow-hidden">
-          <div className="flex gap-1 overflow-auto max-w-[80%]">
-            {selectedPinnary.map((pin, index) => (
-              <span
-                key={index}
-                className="bg-blue-500 text-white px-2 py-1 rounded-full flex items-center text-sm"
-              >
-                {pin}
-                <button
-                  type="button"
-                  className="ml-2 text-white font-bold"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removeItem(setSelectedPinnary, pin, "pinnary");
+                <label className="block text-sm font-medium text-blue-900 mb-1">Pinnary code</label>
+                <div
+                  className={`w-full h-10 px-4 py-2 border rounded-full cursor-pointer flex items-center gap-2 overflow-hidden ${touched.pinnary && errors.pinnary
+                    ? "border-red-500"
+                    : "border-blue-900"
+                    }`}
+                  onClick={() => {
+                    setShowPinnaryDropdown(!showPinnaryDropdown);
+                    if (!touched.pinnary) {
+                      setTouched({ ...touched, pinnary: true });
+                      validateField("pinnary", selectedPinnary);
+                    }
                   }}
                 >
-                  <i className="fa-solid fa-xmark"></i>
-                </button>
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-    {touched.pinnary && errors.pinnary && (
-      <p className="text-sm text-red-500 mt-1">{errors.pinnary}</p>
-    )}
-    {showPinnaryDropdown && (
-      <div className="absolute z-10 mt-2 w-full bg-white border border-blue-600 rounded-lg shadow-lg p-3 max-h-48 overflow-y-auto">
-        <input
-          type="text"
-          className="w-full p-2 border rounded sticky top-0 bg-white"
-          placeholder="Search Pinnary"
-          value={searchPinnary}
-          onChange={(e) => setSearchPinnary(e.target.value)}
-        />
-        {filterPinnaryCodes(searchPinnary)
-          .map((pin) => {
-            const code = pin; 
-            return (
-              <p
-                key={pin}
-                className="cursor-pointer p-1 hover:bg-blue-100"
-                onClick={() => selectItem(setSelectedPinnary, pin, "pinnary")}
-              >
-                {code}
-              </p>
-            );
-          })}
-      </div>
-    )}
-  </div>
+                  {selectedPinnary.length === 0 ? (
+                    <span className="text-gray-400 whitespace-nowrap">Select Pinnary</span>
+                  ) : (
+                    <div className="flex items-center gap-2 w-full overflow-hidden">
+                      <div className="flex gap-1 overflow-auto max-w-[80%]">
+                        {selectedPinnary.map((pin, index) => (
+                          <span
+                            key={index}
+                            className="bg-blue-500 text-white px-2 py-1 rounded-full flex items-center text-sm"
+                          >
+                            {pin}
+                            <button
+                              type="button"
+                              className="ml-2 text-white font-bold"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeItem(setSelectedPinnary, pin, "pinnary");
+                              }}
+                            >
+                              <i className="fa-solid fa-xmark"></i>
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {touched.pinnary && errors.pinnary && (
+                  <p className="text-sm text-red-500 mt-1">{errors.pinnary}</p>
+                )}
+                {showPinnaryDropdown && (
+                  <div className="absolute z-10 mt-2 w-full bg-white border border-blue-600 rounded-lg shadow-lg p-3 max-h-48 overflow-y-auto">
+                    <input
+                      type="text"
+                      className="w-full p-2 border rounded sticky top-0 bg-white"
+                      placeholder="Search Pinnary"
+                      value={searchPinnary}
+                      onChange={(e) => setSearchPinnary(e.target.value)}
+                    />
+                    {filterPinnaryCodes(searchPinnary)
+                      .map((pin) => {
+                        const code = pin;
+                        return (
+                          <p
+                            key={pin}
+                            className="cursor-pointer p-1 hover:bg-blue-100"
+                            onClick={() => selectItem(setSelectedPinnary, pin, "pinnary")}
+                          >
+                            {code}
+                          </p>
+                        );
+                      })}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="flex justify-center sm:justify-end mt-6 sticky bottom-0 bg-white py-4">
               <button

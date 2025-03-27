@@ -113,9 +113,6 @@ const EditParticipate = ({ onClose, participantData }) => {
       case "events":
         if (!value || value.length === 0) errorMessage = "At least one event must be selected";
         break;
-      case "pinnary":
-        if (!value || value.length === 0) errorMessage = "At least one pinnary code must be selected";
-        break;
       case "image":
         if (value) {
           const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
@@ -276,7 +273,7 @@ const EditParticipate = ({ onClose, participantData }) => {
                 onClick={handleUploadClick}
                 className="px-4 py-2 ml-24 bg-blue-900 text-white rounded-full shadow-md"
               >
-                Update Logo
+                Update Photo
               </button>
               <input
                 type="file"
@@ -299,6 +296,7 @@ const EditParticipate = ({ onClose, participantData }) => {
                   type="text"
                   name="regNo"
                   value={formData.regNo}
+                  readOnly
                   onChange={handleInputChange}
                   onBlur={() => handleBlur("regNo")}
                   className={`w-full border px-4 py-2 rounded-full ${touched.regNo && errors.regNo

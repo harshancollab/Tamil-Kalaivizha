@@ -18,7 +18,8 @@ const Dashboard = () => {
   ); // Initialize from localStorage
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [isConfirmButtonDisabled, setIsConfirmButtonDisabled] = useState(
-    localStorage.getItem("reportConfirmed") === "true"
+    localStorage.getItem("reportConfirmed") === "false"
+    // true
   ); // Initialize disable state
   const [SchDetails, setSchDetails] = useState([]);
   const [showMultiStepModal, setShowMultiStepModal] = useState(false);
@@ -270,11 +271,10 @@ const Dashboard = () => {
                       <button
                         onClick={handleConfirm}
                         disabled={isConfirmButtonDisabled}
-                        className={`w-full xs:w-auto sm:w-28 py-2 sm:py-3 border border-blue-400 rounded-lg ${
-                          isConfirmButtonDisabled
+                        className={`w-full xs:w-auto sm:w-28 py-2 sm:py-3 border border-blue-400 rounded-lg ${isConfirmButtonDisabled
                             ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                             : "text-gray-700 hover:bg-gray-200 cursor-pointer"
-                        } transition`}
+                          } transition`}
                       >
                         Confirm
                       </button>
@@ -293,3 +293,5 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+
