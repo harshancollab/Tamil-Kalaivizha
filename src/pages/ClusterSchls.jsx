@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useSearchParams } from 'react-router-dom'
+import { allClusterSchoolsAPI } from '../services/allAPI' 
 
 const ClusterSchls = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(searchParams.get('code') || '');
   const printRef = useRef();
 
+  // State for schools data
   const [schools, setSchools] = useState([
     { slno: 1, code: '6004', name: 'G. H. S. S Kumily', dataEntered: 'Yes', confirmed: 'No' },
     { slno: 2, code: '6059', name: 'G. H. S. S Anakara', dataEntered: 'Yes', confirmed: 'No' },
@@ -20,6 +22,58 @@ const ClusterSchls = () => {
     { slno: 9, code: '30010', name: 'S. H. H. S. Kanthalloor', dataEntered: 'Yes', confirmed: 'No' },
   ]);
   const [filteredSchools, setFilteredSchools] = useState(schools);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  
+  useEffect(() => {
+    getAllClusterSchools();
+  }, []);
+
+ 
+  const getAllClusterSchools = async () => {
+    const token = sessionStorage.getItem("token")
+    if (token) {
+      const reqHeader = {
+        "Authorization": `Bearer ${token}`
+      }
+      try {
+        setLoading(true);
+        const result = await allClusterSchoolsAPI(reqHeader)
+        if (result.status === 200) {
+  
+          const apiSchools = result.data.map((school, index) => ({
+            slno: index + 1,
+            code: school.code || '',
+            name: school.name || '',
+            dataEntered: school.dataEntered ? 'Yes' : 'No',
+            confirmed: school.confirmed ? 'Yes' : 'No'
+          }));
+          
+          setSchools(apiSchools.length > 0 ? apiSchools : schools);
+          setFilteredSchools(apiSchools.length > 0 ? apiSchools : schools);
+        } else {
+
+          setSchools(schools);
+          setFilteredSchools(schools);
+        }
+      } catch (err) {
+        console.error(err);
+       
+        setSchools(schools);
+        setFilteredSchools(schools);
+        setError("An error occurred while fetching schools. Using default data.");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      
+      setSchools(schools);
+      setFilteredSchools(schools);
+      // setError("No authentication token found. Using default data.");
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const initialSearchTerm = searchParams.get('code') || '';
@@ -88,6 +142,24 @@ const ClusterSchls = () => {
     window.location.reload();
   };
 
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="flex flex-col md:flex-row min-h-screen">
+          <Dash />
+          <div className="flex-1 p-4 md:p-6 lg:p-8 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading schools data...</p>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <Header />
@@ -105,6 +177,11 @@ const ClusterSchls = () => {
               Print
             </button>
           </div>
+          {error && (
+            <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-4" role="alert">
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
           <div className="relative flex mt-2 items-center w-full sm:w-64 h-9 border border-blue-800 rounded-full px-4">
             <input
               type="text"

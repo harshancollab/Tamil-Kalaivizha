@@ -64,3 +64,28 @@ export const allItemWiseAPI = async (reqHeader) => {
 export const getAGradeResultsAPI = async (reqHeader) => {
     return await commonAPI("GET", `${SERVER_URL}/results-agrade`, "", reqHeader);
   }
+
+
+
+
+  //  AllKalolsavam
+  export const getAllKalolsavamAPI = async (reqHeader) => {
+    return await commonAPI("GET", `${SERVER_URL}/kalolsavam/all`, {}, reqHeader);
+};
+
+//  edit a Kalolsavam
+export const editKalolsavamAPI = async (kalolsavamId, reqBody, reqHeader) => {
+  return await commonAPI("PUT", `${SERVER_URL}/kalolsavam/edit/${kalolsavamId}`, reqBody, reqHeader);
+};
+
+
+// add School entry
+
+export const addSchoolEntryAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/school/add`, reqBody, reqHeader);
+};
+
+//  all cluster schools
+export const allClusterSchoolsAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/cluster-schools`, "", reqHeader);
+};

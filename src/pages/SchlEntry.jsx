@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import Header from "../components/Header"
 import Dash from "../components/Dash"
+import { addSchoolEntryAPI } from "../services/allAPI";
 
 const  SchlEntry = () => {
   const [escortingTeachers, setEscortingTeachers] = useState([{ name: "", phone: "" }]);
@@ -127,10 +128,69 @@ const  SchlEntry = () => {
     return isValid;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      console.log("Form data:", schoolDetails, escortingTeachers);
+      const reqBody = {
+        schoolCode: schoolDetails.schoolCode,
+        schoolName: schoolDetails.schoolName,
+        schoolType: schoolDetails.schoolType,
+        email: schoolDetails.email,
+        standardFrom: schoolDetails.standardFrom,
+        standardTo: schoolDetails.standardTo,
+        principalName: schoolDetails.principalName,
+        principalPhone: schoolDetails.principalPhone,
+        headmasterName: schoolDetails.headmasterName,
+        headmasterPhone: schoolDetails.headmasterPhone,
+        teamManagerName: schoolDetails.teamManagerName,
+        teamManagerPhone: schoolDetails.teamManagerPhone,
+        escortingTeachers: escortingTeachers,
+        upperPrimaryStudents: schoolDetails.upperPrimaryStudents,
+        hsStudents: schoolDetails.hsStudents,
+        hssStudents: schoolDetails.hssStudents,
+        vhseStudents: schoolDetails.vhseStudents,
+        totalStudents: schoolDetails.totalStudents
+      };
+  
+      const token = sessionStorage.getItem("token");
+      const reqHeader = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      };
+  
+      try {
+        const result = await addSchoolEntryAPI(reqBody, reqHeader);
+        
+        if (result.status === 200) {
+          alert("School details added successfully");
+         
+          setSchoolDetails({
+            schoolCode: "",
+            schoolName: "",
+            schoolType: "",
+            email: "",
+            standardFrom: "",
+            standardTo: "",
+            principalName: "",
+            principalPhone: "",
+            headmasterName: "",
+            headmasterPhone: "",
+            teamManagerName: "",
+            teamManagerPhone: "",
+            upperPrimaryStudents: "",
+            hsStudents: "",
+            hssStudents: "",
+            vhseStudents: "",
+            totalStudents: "",
+          });
+          setEscortingTeachers([{ name: "", phone: "" }]);
+        } else {
+          alert("Failed to add school details");
+        }
+      } catch (error) {
+        console.error("Error adding school details", error);
+        alert("Error adding school details");
+      }
     }
   };
 

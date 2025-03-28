@@ -22,7 +22,6 @@ const StageDurationList = () => {
       date: '',
       stageTime: ''
     },
-    // ... other school entries with added fields
   ]);
   const [filteredSchools, setFilteredSchools] = useState(schools);
 
@@ -98,19 +97,33 @@ const StageDurationList = () => {
   return (
     <>
       <Header />
-      <div className="flex flex-col md:flex-row  min-h-screen">
+      <div className="flex flex-col md:flex-row min-h-screen">
         <Dash />
         <div className="flex-1 p-4 md:p-6 lg:p-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
               Stage Duration List
             </h2>
-            <button 
-              onClick={handlePrint}
-              className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full"
-            >
-              Print
-            </button>
+            <div className="flex items-center space-x-4">
+              <div className="relative w-40">
+                <select
+                  className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
+                >
+                  <option value=""> ALL Festivel</option>
+                  <option value="UP">UP</option>
+                  <option value="Lp">Lp</option>
+                </select>
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 ">
+                  <i className="fa-solid fa-chevron-down"></i>
+                </div>
+              </div>
+              <button 
+                onClick={handlePrint}
+                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full"
+              >
+                Print
+              </button>
+            </div>
           </div>
           <div className="relative flex mt-2 items-center w-full sm:w-64 h-9 border border-blue-800 rounded-full px-4">
             <input

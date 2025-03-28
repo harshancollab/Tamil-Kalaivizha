@@ -15,7 +15,7 @@ const StageDuration = () => {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[#003566] mt-5 ml-10 ">
-                            <div className="flex items-center space-x-4 ml-8 mt-6">
+                            <div className="flex items-center space-x-4 ml-8 mt-6 mb-4">
                                 <label className="font-semibold text-blue-900 w-40">Item Code</label>
                                 <input
                                     type="text"
@@ -31,7 +31,7 @@ const StageDuration = () => {
                                     className="border border-blue-900 px-2 py-1 rounded-full w-80"
                                 />
                             </div>
-                            <div className="flex items-center space-x-4 ml-8">
+                            <div className="flex items-center space-x-4 ml-8 mb-4">
                                 <label className="font-semibold text-blue-900 w-40">No of Participants</label>
                                 <input
                                     type="text"
@@ -47,7 +47,7 @@ const StageDuration = () => {
                                     className="border border-blue-900 px-2 py-1 rounded-full w-80"
                                 />
                             </div>
-                            <div className="flex items-center space-x-4 ml-8">
+                            <div className="flex items-center space-x-4 ml-8 mb-4">
                                 <label className="font-semibold text-blue-900 w-40">Completion Time</label>
                                 <input
                                     type="text"
@@ -96,3 +96,5 @@ const StageDuration = () => {
 }
 
 export default StageDuration
+
+
