@@ -5,6 +5,7 @@ import Dash from '../components/Dash'
 const SplEntry = () => {
     const [participants, setParticipants] = useState([{ id: 1 }]);
     const [remarkText, setRemarkText] = useState('');
+    const [isPrimary, setIsPrimary] = useState(false);
 
     const addParticipant = () => {
         const newParticipantId = participants.length > 0
@@ -149,14 +150,30 @@ const SplEntry = () => {
                                     </div>
                                     <div className="flex items-center space-x-4">
                                         <label className="font-semibold text-blue-900 w-40">Captain Adno</label>
-                                        <input
-                                            type="number"
-                                            name="captainAdno"
-                                            className="border border-blue-900 px-2 py-1 rounded-full w-80"
-                                        />
+                                        <div className="flex flex-col">
+                                            <input
+                                                type="number"
+                                                name="captainAdno"
+                                                className="border border-blue-900 px-2 py-1 rounded-full w-80 mb-2"
+                                            />
+                                            <div className="flex items-center  space-x-2 ml-60">
+                                                <input
+                                                    type="checkbox"
+                                                    id="isPrimary"
+                                                    checked={isPrimary}
+                                                    onChange={(e) => setIsPrimary(e.target.checked)}
+                                                    className="form-checkbox border border-blue-500 h-5 w-5 text-blue-600"
+                                                />
+                                                <label 
+                                                    htmlFor="isPrimary" 
+                                                    className="text-sm text-blue-900"
+                                                >
+                                                    Is Primary
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                
                                 
                                 <div className="col-span-2 flex justify-start items-start space-x-4 ml-14 mt-6 relative">
                                     <label className="font-semibold text-blue-900 w-40 pt-2">Remark</label>

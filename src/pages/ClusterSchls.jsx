@@ -91,7 +91,7 @@ const ClusterSchls = () => {
   return (
     <>
       <Header />
-      <div className="flex flex-col md:flex-row bg-gray-200 min-h-screen">
+      <div className="flex flex-col md:flex-row min-h-screen">
         <Dash />
         <div className="flex-1 p-4 md:p-6 lg:p-8">
           <div className="flex justify-between items-center mb-4">
@@ -120,9 +120,9 @@ const ClusterSchls = () => {
           <div ref={printRef}>
             <div className="print-title hidden">Cluster School List Report</div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-separate border-spacing-y-2 print-table">
+              <table className="w-full text-left  border-separate border-spacing-y-2 print-table">
                 <thead>
-                  <tr className="text-gray-700">
+                  <tr className="text-gray-700 ">
                     <th className="p-2 md:p-3">Sl No</th>
                     <th className="p-2 md:p-3">School Code</th>
                     <th className="p-2 md:p-3">School Name</th>
@@ -135,7 +135,7 @@ const ClusterSchls = () => {
                 <tbody>
                   {filteredSchools.length > 0 ? (
                     filteredSchools.map((school) => (
-                      <tr key={school.slno} className=" ">
+                      <tr key={school.slno} className="hover:bg-gray-200 ">
                         <td className="p-2 md:p-3">{school.slno}</td>
                         <td className="p-2 md:p-3">{school.code}</td>
                         <td className="p-2 md:p-3">{school.name}</td>

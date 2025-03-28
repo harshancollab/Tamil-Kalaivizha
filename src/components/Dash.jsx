@@ -147,7 +147,7 @@ const Dash = () => {
                   onClick={toggleStageSettingsSubMenu}
                 >
                   <h3 className="text-base font-semibold text-gray-300 flex items-center">
-                    <i className="fa-solid fa-sliders mr-2"></i> Stage Settings
+                  <span className='text-white mr-2'>🎤</span> Stage Settings
                   </h3>
                   <i
                     className={`fa-solid fa-chevron-${
