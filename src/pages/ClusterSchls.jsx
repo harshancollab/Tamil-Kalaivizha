@@ -219,7 +219,7 @@ const ClusterSchls = () => {
                         <td className="p-2  md:p-3">{school.dataEntered}</td>
                         <td className="p-2 md:p-3">{school.confirmed}</td>
                         <td className="p-2 text-blue-500 md:p-3 no-print">
-                          {school.confirmed === 'Yes' ? 'Published' : 'Pending'}
+                          {school.confirmed === 'Yes' ? 'Publish' : 'Unpublish'}
                         </td>
                         <td className="p-2 md:p-3 no-print">
                           <i className="text-blue-500 fa-solid fa-arrow-rotate-right"></i>

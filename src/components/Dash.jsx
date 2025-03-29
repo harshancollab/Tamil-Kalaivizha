@@ -40,6 +40,8 @@ const Dash = () => {
 
   const toggleStageSettingsSubMenu = () => {
     setIsStageSettingsSubMenuOpen(!isStageSettingsSubMenuOpen);
+    setIsSettingsSubMenuOpen(false);
+    setIsSettingsClicked(false);
     setIsStageSettingsClicked(true);
   };
 
@@ -80,7 +82,7 @@ const Dash = () => {
             <div className="mb-4">
               <div
                 className={`flex justify-between items-center w-full cursor-pointer ${
-                  isSettingsClicked ? 'bg-[#00284d]' : ''
+                  isSettingsClicked ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
                 } p-2 rounded`}
                 onClick={toggleSettingsSubMenu}
               >
@@ -138,12 +140,12 @@ const Dash = () => {
             <div className="mb-4">
               <div
                 className={`flex justify-between items-center w-full cursor-pointer ${
-                  isStageSettingsClicked ? 'bg-[#00284d]' : ''
+                  isStageSettingsClicked ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
                 } p-2 rounded`}
                 onClick={toggleStageSettingsSubMenu}
               >
                 <h2 className="text-lg font-semibold flex items-center">
-                  <span className='text-white mr-2'>🎤</span> Stage Settings
+                <span className='text-white mr-1'>🎤</span> Stage Settings
                 </h2>
                 <i
                   className={`fa-solid fa-chevron-${
@@ -154,22 +156,31 @@ const Dash = () => {
               {isStageSettingsSubMenuOpen && (
                 <div className="mt-2 pl-4">
                   <Link
-                    to="/stage-duration"
-                    className={`block py-2 text-gray-300 hover:text-white ${
-                      location.pathname === '/stage-duration' ? 'font-semibold' : ''
-                    }`}
-                    onClick={() => setIsSidebarOpen(false)}
-                  >
-                    Stage Duration
-                  </Link>
-                  <Link
                     to="/stage-duration-list"
                     className={`block py-2 text-gray-300 hover:text-white ${
                       location.pathname === '/stage-duration-list' ? 'font-semibold' : ''
                     }`}
                     onClick={() => setIsSidebarOpen(false)}
                   >
-                    Stage Duration List
+                    Stage Duration
+                  </Link>
+                  <Link
+                    to="/StageList"
+                    className={`block py-2 text-gray-300 hover:text-white ${
+                      location.pathname === '/StageList' ? 'font-semibold' : ''
+                    }`}
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                   Define Stage
+                  </Link>
+                  <Link
+                    to="/Stage-itemwise"
+                    className={`block py-2 text-gray-300 hover:text-white ${
+                      location.pathname === '/Stage-itemwise' ? 'font-semibold' : ''
+                    }`}
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                 Stage Allotment Item Wise
                   </Link>
                 </div>
               )}

@@ -89,3 +89,30 @@ export const addSchoolEntryAPI = async (reqBody, reqHeader) => {
 export const allClusterSchoolsAPI = async (reqHeader) => {
   return await commonAPI("GET", `${SERVER_URL}/cluster-schools`, "", reqHeader);
 };
+
+
+
+// add spl entry
+export const addSpecialOrderAPI = async (reqBody,reqHeader)=>{
+  return await commonAPI("POST",`${SERVER_URL}/add-splentry`,reqBody,reqHeader)
+}
+
+// addstatge duration
+export const addStageDurationAPI = async (reqBody,reqHeader)=>{
+  return await commonAPI("POST",`${SERVER_URL}/add-stage`,reqBody,reqHeader)
+}
+
+
+
+// get all stage durationlist
+export const getAllStageDurationsAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/all-stages`, {}, reqHeader);
+};
+
+// Add Stage API
+export const addStageAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/stages/add`,reqBody, reqHeader);
+};
+
+
+// 

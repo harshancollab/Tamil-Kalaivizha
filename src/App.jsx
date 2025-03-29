@@ -26,6 +26,14 @@ import ClusterSchls from './pages/ClusterSchls';
 import StageDuration from './pages/StageDuration';
 import SplEntry from './pages/SplEntry';
 import StageDurationList from './pages/StageDurationList';
+import DefineStage from './pages/DefineStage';
+import AddStage from './pages/AddStage';
+import StageItemwise from './pages/StageItemwise';
+import StageItemwiseList from './pages/StageItemwiseList';
+import EditStageitem from './pages/EditStageitem';
+
+
+
 
 function App() {
   return (
@@ -68,7 +76,13 @@ function App() {
           <Route path="/Spl-entry" element={<SplEntry />} />
           <Route path="/stage-duration" element={<StageDuration />} />
           <Route path="/stage-duration-list" element={<StageDurationList />} />
-
+          <Route path="/StageList" element={<DefineStage />} />
+          <Route path="/AddStage" element={<AddStage />} />
+          <Route path="/Stage-itemwise" element={<StageItemwise />} />
+          <Route path="/Stage-itemwiseList" element={<StageItemwiseList />} />
+          <Route path="/Edit-itemwiseList" element={<EditStageitem />} />
+            
+         
         </Route>
 
         {/* Routes ONLY for "admin" */}
