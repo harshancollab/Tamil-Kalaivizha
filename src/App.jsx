@@ -31,6 +31,7 @@ import AddStage from './pages/AddStage';
 import StageItemwise from './pages/StageItemwise';
 import StageItemwiseList from './pages/StageItemwiseList';
 import EditStageitem from './pages/EditStageitem';
+import AddCallsheet from './pages/AddCallsheet';
 
 
 
@@ -81,6 +82,7 @@ function App() {
           <Route path="/Stage-itemwise" element={<StageItemwise />} />
           <Route path="/Stage-itemwiseList" element={<StageItemwiseList />} />
           <Route path="/Edit-itemwiseList" element={<EditStageitem />} />
+          <Route path="/AddCallsheet" element={<AddCallsheet />} />
             
          
         </Route>

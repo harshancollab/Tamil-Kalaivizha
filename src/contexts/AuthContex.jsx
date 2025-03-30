@@ -40,31 +40,13 @@
 // export const useAuth = () => useContext(AuthContext);
 
 
-// import { createContext, useState, useContext } from 'react';
-
-// const AuthContext = createContext();
-
-// export const AuthProvider = ({ children }) => {
-//   // Simulating a logged-in school admin user
-//   const [user, setUser] = useState({ role: 'school admin', isAuthenticated: true });
-
-//   return (
-//     <AuthContext.Provider value={{ user, setUser }}>
-//       {children}
-//     </AuthContext.Provider>
-//   );
-// };
-
-// export const useAuth = () => useContext(AuthContext);
-
-
 import { createContext, useState, useContext } from 'react';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  // Simulating a logged-in sub district admin user (for testing)
-  const [user, setUser] = useState({ role: 'sub district admin', isAuthenticated: true });
+  // Simulating a logged-in school admin user
+  const [user, setUser] = useState({ role: 'school admin', isAuthenticated: true });
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>
@@ -74,3 +56,21 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
+
+// import { createContext, useState, useContext } from 'react';
+
+// const AuthContext = createContext();
+
+// export const AuthProvider = ({ children }) => {
+//   // Simulating a logged-in sub district admin user (for testing)
+//   const [user, setUser] = useState({ role: 'sub district admin', isAuthenticated: true });
+
+//   return (
+//     <AuthContext.Provider value={{ user, setUser }}>
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// };
+
+// export const useAuth = () => useContext(AuthContext);

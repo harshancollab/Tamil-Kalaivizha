@@ -97,7 +97,7 @@ const AddStage = () => {
                     const result = await addStageAPI(reqBody, reqHeader);
                     if (result.status === 200) {
                         alert("Stage added successfully");
-                        // Reset form after successful submission
+                        
                         setFormData({
                             stage: "",
                             description: ""

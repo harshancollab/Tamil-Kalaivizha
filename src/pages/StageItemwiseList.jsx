@@ -1,12 +1,42 @@
-import React from 'react';
-import Header from '../components/Header';
-import Dash from '../components/Dash';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import React, { useEffect, useState } from 'react'
+import Header from '../components/Header'
+import Dash from '../components/Dash'
+import { useNavigate } from 'react-router-dom'
+import { getAllItemStageListAPI } from '../services/allAPI'
 
 const StageItemwiseList = () => {
-    const navigate = useNavigate(); // Initialize useNavigate
+    const [Allitemise, setItemwise] = useState([]);
+    console.log(Allitemise);
 
-    // Dummy data for the stage list
+    useEffect(() => {
+        getAllitemise
+    }, [])
+    const getAllitemise = async () => {
+        const token = sessionStorage.getItem
+        if (token) {
+            const reqHeader = {
+                "Authorization": `Bearer ${token}`
+            }
+            try {
+                const result = await getAllItemStageListAPI(reqHeader)
+                if (result.status == 200) {
+                    setStages(result.data)
+                }
+            } catch (err) {
+                console.log(err);
+
+            }
+        }
+    }
+
+
+
+
+
+
+    const navigate = useNavigate();
+
+   
     const dummyStages = [
         {
             id: 1,
@@ -71,7 +101,7 @@ const StageItemwiseList = () => {
     ];
 
     const handleEditClick = (itemId) => {
-        navigate(`/Edit-itemwiseList/${itemId}`); // Navigate to the edit page with the item ID
+        navigate(`/Edit-itemwiseList/${itemId}`); 
     };
 
     return (

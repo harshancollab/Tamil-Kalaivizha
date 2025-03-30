@@ -223,7 +223,6 @@ const AddParticipant = ({ onClose }) => {
           }
         } catch (err) {
           console.log(err);
-          alert("Error adding participant. Please try again.");
         }
       } else {
         alert("Authentication token missing. Please log in again.");

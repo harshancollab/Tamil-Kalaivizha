@@ -1,11 +1,37 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
+import { getAllStageListAPI } from '../services/allAPI';
 
 
 
 
 const DefineStage = () => {
+    const [Allstages, setStages] = useState([]);
+    console.log(Allstages);
+
+    useEffect(() => {
+        getAllstages
+    }, [])
+    const getAllstages = async () => {
+        const token = sessionStorage.getItem
+        if (token) {
+            const reqHeader = {
+                "Authorization": `Bearer ${token}`
+            }
+            try {
+                const result = await getAllStageListAPI(reqHeader)
+                if (result.status == 200) {
+                    setStages(result.data)
+                }
+            } catch (err) {
+                console.log(err);
+
+            }
+        }
+    }
+
+
     return (
         <>
 
@@ -31,7 +57,7 @@ const DefineStage = () => {
                                         <th className="p-2 md:p-3">Stage description</th>
                                         <th className="p-2 md:p-3">Edit</th>
                                         <th className="p-2 md:p-3">Delete</th>
-                                      
+
                                     </tr>
                                 </thead>
                                 <tbody>

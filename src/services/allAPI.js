@@ -58,7 +58,7 @@ export const updateparticipateAPI = async (id,reqBody,reqHeader)=>{
 
 // item wise 
 export const allItemWiseAPI = async (reqHeader) => {
-    return await commonAPI("GET"`${SERVER_URL}/all-itemwise`, reqHeader);
+    return await commonAPI("GET",`${SERVER_URL}/all-itemwise`, reqHeader);
   };
 //   a grade
 export const getAGradeResultsAPI = async (reqHeader) => {
@@ -106,7 +106,7 @@ export const addStageDurationAPI = async (reqBody,reqHeader)=>{
 
 // get all stage durationlist
 export const getAllStageDurationsAPI = async (reqHeader) => {
-  return await commonAPI("GET", `${SERVER_URL}/all-stages`, {}, reqHeader);
+  return await commonAPI("GET", `${SERVER_URL}/all-stagesduration`, {}, reqHeader);
 };
 
 // Add Stage API
@@ -115,4 +115,22 @@ export const addStageAPI = async (reqBody, reqHeader) => {
 };
 
 
-// 
+// all stage api
+export const getAllStageListAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/all-stages`, {}, reqHeader);
+};
+
+// Add ItemwiseStage API
+export const  addStageItemwiseAPI  = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/itemwisestages/add`,reqBody, reqHeader);
+};
+
+// all stage api
+export const getAllItemStageListAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/all-itemwisestages`, {}, reqHeader);
+};
+
+// add callsheet
+export const AddCallSheetAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/callsheet-add`, reqBody, reqHeader);
+};
