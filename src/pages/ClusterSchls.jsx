@@ -168,7 +168,7 @@ const ClusterSchls = () => {
         <div className="flex-1 p-4 md:p-6 lg:p-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
-              Cluster Schools
+              Cluster School List 
             </h2>
             <button 
               onClick={handlePrint}

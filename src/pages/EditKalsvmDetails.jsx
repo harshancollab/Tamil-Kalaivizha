@@ -190,7 +190,7 @@ const EditKalsvmDetails = () => {
         <Header />
         <div className="flex flex-col sm:flex-row">
           <Dash />
-          <div className="flex-1 sm:ml-6 p-4 sm:p-8 w-full md:w-full">
+          <div className="flex-1 p-4 sm:p-6 md:p-8 w-full">
             {error && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
                 {error}
@@ -205,11 +205,11 @@ const EditKalsvmDetails = () => {
               onChange={handleFileSelect}
             />
 
-            <div className="sm:ml-16 mt-10 md:ml-8">
-              <div className="flex flex-col sm:flex-row items-center mb-6">
-                <h4 className="w-full sm:w-40 font-semibold mb-3 sm:mb-0 sm:mr-10">Kalolsavam Logo</h4>
-                <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4 w-full">
-                  <div className="w-24 mr-40 ml-10 h-24 sm:w-16 sm:h-16 rounded-full bg-gray-200 flex items-center justify-center relative">
+            <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-0">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center mb-6">
+                <h4 className="w-full sm:w-40 font-semibold mb-3 sm:mb-0">Kalolsavam Logo</h4>
+                <div className="flex flex-col sm:flex-row items-center w-full">
+                  <div className="w-24 h-24 ml-14 sm:w-16 sm:h-16 rounded-full bg-gray-200 flex items-center justify-center relative mb-3 sm:mb-0 sm:mr-4">
                     {formData.logo ? (
                       <>
                         <img 
@@ -222,7 +222,7 @@ const EditKalsvmDetails = () => {
                             setFormData(prev => ({...prev, logo: ''}));
                             setErrors(prev => ({...prev, logo: 'Logo is required'}));
                           }}
-                          className="absolute ml-8 -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
                         >
                           ✕
                         </button>
@@ -234,35 +234,35 @@ const EditKalsvmDetails = () => {
                   <button
                     type="button"
                     onClick={handleLogoUpload}
-                    className="bg-blue-900 text-white font-bold py-3 px-6 rounded-full focus:outline-none focus:shadow-outline text-sm"
+                    className="bg-blue-900 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-full focus:outline-none focus:shadow-outline text-sm"
                   >
                     Upload Logo
                   </button>
                 </div>
               </div>
               {errors.logo && (
-                <div className="text-red-500 text-sm ml-48 mb-4">{errors.logo}</div>
+                <div className="text-red-500 text-sm ml-0 sm:ml-40 mb-4">{errors.logo}</div>
               )}
               
-              <div className="space-y-6 mr-1 md:mr-32">
-                <div className="flex flex-col sm:flex-row items-center">
-                  <h4 className="w-full sm:w-40 font-semibold mb-3 sm:mb-0 sm:mr-10">Kalolsavam Name</h4>
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center">
+                  <h4 className="w-full sm:w-40 font-semibold mb-3 sm:mb-0">Kalolsavam Name</h4>
                   <input
                     readOnly
                     type="text"
                     name="kalolsavamName"
-                    className="w-full ml-8 sm:w-[30rem] border border-blue-600 px-6 py-1 rounded-full bg-gray-100"
+                    className="w-full sm:max-w-md ml-10 border border-blue-600 px-4 sm:px-6 py-1 rounded-full bg-gray-100"
                     value={formData.kalolsavamName}
                   />
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center">
-                  <h4 className="w-full sm:w-40 font-semibold mb-3 sm:mb-0 sm:mr-10">Kalolsavam year</h4>
-                  <div className="w-full ml-8 sm:w-[30rem]">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center">
+                  <h4 className="w-full sm:w-40 font-semibold mb-3 sm:mb-0">Kalolsavam year</h4>
+                  <div className="w-full sm:max-w-md">
                     <input
                       type="text"
                       name="kalolsavamYear"
-                      className={`w-full border ${errors.kalolsavamYear ? 'border-red-500' : 'border-blue-600'} rounded-full px-6 py-1`}
+                      className={`w-full border ${errors.kalolsavamYear ? 'border-red-500' : 'border-blue-600'} rounded-full px-4 sm:px-6 py-1 ml-10`}
                       value={formData.kalolsavamYear}
                       onChange={handleInputChange}
                     />
@@ -272,13 +272,13 @@ const EditKalsvmDetails = () => {
                   </div>
                 </div>
                 
-                <div className="flex flex-col sm:flex-row items-center">
-                  <h4 className="w-full sm:w-40 font-semibold mb-3 sm:mb-0 sm:mr-10">Venue</h4>
-                  <div className="w-full ml-8 sm:w-[30rem]">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center">
+                  <h4 className="w-full sm:w-40 font-semibold mb-3 sm:mb-0">Venue</h4>
+                  <div className="w-full sm:max-w-md">
                     <input
                       type="text"
                       name="venue"
-                      className={`w-full border ${errors.venue ? 'border-red-500' : 'border-blue-600'} rounded-full px-6 py-1`}
+                      className={`w-full border ${errors.venue ? 'border-red-500' : 'border-blue-600'} rounded-full px-4 sm:px-6 py-1 ml-10`}
                       value={formData.venue}
                       onChange={handleInputChange}
                     />
@@ -288,13 +288,13 @@ const EditKalsvmDetails = () => {
                   </div>
                 </div>
                 
-                <div className="flex flex-col sm:flex-row items-center">
-                  <h4 className="w-full sm:w-40 font-semibold mb-3 sm:mb-0 sm:mr-10">Start Date</h4>
-                  <div className="w-full ml-8 sm:w-[30rem]">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center">
+                  <h4 className="w-full sm:w-40 font-semibold mb-3 sm:mb-0">Start Date</h4>
+                  <div className="w-full sm:max-w-md">
                     <input
                       type="date"
                       name="startDate"
-                      className={`w-full border ${errors.startDate ? 'border-red-500' : 'border-blue-600'} rounded-full px-6 py-1`}
+                      className={`w-full border ${errors.startDate ? 'border-red-500' : 'border-blue-600'} rounded-full px-4 sm:px-6 py-1 ml-10`}
                       value={formData.startDate}
                       onChange={handleInputChange}
                     />
@@ -304,13 +304,13 @@ const EditKalsvmDetails = () => {
                   </div>
                 </div>
                 
-                <div className="flex flex-col sm:flex-row items-center">
-                  <h4 className="w-full sm:w-40 font-semibold mb-3 sm:mb-0 sm:mr-10">End Date</h4>
-                  <div className="w-full ml-8 sm:w-[30rem]">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center">
+                  <h4 className="w-full sm:w-40 font-semibold mb-3 sm:mb-0">End Date</h4>
+                  <div className="w-full sm:max-w-md">
                     <input
                       type="date"
                       name="endDate"
-                      className={`w-full border ${errors.endDate ? 'border-red-500' : 'border-blue-600'} rounded-full px-6 py-1`}
+                      className={`w-full border ${errors.endDate ? 'border-red-500' : 'border-blue-600'} rounded-full px-4 sm:px-6 py-1 ml-10`}
                       value={formData.endDate}
                       onChange={handleInputChange}
                     />
@@ -321,18 +321,18 @@ const EditKalsvmDetails = () => {
                 </div>
               </div>
         
-              <div className="flex flex-col sm:flex-row justify-center mt-32 space-y-4 sm:space-y-0 sm:space-x-4">
+              <div className="flex flex-col sm:flex-row justify-center mt-16 sm:mt-24 md:mt-32 space-y-4 sm:space-y-0 sm:space-x-4">
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="bg-white border border-blue-500 text-blue-500 font-bold py-3 px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto"
+                  className="bg-white border border-blue-500 text-blue-500 font-bold py-2 px-8 sm:py-3 sm:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleUpdate}
-                  className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-3 px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto"
+                  className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-8 sm:py-3 sm:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto"
                 >
                   {loading ? 'Updating...' : 'Update'}
                 </button>

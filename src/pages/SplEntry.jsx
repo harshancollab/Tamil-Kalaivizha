@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
-import Dash from '../components/Dash';
-import { addSpecialOrderAPI } from '../services/allAPI';
+import React, { useState, useEffect } from 'react'
+import Header from '../components/Header'
+import Dash from '../components/Dash'
+import { addSpecialOrderAPI } from '../services/allAPI'
 
 const SplEntry = () => {
   // State for form data
@@ -281,18 +281,18 @@ const SplEntry = () => {
   return (
     <>
       <Header />
-      <div className="flex flex-col md:flex-row bg-gray-200 min-h-screen overflow-x-hidden">
+      <div className="flex flex-col md:flex-row bg-gray-200 min-h-screen">
         <Dash />
-        <div className="ml-4 mt-3 w-full">
+        <div className="w-full px-2 md:px-4 py-3 md:ml-4 mt-3">
           <form
             onSubmit={handleSubmit}
-            className="min-h-screen mx-auto p-6 bg-white rounded-lg shadow-md"
+            className="min-h-screen mx-auto p-4 md:p-6 bg-white rounded-lg shadow-md overflow-hidden"
           >
-            <h2 className="text-2xl font-bold mb-4">Special Order Entry</h2>
+            <h2 className="text-xl md:text-2xl font-bold mb-4">Special Order Entry</h2>
 
             {/* School Code and Name */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-4">
-              <div className="flex flex-col md:flex-row items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mx-2 md:ml-4">
+              <div className="flex flex-col md:flex-row items-start md:items-center">
                 <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">School Code</label>
                 <div className="w-full md:w-80">
                   <input
@@ -309,7 +309,7 @@ const SplEntry = () => {
                   )}
                 </div>
               </div>
-              <div className="flex flex-col md:flex-row items-center">
+              <div className="flex flex-col md:flex-row items-start md:items-center">
                 <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">School Name</label>
                 <div className="w-full md:w-80">
                   <input
@@ -329,13 +329,13 @@ const SplEntry = () => {
             </div>
 
             {/* Participants and Gender Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 ml-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-4 mx-2 md:ml-4">
               {/* Participants Section */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-700">Participants</h3>
+               <h3 className="text-lg md:text-xl font-semibold text-gray-700 ">Participants</h3>
                 <div className="space-y-4 mt-2">
                   {!formData.showManualEntry && (
-                    <div className="flex flex-col md:flex-row items-center">
+                    <div className="flex flex-col md:flex-row items-start md:items-center">
                       <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Participant
                       </label>
                       <div className="relative w-full md:w-80 flex items-center">
@@ -354,11 +354,11 @@ const SplEntry = () => {
                   )}
 
                   {!formData.showManualEntry && touched.participants && errors.participants && (
-                    <p className="text-sm text-red-500 ml-40">{errors.participants}</p>
+                    <p className="text-sm text-red-500 md:ml-40">{errors.participants}</p>
                   )}
                   
                   {/* Moved "Add" checkbox here under participants */}
-                  <div className="flex justify-center ml-80  mt-2">
+                  <div className="flex justify-start md:justify-center md:ml-80 mt-2">
                     <input
                       type="checkbox"
                       id="showManualEntry"
@@ -374,19 +374,35 @@ const SplEntry = () => {
                 </div>
               </div>
 
-              {/* Gender Field */}
-              <div>
-                <div className="flex flex-col md:flex-row items-center">
-                
+              {/* Gender Field - Moved from below */}
+              <div className="flex flex-col md:flex-row items-start md:items-center">
+                <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Gender</label>
+                <div className="w-full md:w-80">
+                  <select
+                    name="gender"
+                    value={formData.gender}
+                    onChange={(e) => handleInputChange(e)}
+                    onBlur={() => handleBlur('gender')}
+                    className={`border ${touched.gender && errors.gender ? 'border-red-500' : 'border-blue-900'} px-2 py-1 rounded-full w-full`}
+                    required
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                  {touched.gender && errors.gender && (
+                    <p className="text-sm text-red-500 mt-1">{errors.gender}</p>
+                  )}
                 </div>
               </div>
             </div>
 
             {/* Manual Entry Fields - only show when checkbox is checked */}
             {formData.showManualEntry && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 ml-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-4 mx-2 md:ml-4">
                 {/* Participant Name */}
-                <div className="flex flex-col md:flex-row items-center">
+                <div className="flex flex-col md:flex-row items-start md:items-center">
                   <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Name</label>
                   <div className="w-full md:w-80">
                     <input
@@ -404,7 +420,7 @@ const SplEntry = () => {
                 </div>
 
                 {/* Participant Class */}
-                <div className="flex flex-col md:flex-row items-center">
+                <div className="flex flex-col md:flex-row items-start md:items-center">
                   <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Class</label>
                   <div className="w-full md:w-80">
                     <input
@@ -422,7 +438,7 @@ const SplEntry = () => {
                 </div>
 
                 {/* Admission Number */}
-                <div className="flex flex-col md:flex-row items-center">
+                <div className="flex flex-col md:flex-row items-start md:items-center">
                   <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Adm No</label>
                   <div className="w-full md:w-80">
                     <input
@@ -442,9 +458,9 @@ const SplEntry = () => {
             )}
 
             {/* Class and Special Order Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 ml-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-4 mx-2 md:ml-4">
               {/* Special Order Field */}
-              <div className="flex flex-col md:flex-row items-center">
+              <div className="flex flex-col md:flex-row items-start md:items-center">
                 <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Special Order</label>
                 <div className="w-full md:w-80">
                   <select
@@ -467,33 +483,33 @@ const SplEntry = () => {
               </div>
 
               {/* Class Field */}
-              <div className="flex flex-col md:flex-row items-center">
-              <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Gender</label>
-                  <div className="w-full md:w-80">
-                    <select
-                      name="gender"
-                      value={formData.gender}
-                      onChange={(e) => handleInputChange(e)}
-                      onBlur={() => handleBlur('gender')}
-                      className={`border ${touched.gender && errors.gender ? 'border-red-500' : 'border-blue-900'} px-2 py-1 rounded-full w-full`}
-                      required
-                    >
-                      <option value="">Select Gender</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                    </select>
-                    {touched.gender && errors.gender && (
-                      <p className="text-sm text-red-500 mt-1">{errors.gender}</p>
-                    )}
-                  </div>
+              <div className="flex flex-col md:flex-row items-start md:items-center">
+                <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Class</label>
+                <div className="w-full md:w-80">
+                  <select
+                    name="class"
+                    value={formData.class}
+                    onChange={(e) => handleInputChange(e)}
+                    onBlur={() => handleBlur('class')}
+                    className={`border ${touched.class && errors.class ? 'border-red-500' : 'border-blue-900'} px-2 py-1 rounded-full w-full`}
+                    required
+                  >
+                    <option value="">Select Class</option>
+                    <option value="class1">Class 1</option>
+                    <option value="class2">Class 2</option>
+                    <option value="class3">Class 3</option>
+                  </select>
+                  {touched.class && errors.class && (
+                    <p className="text-sm text-red-500 mt-1">{errors.class}</p>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Item Code and Captain Adno Section */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 ml-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-4 mx-2 md:ml-4">
               {/* Item Code */}
-              <div className="flex flex-col md:flex-row items-center">
+              <div className="flex flex-col md:flex-row items-start md:items-center">
                 <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Item Code</label>
                 <div className="w-full md:w-80">
                   <input
@@ -513,7 +529,7 @@ const SplEntry = () => {
 
               {/* Captain Adno and Is Primary */}
               <div className="flex flex-col">
-                <div className="flex flex-col md:flex-row items-center">
+                <div className="flex flex-col md:flex-row items-start md:items-center">
                   <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Captain Adno</label>
                   <input
                     type="text"
@@ -542,14 +558,14 @@ const SplEntry = () => {
             </div>
 
             {/* Remark */}
-            <div className="flex flex-col md:flex-row items-start mt-10 ml-4">
+            <div className="flex flex-col md:flex-row items-start mt-6 md:mt-10 mx-2 md:ml-4">
               <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Remark</label>
               <div className="w-full">
                 <textarea
                   name="remark"
                   value={formData.remark}
                   onChange={(e) => handleInputChange(e, 'remark')}
-                  className="border border-blue-900 h-32 px-4 py-2 rounded-3xl w-full"
+                  className="border border-blue-900 h-24 md:h-32 px-4 py-2 rounded-3xl w-full"
                   maxLength={200}
                   placeholder="Enter your remarks here (max 200 characters)"
                 />
@@ -560,7 +576,7 @@ const SplEntry = () => {
             </div>
 
             {/* Save Button */}
-            <div className='mt-16 text-right md:mr-20'>
+            <div className='mt-8 md:mt-16 text-right px-4 md:mr-20'>
               <button
                 type="submit"
                 className='bg-gradient-to-r from-[#003566] to-[#05B9F4] rounded-full px-6 md:px-10 text-white py-2'
@@ -575,4 +591,4 @@ const SplEntry = () => {
   );
 };
 
-export default SplEntry;
+export default SplEntry

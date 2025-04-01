@@ -164,7 +164,7 @@ const StageDuration = () => {
         <Dash />
         <div className="w-full p-2 md:p-4 lg:p-6 ">
           <form 
-            className="bg-white p-4 md:p-5 lg:p-6 rounded-lg shadow-md max-w-6xl mx-auto min-h-screen"
+            className="bg-white p-2 md:p-2 lg:p-6 rounded-lg shadow-md w-full min-h-screen"
             onSubmit={handleSubmit}
           >
             <div className="mb-5">
