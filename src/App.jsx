@@ -32,6 +32,14 @@ import StageItemwise from './pages/StageItemwise';
 import StageItemwiseList from './pages/StageItemwiseList';
 import EditStageitem from './pages/EditStageitem';
 import AddCallsheet from './pages/AddCallsheet';
+import Timesheet from './pages/Timesheet';
+import AddTimesheet from './pages/AddTimesheet';
+import Scoresheet from './pages/Scoresheet';
+import AddScoresheet from './pages/AddScoresheet';
+import AddTabulationSheet from './pages/AddTabulationSheet';
+import Addstgfestival from './pages/Addstgfestival';
+import StageFestivalwise from './pages/StageFestivalwise';
+import EditFestivalwise from './pages/EditFestivalwise';
 
 
 
@@ -81,8 +89,14 @@ function App() {
           <Route path="/AddStage" element={<AddStage />} />
           <Route path="/Stage-itemwise" element={<StageItemwise />} />
           <Route path="/Stage-itemwiseList" element={<StageItemwiseList />} />
-          <Route path="/Edit-itemwiseList" element={<EditStageitem />} />
+          <Route path="/Edit-itemwiseList/:id" element={<EditStageitem />} />
           <Route path="/AddCallsheet" element={<AddCallsheet />} />
+          <Route path="/AddTimesheet" element={<AddTimesheet />} />
+          <Route path="/AddScoresheet" element={<AddScoresheet />} />
+          <Route path="/AddTabulationsheet" element={<AddTabulationSheet />} />
+          <Route path="/Addfestivalwise" element={<Addstgfestival />} />
+          <Route path="/festivalwiselist" element={<StageFestivalwise />} />
+          <Route path="/Edit-festwiseList/:id" element={<EditFestivalwise />} />
             
          
         </Route>

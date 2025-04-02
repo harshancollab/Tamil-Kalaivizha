@@ -192,13 +192,22 @@ const Dash = () => {
                     Define Stage
                   </Link>
                   <Link
-                    to="/Stage-itemwise"
+                    to="/Stage-itemwiselist"
                     className={`block py-2 text-gray-300 hover:text-white ${
-                      isActive('/Stage-itemwise') ? 'font-semibold' : ''
+                      isActive('/Stage-itemwiselist') ? 'font-semibold' : ''
                     }`}
                     onClick={handleLinkClick}
                   >
                     Stage Allotment Item Wise
+                  </Link>
+                  <Link
+                    to="/festivalwiselist"
+                    className={`block py-2 text-gray-300 hover:text-white ${
+                      isActive('/festivalwiselist') ? 'font-semibold' : ''
+                    }`}
+                    onClick={handleLinkClick}
+                  >
+                  Stage Allotment Festival Wise List
                   </Link>
                 </div>
               )}
@@ -231,6 +240,33 @@ const Dash = () => {
                     onClick={handleLinkClick}
                   >
                     Call Sheet
+                  </Link>
+                  <Link
+                    to="/AddTimesheet"
+                    className={`block py-2 text-gray-300 hover:text-white ${
+                      isActive('/AddTimesheet') ? 'font-semibold' : ''
+                    }`}
+                    onClick={handleLinkClick}
+                  >
+                    Time Sheet
+                  </Link>
+                  <Link
+                    to="/AddScoresheet"
+                    className={`block py-2 text-gray-300 hover:text-white ${
+                      isActive('/AddScoresheet') ? 'font-semibold' : ''
+                    }`}
+                    onClick={handleLinkClick}
+                  >
+                    Score sheet
+                  </Link>
+                  <Link
+                    to="/AddTabulationsheet"
+                    className={`block py-2 text-gray-300 hover:text-white ${
+                      isActive('/AddTabulationsheet') ? 'font-semibold' : ''
+                    }`}
+                    onClick={handleLinkClick}
+                  >
+                    Tabulation Sheet
                   </Link>
                 </div>
               )}

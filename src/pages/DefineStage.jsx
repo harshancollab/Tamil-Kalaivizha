@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { getAllStageListAPI } from '../services/allAPI';
+import { useNavigate } from 'react-router-dom';
 
 
 
 
 const DefineStage = () => {
+    const navigate = useNavigate();
     const [Allstages, setStages] = useState([]);
     console.log(Allstages);
 
@@ -32,6 +34,10 @@ const DefineStage = () => {
     }
 
 
+    const handleAddClick = () => {
+        navigate('/AddStage');
+    };
+
     return (
         <>
 
@@ -43,7 +49,9 @@ const DefineStage = () => {
                         <h2 className="text-[20px] font-[600] leading-[100%] tracking-[2%]">
                             Stages
                         </h2>
-
+                        <button onClick={handleAddClick} className="text-blue-500 border border-blue-500 py-2 px-6 rounded-full flex items-center">
+                            Add Stage
+                        </button>
                     </div>
 
 
@@ -86,3 +94,4 @@ const DefineStage = () => {
 }
 
 export default DefineStage
+

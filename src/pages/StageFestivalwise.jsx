@@ -2,46 +2,45 @@ import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useNavigate } from 'react-router-dom'
-import { getAllItemStageListAPI } from '../services/allAPI'
+import { AllStageFestivalwise } from '../services/allAPI'
 
-const StageItemwiseList = () => {
+const StageFestivalwise = () => {
     const [Allitemise, setItemwise] = useState([]);
+    const [selectedFestival, setSelectedFestival] = useState('UP'); // Add state for selected festival
     console.log(Allitemise);
 
     useEffect(() => {
-        getAllitemise
+        getAllitemise()
     }, [])
+
     const getAllitemise = async () => {
-        const token = sessionStorage.getItem
+        const token = sessionStorage.getItem('token') // Fixed missing method name
         if (token) {
             const reqHeader = {
                 "Authorization": `Bearer ${token}`
             }
             try {
-                const result = await getAllItemStageListAPI(reqHeader)
-                if (result.status == 200) {
-                    setStages(result.data)
+                const result = await AllStageFestivalwise(reqHeader)
+                if (result.status === 200) { // Changed == to ===
+                    setItemwise(result.data) // Changed setStages to setItemwise to match state variable
                 }
             } catch (err) {
                 console.log(err);
-
             }
         }
     }
 
-
     const navigate = useNavigate();
 
-
     const handleAddClick = () => {
-        navigate('/Stage-itemwise');
+        navigate('/Addfestivalwise');
     };
-    
 
+    // Handle festival selection change
+    const handleFestivalChange = (e) => {
+        setSelectedFestival(e.target.value);
+    };
 
-   
-
-   
     const dummyStages = [
         {
             id: 1,
@@ -106,7 +105,7 @@ const StageItemwiseList = () => {
     ];
 
     const handleEditClick = (itemId) => {
-        navigate(`/Edit-itemwiseList/${itemId}`); 
+        navigate(`/Edit-festwiseList/${itemId}`);
     };
 
     return (
@@ -117,8 +116,23 @@ const StageItemwiseList = () => {
                 <div className="flex-1 p-4 md:p-6 lg:p-8">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-[20px] font-[600] leading-[100%] tracking-[2%]">
-                            Stage Allotment Item Wise List
+                            {selectedFestival} - Stage Allotment Festival Wise List
                         </h2>
+                        <div className="flex flex-col sm:flex-row items-center sm:items-center gap-2">
+                            <div className="relative w-full sm:w-20">
+                                <select
+                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
+                                    value={selectedFestival}
+                                    onChange={handleFestivalChange}
+                                >
+                                    <option value="UP">UP</option>
+                                    <option value="LP">LP</option>
+                                </select>
+                                <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                    <i className="fa-solid fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div>
@@ -155,7 +169,7 @@ const StageItemwiseList = () => {
                                             <td className="p-2 md:p-3">
                                                 <i
                                                     className="fa-solid text-blue-500 fa-pen-to-square cursor-pointer"
-                                                    onClick={() => handleEditClick(stage.id)} 
+                                                    onClick={() => handleEditClick(stage.id)}
                                                 ></i>
                                             </td>
                                         </tr>
@@ -166,11 +180,11 @@ const StageItemwiseList = () => {
                     </div>
 
                     <div className='text-right mt-8'>
-                    <button onClick={handleAddClick}
+                        <button onClick={handleAddClick}
                             type="button"
                             className="border border-blue-500 text-blue-600 px-14 py-2 rounded-full mr-5"
                         >
-                            Add 
+                            Add
                         </button>
                         <button
                             type="button"
@@ -185,4 +199,4 @@ const StageItemwiseList = () => {
     );
 };
 
-export default StageItemwiseList;
+export default StageFestivalwise

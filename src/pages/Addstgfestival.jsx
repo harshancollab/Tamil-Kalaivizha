@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import Dash from '../components/Dash';
-import { addStageItemwiseAPI } from "../services/allAPI";
+import { addStagefestAPI } from "../services/allAPI";
 
-const StageItemwise = () => {
+const Addstgfestival = () => {
   const [formData, setFormData] = useState({
     itemName: "",
     itemCode: "",
@@ -155,7 +155,7 @@ const StageItemwise = () => {
         };
 
         try {
-          const result = await addStageItemwiseAPI(reqBody, reqHeader);
+          const result = await addStagefestAPI(reqBody, reqHeader);
           if (result.status === 200) {
             alert("Stage allocated successfully");
 
@@ -231,7 +231,7 @@ const StageItemwise = () => {
           <form onSubmit={handleSubmit} className='min-h-screen mx-auto p-6 bg-white rounded-lg shadow-md'>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-[20px] font-[600] leading-[100%] tracking-[2%]">
-                Stage Allotment Itemwise
+              Stage Allotment Festival Wise
               </h2>
             </div>
 
@@ -463,4 +463,4 @@ const StageItemwise = () => {
   );
 };
 
-export default StageItemwise;
+export default Addstgfestival;

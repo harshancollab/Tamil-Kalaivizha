@@ -119,17 +119,45 @@ export const addStageAPI = async (reqBody, reqHeader) => {
 export const getAllStageListAPI = async (reqHeader) => {
   return await commonAPI("GET", `${SERVER_URL}/all-stages`, {}, reqHeader);
 };
+// edit stage 
+
+
+// Delete a stage
+export const deleteStageAPI = async (stageId, reqHeader) => {
+  return await commonAPI("DELETE", `${BASE_URL}/stages/${stageId}`, null, reqHeader);
+};
+
+// Update a stage
+export const updateStageAPI = async (stageId, reqBody, reqHeader) => {
+  return await commonAPI("PUT", `${BASE_URL}/stages/${stageId}`, reqBody, reqHeader);
+};
+// delete stage 
 
 // Add ItemwiseStage API
 export const  addStageItemwiseAPI  = async (reqBody, reqHeader) => {
   return await commonAPI("POST", `${SERVER_URL}/itemwisestages/add`,reqBody, reqHeader);
 };
+// updateItemwiseStage API
+export const  updateStageItemwiseAPI  = async (id,reqBody, reqHeader) => {
+  return await commonAPI("PUT", `${SERVER_URL}/itemwisestages-edit/${id}`,reqBody, reqHeader);
+};
 
-// all stage api
+
+// all stage  api
 export const getAllItemStageListAPI = async (reqHeader) => {
   return await commonAPI("GET", `${SERVER_URL}/all-itemwisestages`, {}, reqHeader);
 };
 
+// 
+// Add festStage API
+export const  addStagefestAPI  = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/festvelwisestages/add`,reqBody, reqHeader);
+};
+
+// all festwise
+export const AllStageFestivalwise = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/all-festvelwestages`, {}, reqHeader);
+};
 // add callsheet
 export const AddCallSheetAPI = async (reqBody, reqHeader) => {
   return await commonAPI("POST", `${SERVER_URL}/callsheet-add`, reqBody, reqHeader);
