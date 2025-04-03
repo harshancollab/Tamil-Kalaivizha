@@ -51,10 +51,11 @@ const AddScoresheet = () => {
 
     return (
         <>
+          
             <Header />
-            <div className="flex flex-col md:flex-row min-h-screen">
+            <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
                 <Dash />
-                <div className="p-6 bg-gray-100 w-full min-h-screen">
+                <div className="flex-1 p-4 md:p-6 mt-4 w-full overflow-x-auto">
                     <h2 className="text-lg font-semibold mb-4">Stage Report - Score Sheet</h2>
 
                     <div className="space-y-6">

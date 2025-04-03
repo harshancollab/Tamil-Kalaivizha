@@ -40,6 +40,11 @@ import AddTabulationSheet from './pages/AddTabulationSheet';
 import Addstgfestival from './pages/Addstgfestival';
 import StageFestivalwise from './pages/StageFestivalwise';
 import EditFestivalwise from './pages/EditFestivalwise';
+import AddStgReport from './pages/AddStgReport';
+import EligibleSclList from './pages/EligibleSclList';
+import ParticipatingSclList from './pages/ParticipatingSclList';
+import SclContactList from './pages/SclContactList';
+import FestivalWisepat from './pages/FestivalWisepat';
 
 
 
@@ -97,7 +102,11 @@ function App() {
           <Route path="/Addfestivalwise" element={<Addstgfestival />} />
           <Route path="/festivalwiselist" element={<StageFestivalwise />} />
           <Route path="/Edit-festwiseList/:id" element={<EditFestivalwise />} />
-            
+          <Route path="/Addreport" element={<AddStgReport />} />
+          <Route path="/eligible-schools" element={<EligibleSclList />} />
+          <Route path="/Partcipatescllist" element={<ParticipatingSclList />} />
+          <Route path="/SclContactList" element={<SclContactList />} />
+          <Route path="/festwiseList" element={<FestivalWisepat />} />
          
         </Route>
 

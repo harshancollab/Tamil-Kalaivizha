@@ -281,9 +281,9 @@ const SplEntry = () => {
   return (
     <>
       <Header />
-      <div className="flex flex-col md:flex-row bg-gray-200 min-h-screen">
-        <Dash />
-        <div className="w-full px-2 md:px-4 py-3 md:ml-4 mt-3">
+            <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
+                <Dash />
+                <div className="flex-1 p-4 md:p-6 mt-4 w-full overflow-x-auto">
           <form
             onSubmit={handleSubmit}
             className="min-h-screen mx-auto p-4 md:p-6 bg-white rounded-lg shadow-md overflow-hidden"

@@ -51,10 +51,10 @@ const AddTabulationSheet = () => {
 
     return (
         <>
-            <Header />
-            <div className="flex flex-col md:flex-row min-h-screen">
+          <Header />
+            <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
                 <Dash />
-                <div className="p-6 bg-gray-100 w-full min-h-screen">
+                <div className="flex-1 p-4 md:p-6 mt-4 w-full overflow-x-auto">
                     <h2 className="text-lg font-semibold mb-4">Stage Report - Tabulation Sheet</h2>
 
                     <div className="space-y-6">
@@ -100,7 +100,7 @@ const AddTabulationSheet = () => {
                                     <div className="flex flex-col md:flex-row mb-8">
                                         <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">No of Participants</label>
                                         <div className="w-full md:w-80">
-                                           <input type="text"  className="border border-blue-600 px-2 py-1 rounded-full w-full" />
+                                            <input type="text" className="border border-blue-600 px-2 py-1 rounded-full w-full" />
                                         </div>
                                     </div>
                                     <div className='text-center mt-10'>
@@ -125,16 +125,16 @@ const AddTabulationSheet = () => {
                                         <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Festival Type</label>
                                         <div className="w-full md:w-80">
                                             <select
-                                                name="Festival"
+                                                name="Festival item"
                                                 value={callsheet.Festival}
                                                 onChange={handleChange}
                                                 className="border border-blue-600 px-2 py-1 rounded-full w-full"
                                                 required
                                             >
                                                 <option value="">Select Festival</option>
-                                                <option value="UP">UP</option>
-                                                <option value="LP">LP</option>
-                                                <option value="HS">HS</option>
+                                                <option value="Festival 1">Festival 1</option>
+                                                <option value="Festival 2">Festival 2</option>
+                                                <option value="Festival 3">Festival 3</option>
                                             </select>
                                         </div>
                                     </div>
@@ -177,16 +177,16 @@ const AddTabulationSheet = () => {
                                         <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Stage</label>
                                         <div className="w-full md:w-80">
                                             <select
-                                                name="Item"
+                                                name="Stage"
                                                 value={callsheet.Item}
                                                 onChange={handleChange}
                                                 className="border border-blue-600 px-2 py-1 rounded-full w-full"
                                                 required
                                             >
-                                                <option value="">Select Item </option>
-                                                <option value="Drama">Drama</option>
-                                                <option value="Essay">Essay</option>
-                                                <option value="Story">Story</option>
+                                                <option value="">Select stage </option>
+                                                <option value="Stage">Stage </option>
+                                                <option value="Stage 1">Stage 1</option>
+                                                <option value="Stage 2">Stage 2</option>
                                             </select>
                                         </div>
                                     </div>

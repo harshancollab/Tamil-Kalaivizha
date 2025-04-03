@@ -219,17 +219,18 @@ import Dash from '../components/Dash'
 import { AddCallSheetAPI } from '../services/allAPI'
 
 const AddCallsheet = () => {
+    // Maintain original state structure
     const [callsheet, setCallsheet] = useState({
         Festival: "", Item: ""
     })
     console.log(callsheet);
-
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCallsheet({ ...callsheet, [name]: value });
     }
 
+    // Implementation of the missing handleAddcallsheet function
     const handleAddcallsheet = async (e) => {
         e.preventDefault();
         const { Festival, Item } = callsheet
@@ -263,164 +264,188 @@ const AddCallsheet = () => {
         }
     }
 
+    // Function to handle festival-wise report generation
+    const handleFestivalReport = (e) => {
+        e.preventDefault();
+        if (callsheet.Festival) {
+            // Implement festival report logic here
+            alert(`Generating report for festival: ${callsheet.Festival}`);
+            // Reset after generating report
+            setCallsheet({ Festival: "", Item: "" });
+        } else {
+            alert("Please select a festival");
+        }
+    }
+    
+    // Function to handle date & stage report generation
+    const handleDateStageReport = (e) => {
+        e.preventDefault();
+        if (callsheet.Festival && callsheet.Item) {
+            // Using Festival field for Date and Item field for Stage as per original design
+            alert(`Generating report for date: ${callsheet.Festival} and stage: ${callsheet.Item}`);
+            // Reset after generating report
+            setCallsheet({ Festival: "", Item: "" });
+        } else {
+            alert("Please select both date and stage");
+        }
+    }
+
     return (
         <>
+          
+            <div>
             <Header />
-            <div className="flex flex-col md:flex-row min-h-screen">
+            <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
                 <Dash />
-                <div className="p-6 bg-gray-100 w-full min-h-screen">
+                <div className="flex-1 p-4 md:p-6 mt-4 w-full overflow-x-auto">
                     <h2 className="text-lg font-semibold mb-4">Stage Report - Call Sheet</h2>
 
                     <div className="space-y-6">
                         {/* Call Sheet (Item) */}
                         <div className="bg-gray-200 p-6 rounded-lg">
                             <h3 className="text-md font-semibold mb-4">Call Sheet (Item)</h3>
-                            <div className="flex justify-center">
-                                <div className="space-y-4 ">
-                                    <div className="flex flex-col md:flex-row mb-8 ">
-                                        <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Festival Type</label>
-                                        <div className="w-full md:w-80">
-                                            <select
-                                                name="Festival"
-                                                value={callsheet.Festival}
-                                                onChange={handleChange}
-                                                className="border border-blue-600 px-2 py-1 rounded-full w-full"
-                                                required
-                                            >
-                                                <option value="">Select Festival</option>
-                                                <option value="UP">UP</option>
-                                                <option value="LP">LP</option>
-                                                <option value="HS">HS</option>
-                                            </select>
+                            <form onSubmit={handleAddcallsheet}>
+                                <div className="flex justify-center">
+                                    <div className="space-y-4 ">
+                                        <div className="flex flex-col md:flex-row mb-8 ">
+                                            <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Festival Type</label>
+                                            <div className="w-full md:w-80">
+                                                <select
+                                                    name="Festival"
+                                                    value={callsheet.Festival}
+                                                    onChange={handleChange}
+                                                    className="border border-blue-600 px-2 py-1 rounded-full w-full"
+                                                    required
+                                                >
+                                                    <option value="">Select Festival</option>
+                                                    <option value="Festival">Festival</option>
+                                                    <option value="Festival 4">Festival 4</option>
+                                                    <option value="Festival 5">Festival 5</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="flex flex-col md:flex-row mb-8">
-                                        <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Item Name</label>
-                                        <div className="w-full md:w-80">
-                                            <select
-                                                name="Item"
-                                                value={callsheet.Item}
-                                                onChange={handleChange}
-                                                className="border border-blue-600 px-2 py-1 rounded-full w-full"
-                                                required
-                                            >
-                                                <option value="">Select Item </option>
-                                                <option value="Drama">Drama</option>
-                                                <option value="Essay">Essay</option>
-                                                <option value="Story">Story</option>
-                                            </select>
+                                        <div className="flex flex-col md:flex-row mb-8">
+                                            <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Item Name</label>
+                                            <div className="w-full md:w-80">
+                                                <select
+                                                    name="Item"
+                                                    value={callsheet.Item}
+                                                    onChange={handleChange}
+                                                    className="border border-blue-600 px-2 py-1 rounded-full w-full"
+                                                    required
+                                                >
+                                                    <option value="">Select Item </option>
+                                                    <option value="Drama">Drama</option>
+                                                    <option value="Essay">Essay</option>
+                                                    <option value="Story">Story</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className='text-center mt-10'>
-                                        <button
-                                            type="submit"
-                                            className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-14 py-3 rounded-full mt-4"
-                                        >
-                                            Report
-                                        </button>
+                                        <div className='text-center mt-10'>
+                                            <button
+                                                type="submit"
+                                                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-14 py-3 rounded-full mt-4"
+                                            >
+                                                Report
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </form>
                         </div>
 
                         {/* Call Sheet (Festival Wise) */}
                         <div className="bg-gray-200 p-6 rounded-lg">
                             <h3 className="text-md font-semibold mb-4">Call Sheet (Festival Wise)</h3>
-                            <div className="flex justify-center">
-                                <div className="space-y-4 ">
-                                    <div className="flex flex-col md:flex-row mb-8 ">
-                                        <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Festival Type</label>
-                                        <div className="w-full md:w-80">
-                                            <select
-                                                name="Festival"
-                                                value={callsheet.Festival}
-                                                onChange={handleChange}
-                                                className="border border-blue-600 px-2 py-1 rounded-full w-full"
-                                                required
+                            <form onSubmit={handleFestivalReport}>
+                                <div className="flex justify-center">
+                                    <div className="space-y-4 ">
+                                        <div className="flex flex-col md:flex-row mb-8 ">
+                                            <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Festival Type</label>
+                                            <div className="w-full md:w-80">
+                                                <select
+                                                    name="Festival"
+                                                    value={callsheet.Festival}
+                                                    onChange={handleChange}
+                                                    className="border border-blue-600 px-2 py-1 rounded-full w-full"
+                                                    required
+                                                >
+                                                    <option value="">Select Festival</option>
+                                                    <option value="Festival 1">Festival 1</option>
+                                                    <option value="Festival 2">Festival 2</option>
+                                                    <option value="Festival 3">Festival 3</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div className='text-center mt-10'>
+                                            <button
+                                                type="submit"
+                                                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-14 py-3 rounded-full mt-4"
                                             >
-                                                <option value="">Select Festival</option>
-                                                <option value="UP">UP</option>
-                                                <option value="LP">LP</option>
-                                                <option value="HS">HS</option>
-                                            </select>
+                                                Report
+                                            </button>
                                         </div>
                                     </div>
-
-                                    <div className='text-center mt-10'>
-                                        <button
-                                            type="submit"
-                                            className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-14 py-3 rounded-full mt-4"
-                                        >
-                                            Report
-                                        </button>
-                                    </div>
                                 </div>
-                            </div>
+                            </form>
                         </div>
 
                         {/* Call Sheet (Date & Stage Wise) */}
                         <div className="bg-gray-200 p-6 rounded-lg">
                             <h3 className="text-md font-semibold mb-4">Call Sheet (Date & Stage Wise)</h3>
-                            <div className="flex justify-center">
-                                <div className="space-y-4 ">
-                                    <div className="flex flex-col md:flex-row mb-8 ">
-                                        <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Date</label>
-                                        <div className="w-full md:w-80">
-                                            <select
-                                                name="Festival"
-                                                value={callsheet.Festival}
-                                                onChange={handleChange}
-                                                className="border border-blue-600 px-2 py-1 rounded-full w-full"
-                                                required
-                                            >
-                                                <option value="">Select Date</option>
-                                                <option value="UP">UP</option>
-                                                <option value="LP">LP</option>
-                                                <option value="HS">HS</option>
-                                            </select>
+                            <form onSubmit={handleDateStageReport}>
+                                <div className="flex justify-center">
+                                    <div className="space-y-4 ">
+                                        <div className="flex flex-col md:flex-row mb-8 ">
+                                            <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Date</label>
+                                            <div className="w-full md:w-80">
+                                                <select
+                                                    name="Festival"
+                                                    value={callsheet.Festival}
+                                                    onChange={handleChange}
+                                                    className="border border-blue-600 px-2 py-1 rounded-full w-full"
+                                                    required
+                                                >
+                                                    <option value="">Select Date</option>
+                                                    <option value="UP">UP</option>
+                                                    <option value="LP">LP</option>
+                                                    <option value="HS">HS</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="flex flex-col md:flex-row mb-8">
-                                        <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Stage</label>
-                                        <div className="w-full md:w-80">
-                                            <select
-                                                name="Item"
-                                                value={callsheet.Item}
-                                                onChange={handleChange}
-                                                className="border border-blue-600 px-2 py-1 rounded-full w-full"
-                                                required
-                                            >
-                                                <option value="">Select Item </option>
-                                                <option value="Drama">Drama</option>
-                                                <option value="Essay">Essay</option>
-                                                <option value="Story">Story</option>
-                                            </select>
+                                        <div className="flex flex-col md:flex-row mb-8">
+                                            <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Stage</label>
+                                            <div className="w-full md:w-80">
+                                                <select
+                                                    name="Item"
+                                                    value={callsheet.Item}
+                                                    onChange={handleChange}
+                                                    className="border border-blue-600 px-2 py-1 rounded-full w-full"
+                                                    required
+                                                >
+                                                    <option value="">Select stage </option>
+                                                    <option value="stage 1">stage 1</option>
+                                                    <option value="stage 2">stage 2</option>
+                                                    <option value="stage 3">stage 3</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className='text-center mt-10'>
-                                        <button
-                                            type="submit"
-                                            className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-14 py-3 rounded-full mt-4"
-                                        >
-                                            Report
-                                        </button>
+                                        <div className='text-center mt-10'>
+                                            <button
+                                                type="submit"
+                                                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-14 py-3 rounded-full mt-4"
+                                            >
+                                                Report
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-
-
-
-
-
-
-
-
-
-
-
+            </div>
             </div>
         </>
     )

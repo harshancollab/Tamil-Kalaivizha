@@ -107,15 +107,15 @@ console.log(formData);
   return (
     <>
       <Header />
-      <div className="flex flex-col md:flex-row bg-gray-200 min-h-screen">
-        <Dash />
-        <div className="w-full p-2 md:p-4">
+            <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
+                <Dash />
+                <div className="flex-1 p-4 md:p-6 mt-4 w-full overflow-x-auto">
           <form
             className="bg-white p-3 md:p-4 rounded-lg shadow-md w-full min-h-screen"
             onSubmit={handleUpdate}
           >
             <div className="mb-4 mt-2 md:mb-5 md:mt-3">
-              <h2 className="text-xl md:text-2xl font-semibold">Update Stage Allotment Itemwise</h2>
+              <h2 className="text-xl md:text-2xl font-semibold">Update Stage Allotment Festivalwise</h2>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-3 md:gap-y-4 gap-x-4 md:gap-x-6 text-[#003566] p-2 md:p-4">

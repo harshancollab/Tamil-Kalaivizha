@@ -224,10 +224,10 @@ const StageItemwise = () => {
 
   return (
     <>
-      <Header />
-      <div className="flex flex-col md:flex-row min-h-screen">
-        <Dash />
-        <div className="flex-1 p-4 bg-gray-300 overflow-x-hidden">
+       <Header />
+            <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
+                <Dash />
+                <div className="flex-1 p-4 md:p-6 mt-4 w-full overflow-x-auto">
           <form onSubmit={handleSubmit} className='min-h-screen mx-auto p-6 bg-white rounded-lg shadow-md'>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-[20px] font-[600] leading-[100%] tracking-[2%]">

@@ -162,3 +162,23 @@ export const AllStageFestivalwise = async (reqHeader) => {
 export const AddCallSheetAPI = async (reqBody, reqHeader) => {
   return await commonAPI("POST", `${SERVER_URL}/callsheet-add`, reqBody, reqHeader);
 };
+
+
+// all Eligblescl  api
+export const getAllElgibleSclListAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/allelgiblescllist`, {}, reqHeader);
+};
+
+// all getAllPartcipteSclList  api
+export const getAllPartcipteSclListAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/allparticipatelist`, {}, reqHeader);
+};
+// all getAllScl contact  api
+export const getAllSchoolContactAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/allsclcontactlist`, {}, reqHeader);
+};
+
+// all getFestvelwise contact  api
+export const getAllfestParticipantsAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/allfestvellist`, {}, reqHeader);
+};
