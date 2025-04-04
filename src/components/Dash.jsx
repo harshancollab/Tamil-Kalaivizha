@@ -18,7 +18,7 @@ const Dash = () => {
       // Stage Report menu should be open if current path matches any of its links
       stageReport: ['/AddCallsheet', '/AddTimesheet', '/AddScoresheet', '/AddTabulationsheet', '/Addreport'].some(route => path === route),
       // Pre Fest Report menu should be open if current path matches any of its links
-      preFestReport: ['/eligible-schools'].some(route => path === route)
+      preFestReport: ['/eligible-schools','/Partcipatescllist','/SclContactList','/festwiseList','/DateWiseList','/ParticipantsCardList'].some(route => path === route)
     };
   });
 
@@ -34,7 +34,7 @@ const Dash = () => {
       settings: openMenus.settings || ['/AllKalolsavam', '/schlentry', '/All-schools', '/Spl-entry'].some(route => path === route),
       stageSettings: openMenus.stageSettings || ['/stage-duration-list', '/StageList', '/Stage-itemwiselist', '/festivalwiselist'].some(route => path === route),
       stageReport: openMenus.stageReport || ['/AddCallsheet', '/AddTimesheet', '/AddScoresheet', '/AddTabulationsheet', '/Addreport'].some(route => path === route),
-      preFestReport: openMenus.preFestReport || ['/eligible-schools'].some(route => path === route)
+      preFestReport: openMenus.preFestReport || ['/eligible-schools','/Partcipatescllist','/SclContactList','/festwiseList','/DateWiseList','/ParticipantsCardList'].some(route => path === route)
     };
     
     setOpenMenus(newOpenMenus);
@@ -71,9 +71,9 @@ const Dash = () => {
       >
         {/* Sidebar header */}
         <div className="flex justify-between items-center w-full mb-6">
-          <h2 className="text-lg font-semibold flex items-center">
-            <i className="fa-solid fa-table mr-2" aria-hidden="true"></i> Dashboard
-          </h2>
+        <Link to="/" className="text-lg font-semibold flex items-center cursor-pointer ">
+      <i className="fa-solid fa-table mr-2" aria-hidden="true"></i> Dashboard
+    </Link>
           <button
             className="md:hidden text-white"
             onClick={() => setIsSidebarOpen(false)}
@@ -327,6 +327,24 @@ const Dash = () => {
                     onClick={() => setIsSidebarOpen(false)}
                   >
                    Festival Wise Participants
+                  </Link>
+                  <Link
+                    to="/DateWiseList"
+                    className={`block py-2 text-gray-300 hover:bg-gradient-to-r from-[#003566] to-[#05B9F4] ${
+                      isActive('/DateWiseList') ? 'font-semibold' : ''
+                    }`}
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                   Date Wise Participants
+                  </Link>
+                  <Link
+                    to="/ParticipantsCardList"
+                    className={`block py-2 text-gray-300 hover:bg-gradient-to-r from-[#003566] to-[#05B9F4] ${
+                      isActive('/ParticipantsCardList') ? 'font-semibold' : ''
+                    }`}
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                   Participants Card
                   </Link>
                 </div>
               )}

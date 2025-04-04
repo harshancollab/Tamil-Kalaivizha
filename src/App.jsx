@@ -45,6 +45,8 @@ import EligibleSclList from './pages/EligibleSclList';
 import ParticipatingSclList from './pages/ParticipatingSclList';
 import SclContactList from './pages/SclContactList';
 import FestivalWisepat from './pages/FestivalWisepat';
+import DateWisePatcipatList from './pages/DateWisePatcipatList';
+import ParticipantsCardlist from './pages/ParticipantsCardlist';
 
 
 
@@ -107,6 +109,8 @@ function App() {
           <Route path="/Partcipatescllist" element={<ParticipatingSclList />} />
           <Route path="/SclContactList" element={<SclContactList />} />
           <Route path="/festwiseList" element={<FestivalWisepat />} />
+          <Route path="/DateWiseList" element={<DateWisePatcipatList />} />
+          <Route path="/ParticipantsCardList" element={<ParticipantsCardlist />} />
          
         </Route>
 
