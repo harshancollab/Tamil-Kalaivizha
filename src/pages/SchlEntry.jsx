@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import Header from "../components/Header"
 import Dash from "../components/Dash"
-import { addSchoolEntryAPI } from "../services/allAPI";
+import { addSchoolEntryAPI } from "../services/allAPI"
 
 const  SchlEntry = () => {
   const [escortingTeachers, setEscortingTeachers] = useState([{ name: "", phone: "" }]);

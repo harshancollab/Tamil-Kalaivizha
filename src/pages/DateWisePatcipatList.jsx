@@ -33,12 +33,10 @@ const DateWiseParticipantList = () => {
     setSelectedDate(e.target.value);
   };
 
-  // Generate the appropriate title based on the selected date
   const getPrintTitle = () => {
     if (selectedDate === "ALL") {
       return "All Dates - Participants List";
     } else {
-      // Format the date for display
       const dateObj = new Date(selectedDate);
       const formattedDate = dateObj.toLocaleDateString('en-US', {
         year: 'numeric',
@@ -133,82 +131,85 @@ const DateWiseParticipantList = () => {
               </button>
             </div>
           </div>
+          
           <div ref={printRef} className="w-full">
             <div className="print-title hidden">{getPrintTitle()}</div>
-            <div className="overflow-x-auto -mx-4 sm:mx-0 ">
-              <div className="inline-block min-w-full align-middle px-4 sm:px-0">
-                <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
-                  <thead className="text-xs sm:text-sm">
+            
+            {/* Mobile view table with horizontal scrolling */}
+            <div className="md:hidden w-full">
+              <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
+                <table className="min-w-full text-center border-separate border-spacing-y-2 print-table whitespace-nowrap" style={{ minWidth: "800px" }}>
+                  <thead className="text-xs">
                     {/* Category Headers */}
                     <tr>
-                      <th rowSpan="2" className="p-2 md:p-3 align-bottom">Sl No</th>
-                      <th rowSpan="2" className="p-2 md:p-3 align-bottom">School code</th>
-                      <th rowSpan="2" className="p-2 md:p-3 align-bottom">School Name</th>
+                      <th rowSpan="2" className="p-2 align-bottom">Sl No</th>
+                      <th rowSpan="2" className="p-2 align-bottom">School code</th>
+                      <th rowSpan="2" className="p-2 align-bottom">School Name</th>
                       {/* UP Category */}
-                      <th colSpan="2" className="p-2 md:p-3">
-                        <div className="relative font-normal text-sm flex items-center justify-center w-full">
-                          <div className="px-4 py-1 border border-blue-800 rounded-full bg-white text-gray-500">
+                      <th colSpan="2" className="p-2">
+                        <div className="relative font-normal text-xs flex items-center justify-center w-full">
+                          <div className="px-3 py-1 border border-blue-800 rounded-full bg-white text-gray-500">
                             UP
                           </div>
                         </div>
                       </th>
                       {/* LP Category */}
-                      <th colSpan="2" className="p-2 md:p-3">
-                        <div className="relative font-normal text-sm flex items-center justify-center w-full">
-                          <div className="px-4 py-1 border border-blue-800 rounded-full bg-white text-gray-500">
+                      <th colSpan="2" className="p-2">
+                        <div className="relative font-normal text-xs flex items-center justify-center w-full">
+                          <div className="px-3 py-1 border border-blue-800 rounded-full bg-white text-gray-500">
                             LP
                           </div>
                         </div>
                       </th>
                       {/* HS Category */}
-                      <th colSpan="2" className="p-2 md:p-3">
-                        <div className="relative font-normal text-sm flex items-center justify-center w-full">
-                          <div className="px-4 py-1 border border-blue-800 rounded-full bg-white text-gray-500">
+                      <th colSpan="2" className="p-2">
+                        <div className="relative font-normal text-xs flex items-center justify-center w-full">
+                          <div className="px-3 py-1 border border-blue-800 rounded-full bg-white text-gray-500">
                             HS
                           </div>
                         </div>
                       </th>
                       {/* HSS Category */}
-                      <th colSpan="2" className="p-2 md:p-3">
-                        <div className="relative font-normal text-sm flex items-center justify-center w-full">
-                          <div className="px-4 py-1 border border-blue-800 rounded-full bg-white text-gray-500">
+                      <th colSpan="2" className="p-2">
+                        <div className="relative font-normal text-xs flex items-center justify-center w-full">
+                          <div className="px-3 py-1 border border-blue-800 rounded-full bg-white text-gray-500">
                             HSS
                           </div>
                         </div>
                       </th>
-                      <th rowSpan="2" className="p-2 md:p-3 align-bottom">Total</th>
+                      <th rowSpan="2" className="p-2 align-bottom">Total</th>
                     </tr>
                     <tr className="text-gray-700">
                       {/* UP Boys/Girls */}
-                      <th className="p-2 md:p-3">Boys</th>
-                      <th className="p-2 md:p-3">Girls</th>
+                      <th className="p-2">Boys</th>
+                      <th className="p-2">Girls</th>
                       {/* LP Boys/Girls */}
-                      <th className="p-2 md:p-3">Boys</th>
-                      <th className="p-2 md:p-3">Girls</th>
+                      <th className="p-2">Boys</th>
+                      <th className="p-2">Girls</th>
                       {/* HS Boys/Girls */}
-                      <th className="p-2 md:p-3">Boys</th>
-                      <th className="p-2 md:p-3">Girls</th>
+                      <th className="p-2">Boys</th>
+                      <th className="p-2">Girls</th>
                       {/* HSS Boys/Girls */}
-                      <th className="p-2 md:p-3">Boys</th>
-                      <th className="p-2 md:p-3">Girls</th>
+                      <th className="p-2">Boys</th>
+                      <th className="p-2">Girls</th>
                     </tr>
                   </thead>
-                  <tbody className="text-xs sm:text-sm">
+                  <tbody className="text-xs">
                     {Alllist && Alllist.length > 0 ? (
                       Alllist.map((item, index) => (
                         <tr key={index} className="hover:bg-gray-100">
-                          <td className="p-2 md:p-3">{index + 1}</td>
-                          <td className="p-2 md:p-3">{item.schoolCode || "-"}</td>
-                          <td className="p-2 md:p-3">{item.schoolName || "-"}</td>
-                          <td className="p-2 md:p-3">{item.upBoys || "0"}</td>
-                          <td className="p-2 md:p-3">{item.upGirls || "0"}</td>
-                          <td className="p-2 md:p-3">{item.lpBoys || "0"}</td>
-                          <td className="p-2 md:p-3">{item.lpGirls || "0"}</td>
-                          <td className="p-2 md:p-3">{item.hsBoys || "0"}</td>
-                          <td className="p-2 md:p-3">{item.hsGirls || "0"}</td>
-                          <td className="p-2 md:p-3">{item.hssBoys || "0"}</td>
-                          <td className="p-2 md:p-3">{item.hssGirls || "0"}</td>
-                          <td className="p-2 md:p-3">
+                          <td className="p-2">{index + 1}</td>
+                          <td className="p-2">{item.schoolCode || "-"}</td>
+                          <td className="p-2 text-left">{item.schoolName || "-"}</td>
+                          <td className="p-2">{item.upBoys || "0"}</td>
+                          <td className="p-2">{item.upGirls || "0"}</td>
+                          <td className="p-2">{item.lpBoys || "0"}</td>
+                          <td className="p-2">{item.lpGirls || "0"}</td>
+                          <td className="p-2">{item.hsBoys || "0"}</td>
+                          <td className="p-2">{item.hsGirls || "0"}</td>
+                          <td className="p-2">{item.hssBoys || "0"}</td>
+                          <td className="p-2">{item.hssGirls || "0"}</td>
+                          <td className="p-2">
                             {(parseInt(item.upBoys || 0) + 
                               parseInt(item.upGirls || 0) + 
                               parseInt(item.lpBoys || 0) + 
@@ -222,23 +223,131 @@ const DateWiseParticipantList = () => {
                       ))
                     ) : (
                       <tr className="hover:bg-gray-100">
-                        <td className="p-2 md:p-3">1</td>
-                        <td className="p-2 md:p-3">933</td>
-                        <td className="p-2 md:p-3">School 1</td>
-                        <td className="p-2 md:p-3">8</td>
-                        <td className="p-2 md:p-3">9</td>
-                        <td className="p-2 md:p-3">6</td>
-                        <td className="p-2 md:p-3">4</td>
-                        <td className="p-2 md:p-3">5</td>
-                        <td className="p-2 md:p-3">3</td>
-                        <td className="p-2 md:p-3">7</td>
-                        <td className="p-2 md:p-3">2</td>
-                        <td className="p-2 md:p-3">44</td>
+                        <td className="p-2">1</td>
+                        <td className="p-2">933</td>
+                        <td className="p-2 text-left">School 1</td>
+                        <td className="p-2">8</td>
+                        <td className="p-2">9</td>
+                        <td className="p-2">6</td>
+                        <td className="p-2">4</td>
+                        <td className="p-2">5</td>
+                        <td className="p-2">3</td>
+                        <td className="p-2">7</td>
+                        <td className="p-2">2</td>
+                        <td className="p-2">44</td>
                       </tr>
                     )}
                   </tbody>
                 </table>
               </div>
+              <div className="text-xs text-gray-500 mt-2 italic">
+                Swipe left/right to see all data
+              </div>
+            </div>
+            
+            {/* Desktop view table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
+                <thead className="text-sm">
+                  {/* Category Headers */}
+                  <tr>
+                    <th rowSpan="2" className="p-3 align-bottom">Sl No</th>
+                    <th rowSpan="2" className="p-3 align-bottom">School code</th>
+                    <th rowSpan="2" className="p-3 align-bottom">School Name</th>
+                    {/* UP Category */}
+                    <th colSpan="2" className="p-3">
+                      <div className="relative font-normal text-sm flex items-center justify-center w-full">
+                        <div className="px-4 py-1 border border-blue-800 rounded-full bg-white text-gray-500">
+                          UP
+                        </div>
+                      </div>
+                    </th>
+                    {/* LP Category */}
+                    <th colSpan="2" className="p-3">
+                      <div className="relative font-normal text-sm flex items-center justify-center w-full">
+                        <div className="px-4 py-1 border border-blue-800 rounded-full bg-white text-gray-500">
+                          LP
+                        </div>
+                      </div>
+                    </th>
+                    {/* HS Category */}
+                    <th colSpan="2" className="p-3">
+                      <div className="relative font-normal text-sm flex items-center justify-center w-full">
+                        <div className="px-4 py-1 border border-blue-800 rounded-full bg-white text-gray-500">
+                          HS
+                        </div>
+                      </div>
+                    </th>
+                    {/* HSS Category */}
+                    <th colSpan="2" className="p-3">
+                      <div className="relative font-normal text-sm flex items-center justify-center w-full">
+                        <div className="px-4 py-1 border border-blue-800 rounded-full bg-white text-gray-500">
+                          HSS
+                        </div>
+                      </div>
+                    </th>
+                    <th rowSpan="2" className="p-3 align-bottom">Total</th>
+                  </tr>
+                  <tr className="text-gray-700">
+                    {/* UP Boys/Girls */}
+                    <th className="p-3">Boys</th>
+                    <th className="p-3">Girls</th>
+                    {/* LP Boys/Girls */}
+                    <th className="p-3">Boys</th>
+                    <th className="p-3">Girls</th>
+                    {/* HS Boys/Girls */}
+                    <th className="p-3">Boys</th>
+                    <th className="p-3">Girls</th>
+                    {/* HSS Boys/Girls */}
+                    <th className="p-3">Boys</th>
+                    <th className="p-3">Girls</th>
+                  </tr>
+                </thead>
+                <tbody className="text-sm">
+                  {Alllist && Alllist.length > 0 ? (
+                    Alllist.map((item, index) => (
+                      <tr key={index} className="hover:bg-gray-100">
+                        <td className="p-3">{index + 1}</td>
+                        <td className="p-3">{item.schoolCode || "-"}</td>
+                        <td className="p-3 text-left">{item.schoolName || "-"}</td>
+                        <td className="p-3">{item.upBoys || "0"}</td>
+                        <td className="p-3">{item.upGirls || "0"}</td>
+                        <td className="p-3">{item.lpBoys || "0"}</td>
+                        <td className="p-3">{item.lpGirls || "0"}</td>
+                        <td className="p-3">{item.hsBoys || "0"}</td>
+                        <td className="p-3">{item.hsGirls || "0"}</td>
+                        <td className="p-3">{item.hssBoys || "0"}</td>
+                        <td className="p-3">{item.hssGirls || "0"}</td>
+                        <td className="p-3">
+                          {(parseInt(item.upBoys || 0) + 
+                            parseInt(item.upGirls || 0) + 
+                            parseInt(item.lpBoys || 0) + 
+                            parseInt(item.lpGirls || 0) + 
+                            parseInt(item.hsBoys || 0) + 
+                            parseInt(item.hsGirls || 0) + 
+                            parseInt(item.hssBoys || 0) + 
+                            parseInt(item.hssGirls || 0))}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr className="hover:bg-gray-100">
+                      <td className="p-3">1</td>
+                      <td className="p-3">933</td>
+                      <td className="p-3 ">School 1</td>
+                      <td className="p-3">8</td>
+                      <td className="p-3">9</td>
+                      <td className="p-3">6</td>
+                      <td className="p-3">4</td>
+                      <td className="p-3">5</td>
+                      <td className="p-3">3</td>
+                      <td className="p-3">7</td>
+                      <td className="p-3">2</td>
+                      <td className="p-3">44</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

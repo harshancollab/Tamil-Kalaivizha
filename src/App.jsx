@@ -47,6 +47,10 @@ import SclContactList from './pages/SclContactList';
 import FestivalWisepat from './pages/FestivalWisepat';
 import DateWisePatcipatList from './pages/DateWisePatcipatList';
 import ParticipantsCardlist from './pages/ParticipantsCardlist';
+import ParticipantsMorethan from './pages/ParticipantsMorethan';
+import ClashReportList from './pages/ClashReportList';
+import ClusterReport from './pages/ClusterReport';
+import StageReport from './pages/StageReport';
 
 
 
@@ -111,6 +115,10 @@ function App() {
           <Route path="/festwiseList" element={<FestivalWisepat />} />
           <Route path="/DateWiseList" element={<DateWisePatcipatList />} />
           <Route path="/ParticipantsCardList" element={<ParticipantsCardlist />} />
+          <Route path="/ParticipantsMorethan" element={<ParticipantsMorethan />} />
+          <Route path="/ClashReportList" element={<ClashReportList />} />
+          <Route path="/ClusterReport" element={<ClusterReport />} />
+          <Route path="/StageReport" element={<StageReport />} />
          
         </Route>
 

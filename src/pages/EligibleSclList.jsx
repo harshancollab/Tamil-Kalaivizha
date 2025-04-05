@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
-import { getAllElgibleSclListAPI } from '../services/allAPI';
+import { getAllElgibleSclListAPI } from '../services/allAPI'
 
 const EligibleSclList = () => {
   const [Alllist, setList] = useState([]);

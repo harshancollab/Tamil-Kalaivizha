@@ -1,55 +1,32 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
-import { getAllPartcipteSclListAPI } from '../services/allAPI';
 
-const ParticipatingSclList = () => {
-  const [Alllist, setList] = useState([]);
+const ParticipantsMorethan = () => {
+    const [participants, setParticipants] = useState([])
   const printRef = useRef();
-  const [selectedFestival, setSelectedFestival] = useState("ALL Festival");
+
+
+   useEffect(() => {
+      getAllParticipants();
+    }, []);
   
-  console.log(Alllist);
-
-  useEffect(() => {
-    getAllitemise();
-  }, []);
-
-  const getAllitemise = async () => {
-    const token = sessionStorage.getItem('token');
-    if (token) {
-      const reqHeader = {
-        Authorization: `Bearer ${token}`,
-      };
-      try {
-        const result = await getAllPartcipteSclListAPI(reqHeader);
-        if (result?.status === 200) {
-          setList(result.data);
+    const getAllParticipants = async () => {
+      const token = sessionStorage.getItem('token');
+      if (token) {
+        const reqHeader = {
+          Authorization: `Bearer ${token}`,
+        };
+        try {
+          const result = await (reqHeader);
+          if (result?.status === 200) {
+            setParticipants(result.data);
+          }
+        } catch (err) {
+          console.log(err);
         }
-      } catch (err) {
-        console.log(err);
       }
-    }
-  };
-
-  const handleFestivalChange = (e) => {
-    setSelectedFestival(e.target.value);
-  };
-
-  // Generate the appropriate title based on the selected festival
-  const getPrintTitle = () => {
-    switch(selectedFestival) {
-      case "UP":
-        return "UP Tamil Kalaivizha - List of Participating Schools";
-      case "Lp":
-        return "LP Tamil Kalaivizha - List of Participating Schools";
-      case "Hs":
-        return "HS Tamil Kalaivizha - List of Participating Schools";
-      case "Hss":
-        return "HSS Tamil Kalaivizha - List of Participating Schools";
-      default:
-        return "ALL Festival - List of Participating Schools";
-    }
-  };
+    };
 
   const handlePrint = () => {
     const originalContents = document.body.innerHTML;
@@ -69,10 +46,10 @@ const ParticipatingSclList = () => {
           width: 100%;
           border-collapse: collapse;
         }
-       .print-table th, .print-table td {
+        .print-table th, .print-table td {
           border: 1px solid #ddd;
           padding: 8px;
-          text-align: center;
+          text-align: left;
         }
         .print-table th {
           background-color: #f2f2f2;
@@ -83,6 +60,8 @@ const ParticipatingSclList = () => {
           margin-bottom: 20px;
           font-size: 18px;
           font-weight: bold;
+        }
+        .print-title {
           display: block !important;
         }
         .no-print {
@@ -105,14 +84,26 @@ const ParticipatingSclList = () => {
           {/* Header section with title and controls */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
             <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
-              Participating Schools List
+              Participants List more than one item
             </h2>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
               <div className="relative w-full sm:w-40">
                 <select
                   className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
-                  onChange={handleFestivalChange}
-                  value={selectedFestival}
+                >
+                  <option value="ALL Festival">Select no of item</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </select>
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                  <i className="fa-solid fa-chevron-down"></i>
+                </div>
+              </div>
+              <div className="relative w-full sm:w-40">
+                <select
+                  className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
                 >
                   <option value="ALL Festival">ALL Festival</option>
                   <option value="UP">UP</option>
@@ -133,33 +124,31 @@ const ParticipatingSclList = () => {
             </div>
           </div>
           <div ref={printRef} className="w-full">
-            <div className="print-title hidden">{getPrintTitle()}</div>
+            <div className="print-title hidden">Participants List More Than One Item Report</div>
             <div className="overflow-x-auto -mx-4 sm:mx-0 ">
               <div className="inline-block min-w-full align-middle px-4 sm:px-0">
                 <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
                   <thead className="text-xs sm:text-sm">
-                    <tr className="text-gray-700 ">
+                    <tr className="text-gray-700">
                       <th className="p-2 md:p-3">Sl No</th>
-                      <th className="p-2 md:p-3">School Code</th>
+                      <th className="p-2 md:p-3">Reg No</th>
+                      <th className="p-2 md:p-3"> Name</th>
+                      <th className="p-2 md:p-3">Gender</th>
+                      <th className="p-2 md:p-3">Class</th>
+                      <th className="p-2 md:p-3">School code</th>
                       <th className="p-2 md:p-3">School Name</th>
                     </tr>
                   </thead>
                   <tbody className="text-xs sm:text-sm">
-                    {Alllist && Alllist.length > 0 ? (
-                      Alllist.map((item, index) => (
-                        <tr key={index} className="hover:bg-gray-100">
-                          <td className="p-2 md:p-3">{index + 1}</td>
-                          <td className="p-2 md:p-3">{item.schoolCode || "-"}</td>
-                          <td className="p-2 md:p-3">{item.schoolName || "-"}</td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr className="hover:bg-gray-100">
-                        <td className="p-2 md:p-3">8</td>
-                        <td className="p-2 md:p-3">9</td>
-                        <td className="p-2 md:p-3">name</td>
-                      </tr>
-                    )}
+                    <tr className="hover:bg-gray-100">
+                      <td className="p-2 md:p-3">8</td>
+                      <td className="p-2 md:p-3">9</td>
+                      <td className="p-2 md:p-3">nazme</td>
+                      <td className="p-2 md:p-3">Boy</td>
+                      <td className="p-2 md:p-3">9</td>
+                      <td className="p-2 md:p-3">933</td>
+                      <td className="p-2 md:p-3">school 1</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -171,4 +160,4 @@ const ParticipatingSclList = () => {
   )
 }
 
-export default ParticipatingSclList
+export default ParticipantsMorethan

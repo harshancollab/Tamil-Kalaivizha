@@ -226,11 +226,11 @@
 
 
 
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import Header from '../components/Header';
-import Dash from '../components/Dash';
-import { updateStageItemwiseAPI, addStageItemwiseAPI } from '../services/allAPI';
+import React, { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
+import Header from '../components/Header'
+import Dash from '../components/Dash'
+import { updateStageItemwiseAPI, addStageItemwiseAPI } from '../services/allAPI'
 
 const EditStageitem = () => {
   const { id } = useParams();
@@ -246,7 +246,30 @@ const EditStageitem = () => {
     date: "",
     numberOfClusters: ""
   });
-console.log(formData);
+
+  const [errors, setErrors] = useState({
+    itemName: "",
+    itemCode: "",
+    numberOfParticipants: "",
+    stage: "",
+    time: "",
+    numberOfJudges: "",
+    approxTimeTaken: "",
+    date: "",
+    numberOfClusters: ""
+  });
+
+  const [touched, setTouched] = useState({
+    itemName: false,
+    itemCode: false,
+    numberOfParticipants: false,
+    stage: false,
+    time: false,
+    numberOfJudges: false,
+    approxTimeTaken: false,
+    date: false,
+    numberOfClusters: false
+  });
 
   // Fetch existing data when component mounts
   useEffect(() => {
@@ -277,34 +300,95 @@ console.log(formData);
       ...formData,
       [name]: value
     });
+    
+    validateField(name, value);
+  };
+
+  const handleBlur = (field) => {
+    setTouched({
+      ...touched,
+      [field]: true,
+    });
+    validateField(field, formData[field]);
+  };
+
+  const validateField = (field, value) => {
+    let errorMessage = "";
+
+    switch (field) {
+      case "itemName":
+        if (!value) errorMessage = "Item name is required";
+        break;
+      case "itemCode":
+        if (!value) errorMessage = "Item code is required";
+        break;
+      case "numberOfParticipants":
+        if (!value) errorMessage = "Number of participants is required";
+        else if (value <= 0) errorMessage = "Number must be greater than 0";
+        break;
+      case "stage":
+        if (!value) errorMessage = "Stage is required";
+        break;
+      case "time":
+        if (!value) errorMessage = "Time is required";
+        break;
+      case "numberOfJudges":
+        if (!value) errorMessage = "Number of judges is required";
+        break;
+      case "approxTimeTaken":
+        if (!value) errorMessage = "Approximate time taken is required";
+        break;
+      case "date":
+        if (!value) errorMessage = "Date is required";
+        break;
+      case "numberOfClusters":
+        if (!value) errorMessage = "Number of clusters is required";
+        break;
+      default:
+        break;
+    }
+
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [field]: errorMessage,
+    }));
+
+    return errorMessage === "";
+  };
+
+  const validateForm = () => {
+    const fieldValidations = {
+      itemName: validateField("itemName", formData.itemName),
+      itemCode: validateField("itemCode", formData.itemCode),
+      numberOfParticipants: validateField("numberOfParticipants", formData.numberOfParticipants),
+      stage: validateField("stage", formData.stage),
+      time: validateField("time", formData.time),
+      numberOfJudges: validateField("numberOfJudges", formData.numberOfJudges),
+      approxTimeTaken: validateField("approxTimeTaken", formData.approxTimeTaken),
+      date: validateField("date", formData.date),
+      numberOfClusters: validateField("numberOfClusters", formData.numberOfClusters)
+    };
+
+    
+    setTouched({
+      itemName: true,
+      itemCode: true,
+      numberOfParticipants: true,
+      stage: true,
+      time: true,
+      numberOfJudges: true,
+      approxTimeTaken: true,
+      date: true,
+      numberOfClusters: true
+    });
+
+    return Object.values(fieldValidations).every(Boolean);
   };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     
-    const { 
-      itemName,
-      itemCode,
-      numberOfParticipants,
-      stage,
-      time,
-      numberOfJudges,
-      approxTimeTaken,
-      date,
-      numberOfClusters 
-    } = formData;
-    
-    if (
-      itemName &&
-      itemCode &&
-      numberOfParticipants &&
-      stage &&
-      time &&
-      numberOfJudges &&
-      approxTimeTaken &&
-      date &&
-      numberOfClusters
-    ) {
+    if (validateForm()) {
       const token = sessionStorage.getItem("token");
       if (token) {
         const reqHeader = {
@@ -323,7 +407,7 @@ console.log(formData);
         }
       }
     } else {
-      alert("Please fill the form completely!");
+      console.log("Form has validation errors");
     }
   };
 
@@ -335,9 +419,9 @@ console.log(formData);
   return (
     <>
       <Header />
-            <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
-                <Dash />
-                <div className="flex-1 p-4 md:p-6 mt-4 w-full overflow-x-auto">
+      <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
+        <Dash />
+        <div className="flex-1 p-4 md:p-6 mt-4 w-full overflow-x-auto">
           <form
             className="bg-white p-3 md:p-4 rounded-lg shadow-md w-full min-h-screen"
             onSubmit={handleUpdate}
@@ -355,9 +439,17 @@ console.log(formData);
                     name="itemCode"
                     value={formData.itemCode}
                     onChange={handleChange}
-                    className='border border-blue-500 px-2 py-1 rounded-full w-full text-sm md:text-base'
+                    onBlur={() => handleBlur("itemCode")}
+                    className={`border px-2 py-1 rounded-full w-full text-sm md:text-base ${
+                      touched.itemCode && errors.itemCode
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-500 focus:outline-blue-500"
+                    }`}
                     required
                   />
+                  {touched.itemCode && errors.itemCode && (
+                    <p className="text-xs md:text-sm text-red-500 mt-1">{errors.itemCode}</p>
+                  )}
                 </div>
               </div>
 
@@ -369,9 +461,17 @@ console.log(formData);
                     name="itemName"
                     value={formData.itemName}
                     onChange={handleChange}
-                    className='border border-blue-500 px-2 py-1 rounded-full w-full text-sm md:text-base'
+                    onBlur={() => handleBlur("itemName")}
+                    className={`border px-2 py-1 rounded-full w-full text-sm md:text-base ${
+                      touched.itemName && errors.itemName
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-500 focus:outline-blue-500"
+                    }`}
                     required
                   />
+                  {touched.itemName && errors.itemName && (
+                    <p className="text-xs md:text-sm text-red-500 mt-1">{errors.itemName}</p>
+                  )}
                 </div>
               </div>
 
@@ -379,13 +479,21 @@ console.log(formData);
                 <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0">No of Participants</label>
                 <div className="w-full">
                   <input
-                    type="text"
+                    type="number"
                     name="numberOfParticipants"
                     value={formData.numberOfParticipants}
                     onChange={handleChange}
-                    className='border border-blue-500 px-2 py-1 rounded-full w-full text-sm md:text-base'
+                    onBlur={() => handleBlur("numberOfParticipants")}
+                    className={`border px-2 py-1 rounded-full w-full text-sm md:text-base ${
+                      touched.numberOfParticipants && errors.numberOfParticipants
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-500 focus:outline-blue-500"
+                    }`}
                     required
                   />
+                  {touched.numberOfParticipants && errors.numberOfParticipants && (
+                    <p className="text-xs md:text-sm text-red-500 mt-1">{errors.numberOfParticipants}</p>
+                  )}
                 </div>
               </div>
 
@@ -397,9 +505,18 @@ console.log(formData);
                     name="approxTimeTaken"
                     value={formData.approxTimeTaken}
                     onChange={handleChange}
-                    className='border border-blue-500 px-2 py-1 rounded-full w-full text-sm md:text-base'
+                    onBlur={() => handleBlur("approxTimeTaken")}
+                    className={`border px-2 py-1 rounded-full w-full text-sm md:text-base ${
+                      touched.approxTimeTaken && errors.approxTimeTaken
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-500 focus:outline-blue-500"
+                    }`}
                     required
+                    placeholder="e.g. 30 minutes"
                   />
+                  {touched.approxTimeTaken && errors.approxTimeTaken && (
+                    <p className="text-xs md:text-sm text-red-500 mt-1">{errors.approxTimeTaken}</p>
+                  )}
                 </div>
               </div>
 
@@ -410,7 +527,12 @@ console.log(formData);
                     name="stage"
                     value={formData.stage}
                     onChange={handleChange}
-                    className="border border-blue-500 px-2 py-1 rounded-full w-full mb-1 md:mb-2 text-sm md:text-base"
+                    onBlur={() => handleBlur("stage")}
+                    className={`border px-2 py-1 rounded-full w-full mb-1 md:mb-2 text-sm md:text-base ${
+                      touched.stage && errors.stage
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-500 focus:outline-blue-500"
+                    }`}
                     required
                   >
                     <option value="">Select</option>
@@ -418,6 +540,9 @@ console.log(formData);
                     <option value="Stage 2">Stage 2</option>
                     <option value="Stage 3">Stage 3</option>
                   </select>
+                  {touched.stage && errors.stage && (
+                    <p className="text-xs md:text-sm text-red-500 mt-1">{errors.stage}</p>
+                  )}
                 </div>
               </div>
 
@@ -429,9 +554,17 @@ console.log(formData);
                     name="date"
                     value={formData.date}
                     onChange={handleChange}
-                    className='border border-blue-500 px-2 py-1 rounded-full w-full text-sm md:text-base'
+                    onBlur={() => handleBlur("date")}
+                    className={`border px-2 py-1 rounded-full w-full text-sm md:text-base ${
+                      touched.date && errors.date
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-500 focus:outline-blue-500"
+                    }`}
                     required
                   />
+                  {touched.date && errors.date && (
+                    <p className="text-xs md:text-sm text-red-500 mt-1">{errors.date}</p>
+                  )}
                 </div>
               </div>
 
@@ -443,9 +576,17 @@ console.log(formData);
                     name="time"
                     value={formData.time}
                     onChange={handleChange}
-                    className='border border-blue-500 px-2 py-1 rounded-full w-full text-sm md:text-base'
+                    onBlur={() => handleBlur("time")}
+                    className={`border px-2 py-1 rounded-full w-full text-sm md:text-base ${
+                      touched.time && errors.time
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-500 focus:outline-blue-500"
+                    }`}
                     required
                   />
+                  {touched.time && errors.time && (
+                    <p className="text-xs md:text-sm text-red-500 mt-1">{errors.time}</p>
+                  )}
                 </div>
               </div>
 
@@ -456,7 +597,12 @@ console.log(formData);
                     name="numberOfClusters"
                     value={formData.numberOfClusters}
                     onChange={handleChange}
-                    className="border border-blue-500 px-2 py-1 rounded-full w-full mb-1 md:mb-2 text-sm md:text-base"
+                    onBlur={() => handleBlur("numberOfClusters")}
+                    className={`border px-2 py-1 rounded-full w-full mb-1 md:mb-2 text-sm md:text-base ${
+                      touched.numberOfClusters && errors.numberOfClusters
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-500 focus:outline-blue-500"
+                    }`}
                     required
                   >
                     <option value="">Select</option>
@@ -464,6 +610,9 @@ console.log(formData);
                     <option value="2">2</option>
                     <option value="3">3</option>
                   </select>
+                  {touched.numberOfClusters && errors.numberOfClusters && (
+                    <p className="text-xs md:text-sm text-red-500 mt-1">{errors.numberOfClusters}</p>
+                  )}
                 </div>
               </div>
 
@@ -474,7 +623,12 @@ console.log(formData);
                     name="numberOfJudges"
                     value={formData.numberOfJudges}
                     onChange={handleChange}
-                    className="border border-blue-500 px-2 py-1 rounded-full w-full mb-1 md:mb-2 text-sm md:text-base"
+                    onBlur={() => handleBlur("numberOfJudges")}
+                    className={`border px-2 py-1 rounded-full w-full mb-1 md:mb-2 text-sm md:text-base ${
+                      touched.numberOfJudges && errors.numberOfJudges
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-500 focus:outline-blue-500"
+                    }`}
                     required
                   >
                     <option value="">Select</option>
@@ -482,6 +636,9 @@ console.log(formData);
                     <option value="2">2</option>
                     <option value="3">3</option>
                   </select>
+                  {touched.numberOfJudges && errors.numberOfJudges && (
+                    <p className="text-xs md:text-sm text-red-500 mt-1">{errors.numberOfJudges}</p>
+                  )}
                 </div>
               </div>
             </div>

@@ -17,8 +17,6 @@ const EditKalsvmDetails = () => {
     startDate: '',
     endDate: ''
   });
-  
-  
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -195,10 +193,18 @@ const EditKalsvmDetails = () => {
           <div className="flex-1 p-4 sm:p-6 md:p-8 w-full">
             {error && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                {error}
+                <span className="block sm:inline">{error}</span>
+                <button
+                  onClick={() => setError(null)}
+                  className="absolute top-0 bottom-0 right-0 px-4 py-3"
+                >
+                  <span className="text-red-500">×</span>
+                </button>
               </div>
             )}
+            
             <h2 className="text-xl font-bold mb-6">Kalolsavam Details</h2>
+            
             <input 
               type="file" 
               ref={fileInputRef}
@@ -207,11 +213,11 @@ const EditKalsvmDetails = () => {
               onChange={handleFileSelect}
             />
 
-            <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-0">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center mb-6">
+            <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-0 transition-all duration-300">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center mb-6 transition-all duration-300">
                 <h4 className="w-full sm:w-40 font-semibold mb-3 sm:mb-0">Kalolsavam Logo</h4>
                 <div className="flex flex-col sm:flex-row items-center w-full">
-                  <div className="w-24 h-24 ml-14 sm:w-16 sm:h-16 rounded-full bg-gray-200 flex items-center justify-center relative mb-3 sm:mb-0 sm:mr-4">
+                  <div className="w-24 h-24 sm:w-16 sm:h-16 rounded-full bg-gray-200 flex items-center justify-center relative mb-3 sm:mb-0 sm:mr-4 mx-auto sm:mx-0 sm:ml-14">
                     {formData.logo ? (
                       <>
                         <img 
@@ -225,6 +231,7 @@ const EditKalsvmDetails = () => {
                             setErrors(prev => ({...prev, logo: 'Logo is required'}));
                           }}
                           className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                          aria-label="Remove logo"
                         >
                           ✕
                         </button>
@@ -236,14 +243,14 @@ const EditKalsvmDetails = () => {
                   <button
                     type="button"
                     onClick={handleLogoUpload}
-                    className="bg-blue-900 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-full focus:outline-none focus:shadow-outline text-sm"
+                    className="bg-blue-900 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-full focus:outline-none focus:shadow-outline text-sm hover:bg-blue-800 transition-colors duration-300 w-full sm:w-auto mt-2 sm:mt-0"
                   >
                     Upload Logo
                   </button>
                 </div>
               </div>
               {errors.logo && (
-                <div className="text-red-500 text-sm ml-0 sm:ml-40 mb-4">{errors.logo}</div>
+                <div className="text-red-500 text-sm text-center sm:text-left sm:ml-40 mb-4">{errors.logo}</div>
               )}
               
               <div className="space-y-6">
@@ -253,8 +260,9 @@ const EditKalsvmDetails = () => {
                     readOnly
                     type="text"
                     name="kalolsavamName"
-                    className="w-full sm:max-w-md ml-10 border border-blue-600 px-4 sm:px-6 py-1 rounded-full bg-gray-100"
+                    className="w-full sm:max-w-md sm:ml-10 border border-blue-600 px-4 sm:px-6 py-2 rounded-full bg-gray-100"
                     value={formData.kalolsavamName}
+                    aria-label="Kalolsavam Name"
                   />
                 </div>
 
@@ -264,12 +272,15 @@ const EditKalsvmDetails = () => {
                     <input
                       type="text"
                       name="kalolsavamYear"
-                      className={`w-full border ${errors.kalolsavamYear ? 'border-red-500' : 'border-blue-600'} rounded-full px-4 sm:px-6 py-1 ml-10`}
+                      className={`w-full border ${errors.kalolsavamYear ? 'border-red-500' : 'border-blue-600'} rounded-full px-4 sm:px-6 py-2 sm:ml-10 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-300`}
                       value={formData.kalolsavamYear}
                       onChange={handleInputChange}
+                      placeholder="Enter 4-digit year"
+                      aria-label="Kalolsavam Year"
+                      aria-invalid={errors.kalolsavamYear ? "true" : "false"}
                     />
                     {errors.kalolsavamYear && (
-                      <div className="text-red-500 text-sm mt-1">{errors.kalolsavamYear}</div>
+                      <div className="text-red-500 text-sm mt-1 ml-0 sm:ml-10">{errors.kalolsavamYear}</div>
                     )}
                   </div>
                 </div>
@@ -280,12 +291,15 @@ const EditKalsvmDetails = () => {
                     <input
                       type="text"
                       name="venue"
-                      className={`w-full border ${errors.venue ? 'border-red-500' : 'border-blue-600'} rounded-full px-4 sm:px-6 py-1 ml-10`}
+                      className={`w-full border ${errors.venue ? 'border-red-500' : 'border-blue-600'} rounded-full px-4 sm:px-6 py-2 sm:ml-10 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-300`}
                       value={formData.venue}
                       onChange={handleInputChange}
+                      placeholder="Enter venue"
+                      aria-label="Venue"
+                      aria-invalid={errors.venue ? "true" : "false"}
                     />
                     {errors.venue && (
-                      <div className="text-red-500 text-sm mt-1">{errors.venue}</div>
+                      <div className="text-red-500 text-sm mt-1 ml-0 sm:ml-10">{errors.venue}</div>
                     )}
                   </div>
                 </div>
@@ -296,12 +310,14 @@ const EditKalsvmDetails = () => {
                     <input
                       type="date"
                       name="startDate"
-                      className={`w-full border ${errors.startDate ? 'border-red-500' : 'border-blue-600'} rounded-full px-4 sm:px-6 py-1 ml-10`}
+                      className={`w-full border ${errors.startDate ? 'border-red-500' : 'border-blue-600'} rounded-full px-4 sm:px-6 py-2 sm:ml-10 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-300`}
                       value={formData.startDate}
                       onChange={handleInputChange}
+                      aria-label="Start Date"
+                      aria-invalid={errors.startDate ? "true" : "false"}
                     />
                     {errors.startDate && (
-                      <div className="text-red-500 text-sm mt-1">{errors.startDate}</div>
+                      <div className="text-red-500 text-sm mt-1 ml-0 sm:ml-10">{errors.startDate}</div>
                     )}
                   </div>
                 </div>
@@ -312,12 +328,15 @@ const EditKalsvmDetails = () => {
                     <input
                       type="date"
                       name="endDate"
-                      className={`w-full border ${errors.endDate ? 'border-red-500' : 'border-blue-600'} rounded-full px-4 sm:px-6 py-1 ml-10`}
+                      className={`w-full border ${errors.endDate ? 'border-red-500' : 'border-blue-600'} rounded-full px-4 sm:px-6 py-2 sm:ml-10 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-300`}
                       value={formData.endDate}
                       onChange={handleInputChange}
+                      aria-label="End Date"
+                      aria-invalid={errors.endDate ? "true" : "false"}
+                      min={formData.startDate}
                     />
                     {errors.endDate && (
-                      <div className="text-red-500 text-sm mt-1">{errors.endDate}</div>
+                      <div className="text-red-500 text-sm mt-1 ml-0 sm:ml-10">{errors.endDate}</div>
                     )}
                   </div>
                 </div>
@@ -327,14 +346,15 @@ const EditKalsvmDetails = () => {
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="bg-white border border-blue-500 text-blue-500 font-bold py-2 px-8 sm:py-3 sm:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto"
+                  className="bg-white border border-blue-500 text-blue-500 font-bold py-2 px-8 sm:py-3 sm:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:bg-blue-50 transition-colors duration-300"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleUpdate}
-                  className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-8 sm:py-3 sm:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto"
+                  disabled={loading}
+                  className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-8 sm:py-3 sm:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:opacity-90 transition-opacity duration-300"
                 >
                   {loading ? 'Updating...' : 'Update'}
                 </button>

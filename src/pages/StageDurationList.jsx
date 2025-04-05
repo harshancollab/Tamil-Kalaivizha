@@ -10,6 +10,7 @@ const StageDurationList = () => {
   const printRef = useRef();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedFestival, setSelectedFestival] = useState("ALL Festival");
 
   const [schools, setSchools] = useState([]);
   const [filteredSchools, setFilteredSchools] = useState([]);
@@ -160,6 +161,10 @@ const StageDurationList = () => {
     filterSchools(newSearchTerm);
   };
 
+  const handleFestivalChange = (e) => {
+    setSelectedFestival(e.target.value);
+  };
+
   const filterSchools = (term) => {
     const lowercasedTerm = term.toLowerCase();
     const results = schools.filter(school =>
@@ -167,6 +172,22 @@ const StageDurationList = () => {
       school.name.toLowerCase().includes(lowercasedTerm)
     );
     setFilteredSchools(results);
+  };
+
+  // Generate the appropriate title based on the selected festival
+  const getPrintTitle = () => {
+    switch(selectedFestival) {
+      case "UP":
+        return "UP Festival - Stage Duration List";
+      case "Lp":
+        return "LP Festival - Stage Duration List";
+      case "Hs":
+        return "HS Festival - Stage Duration List";
+      case "Hss":
+        return "HSS Festival - Stage Duration List";
+      default:
+        return "ALL Festival - Stage Duration List";
+    }
   };
 
   const handlePrint = () => {
@@ -190,7 +211,7 @@ const StageDurationList = () => {
         .print-table th, .print-table td {
           border: 1px solid #ddd;
           padding: 8px;
-          text-align: left;
+          text-align: center;
         }
         .print-table th {
           background-color: #f2f2f2;
@@ -201,8 +222,6 @@ const StageDurationList = () => {
           margin-bottom: 20px;
           font-size: 18px;
           font-weight: bold;
-        }
-        .print-title {
           display: block !important;
         }
         .no-print {
@@ -231,10 +250,14 @@ const StageDurationList = () => {
               <div className="relative w-full sm:w-40">
                 <select
                   className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
+                  onChange={handleFestivalChange}
+                  value={selectedFestival}
                 >
-                  <option value=""> ALL Festival</option>
+                  <option value="ALL Festival">ALL Festival</option>
                   <option value="UP">UP</option>
                   <option value="Lp">Lp</option>
+                  <option value="Hs">Hs</option>
+                  <option value="Hss">Hss</option>
                 </select>
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                   <i className="fa-solid fa-chevron-down"></i>
@@ -273,10 +296,10 @@ const StageDurationList = () => {
             </div>
           ) : (
             <div ref={printRef} className="w-full">
-              <div className="print-title hidden">Stage Duration List Report</div>
+              <div className="print-title hidden">{getPrintTitle()}</div>
               <div className="overflow-x-auto -mx-4 sm:mx-0">
                 <div className="inline-block min-w-full align-middle px-4 sm:px-0">
-                  <table className="min-w-full text-left border-separate border-spacing-y-2 print-table">
+                  <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
                     <thead className="text-xs sm:text-sm">
                       <tr className="text-gray-700">
                         <th className="p-2 md:p-3">Sl No</th>

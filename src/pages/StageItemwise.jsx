@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import Header from '../components/Header';
-import Dash from '../components/Dash';
-import { addStageItemwiseAPI } from "../services/allAPI";
+import React, { useState } from 'react'
+import Header from '../components/Header'
+import Dash from '../components/Dash'
+import { addStageItemwiseAPI } from "../services/allAPI"
 
 const StageItemwise = () => {
   const [formData, setFormData] = useState({
@@ -224,20 +224,21 @@ const StageItemwise = () => {
 
   return (
     <>
-       <Header />
-            <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
-                <Dash />
-                <div className="flex-1 p-4 md:p-6 mt-4 w-full overflow-x-auto">
-          <form onSubmit={handleSubmit} className='min-h-screen mx-auto p-6 bg-white rounded-lg shadow-md'>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-[20px] font-[600] leading-[100%] tracking-[2%]">
+      <Header />
+      <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
+        <Dash />
+        <div className="flex-1 p-2 sm:p-4 md:p-6 mt-2 sm:mt-4 w-full">
+          <form onSubmit={handleSubmit} className='min-h-screen w-full mx-auto p-3 sm:p-6 bg-white rounded-lg shadow-md'>
+            <div className="flex justify-between items-center mb-2 sm:mb-4">
+              <h2 className="text-lg sm:text-[20px] font-[600] leading-[100%] tracking-[2%]">
                 Stage Allotment Itemwise
               </h2>
             </div>
 
-            <div className='w-full max-w-full sm:ml-0 md:ml-8 lg:ml-24 xl:ml-48 mt-8 md:mt-16'>
-              <div className="mt-4 md:mt-10 sm:ml-0 md:ml-6 lg:ml-12 items-center">
-                <div className="flex flex-col md:flex-row mb-4">
+            <div className='w-full max-w-full mx-auto sm:ml-0 md:ml-4 lg:ml-16 xl:ml-48 mt-4 sm:mt-8 md:mt-16'>
+              <div className="mt-4 md:mt-10 sm:ml-0 md:ml-4 lg:ml-12 items-center">
+                {/* Form Fields */}
+                <div className="flex flex-col md:flex-row mb-3 sm:mb-4">
                   <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Item Name</label>
                   <div className="w-full sm:w-full md:w-80">
                     <input
@@ -247,18 +248,18 @@ const StageItemwise = () => {
                       onChange={handleInputChange}
                       onBlur={() => handleBlur("itemName")}
                       className={`border px-2 py-1 rounded-full w-full mb-2 ${touched.itemName && errors.itemName
-                          ? "border-red-500 focus:outline-red-500"
-                          : "border-blue-600 focus:outline-blue-600"
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-600 focus:outline-blue-600"
                         }`}
                       required
                     />
                     {touched.itemName && errors.itemName && (
-                      <p className="text-sm text-red-500 mt-1">{errors.itemName}</p>
+                      <p className="text-xs sm:text-sm text-red-500 mt-1">{errors.itemName}</p>
                     )}
                   </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row mb-4">
+                <div className="flex flex-col md:flex-row mb-3 sm:mb-4">
                   <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Item Code</label>
                   <div className="w-full sm:w-full md:w-80">
                     <input
@@ -268,18 +269,18 @@ const StageItemwise = () => {
                       onChange={handleInputChange}
                       onBlur={() => handleBlur("itemCode")}
                       className={`border px-2 py-1 rounded-full w-full mb-2 ${touched.itemCode && errors.itemCode
-                          ? "border-red-500 focus:outline-red-500"
-                          : "border-blue-600 focus:outline-blue-600"
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-600 focus:outline-blue-600"
                         }`}
                       required
                     />
                     {touched.itemCode && errors.itemCode && (
-                      <p className="text-sm text-red-500 mt-1">{errors.itemCode}</p>
+                      <p className="text-xs sm:text-sm text-red-500 mt-1">{errors.itemCode}</p>
                     )}
                   </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row mb-4">
+                <div className="flex flex-col md:flex-row mb-3 sm:mb-4">
                   <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">No of Participants</label>
                   <div className="w-full sm:w-full md:w-80">
                     <input
@@ -289,18 +290,18 @@ const StageItemwise = () => {
                       onChange={handleInputChange}
                       onBlur={() => handleBlur("numberOfParticipants")}
                       className={`border px-2 py-1 rounded-full w-full mb-2 ${touched.numberOfParticipants && errors.numberOfParticipants
-                          ? "border-red-500 focus:outline-red-500"
-                          : "border-blue-600 focus:outline-blue-600"
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-600 focus:outline-blue-600"
                         }`}
                       required
                     />
                     {touched.numberOfParticipants && errors.numberOfParticipants && (
-                      <p className="text-sm text-red-500 mt-1">{errors.numberOfParticipants}</p>
+                      <p className="text-xs sm:text-sm text-red-500 mt-1">{errors.numberOfParticipants}</p>
                     )}
                   </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row mb-4">
+                <div className="flex flex-col md:flex-row mb-3 sm:mb-4">
                   <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Stage</label>
                   <div className="w-full sm:w-full md:w-80">
                     <select
@@ -309,8 +310,8 @@ const StageItemwise = () => {
                       onChange={handleInputChange}
                       onBlur={() => handleBlur("stage")}
                       className={`border px-2 py-1 rounded-full w-full mb-2 ${touched.stage && errors.stage
-                          ? "border-red-500 focus:outline-red-500"
-                          : "border-blue-600 focus:outline-blue-600"
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-600 focus:outline-blue-600"
                         }`}
                       required
                     >
@@ -320,12 +321,12 @@ const StageItemwise = () => {
                       <option value="Stage 3">Stage 3</option>
                     </select>
                     {touched.stage && errors.stage && (
-                      <p className="text-sm text-red-500 mt-1">{errors.stage}</p>
+                      <p className="text-xs sm:text-sm text-red-500 mt-1">{errors.stage}</p>
                     )}
                   </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row mb-4">
+                <div className="flex flex-col md:flex-row mb-3 sm:mb-4">
                   <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Time</label>
                   <div className="w-full sm:w-full md:w-80">
                     <input
@@ -335,18 +336,18 @@ const StageItemwise = () => {
                       onChange={handleInputChange}
                       onBlur={() => handleBlur("time")}
                       className={`border px-2 py-1 rounded-full w-full mb-2 ${touched.time && errors.time
-                          ? "border-red-500 focus:outline-red-500"
-                          : "border-blue-600 focus:outline-blue-600"
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-600 focus:outline-blue-600"
                         }`}
                       required
                     />
                     {touched.time && errors.time && (
-                      <p className="text-sm text-red-500 mt-1">{errors.time}</p>
+                      <p className="text-xs sm:text-sm text-red-500 mt-1">{errors.time}</p>
                     )}
                   </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row mb-4">
+                <div className="flex flex-col md:flex-row mb-3 sm:mb-4">
                   <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">No of Judges</label>
                   <div className="w-full sm:w-full md:w-80">
                     <select
@@ -355,8 +356,8 @@ const StageItemwise = () => {
                       onChange={handleInputChange}
                       onBlur={() => handleBlur("numberOfJudges")}
                       className={`border px-2 py-1 rounded-full w-full mb-2 ${touched.numberOfJudges && errors.numberOfJudges
-                          ? "border-red-500 focus:outline-red-500"
-                          : "border-blue-600 focus:outline-blue-600"
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-600 focus:outline-blue-600"
                         }`}
                       required
                     >
@@ -366,12 +367,12 @@ const StageItemwise = () => {
                       <option value="3">3</option>
                     </select>
                     {touched.numberOfJudges && errors.numberOfJudges && (
-                      <p className="text-sm text-red-500 mt-1">{errors.numberOfJudges}</p>
+                      <p className="text-xs sm:text-sm text-red-500 mt-1">{errors.numberOfJudges}</p>
                     )}
                   </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row mb-4">
+                <div className="flex flex-col md:flex-row mb-3 sm:mb-4">
                   <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Appr Time Taken</label>
                   <div className="w-full sm:w-full md:w-80">
                     <input
@@ -381,19 +382,19 @@ const StageItemwise = () => {
                       onChange={handleInputChange}
                       onBlur={() => handleBlur("approxTimeTaken")}
                       className={`border px-2 py-1 rounded-full w-full mb-2 ${touched.approxTimeTaken && errors.approxTimeTaken
-                          ? "border-red-500 focus:outline-red-500"
-                          : "border-blue-600 focus:outline-blue-600"
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-600 focus:outline-blue-600"
                         }`}
                       required
                       placeholder="e.g. 30 minutes"
                     />
                     {touched.approxTimeTaken && errors.approxTimeTaken && (
-                      <p className="text-sm text-red-500 mt-1">{errors.approxTimeTaken}</p>
+                      <p className="text-xs sm:text-sm text-red-500 mt-1">{errors.approxTimeTaken}</p>
                     )}
                   </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row mb-4">
+                <div className="flex flex-col md:flex-row mb-3 sm:mb-4">
                   <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Date</label>
                   <div className="w-full sm:w-full md:w-80">
                     <input
@@ -403,18 +404,18 @@ const StageItemwise = () => {
                       onChange={handleInputChange}
                       onBlur={() => handleBlur("date")}
                       className={`border px-2 py-1 rounded-full w-full mb-2 ${touched.date && errors.date
-                          ? "border-red-500 focus:outline-red-500"
-                          : "border-blue-600 focus:outline-blue-600"
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-600 focus:outline-blue-600"
                         }`}
                       required
                     />
                     {touched.date && errors.date && (
-                      <p className="text-sm text-red-500 mt-1">{errors.date}</p>
+                      <p className="text-xs sm:text-sm text-red-500 mt-1">{errors.date}</p>
                     )}
                   </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row mb-4">
+                <div className="flex flex-col md:flex-row mb-3 sm:mb-4">
                   <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">No of Clusters</label>
                   <div className="w-full sm:w-full md:w-80">
                     <select
@@ -423,8 +424,8 @@ const StageItemwise = () => {
                       onChange={handleInputChange}
                       onBlur={() => handleBlur("numberOfClusters")}
                       className={`border px-2 py-1 rounded-full w-full mb-2 ${touched.numberOfClusters && errors.numberOfClusters
-                          ? "border-red-500 focus:outline-red-500"
-                          : "border-blue-600 focus:outline-blue-600"
+                        ? "border-red-500 focus:outline-red-500"
+                        : "border-blue-600 focus:outline-blue-600"
                         }`}
                       required
                     >
@@ -434,23 +435,23 @@ const StageItemwise = () => {
                       <option value="3">3</option>
                     </select>
                     {touched.numberOfClusters && errors.numberOfClusters && (
-                      <p className="text-sm text-red-500 mt-1">{errors.numberOfClusters}</p>
+                      <p className="text-xs sm:text-sm text-red-500 mt-1">{errors.numberOfClusters}</p>
                     )}
                   </div>
                 </div>
               </div>
 
-              <div className='text-center sm:mr-0 md:mr-20 lg:mr-48 mt-8 md:mt-12 max-w-full'>
+              <div className='text-center px-2 sm:mr-0 md:mr-16 lg:mr-48 mt-6 sm:mt-8 md:mt-12 max-w-full'>
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="text-blue-500 mr-4 md:mr-12 border border-blue-600 px-4 sm:px-6 py-2 rounded-full"
+                  className="text-blue-500 mr-2 sm:mr-4 md:mr-12 border border-blue-600 px-3 sm:px-4 md:px-6 py-2 rounded-full"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-4 sm:px-6 py-2 rounded-full "
+                  className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-3 sm:px-4 md:px-6 py-2 rounded-full"
                 >
                   Add Stage
                 </button>
@@ -463,4 +464,4 @@ const StageItemwise = () => {
   );
 };
 
-export default StageItemwise;
+export default StageItemwise

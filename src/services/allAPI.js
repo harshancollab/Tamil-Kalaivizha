@@ -182,3 +182,21 @@ export const getAllSchoolContactAPI = async (reqHeader) => {
 export const getAllfestParticipantsAPI = async (reqHeader) => {
   return await commonAPI("GET", `${SERVER_URL}/allfestvellist`, {}, reqHeader);
 };
+
+
+// Add stage reports
+export const getAllStageReportAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/stage-reports`, "", reqHeader);
+};
+
+
+
+// // Function to fetch all cluster data
+// export const fetchClusterDataAPI = async (reqHeader) => {
+//   return await axios.get(`${BASE_URL}/cluster-report`, { headers: reqHeader });
+// };
+
+// // Function to get cluster report based on provided data
+// export const getClusterReportAPI = async (reqBody, reqHeader) => {
+//   return await axios.post(`${BASE_URL}/cluster-report`, reqBody, { headers: reqHeader });
+// };

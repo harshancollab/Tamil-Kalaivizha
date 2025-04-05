@@ -18,7 +18,7 @@ const Dash = () => {
       // Stage Report menu should be open if current path matches any of its links
       stageReport: ['/AddCallsheet', '/AddTimesheet', '/AddScoresheet', '/AddTabulationsheet', '/Addreport'].some(route => path === route),
       // Pre Fest Report menu should be open if current path matches any of its links
-      preFestReport: ['/eligible-schools','/Partcipatescllist','/SclContactList','/festwiseList','/DateWiseList','/ParticipantsCardList'].some(route => path === route)
+      preFestReport: ['/eligible-schools','/Partcipatescllist','/SclContactList','/festwiseList','/DateWiseList','/ParticipantsCardList','/ParticipantsMorethan','/ClashReportList','/ClusterReport','/StageReport'].some(route => path === route)
     };
   });
 
@@ -34,7 +34,7 @@ const Dash = () => {
       settings: openMenus.settings || ['/AllKalolsavam', '/schlentry', '/All-schools', '/Spl-entry'].some(route => path === route),
       stageSettings: openMenus.stageSettings || ['/stage-duration-list', '/StageList', '/Stage-itemwiselist', '/festivalwiselist'].some(route => path === route),
       stageReport: openMenus.stageReport || ['/AddCallsheet', '/AddTimesheet', '/AddScoresheet', '/AddTabulationsheet', '/Addreport'].some(route => path === route),
-      preFestReport: openMenus.preFestReport || ['/eligible-schools','/Partcipatescllist','/SclContactList','/festwiseList','/DateWiseList','/ParticipantsCardList'].some(route => path === route)
+      preFestReport: openMenus.preFestReport || ['/eligible-schools','/Partcipatescllist','/SclContactList','/festwiseList','/DateWiseList','/ParticipantsCardList','/ClashReportList','/ClusterReport','/StageReport'].some(route => path === route)
     };
     
     setOpenMenus(newOpenMenus);
@@ -346,6 +346,43 @@ const Dash = () => {
                   >
                    Participants Card
                   </Link>
+                  <Link
+                    to="/ParticipantsMorethan"
+                    className={`block py-2 text-gray-300 hover:bg-gradient-to-r from-[#003566] to-[#05B9F4] ${
+                      isActive('/ParticipantsMorethan') ? 'font-semibold' : ''
+                    }`}
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                  Participants more than one item
+                  </Link>
+                  <Link
+                    to="/ClashReportList"
+                    className={`block py-2 text-gray-300 hover:bg-gradient-to-r from-[#003566] to-[#05B9F4] ${
+                      isActive('/ClashReportList') ? 'font-semibold' : ''
+                    }`}
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                 Clash Report
+                  </Link>
+                  <Link
+                    to="/ClusterReport"
+                    className={`block py-2 text-gray-300 hover:bg-gradient-to-r from-[#003566] to-[#05B9F4] ${
+                      isActive('/ClusterReport') ? 'font-semibold' : ''
+                    }`}
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                 Cluster Report
+                  </Link>
+                  <Link
+                    to="/StageReport"
+                    className={`block py-2 text-gray-300 hover:bg-gradient-to-r from-[#003566] to-[#05B9F4] ${
+                      isActive('/StageReport') ? 'font-semibold' : ''
+                    }`}
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                  Stage Report
+                  </Link>
+                 
                 </div>
               )}
             </div>
