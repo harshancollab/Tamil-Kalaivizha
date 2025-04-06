@@ -51,6 +51,7 @@ import ParticipantsMorethan from './pages/ParticipantsMorethan';
 import ClashReportList from './pages/ClashReportList';
 import ClusterReport from './pages/ClusterReport';
 import StageReport from './pages/StageReport';
+import EditStage from './pages/EditStage';
 
 
 
@@ -98,6 +99,7 @@ function App() {
           <Route path="/stage-duration-list" element={<StageDurationList />} />
           <Route path="/StageList" element={<DefineStage />} />
           <Route path="/AddStage" element={<AddStage />} />
+          <Route path="/EditStage" element={<EditStage />} />
           <Route path="/Stage-itemwise" element={<StageItemwise />} />
           <Route path="/Stage-itemwiseList" element={<StageItemwiseList />} />
           <Route path="/Edit-itemwiseList/:id" element={<EditStageitem />} />

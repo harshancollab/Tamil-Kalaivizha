@@ -123,13 +123,13 @@ export const getAllStageListAPI = async (reqHeader) => {
 
 
 // Delete a stage
-export const deleteStageAPI = async (stageId, reqHeader) => {
-  return await commonAPI("DELETE", `${BASE_URL}/stages/${stageId}`, null, reqHeader);
+export const deleteStageAPI = async (id, reqHeader) => {
+  return await commonAPI("DELETE", `${SERVER_URL}/stages/${id}`,{},reqHeader)
 };
 
 // Update a stage
 export const updateStageAPI = async (stageId, reqBody, reqHeader) => {
-  return await commonAPI("PUT", `${BASE_URL}/stages/${stageId}`, reqBody, reqHeader);
+  return await commonAPI("PUT", `${{SERVER_URL}}/stages/${stageId}`, reqBody, reqHeader);
 };
 // delete stage 
 
