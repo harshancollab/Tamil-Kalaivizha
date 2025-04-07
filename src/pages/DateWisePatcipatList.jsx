@@ -135,7 +135,7 @@ const DateWiseParticipantList = () => {
           <div ref={printRef} className="w-full">
             <div className="print-title hidden">{getPrintTitle()}</div>
             
-            {/* Mobile view table with horizontal scrolling */}
+            {/* Mobile view table with horizontal scrolling - Hide at exactly 768px and above */}
             <div className="md:hidden w-full">
               <div className="overflow-x-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
                 <table className="min-w-full text-center border-separate border-spacing-y-2 print-table whitespace-nowrap" style={{ minWidth: "800px" }}>
@@ -240,13 +240,116 @@ const DateWiseParticipantList = () => {
                   </tbody>
                 </table>
               </div>
-              <div className="text-xs text-gray-500 mt-2 italic">
-                Swipe left/right to see all data
-              </div>
+            
             </div>
             
-            {/* Desktop view table */}
-            <div className="hidden md:block overflow-x-auto">
+            {/* Medium size specific view (exactly at 768px) */}
+            <div className="hidden md:block lg:hidden overflow-x-auto">
+              <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
+                <thead className="text-xs lg:text-sm">
+                  {/* Category Headers */}
+                  <tr>
+                    <th rowSpan="2" className="p-2 lg:p-3 align-bottom">Sl No</th>
+                    <th rowSpan="2" className="p-2 lg:p-3 align-bottom">School code</th>
+                    <th rowSpan="2" className="p-2 lg:p-3 align-bottom">School Name</th>
+                    {/* UP Category */}
+                    <th colSpan="2" className="p-2 lg:p-3">
+                      <div className="relative font-normal text-xs flex items-center justify-center w-full">
+                        <div className="px-3 lg:px-4 py-1 border border-blue-800 rounded-full bg-white text-gray-500">
+                          UP
+                        </div>
+                      </div>
+                    </th>
+                    {/* LP Category */}
+                    <th colSpan="2" className="p-2 lg:p-3">
+                      <div className="relative font-normal text-xs flex items-center justify-center w-full">
+                        <div className="px-3 lg:px-4 py-1 border border-blue-800 rounded-full bg-white text-gray-500">
+                          LP
+                        </div>
+                      </div>
+                    </th>
+                    {/* HS Category */}
+                    <th colSpan="2" className="p-2 lg:p-3">
+                      <div className="relative font-normal text-xs flex items-center justify-center w-full">
+                        <div className="px-3 lg:px-4 py-1 border border-blue-800 rounded-full bg-white text-gray-500">
+                          HS
+                        </div>
+                      </div>
+                    </th>
+                    {/* HSS Category */}
+                    <th colSpan="2" className="p-2 lg:p-3">
+                      <div className="relative font-normal text-xs flex items-center justify-center w-full">
+                        <div className="px-3 lg:px-4 py-1 border border-blue-800 rounded-full bg-white text-gray-500">
+                          HSS
+                        </div>
+                      </div>
+                    </th>
+                    <th rowSpan="2" className="p-2 lg:p-3 align-bottom">Total</th>
+                  </tr>
+                  <tr className="text-gray-700">
+                    {/* UP Boys/Girls */}
+                    <th className="p-2 lg:p-3">Boys</th>
+                    <th className="p-2 lg:p-3">Girls</th>
+                    {/* LP Boys/Girls */}
+                    <th className="p-2 lg:p-3">Boys</th>
+                    <th className="p-2 lg:p-3">Girls</th>
+                    {/* HS Boys/Girls */}
+                    <th className="p-2 lg:p-3">Boys</th>
+                    <th className="p-2 lg:p-3">Girls</th>
+                    {/* HSS Boys/Girls */}
+                    <th className="p-2 lg:p-3">Boys</th>
+                    <th className="p-2 lg:p-3">Girls</th>
+                  </tr>
+                </thead>
+                <tbody className="text-xs lg:text-sm">
+                  {Alllist && Alllist.length > 0 ? (
+                    Alllist.map((item, index) => (
+                      <tr key={index} className="hover:bg-gray-100">
+                        <td className="p-2 lg:p-3">{index + 1}</td>
+                        <td className="p-2 lg:p-3">{item.schoolCode || "-"}</td>
+                        <td className="p-2 lg:p-3 text-left">{item.schoolName || "-"}</td>
+                        <td className="p-2 lg:p-3">{item.upBoys || "0"}</td>
+                        <td className="p-2 lg:p-3">{item.upGirls || "0"}</td>
+                        <td className="p-2 lg:p-3">{item.lpBoys || "0"}</td>
+                        <td className="p-2 lg:p-3">{item.lpGirls || "0"}</td>
+                        <td className="p-2 lg:p-3">{item.hsBoys || "0"}</td>
+                        <td className="p-2 lg:p-3">{item.hsGirls || "0"}</td>
+                        <td className="p-2 lg:p-3">{item.hssBoys || "0"}</td>
+                        <td className="p-2 lg:p-3">{item.hssGirls || "0"}</td>
+                        <td className="p-2 lg:p-3">
+                          {(parseInt(item.upBoys || 0) + 
+                            parseInt(item.upGirls || 0) + 
+                            parseInt(item.lpBoys || 0) + 
+                            parseInt(item.lpGirls || 0) + 
+                            parseInt(item.hsBoys || 0) + 
+                            parseInt(item.hsGirls || 0) + 
+                            parseInt(item.hssBoys || 0) + 
+                            parseInt(item.hssGirls || 0))}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr className="hover:bg-gray-100">
+                      <td className="p-2 lg:p-3">1</td>
+                      <td className="p-2 lg:p-3">933</td>
+                      <td className="p-2 lg:p-3 text-left">School 1</td>
+                      <td className="p-2 lg:p-3">8</td>
+                      <td className="p-2 lg:p-3">9</td>
+                      <td className="p-2 lg:p-3">6</td>
+                      <td className="p-2 lg:p-3">4</td>
+                      <td className="p-2 lg:p-3">5</td>
+                      <td className="p-2 lg:p-3">3</td>
+                      <td className="p-2 lg:p-3">7</td>
+                      <td className="p-2 lg:p-3">2</td>
+                      <td className="p-2 lg:p-3">44</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Larger desktop view table */}
+            <div className="hidden lg:block overflow-x-auto">
               <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
                 <thead className="text-sm">
                   {/* Category Headers */}
