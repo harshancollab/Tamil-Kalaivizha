@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 const DefineStage = () => {
     const navigate = useNavigate();
     
-    // Dummy data for testing
+    // Dummy data 
     const dummyStages = [
         { id: 1, name: "Discovery", description: "Initial assessment of client needs" },
         { id: 2, name: "Planning", description: "Project scope and resource allocation" },
@@ -20,7 +20,7 @@ const DefineStage = () => {
     console.log(Allstages);
 
     useEffect(() => {
-        // Comment out the API call when using dummy data
+        
         // getAllstages();
     }, []);
 

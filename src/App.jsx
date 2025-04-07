@@ -52,6 +52,7 @@ import ClashReportList from './pages/ClashReportList';
 import ClusterReport from './pages/ClusterReport';
 import StageReport from './pages/StageReport';
 import EditStage from './pages/EditStage';
+import ResultEntry from './pages/ResultEntry';
 
 
 
@@ -121,6 +122,8 @@ function App() {
           <Route path="/ClashReportList" element={<ClashReportList />} />
           <Route path="/ClusterReport" element={<ClusterReport />} />
           <Route path="/StageReport" element={<StageReport />} />
+          <Route path="/result-entry" element={<ResultEntry />} />
+          
          
         </Route>
 

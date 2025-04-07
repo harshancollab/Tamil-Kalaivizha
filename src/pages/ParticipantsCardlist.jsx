@@ -241,7 +241,7 @@ const ParticipantsCardList = () => {
                     
                     <div className="card-event-details">
                       304 - Mono Act, 300 - Versification,<br />
-                      301 - Story Writing{participant.id === 4 ? ', 302 - Drama' : ''}
+                      301 - Story Writing, 301 - Story telling,301 - Story telling{participant.id === 4 ? ', 302 - Drama' : ''}
                     </div>
                   </div>
                 ))

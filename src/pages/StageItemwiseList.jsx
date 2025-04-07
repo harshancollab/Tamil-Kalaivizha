@@ -6,8 +6,7 @@ import { getAllItemStageListAPI } from '../services/allAPI';
 
 const StageItemwiseList = () => {
     const [Allitemise, setItemwise] = useState([]);
-    console.log(Allitemise);
-
+    
     useEffect(() => {
         getAllitemise();
     }, []);
@@ -47,53 +46,60 @@ const StageItemwiseList = () => {
         navigate(`/Edit-itemwiseList/${itemId}`);
     };
 
+    // Format time to display hours and minutes properly
+    const formatTime = (hours, minutes) => {
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    };
+
     return (
         <>
             <Header />
             <div className="flex flex-col md:flex-row min-h-screen">
                 <Dash />
-                <div className="flex-1 p-4 md:p-6 lg:p-8">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-[20px] font-[600] leading-[100%] tracking-[2%]">
+                <div className="flex-1 p-3 sm:p-4 lg:p-6 w-full overflow-hidden">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                        <h2 className="text-lg md:text-xl font-semibold tracking-wide">
                             Stage Allotment Item Wise List
                         </h2>
                     </div>
 
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-center border-separate border-spacing-y-2 print-table">
+                    {/* Table container with horizontal scroll for mobile */}
+                    <div className="overflow-x-auto  rounded-lg w-full bg-white">
+                        <table className="min-w-full  text-center">
                             <thead>
-                                <tr className="text-gray-700">
-                                    <th className="p-2 md:p-3">Sl No</th>
-                                    <th className="p-2 md:p-3">Item code</th>
-                                    <th className="p-2 md:p-3">Item name</th>
-                                    <th className="p-2 md:p-3">No of participate</th>
-                                    <th className="p-2 md:p-3">Date</th>
-                                    <th className="p-2 md:p-3 hidden sm:table-cell md:table-cell">Hours</th> {/* Visible on small and medium screens */}
-                                    <th className="p-2 md:p-3 hidden sm:table-cell md:table-cell">Min</th>   {/* Visible on small and medium screens */}
-                                    <th className="p-2 md:p-3">StageName</th>
-                                    <th className="p-2 md:p-3 hidden lg:table-cell">No of cluster</th> {/* Hidden on medium and smaller screens */}
-                                    <th className="p-2 md:p-3 hidden lg:table-cell">No of judges</th> {/* Hidden on medium and smaller screens */}
-                                    <th className="p-2 md:p-3">Edit</th>
+                                <tr className="bg-gray-50 ">
+                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700  bg-gray-50 z-10">Sl No</th>
+                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Item code</th>
+                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Item name</th>
+                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Participants</th>
+                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Date</th>
+                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Time</th>
+                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Stage</th>
+                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Clusters</th>
+                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Judges</th>
+                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Edit</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {stagesToRender.map((stage, index) => (
-                                    <tr key={stage.id} className="hover:bg-gray-200">
-                                        <td className="p-2 md:p-3">{index + 1}</td>
-                                        <td className="p-2 md:p-3">{stage.itemCode}</td>
-                                        <td className="p-2 md:p-3">{stage.itemName}</td>
-                                        <td className="p-2 md:p-3">{stage.noOfParticipants}</td>
-                                        <td className="p-2 md:p-3">{stage.date}</td>
-                                        <td className="p-2 md:p-3 hidden sm:table-cell md:table-cell">{stage.hours}</td> {/* Visible on small and medium screens */}
-                                        <td className="p-2 md:p-3 hidden sm:table-cell md:table-cell">{stage.minutes}</td> {/* Visible on small and medium screens */}
-                                        <td className="p-2 md:p-3">{stage.stageName}</td>
-                                        <td className="p-2 md:p-3 hidden lg:table-cell">{stage.noOfCluster}</td> {/* Hidden on medium and smaller screens */}
-                                        <td className="p-2 md:p-3 hidden lg:table-cell">{stage.noOfJudges}</td> {/* Hidden on medium and smaller screens */}
-                                        <td className="p-2 md:p-3">
-                                            <i
-                                                className="fa-solid text-blue-500 fa-pen-to-square cursor-pointer"
+                                    <tr key={stage.id} className="hover:bg-gray-50  text-gray-700">
+                                        <td className="p-2 md:p-3 text-xs md:text-sm  bg-white z-10">{index + 1}</td>
+                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.itemCode}</td>
+                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.itemName}</td>
+                                        <td className="p-2 md:p-3 text-xs md:text-sm">{stage.noOfParticipants}</td>
+                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.date}</td>
+                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{formatTime(stage.hours, stage.minutes)}</td>
+                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.stageName}</td>
+                                        <td className="p-2 md:p-3 text-xs md:text-sm">{stage.noOfCluster}</td>
+                                        <td className="p-2 md:p-3 text-xs md:text-sm">{stage.noOfJudges}</td>
+                                        <td className="p-2 md:p-3 text-xs md:text-sm">
+                                            <button
+                                                className="text-blue-500 hover:text-blue-700 focus:outline-none"
                                                 onClick={() => handleEditClick(stage.id)}
-                                            ></i>
+                                                aria-label={`Edit ${stage.itemName}`}
+                                            >
+                                                <i className="fa-solid fa-pen-to-square"></i>
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}
@@ -101,17 +107,22 @@ const StageItemwiseList = () => {
                         </table>
                     </div>
 
-                    <div className="text-right mt-8">
+                    {/* Show a hint for mobile users */}
+                    <div className="md:hidden text-xs text-gray-500 italic mt-2 text-center">
+                        Swipe left/right to view all columns
+                    </div>
+
+                    <div className="flex flex-col xs:flex-row sm:flex-row justify-end gap-3 mt-6">
                         <button
                             onClick={handleAddClick}
                             type="button"
-                            className="border border-blue-500 text-blue-600 px-6 md:px-10 lg:px-14 py-2 rounded-full mr-2 md:mr-3 lg:mr-5 text-sm md:text-base"
+                            className="border border-blue-500 text-blue-600 px-4 sm:px-6 md:px-10 py-2 rounded-full whitespace-nowrap text-sm md:text-base transition duration-200 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-300"
                         >
                             Add
                         </button>
                         <button
                             type="button"
-                            className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-6 md:px-10 lg:px-14 py-2 rounded-full text-sm md:text-base"
+                            className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-4 sm:px-6 md:px-10 py-2 rounded-full whitespace-nowrap text-sm md:text-base transition duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300"
                         >
                             Allotement
                         </button>
