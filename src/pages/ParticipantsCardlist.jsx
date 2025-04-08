@@ -1,12 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
-
+import { useSearchParams } from 'react-router-dom';
 
 const ParticipantsCardList = () => {
   const [participants, setParticipants] = useState([]);
-  const [photoStatus, setPhotoStatus] = useState("With Photo");
   const printRef = useRef();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Get photoStatus from URL, default to "With Photo" if not present
+  const photoStatus = searchParams.get('photoStatus') || "With Photo";
   
   useEffect(() => {
     getAllParticipants();
@@ -40,7 +43,8 @@ const ParticipantsCardList = () => {
   ];
 
   const handlePhotoStatusChange = (e) => {
-    setPhotoStatus(e.target.value);
+    // Update URL when photoStatus changes
+    setSearchParams({ photoStatus: e.target.value });
   };
 
   const handlePrint = () => {
@@ -112,7 +116,7 @@ const ParticipantsCardList = () => {
           display: none !important;
         }
       </style>
-      <div class="print-title">Participants Card</div>
+      <div class="print-title">Participants Card - ${photoStatus}</div>
       ${printContents}
     `;
     window.print();
@@ -241,7 +245,7 @@ const ParticipantsCardList = () => {
                     
                     <div className="card-event-details">
                       304 - Mono Act, 300 - Versification,<br />
-                      301 - Story Writing, 301 - Story telling,301 - Story telling{participant.id === 4 ? ', 302 - Drama' : ''}
+                      301 - Story Writing{participant.id === 4 ? ', 302 - Drama' : ''}
                     </div>
                   </div>
                 ))

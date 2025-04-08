@@ -2,11 +2,15 @@ import React, { useEffect, useState, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { getAllPartcipteSclListAPI } from '../services/allAPI';
+import { useSearchParams } from 'react-router-dom';
 
 const ParticipatingSclList = () => {
   const [Alllist, setList] = useState([]);
   const printRef = useRef();
-  const [selectedFestival, setSelectedFestival] = useState("ALL Festival");
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Get festival from URL query params, default to "ALL Festival" if not present
+  const selectedFestival = searchParams.get('festival') || "ALL Festival";
   
   console.log(Alllist);
 
@@ -32,7 +36,8 @@ const ParticipatingSclList = () => {
   };
 
   const handleFestivalChange = (e) => {
-    setSelectedFestival(e.target.value);
+    // Update URL when festival changes
+    setSearchParams({ festival: e.target.value });
   };
 
   // Generate the appropriate title based on the selected festival
@@ -96,6 +101,16 @@ const ParticipatingSclList = () => {
     window.location.reload();
   };
 
+  // Filter the list based on selected festival if needed
+  const filteredList = selectedFestival === "ALL Festival" 
+    ? Alllist 
+    : Alllist.filter(item => {
+        // Add your filtering logic here based on the selectedFestival
+        // For example, if schools have a festival property:
+        // return item.festival === selectedFestival;
+        return Alllist; // Replace with actual filtering logic
+      });
+
   return (
     <>
       <Header />
@@ -145,8 +160,8 @@ const ParticipatingSclList = () => {
                     </tr>
                   </thead>
                   <tbody className="text-xs sm:text-sm">
-                    {Alllist && Alllist.length > 0 ? (
-                      Alllist.map((item, index) => (
+                    {filteredList && filteredList.length > 0 ? (
+                      filteredList.map((item, index) => (
                         <tr key={index} className="hover:bg-gray-100">
                           <td className="p-2 md:p-3">{index + 1}</td>
                           <td className="p-2 md:p-3">{item.schoolCode || "-"}</td>

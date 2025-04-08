@@ -171,6 +171,7 @@
 import React, { useState } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
+import { addResultentryAPI } from '../services/allAPI';
 
 const ResultEntry = () => {
     const [formData, setFormData] = useState({
@@ -179,6 +180,8 @@ const ResultEntry = () => {
         numberOfParticipants: "",
         numberOfJudges: ""
     });
+    console.log(formData);
+
 
     const [errors, setErrors] = useState({
         itemCode: "",
@@ -261,14 +264,78 @@ const ResultEntry = () => {
         return Object.values(fieldValidations).every(Boolean);
     };
 
-    const handleSubmit = (e) => {
+
+    // const handleSubmit = async () => {
+    //     const { itemCode,
+    //         itemName,
+    //         numberOfParticipants,
+    //         numberOfJudges } = formData
+    //     if (itemCode &&
+    //         itemName &&
+    //         numberOfParticipants &&
+    //         numberOfJudges) {
+    //         // alert("proceed to api")
+    //         const reqBody = new FormData()
+    //         reqBody.append("itemCode", itemCode)
+    //         reqBody.append("itemName", itemName)
+    //         reqBody.append("numberOfParticipants", numberOfParticipants)
+    //         reqBody.append("numberOfJudges", numberOfJudges)
+    //         const token = sessionStorage.getItem("token")
+    //         if (token) {
+    //             const reqHeader = {
+    //                 "Authorization": `Bearer ${token}`
+    //             }
+    //             try {
+    //                 const result = await addResultentryAPI(reqBody, reqHeader)
+    //                 if (result.status == 200) {
+    //                     alert("result add sucessful")
+    //                 } else {
+    //                     alert(result.response.data)
+    //                 }
+    //             } catch (err) {
+    //                 console.log(err);
+
+    //             }
+    //         }
+    //     } else {
+    //         alert("please fill the form completely!!")
+    //     }
+
+    // }
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Form submitted with data:", formData);
         
         if (validateForm()) {
-            console.log("Form validation passed, submitting data:", formData);
-            // Here you would typically make your API call
-            // Similar to the addparticipateAPI call in the AddParticipant component
+            const { itemCode, itemName, numberOfParticipants, numberOfJudges } = formData;
+            
+            const reqBody = new FormData();
+            reqBody.append("itemCode", itemCode);
+            reqBody.append("itemName", itemName);
+            reqBody.append("numberOfParticipants", numberOfParticipants);
+            reqBody.append("numberOfJudges", numberOfJudges);
+            
+            const token = sessionStorage.getItem("token");
+            if (token) {
+                const reqHeader = {
+                    "Authorization": `Bearer ${token}`
+                };
+                
+                try {
+                    const result = await addResultentryAPI(reqBody, reqHeader);
+                    if (result.status === 200) {
+                        alert("Result added successfully");
+                    } else {
+                        alert(result.response.data);
+                    }
+                } catch (err) {
+                   console.log(err);
+                   
+                  
+                }
+            } else {
+                alert("Authentication token not found. Please login again.");
+            }
         } else {
             console.log("Form has errors");
         }

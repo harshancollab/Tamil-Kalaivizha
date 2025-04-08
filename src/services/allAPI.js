@@ -200,3 +200,22 @@ export const getAllStageReportAPI = async (reqHeader) => {
 // export const getClusterReportAPI = async (reqBody, reqHeader) => {
 //   return await axios.post(`${BASE_URL}/cluster-report`, reqBody, { headers: reqHeader });
 // };
+
+// add result entry 
+export const  addResultentryAPI  = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/add-resultentry`,reqBody, reqHeader);
+};
+
+// all result entry api
+export const getAllResultentryListAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/all-resultentry`, {}, reqHeader);
+};
+// update result entry api API
+export const  updateResultentryAPI  = async (id,reqBody, reqHeader) => {
+  return await commonAPI("PUT", `${SERVER_URL}/Resultentry-edit/${id}`,reqBody, reqHeader);
+};
+
+// delete result entry
+export const deleteresultentryAPI = async (id, reqHeader) => {
+  return await commonAPI("DELETE", `${SERVER_URL}/stages/${id}`,{},reqHeader)
+};

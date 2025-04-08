@@ -53,6 +53,9 @@ import ClusterReport from './pages/ClusterReport';
 import StageReport from './pages/StageReport';
 import EditStage from './pages/EditStage';
 import ResultEntry from './pages/ResultEntry';
+import AllResultEtry from './pages/AllResultEtry';
+import EditResultentry from './pages/EditResultentry';
+import ItemResultList from './pages/ItemResultList';
 
 
 
@@ -123,6 +126,9 @@ function App() {
           <Route path="/ClusterReport" element={<ClusterReport />} />
           <Route path="/StageReport" element={<StageReport />} />
           <Route path="/result-entry" element={<ResultEntry />} />
+          <Route path="/All-resultentry" element={<AllResultEtry />} />
+          <Route path="/Edit-resultentry/:id" element={<EditResultentry />} />
+          <Route path="/Itemresult-list" element={<ItemResultList />} />
           
          
         </Route>

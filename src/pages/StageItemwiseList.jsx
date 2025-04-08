@@ -73,7 +73,8 @@ const StageItemwiseList = () => {
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Item name</th>
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Participants</th>
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Date</th>
-                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Time</th>
+                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Hours</th>
+                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Min</th>
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Stage</th>
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Clusters</th>
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Judges</th>
@@ -88,7 +89,8 @@ const StageItemwiseList = () => {
                                         <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.itemName}</td>
                                         <td className="p-2 md:p-3 text-xs md:text-sm">{stage.noOfParticipants}</td>
                                         <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.date}</td>
-                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{formatTime(stage.hours, stage.minutes)}</td>
+                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.hours}</td>
+                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{ stage.minutes}</td>
                                         <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.stageName}</td>
                                         <td className="p-2 md:p-3 text-xs md:text-sm">{stage.noOfCluster}</td>
                                         <td className="p-2 md:p-3 text-xs md:text-sm">{stage.noOfJudges}</td>

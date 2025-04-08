@@ -1,32 +1,63 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
+import { useSearchParams } from 'react-router-dom';
 
 const ParticipantsMorethan = () => {
-    const [participants, setParticipants] = useState([])
+  const [participants, setParticipants] = useState([])
   const printRef = useRef();
-
-
-   useEffect(() => {
-      getAllParticipants();
-    }, []);
+  const [searchParams, setSearchParams] = useSearchParams();
   
-    const getAllParticipants = async () => {
-      const token = sessionStorage.getItem('token');
-      if (token) {
-        const reqHeader = {
-          Authorization: `Bearer ${token}`,
-        };
-        try {
-          const result = await (reqHeader);
-          if (result?.status === 200) {
-            setParticipants(result.data);
-          }
-        } catch (err) {
-          console.log(err);
+  // Get params from URL, with defaults if not present
+  const selectedItems = searchParams.get('items') || "ALL";
+  const selectedFestival = searchParams.get('festival') || "ALL Festival";
+
+  useEffect(() => {
+    getAllParticipants();
+  }, []);
+  
+  const getAllParticipants = async () => {
+    const token = sessionStorage.getItem('token');
+    if (token) {
+      const reqHeader = {
+        Authorization: `Bearer ${token}`,
+      };
+      try {
+        const result = await (reqHeader);
+        if (result?.status === 200) {
+          setParticipants(result.data);
         }
+      } catch (err) {
+        console.log(err);
       }
-    };
+    }
+  };
+
+  const handleItemsChange = (e) => {
+    // Update URL when items selection changes
+    setSearchParams({ 
+      items: e.target.value,
+      festival: selectedFestival 
+    });
+  };
+
+  const handleFestivalChange = (e) => {
+    // Update URL when festival changes
+    setSearchParams({ 
+      items: selectedItems,
+      festival: e.target.value 
+    });
+  };
+
+  // Generate appropriate title based on selections
+  const getPrintTitle = () => {
+    const festivalText = selectedFestival === "ALL Festival" ? 
+      "ALL Festival" : `${selectedFestival} Festival`;
+    const itemsText = selectedItems === "ALL" ? 
+      "" : ` - More Than ${selectedItems} Items`;
+    
+    return `Participants List ${festivalText}${itemsText} Report`;
+  };
 
   const handlePrint = () => {
     const originalContents = document.body.innerHTML;
@@ -75,6 +106,27 @@ const ParticipantsMorethan = () => {
     window.location.reload();
   };
 
+  // Filter the list based on selected criteria
+  const filteredParticipants = participants.filter(participant => {
+    // Add your filtering logic here based on selectedItems and selectedFestival
+    // This is just a placeholder - implement your actual filter logic
+    let passesItemFilter = true;
+    let passesFestivalFilter = true;
+    
+    if (selectedItems !== "ALL") {
+      // Example logic: filter participants with more than X items
+      // Replace with your actual logic
+      // passesItemFilter = participant.itemCount > parseInt(selectedItems);
+    }
+    
+    if (selectedFestival !== "ALL Festival") {
+      // Example logic: filter by festival
+      // passesFestivalFilter = participant.festival === selectedFestival;
+    }
+    
+    return passesItemFilter && passesFestivalFilter;
+  });
+
   return (
     <>
       <Header />
@@ -90,8 +142,10 @@ const ParticipantsMorethan = () => {
               <div className="relative w-full sm:w-40">
                 <select
                   className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
+                  onChange={handleItemsChange}
+                  value={selectedItems}
                 >
-                  <option value="ALL Festival">Select no of item</option>
+                  <option value="ALL">Select no of item</option>
                   <option value="2">2</option>
                   <option value="3">3</option>
                   <option value="4">4</option>
@@ -104,6 +158,8 @@ const ParticipantsMorethan = () => {
               <div className="relative w-full sm:w-40">
                 <select
                   className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
+                  onChange={handleFestivalChange}
+                  value={selectedFestival}
                 >
                   <option value="ALL Festival">ALL Festival</option>
                   <option value="UP">UP</option>
@@ -124,7 +180,7 @@ const ParticipantsMorethan = () => {
             </div>
           </div>
           <div ref={printRef} className="w-full">
-            <div className="print-title hidden">Participants List More Than One Item Report</div>
+            <div className="print-title hidden">{getPrintTitle()}</div>
             <div className="overflow-x-auto -mx-4 sm:mx-0 ">
               <div className="inline-block min-w-full align-middle px-4 sm:px-0">
                 <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
@@ -140,15 +196,29 @@ const ParticipantsMorethan = () => {
                     </tr>
                   </thead>
                   <tbody className="text-xs sm:text-sm">
-                    <tr className="hover:bg-gray-100">
-                      <td className="p-2 md:p-3">8</td>
-                      <td className="p-2 md:p-3">9</td>
-                      <td className="p-2 md:p-3">nazme</td>
-                      <td className="p-2 md:p-3">Boy</td>
-                      <td className="p-2 md:p-3">9</td>
-                      <td className="p-2 md:p-3">933</td>
-                      <td className="p-2 md:p-3">school 1</td>
-                    </tr>
+                    {filteredParticipants && filteredParticipants.length > 0 ? (
+                      filteredParticipants.map((participant, index) => (
+                        <tr key={index} className="hover:bg-gray-100">
+                          <td className="p-2 md:p-3">{index + 1}</td>
+                          <td className="p-2 md:p-3">{participant.regNo || "-"}</td>
+                          <td className="p-2 md:p-3">{participant.name || "-"}</td>
+                          <td className="p-2 md:p-3">{participant.gender || "-"}</td>
+                          <td className="p-2 md:p-3">{participant.class || "-"}</td>
+                          <td className="p-2 md:p-3">{participant.schoolCode || "-"}</td>
+                          <td className="p-2 md:p-3">{participant.schoolName || "-"}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr className="hover:bg-gray-100">
+                        <td className="p-2 md:p-3">8</td>
+                        <td className="p-2 md:p-3">9</td>
+                        <td className="p-2 md:p-3">nazme</td>
+                        <td className="p-2 md:p-3">Boy</td>
+                        <td className="p-2 md:p-3">9</td>
+                        <td className="p-2 md:p-3">933</td>
+                        <td className="p-2 md:p-3">school 1</td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>

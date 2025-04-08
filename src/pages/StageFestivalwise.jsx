@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { AllStageFestivalwise } from '../services/allAPI'
 
 const StageFestivalwise = () => {
     const [Allitemise, setItemwise] = useState([]);
-    const [selectedFestival, setSelectedFestival] = useState('UP');
-    
+    const [searchParams, setSearchParams] = useSearchParams();
+    const navigate = useNavigate();
+
+    // Get festival from URL query params, default to 'UP' if not present
+    const selectedFestival = searchParams.get('festival') || 'UP';
+
     useEffect(() => {
         getAllitemise();
     }, []);
@@ -29,14 +33,13 @@ const StageFestivalwise = () => {
         }
     };
 
-    const navigate = useNavigate();
-
     const handleAddClick = () => {
         navigate('/Addfestivalwise');
     };
 
     const handleFestivalChange = (e) => {
-        setSelectedFestival(e.target.value);
+        // Update URL when festival changes
+        setSearchParams({ festival: e.target.value });
     };
 
     const dummyStages = [
@@ -103,7 +106,8 @@ const StageFestivalwise = () => {
     ];
 
     const handleEditClick = (itemId) => {
-        navigate(`/Edit-festwiseList/${itemId}`);
+        // Preserve the festival parameter when navigating
+        navigate(`/Edit-festwiseList/${itemId}?festival=${selectedFestival}`);
     };
 
     // Format time to display hours and minutes properly
@@ -141,8 +145,8 @@ const StageFestivalwise = () => {
                     </div>
 
                     {/* Table container with horizontal scroll for mobile */}
-                    <div className="overflow-x-auto  rounded-lg w-full bg-white">
-                        <table className="min-w-full  text-center">
+                    <div className="overflow-x-auto rounded-lg w-full bg-white">
+                        <table className="min-w-full text-center">
                             <thead>
                                 <tr className="bg-gray-50 ">
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700  bg-gray-50 z-10">Sl No</th>
@@ -150,7 +154,9 @@ const StageFestivalwise = () => {
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Item name</th>
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Participants</th>
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Date</th>
-                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Time</th>
+                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Hours</th>
+
+                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Min</th>
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Stage</th>
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Clusters</th>
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Judges</th>
@@ -165,7 +171,8 @@ const StageFestivalwise = () => {
                                         <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.itemName}</td>
                                         <td className="p-2 md:p-3 text-xs md:text-sm">{stage.noOfParticipants}</td>
                                         <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.date}</td>
-                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{formatTime(stage.hours, stage.minutes)}</td>
+                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.hours}</td>
+                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.minutes}</td>
                                         <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.stageName}</td>
                                         <td className="p-2 md:p-3 text-xs md:text-sm">{stage.noOfCluster}</td>
                                         <td className="p-2 md:p-3 text-xs md:text-sm">{stage.noOfJudges}</td>
@@ -184,7 +191,6 @@ const StageFestivalwise = () => {
                         </table>
                     </div>
 
-                    {/* Show a hint for mobile users */}
                     <div className="md:hidden text-xs text-gray-500 italic mt-2 text-center">
                         Swipe left/right to view all columns
                     </div>

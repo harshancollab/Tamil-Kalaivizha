@@ -1,15 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
+import { useSearchParams } from 'react-router-dom';
 
 const DateWiseParticipantList = () => {
   const [Alllist, setList] = useState([]);
   const printRef = useRef();
-  const [selectedDate, setSelectedDate] = useState("ALL");
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedDate = searchParams.get('date') || "ALL";
   
   useEffect(() => {
     getAllitemise();
-  }, []);
+  }, [[selectedDate]]);
 
   const getAllitemise = async () => {
     const token = sessionStorage.getItem('token');
@@ -30,9 +33,16 @@ const DateWiseParticipantList = () => {
   };
 
   const handleDateChange = (e) => {
-    setSelectedDate(e.target.value);
+    const newDate = e.target.value;
+    
+    // Update URL when date changes
+    if (newDate === "ALL") {
+      // Remove date parameter if "ALL" is selected
+      setSearchParams({});
+    } else {
+      setSearchParams({ date: newDate });
+    }
   };
-
   const getPrintTitle = () => {
     if (selectedDate === "ALL") {
       return "All Dates - Participants List";
@@ -50,44 +60,52 @@ const DateWiseParticipantList = () => {
   const handlePrint = () => {
     const originalContents = document.body.innerHTML;
     const printContents = printRef.current.innerHTML;
-
+  
     document.body.innerHTML = `
      <style type="text/css" media="print">
-  @page {
-    size: auto;
-    margin: 0;
-  }
-  body {
-    padding: 20px;
-    font-family: sans-serif;
-  }
-  .print-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  .print-table th, .print-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-  }
-  .print-table td {
-    border-bottom: none; /* Remove bottom border from td */
-  }
-  .print-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-  }
-  .print-title {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 18px;
-    font-weight: bold;
-    display: block !important;
-  }
-  .no-print {
-    display: none !important;
-  }
-</style>
+      @page {
+        size: auto;
+        margin: 0;
+      }
+      body {
+        padding: 20px;
+        font-family: sans-serif;
+        overflow: hidden !important; /* Hide all scrollbars */
+      }
+      ::-webkit-scrollbar {
+        display: none !important; /* Hide webkit scrollbars */
+      }
+      html, body {
+        overflow: visible !important; /* Ensure content is visible but scrollbars are hidden */
+        height: auto !important; /* Allow content to expand to its natural height */
+      }
+      .print-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .print-table th, .print-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+      }
+      .print-table td {
+        border-bottom: none; /* Remove bottom border from td */
+      }
+      .print-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+      .print-title {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 18px;
+        font-weight: bold;
+        display: block !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    </style>
       ${printContents}
     `;
     window.print();
