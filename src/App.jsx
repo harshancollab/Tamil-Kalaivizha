@@ -56,6 +56,11 @@ import ResultEntry from './pages/ResultEntry';
 import AllResultEtry from './pages/AllResultEtry';
 import EditResultentry from './pages/EditResultentry';
 import ItemResultList from './pages/ItemResultList';
+import PubshRsutlist from './pages/PubshRsutlist';
+import ConfidentialResult from './pages/ConfidentialResult';
+import ItemWisePoint from './pages/ItemWisePoint';
+import SclWisePoint from './pages/SclWisePoint';
+
 
 
 
@@ -129,6 +134,10 @@ function App() {
           <Route path="/All-resultentry" element={<AllResultEtry />} />
           <Route path="/Edit-resultentry/:id" element={<EditResultentry />} />
           <Route path="/Itemresult-list" element={<ItemResultList />} />
+          <Route path="/All-Publishresult" element={<PubshRsutlist/>} />
+          <Route path="/ConfidentialResultlist" element={<ConfidentialResult/>} />
+          <Route path="/itemwisepoint" element={<ItemWisePoint/>} />
+          <Route path="/SclWisePoint" element={<SclWisePoint/>} />
           
          
         </Route>

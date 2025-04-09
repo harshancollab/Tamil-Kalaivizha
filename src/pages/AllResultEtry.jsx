@@ -120,7 +120,7 @@ const AllResultEntry = () => {
         { slNo: 1, regNo: "123", code: "301", mark1: 85, mark2: 78, mark3: 92, total: 255, markPercentage: 85, rank: 2, grade: "A", point: 9.5 },
         { slNo: 2, regNo: "456", code: "203", mark1: 90, mark2: 88, mark3: 95, total: 273, markPercentage: 91, rank: 1, grade: "A+", point: 10.0 },
         { slNo: 3, regNo: "89", code: "345", mark1: 75, mark2: 82, mark3: 88, total: 245, markPercentage: 82, rank: 3, grade: "A-", point: 9.0 },
-        { slNo: 4, regNo: "34", code: "BIO", mark1: 68, mark2: 72, mark3: 76, total: 216, markPercentage: 72, rank: 7, grade: "B+", point: 8.0 },
+        { slNo: 4, regNo: "34", code: "567", mark1: 68, mark2: 72, mark3: 76, total: 216, markPercentage: 72, rank: 7, grade: "B+", point: 8.0 },
         { slNo: 5, regNo: "67", code: "234", mark1: 92, mark2: 80, mark3: 88, total: 260, markPercentage: 87, rank: 4, grade: "A", point: 9.5 },
         { slNo: 6, regNo: "890", code: "123", mark1: 78, mark2: 75, mark3: 82, total: 235, markPercentage: 78, rank: 5, grade: "B+", point: 8.5 },
         { slNo: 7, regNo: "45", code: "456", mark1: 65, mark2: 70, mark3: 68, total: 203, markPercentage: 68, rank: 8, grade: "B", point: 7.5 },

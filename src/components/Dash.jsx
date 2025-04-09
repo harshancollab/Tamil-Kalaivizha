@@ -20,7 +20,8 @@ const Dash = () => {
       // Pre Fest Report menu should be open if current path matches any of its links
       preFestReport: ['/eligible-schools', '/Partcipatescllist', '/SclContactList', '/festwiseList', '/DateWiseList', '/ParticipantsCardList', '/ParticipantsMorethan', '/ClashReportList', '/ClusterReport', '/StageReport'].some(route => path === route),
       // Result menu should be open if current path matches any of its links
-      results: ['/result-entry', '/item-result','/Itemresult-list'].some(route => path === route)
+      results: ['/result-entry', '/item-result','/Itemresult-list','/All-Publishresult'].some(route => path === route),
+      resultsReport: ['/ConfidentialResultlist','/itemwisepoint','/SclWisePoint','/Sclgradewise'].some(route => path === route)
     };
   });
 
@@ -37,7 +38,8 @@ const Dash = () => {
       stageSettings: openMenus.stageSettings || ['/stage-duration-list', '/StageList', '/Stage-itemwiselist', '/festivalwiselist'].some(route => path === route),
       stageReport: openMenus.stageReport || ['/AddCallsheet', '/AddTimesheet', '/AddScoresheet', '/AddTabulationsheet', '/Addreport'].some(route => path === route),
       preFestReport: openMenus.preFestReport || ['/eligible-schools', '/Partcipatescllist', '/SclContactList', '/festwiseList', '/DateWiseList', '/ParticipantsCardList', '/ClashReportList', '/ClusterReport', '/StageReport'].some(route => path === route),
-      results: openMenus.results || ['/result-entry', '/item-result','/Itemresult-list'].some(route => path === route)
+      results: openMenus.results || ['/result-entry', '/item-result','/Itemresult-list','/All-Publishresult','/'].some(route => path === route),
+      resultsReport: openMenus.resultsReport || ['/ConfidentialResultlist','/itemwisepoint','/SclWisePoint','/Sclgradewise'].some(route => path === route)
     };
 
     setOpenMenus(newOpenMenus);
@@ -50,7 +52,8 @@ const Dash = () => {
       stageSettings: menuName === 'stageSettings' ? !openMenus[menuName] : false,
       stageReport: menuName === 'stageReport' ? !openMenus[menuName] : false,
       preFestReport: menuName === 'preFestReport' ? !openMenus[menuName] : false,
-      results: menuName === 'results' ? !openMenus[menuName] : false
+      results: menuName === 'results' ? !openMenus[menuName] : false,
+      resultsReport: menuName === 'resultsReport' ? !openMenus[menuName] : false
     });
   };
 
@@ -494,6 +497,87 @@ const Dash = () => {
                     >
                       Item Result List
                     </Link>
+                    <Link
+                      to="/All-Publishresult"
+                      className={`block py-2 text-gray-300 ${
+                        isActive('/All-Publishresult')
+                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                      }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Publish Result
+                    </Link>
+                   
+                  </div>
+                )}
+              </div>
+
+              {/* Result Report Menu */}
+              <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${
+                    openMenus.resultsReport ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                  } p-2 rounded`}
+                  onClick={() => toggleMenu('resultsReport')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                  <i class="fas fa-paper-plane mr-1  "></i> Result Report
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.resultsReport ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.resultsReport && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/ConfidentialResultlist"
+                      className={`block py-2 text-gray-300 ${
+                        isActive('/ConfidentialResultlist')
+                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                      }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                     Confidential Result
+                    </Link>
+                    <Link
+                      to="/itemwisepoint"
+                      className={`block py-2 text-gray-300 ${
+                        isActive('/itemwisepoint')
+                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                      }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Item Wise Point
+                    </Link>
+                    <Link
+                      to="/SclWisePoint"
+                      className={`block py-2 text-gray-300 ${
+                        isActive('/SclWisePoint')
+                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                      }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      School Wise Point
+                    </Link>
+                    <Link
+                      to="/Sclgradewise"
+                      className={`block py-2 text-gray-300 ${
+                        isActive('/Sclgradewise')
+                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                      }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                    School Grade Wise
+                    </Link>
+                    
+                   
                   </div>
                 )}
               </div>

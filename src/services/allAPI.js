@@ -219,3 +219,28 @@ export const  updateResultentryAPI  = async (id,reqBody, reqHeader) => {
 export const deleteresultentryAPI = async (id, reqHeader) => {
   return await commonAPI("DELETE", `${SERVER_URL}/stages/${id}`,{},reqHeader)
 };
+// all result entry api
+export const getAllitemtentryListAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/all-itementry`, {}, reqHeader);
+};
+
+// all publish entry api
+export const getAllPublishentryListAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/all-publish`, {}, reqHeader);
+};
+
+// all getAllConfidentialResult api
+export const getAllConfidentialAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/all-ConfidentialResult`, {}, reqHeader);
+};
+// all //getAllItemwiswpoint api
+export const getAllItemwisepointAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/all-/Itemwiswpoint(`, {}, reqHeader);
+};
+
+
+
+// allSchool Wise Point List api
+export const getAllsclwisepoitAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/all-sclwise-point(`, {}, reqHeader);
+};
