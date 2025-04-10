@@ -249,3 +249,13 @@ export const getAllsclwisepoitAPI = async (reqHeader) => {
 export const getAllsclGradewiseAPI = async (reqHeader) => {
   return await commonAPI("GET", `${SERVER_URL}/all-sclwise-grade(`, {}, reqHeader);
 };
+
+// getAllCertificate itemwise
+export const getAllCertificateitemwiseAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/all-certficate-item(`, {}, reqHeader);
+};
+// getAllCertificate School wise
+
+export const getAllCertificateSclwiseAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/all-certficate-scl(`, {}, reqHeader);
+};

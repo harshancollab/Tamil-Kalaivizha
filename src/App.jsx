@@ -61,6 +61,9 @@ import ConfidentialResult from './pages/ConfidentialResult';
 import ItemWisePoint from './pages/ItemWisePoint';
 import SclWisePoint from './pages/SclWisePoint';
 import SclGradewise from './pages/SclGradewise';
+import Certificateitmwise from './pages/Certificateitmwise';
+import CertificateSclwise from './pages/CertificateSclwise';
+import CertificateTempt from './pages/CertificateTempt';
 
 
 
@@ -140,7 +143,9 @@ function App() {
           <Route path="/itemwisepoint" element={<ItemWisePoint/>} />
           <Route path="/SclWisePoint" element={<SclWisePoint/>} />
           <Route path="/Sclgradewise" element={<SclGradewise/>} />
-          
+          <Route path="/certificate-template" element={<CertificateTempt/>} />
+          <Route path="/certificate-item-wise" element={<Certificateitmwise/>} />
+          <Route path="/certificate-school-wise" element={<CertificateSclwise/>} />
          
         </Route>
 
