@@ -232,7 +232,9 @@ const Dashboard = () => {
                 <Link to="/item" className="block h-full">
                   <div className="bg-white text-blue-900 h-32 sm:h-36 md:h-48 p-3 sm:p-4 md:p-6 rounded-xl shadow-md flex flex-col items-center justify-center border hover:bg-gradient-to-r from-[#003566] to-[#05B9F4] hover:text-white transition cursor-pointer">
                     <span className="text-lg sm:text-xl text-blue-500">
-                      <i className="fa-solid fa-file-arrow-down"></i>
+                      <i className="fa-solid text-blue-500 fa-file-arrow-down"></i> 
+
+
                     </span>
                     <span className="mt-2 text-sm sm:text-base md:text-lg text-center">
                       Item Wise Participants
@@ -242,8 +244,13 @@ const Dashboard = () => {
 
                 <Link to="/result" className="block h-full">
                   <div className="bg-white text-blue-900 h-32 sm:h-36 md:h-48 p-3 sm:p-4 md:p-6 rounded-xl shadow-md flex flex-col items-center justify-center border hover:bg-gradient-to-r from-[#003566] to-[#05B9F4] hover:text-white transition cursor-pointer">
-                    <span className="text-lg sm:text-xl text-blue-500">
-                      <i className="fa-solid fa-border-all"></i>
+                    <span className="text-lg sm:text-xl text-blue-500 ">
+                      {/* <i className="fa-solid fa-border-all"></i> */}
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+</svg>
+
+
                     </span>
                     <span className="mt-2 text-sm sm:text-base md:text-lg text-center">
                       Result View

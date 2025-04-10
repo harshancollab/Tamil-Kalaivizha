@@ -553,7 +553,10 @@ const Dash = () => {
                   onClick={() => toggleMenu('certificate')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <i class="fa-solid fa-file-certificate"></i>Certificate
+                  <i class="fa-solid fa-file-circle-plus mr-1"></i>
+       
+
+                  Certificate
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.certificate ? 'up' : 'down'} text-sm`}

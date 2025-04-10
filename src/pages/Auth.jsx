@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { loginAPI } from "../services/allAPI";
+import login from "../assets/Login.png"
 
 const Auth = () => {
   const navigate = useNavigate();

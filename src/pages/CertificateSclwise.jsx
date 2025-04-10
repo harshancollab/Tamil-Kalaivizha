@@ -65,7 +65,7 @@ const CertificateSclwise = () => {
                 </style>
             </head>
             <body>
-                <h2>${selectedFestival} - Certificate Item Wise Report</h2>
+                <h2>${selectedFestival} - Certificate School Wise Report</h2>
                 ${printContent.innerHTML}
             </body>
             </html>
@@ -173,7 +173,7 @@ const CertificateSclwise = () => {
                 <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-hidden">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
                         <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
-                            Certificate Item Wise
+                            Certificate School Wise
                         </h2>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
                             <div className="relative w-full sm:w-40">
