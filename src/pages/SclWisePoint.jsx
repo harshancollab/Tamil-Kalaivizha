@@ -206,20 +206,33 @@ import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useSearchParams } from 'react-router-dom';
 import { getAllsclwisepoitAPI } from '../services/allAPI';
-import { useReactToPrint } from 'react-to-print';
 
 const SclWisePoint = () => {
 
     const [Allitemresult, setItemresult] = useState([]);
     const printRef = useRef();
+    const iframeRef = useRef(null);
     const [searchParams, setSearchParams] = useSearchParams();
-
+    const [printReady, setPrintReady] = useState(false);
 
     const selectedFestival = searchParams.get('festival') || "UP Kalaivizha";
 
     useEffect(() => {
         //getAllItemResult();
     }, []);
+
+    // Effect to handle printing after iframe is loaded
+    useEffect(() => {
+        if (printReady && iframeRef.current) {
+            try {
+                iframeRef.current.contentWindow.print();
+                setPrintReady(false);
+            } catch (error) {
+                console.error("Printing failed:", error);
+                setPrintReady(false);
+            }
+        }
+    }, [printReady]);
 
     const getAllItemResult = async () => {
         const token = sessionStorage.getItem("token");
@@ -249,7 +262,6 @@ const SclWisePoint = () => {
         { slNo: 8, regNo: "6787", code: "976", mark1: 0, mark2: 6, mark3: 0, total: 226, markPercentage: 75, rank: 6, grade: "B+", point: 8.0 }
     ];
 
-
     const getPrintTitle = () => {
         switch (selectedFestival) {
             case "UP Kalaivizha":
@@ -269,52 +281,72 @@ const SclWisePoint = () => {
         setSearchParams({ festival: e.target.value });
     };
 
-    // New print method using react-to-print
-    const handlePrint = useReactToPrint({
-        content: () => printRef.current,
-        documentTitle: getPrintTitle(),
-        onBeforeGetContent: () => {
-            // You can add any preparation logic here
-            return Promise.resolve();
-        },
-        onAfterPrint: () => {
-            console.log('Print completed');
-        },
-        pageStyle: `
-            @page {
-                size: auto;
-                margin: 20mm;
-            }
-            @media print {
-                body {
-                    font-family: sans-serif;
-                }
-                .no-print {
-                    display: none !important;
-                }
-                .print-title {
-                    text-align: center;
-                    margin-bottom: 20px;
-                    font-size: 18px;
-                    font-weight: bold;
-                    display: block !important;
-                }
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                }
-                th, td {
-                    border: 1px solid #ddd;
-                    padding: 8px;
-                    text-align: center;
-                }
-                th {
-                    background-color: #f2f2f2;
-                    font-weight: bold;
-                }
-            }
-        `,
-    });
+    // New iframe-based print method
+    const handlePrint = () => {
+        if (!iframeRef.current) {
+            // Create iframe if it doesn't exist
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.onload = () => setPrintReady(true);
+            document.body.appendChild(iframe);
+            iframeRef.current = iframe;
+        }
+
+        // Get table content and title
+        const tableData = printRef.current.innerHTML;
+        const title = getPrintTitle();
+        
+        // Write content to iframe
+        const iframeDoc = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>${title}</title>
+                <style>
+                    @page {
+                        margin: 1cm;
+                    }
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 15px;
+                    }
+                    .print-header {
+                        text-align: center;
+                        margin-bottom: 20px;
+                        font-size: 18px;
+                        font-weight: bold;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    th, td {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                        text-align: center;
+                    }
+                    th {
+                        background-color: #f2f2f2;
+                        font-weight: bold;
+                    }
+                    tr:nth-child(even) {
+                        background-color: #f9f9f9;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="print-header">${title}</div>
+                ${tableData}
+            </body>
+            </html>
+        `);
+        iframeDoc.close();
+        
+        // Print will be triggered by the useEffect when iframe is loaded
+    };
 
     const filteredData = resultData;
     return (
@@ -355,39 +387,32 @@ const SclWisePoint = () => {
 
                     <div className="w-full">
                         <div ref={printRef}>
-                            <div className="print-title hidden">{getPrintTitle()}</div>
-                            <div className="overflow-x-auto -mx-4 sm:mx-0">
-                                <div className="inline-block min-w-full align-middle px-4 sm:px-0">
-                                    <div className="shadow overflow-hidden border-gray-200 sm:rounded-lg">
-                                        <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
-                                            <thead className="bg-gray-50">
-                                                <tr className="text-gray-700">
-                                                    <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
-                                                    <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code</th>
-                                                    <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
-                                                    <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade A</th>
-                                                    <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade B</th>
-                                                    <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade C</th>
-                                                    <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Points</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
-                                                {filteredData.map((result) => (
-                                                    <tr key={result.slNo} className="hover:bg-gray-100">
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.slNo}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.regNo}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.code}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.mark1}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.mark2}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.mark3}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.total}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
+                            <table className="min-w-full text-center border-separate border-spacing-y-2">
+                                <thead className="bg-gray-50">
+                                    <tr className="text-gray-700">
+                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
+                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code</th>
+                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade A</th>
+                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade B</th>
+                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade C</th>
+                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
+                                    {filteredData.map((result) => (
+                                        <tr key={result.slNo} className="hover:bg-gray-100">
+                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.slNo}</td>
+                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.regNo}</td>
+                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.code}</td>
+                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.mark1}</td>
+                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.mark2}</td>
+                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.mark3}</td>
+                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.total}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
