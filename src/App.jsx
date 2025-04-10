@@ -60,6 +60,7 @@ import PubshRsutlist from './pages/PubshRsutlist';
 import ConfidentialResult from './pages/ConfidentialResult';
 import ItemWisePoint from './pages/ItemWisePoint';
 import SclWisePoint from './pages/SclWisePoint';
+import SclGradewise from './pages/SclGradewise';
 
 
 
@@ -138,6 +139,7 @@ function App() {
           <Route path="/ConfidentialResultlist" element={<ConfidentialResult/>} />
           <Route path="/itemwisepoint" element={<ItemWisePoint/>} />
           <Route path="/SclWisePoint" element={<SclWisePoint/>} />
+          <Route path="/Sclgradewise" element={<SclGradewise/>} />
           
          
         </Route>

@@ -117,32 +117,37 @@ const ItemWisePoint = () => {
       <div className="flex flex-col md:flex-row min-h-screen">
         <Dash />
         <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-4">
             <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
               Item Wise Point List
             </h2>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4 w-full sm:w-auto">
-              <label className="text-blue-700 whitespace-nowrap">School Code</label>
-              <input 
-                type="text" 
-                className="rounded-full border border-blue-700 px-2 py-2 w-full sm:w-auto"  
-                placeholder="Enter School Code..."
-                value={schoolCode}
-                onChange={handleSchoolCodeChange}
-              />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <label className="text-blue-700 whitespace-nowrap min-w-max">School Code</label>
+                <input 
+                  type="text" 
+                  className="rounded-full border border-blue-700 px-2 py-2 flex-grow"  
+                  placeholder="Enter School Code..."
+                  value={schoolCode}
+                  onChange={handleSchoolCodeChange}
+                />
+              </div>
+
               <button
-                className={`border-blue-800 border text-blue-900 py-2 px-6 rounded-full w-full sm:w-auto ${
+                className={`border-blue-800 border  text-blue-900 py-2 px-2 rounded-full w-full sm:w-auto  ${
                   schoolCode.trim() !== '' ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
                 disabled={schoolCode.trim() !== ''}
               >
                 All School
               </button>
+
               <div className="relative w-full sm:w-40">
                 <select
                   className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
                   onChange={handleFestivalChange}
                   value={selectedFestival}
+                  aria-label="Select Festival"
                 >
                   <option value="All Festival">All Festival</option>
                   <option value="UP Kalaivizha">UP Kalaivizha</option>
@@ -154,9 +159,11 @@ const ItemWisePoint = () => {
                   <i className="fa-solid fa-chevron-down"></i>
                 </div>
               </div>
+
               <button
                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
                 onClick={handlePrint}
+                aria-label="Print report"
               >
                 Print
               </button>

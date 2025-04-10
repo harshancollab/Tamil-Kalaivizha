@@ -8,14 +8,14 @@ const ConfidentialResult = () => {
     const printRef = useRef();
     const [selectedItem, setSelectedItem] = useState(null);
     const [selectedFestival, setSelectedFestival] = useState("All Festival");
-      const [Allitemresult, setItemresult] = useState([]);
+    const [Allitemresult, setItemresult] = useState([]);
 
-console.log(Allitemresult);
+    console.log(Allitemresult);
 
 
-useEffect(() => {
-    getAllConfidentialResult();
-  }, []);
+    useEffect(() => {
+        getAllConfidentialResult();
+    }, []);
 
     const getAllConfidentialResult = async () => {
         const token = sessionStorage.getItem("token");
@@ -24,7 +24,7 @@ useEffect(() => {
                 "Authorization": `Bearer ${token}`
             }
             try {
-                const result = await getAllConfidentialAPI (reqHeader)
+                const result = await getAllConfidentialAPI(reqHeader)
                 if (result.status === 200) {
                     setItemresult(result.data)
                 }
@@ -70,7 +70,7 @@ useEffect(() => {
         const originalContents = document.body.innerHTML;
         const printContents = printRef.current.innerHTML;
         
-       
+    
         const itemHeading = selectedItem || "";
     
         document.body.innerHTML = `
@@ -98,7 +98,7 @@ useEffect(() => {
                 }
                 .print-title {
                     text-align: center;
-                    margin-bottom: 20px;
+                    margin-bottom: 10px;
                     font-size: 18px;
                     font-weight: bold;
                     display: block !important;
@@ -143,6 +143,7 @@ useEffect(() => {
         document.body.innerHTML = originalContents;
         window.location.reload();
     };
+    
     const handleItemClick = (itemName) => {
         setSelectedItem(itemName);
         setTimeout(() => {

@@ -244,3 +244,8 @@ export const getAllItemwisepointAPI = async (reqHeader) => {
 export const getAllsclwisepoitAPI = async (reqHeader) => {
   return await commonAPI("GET", `${SERVER_URL}/all-sclwise-point(`, {}, reqHeader);
 };
+
+// allSchoolGrade wise  Wise Point List api
+export const getAllsclGradewiseAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/all-sclwise-grade(`, {}, reqHeader);
+};
