@@ -22,7 +22,8 @@ const Dash = () => {
       // Result menu should be open if current path matches any of its links
       results: ['/result-entry', '/item-result', '/Itemresult-list', '/All-Publishresult'].some(route => path === route),
       resultsReport: ['/ConfidentialResultlist', '/itemwisepoint', '/SclWisePoint', '/Sclgradewise'].some(route => path === route),
-      certificate: ['/certificate-template', '/certificate-item-wise', '/certificate-school-wise'].some(route => path === route)
+      certificate: ['/certificate-template', '/certificate-item-wise', '/certificate-school-wise','/CertificateRegno'].some(route => path === route),
+      Export: ['/Higherlvlcomp'].some(route => path === route)
     };
   });
 
@@ -41,7 +42,8 @@ const Dash = () => {
       preFestReport: openMenus.preFestReport || ['/eligible-schools', '/Partcipatescllist', '/SclContactList', '/festwiseList', '/DateWiseList', '/ParticipantsCardList', '/ClashReportList', '/ClusterReport', '/StageReport'].some(route => path === route),
       results: openMenus.results || ['/result-entry', '/item-result', '/Itemresult-list', '/All-Publishresult', '/'].some(route => path === route),
       resultsReport: openMenus.resultsReport || ['/ConfidentialResultlist', '/itemwisepoint', '/SclWisePoint', '/Sclgradewise'].some(route => path === route),
-      certificate: openMenus.certificate || ['/certificate-template', '/certificate-item-wise', '/certificate-school-wise'].some(route => path === route)
+      certificate: openMenus.certificate || ['/certificate-template', '/certificate-item-wise', '/certificate-school-wise','/CertificateRegno'].some(route => path === route),
+      Export: openMenus.Export || ['/Higherlvlcomp'].some(route => path === route)
     };
 
     setOpenMenus(newOpenMenus);
@@ -56,7 +58,8 @@ const Dash = () => {
       preFestReport: menuName === 'preFestReport' ? !openMenus[menuName] : false,
       results: menuName === 'results' ? !openMenus[menuName] : false,
       resultsReport: menuName === 'resultsReport' ? !openMenus[menuName] : false,
-      certificate: menuName === 'certificate' ? !openMenus[menuName] : false
+      certificate: menuName === 'certificate' ? !openMenus[menuName] : false,
+      Export: menuName === 'Export' ? !openMenus[menuName] : false
     });
   };
 
@@ -596,7 +599,51 @@ const Dash = () => {
                     >
                       Certificate School Wise
                     </Link>
+                    <Link
+                      to="/CertificateRegno"
+                      className={`block py-2 text-gray-300 ${isActive('/CertificateRegno')
+                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Certificate Reg No Wise
+                    </Link>
                    
+
+                  </div>
+                )}
+              </div>
+              {/*  */}
+              <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.Export ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('Export')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                  <i class="fas fa-arrow-up-right-from-square mr-1"></i>Export 
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.Export ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.Export && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/Higherlvlcomp"
+                      className={`block py-2 text-gray-300 ${isActive('/Higherlvlcomp')
+                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                     Higher Level Competition
+                    </Link>
+              
+                    
 
                   </div>
                 )}

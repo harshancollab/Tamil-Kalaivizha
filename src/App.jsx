@@ -64,6 +64,10 @@ import SclGradewise from './pages/SclGradewise';
 import Certificateitmwise from './pages/Certificateitmwise';
 import CertificateSclwise from './pages/CertificateSclwise';
 import CertificateTempt from './pages/CertificateTempt';
+import AddcertfitDetail from './pages/AddcertfitDetail';
+import CertificateRegno from './pages/CertificateRegno';
+import CertificatePartcipate from './pages/CertificatePartcipate';
+import Higherlvlcomp from './pages/Higherlvlcomp';
 
 
 
@@ -146,6 +150,10 @@ function App() {
           <Route path="/certificate-template" element={<CertificateTempt/>} />
           <Route path="/certificate-item-wise" element={<Certificateitmwise/>} />
           <Route path="/certificate-school-wise" element={<CertificateSclwise/>} />
+          <Route path="/Add-certificate" element={<AddcertfitDetail/>} />
+          <Route path="/CertificateRegno" element={<CertificateRegno/>} />
+          <Route path="/CertificateParticipate" element={<CertificatePartcipate/>} />
+          <Route path="/Higherlvlcomp" element={<Higherlvlcomp/>} />
          
         </Route>
 

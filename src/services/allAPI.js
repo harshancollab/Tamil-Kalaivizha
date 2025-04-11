@@ -259,3 +259,8 @@ export const getAllCertificateitemwiseAPI = async (reqHeader) => {
 export const getAllCertificateSclwiseAPI = async (reqHeader) => {
   return await commonAPI("GET", `${SERVER_URL}/all-certficate-scl(`, {}, reqHeader);
 };
+// getAllhigher level comp School wise
+
+export const getAllHigherlvlcompAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/all-Higherlvlcomp`, {}, reqHeader);
+};
