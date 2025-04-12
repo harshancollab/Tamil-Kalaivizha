@@ -10,26 +10,26 @@ const ItemWisePoint = () => {
   const [Allitemwiswpoint, setItemwiswpoint] = useState([]);
 
 
-   useEffect(() => {
-        getAllItemwiswpoint();
-    }, []);
+  useEffect(() => {
+    getAllItemwiswpoint();
+  }, []);
 
-    const getAllItemwiswpoint = async () => {
-        const token = sessionStorage.getItem("token");
-        if (token) {
-            const reqHeader = {
-                "Authorization": `Bearer ${token}`
-            }
-            try {
-                const result = await getAllItemwisepointAPI(reqHeader)
-                if (result.status === 200) {
-                  setItemwiswpoint(result.data)
-                }
-            } catch (err) {
-                console.log(err);
-            }
+  const getAllItemwiswpoint = async () => {
+    const token = sessionStorage.getItem("token");
+    if (token) {
+      const reqHeader = {
+        "Authorization": `Bearer ${token}`
+      }
+      try {
+        const result = await getAllItemwisepointAPI(reqHeader)
+        if (result.status === 200) {
+          setItemwiswpoint(result.data)
         }
+      } catch (err) {
+        console.log(err);
+      }
     }
+  }
 
 
   const resultData = [
@@ -124,9 +124,9 @@ const ItemWisePoint = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <label className="text-blue-700 whitespace-nowrap min-w-max">School Code</label>
-                <input 
-                  type="text" 
-                  className="rounded-full border border-blue-700 px-2 py-2 flex-grow"  
+                <input
+                  type="text"
+                  className="rounded-full border border-blue-700 px-2 py-2 flex-grow"
                   placeholder="Enter School Code..."
                   value={schoolCode}
                   onChange={handleSchoolCodeChange}
@@ -134,9 +134,8 @@ const ItemWisePoint = () => {
               </div>
 
               <button
-                className={`border-blue-800 border  text-blue-900 py-2 px-2 rounded-full w-full sm:w-auto  ${
-                  schoolCode.trim() !== '' ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
+                className={`border-blue-800 border text-blue-900 py-2 px-4 rounded-full min-w-max whitespace-nowrap ${schoolCode.trim() !== '' ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 disabled={schoolCode.trim() !== ''}
               >
                 All School

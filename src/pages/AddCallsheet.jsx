@@ -403,14 +403,14 @@ const AddCallsheet = () => {
             `;
         }
         
-        // Header info
+        
         const headerInfo = `
             <div class="header-info">
                 ${stageInfo}
             </div>
         `;
         
-        // Footer info
+      
         const footerInfo = `
             <div class="footer-info">
                 <div class="footer-item">
