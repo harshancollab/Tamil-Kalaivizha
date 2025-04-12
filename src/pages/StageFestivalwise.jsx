@@ -5,18 +5,88 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { AllStageFestivalwise } from '../services/allAPI'
 
 const StageFestivalwise = () => {
-    const [Allitemise, setItemwise] = useState([]);
+    const [allItems, setAllItems] = useState([]);
+    const [filteredItems, setFilteredItems] = useState([]);
     const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
 
-    // Get festival from URL query params, default to 'UP' if not present
-    const selectedFestival = searchParams.get('festival') || 'UP';
+    // Get festival from URL query params, default to 'ALL Festival' if not present
+    const selectedFestival = searchParams.get('festival') || 'ALL Festival';
+
+    // Dummy data for testing
+    const dummyStages = [
+        {
+            id: 1,
+            itemCode: '301',
+            itemName: 'Story Writing',
+            noOfParticipants: 50,
+            date: '2025-04-05',
+            hours: 9,
+            minutes: 0,
+            stageName: 'Stage 1',
+            noOfCluster: 5,
+            noOfJudges: 3,
+        },
+        {
+            id: 2,
+            itemCode: '401',
+            itemName: 'Group Song',
+            noOfParticipants: 25,
+            date: '2025-04-06',
+            hours: 14,
+            minutes: 30,
+            stageName: 'Stage 3',
+            noOfCluster: 2,
+            noOfJudges: 5,
+        },
+        {
+            id: 3,
+            itemCode: '501',
+            itemName: 'Recitation',
+            noOfParticipants: 15,
+            date: '2025-04-07',
+            hours: 10,
+            minutes: 15,
+            stageName: 'Stage 4',
+            noOfCluster: 1,
+            noOfJudges: 7,
+        },
+        {
+            id: 4,
+            itemCode: '345',
+            itemName: 'Painting',
+            noOfParticipants: 60,
+            date: '2025-04-05',
+            hours: 11,
+            minutes: 45,
+            stageName: 'Stage 4',
+            noOfCluster: 6,
+            noOfJudges: 2,
+        },
+        {
+            id: 5,
+            itemCode: '405',
+            itemName: 'Dance',
+            noOfParticipants: 30,
+            date: '2025-04-06',
+            hours: 16,
+            minutes: 0,
+            stageName: 'Stage 5',
+            noOfCluster: 3,
+            noOfJudges: 4,
+        },
+    ];
 
     useEffect(() => {
-        getAllitemise();
+        getAllItems();
     }, []);
 
-    const getAllitemise = async () => {
+    useEffect(() => {
+        // Apply filters whenever selected festival changes or data is loaded
+        applyFestivalFilter(selectedFestival);
+    }, [selectedFestival, allItems]);
+
+    const getAllItems = async () => {
         const token = sessionStorage.getItem('token');
         if (token) {
             const reqHeader = {
@@ -25,12 +95,53 @@ const StageFestivalwise = () => {
             try {
                 const result = await AllStageFestivalwise(reqHeader);
                 if (result.status === 200) {
-                    setItemwise(result.data);
+                    setAllItems(result.data);
+                } else {
+                    setAllItems(dummyStages);
                 }
             } catch (err) {
                 console.log(err);
+                setAllItems(dummyStages);
             }
+        } else {
+            setAllItems(dummyStages);
         }
+    };
+
+    // Filter items based on festival selection
+    const applyFestivalFilter = (festival) => {
+        if (!allItems.length) return;
+        
+        let filteredResult = [];
+        
+        if (festival !== "ALL Festival") {
+            switch (festival) {
+                case "UP":
+                    filteredResult = allItems.filter(item => {
+                        const itemCode = parseInt(item.itemCode);
+                        return itemCode >= 300 && itemCode < 400;
+                    });
+                    break;
+                case "Lp":
+                    filteredResult = allItems.filter(item => {
+                        const itemCode = parseInt(item.itemCode);
+                        return itemCode >= 400 && itemCode < 500;
+                    });
+                    break;
+                default:
+                    filteredResult = [...allItems];
+            }
+        } else {
+            filteredResult = [...allItems];
+        }
+        
+        // Update indices for the filtered items
+        filteredResult = filteredResult.map((item, index) => ({
+            ...item,
+            slNo: index + 1
+        }));
+        
+        setFilteredItems(filteredResult);
     };
 
     const handleAddClick = () => {
@@ -42,77 +153,9 @@ const StageFestivalwise = () => {
         setSearchParams({ festival: e.target.value });
     };
 
-    const dummyStages = [
-        {
-            id: 1,
-            itemCode: '3001',
-            itemName: 'Item1',
-            noOfParticipants: 50,
-            date: '2025-04-05',
-            hours: 9,
-            minutes: 0,
-            stageName: 'Stage 1',
-            noOfCluster: 5,
-            noOfJudges: 3,
-        },
-        {
-            id: 2,
-            itemCode: '4004',
-            itemName: 'Item 2',
-            noOfParticipants: 25,
-            date: '2025-04-06',
-            hours: 14,
-            minutes: 30,
-            stageName: 'stage 3',
-            noOfCluster: 2,
-            noOfJudges: 5,
-        },
-        {
-            id: 3,
-            itemCode: '4003',
-            itemName: 'item 3',
-            noOfParticipants: 15,
-            date: '2025-04-07',
-            hours: 10,
-            minutes: 15,
-            stageName: 'Stage 4',
-            noOfCluster: 1,
-            noOfJudges: 7,
-        },
-        {
-            id: 4,
-            itemCode: '3454',
-            itemName: 'Item 4',
-            noOfParticipants: 60,
-            date: '2025-04-05',
-            hours: 11,
-            minutes: 45,
-            stageName: 'stage 4',
-            noOfCluster: 6,
-            noOfJudges: 2,
-        },
-        {
-            id: 5,
-            itemCode: '3405',
-            itemName: 'item 5',
-            noOfParticipants: 30,
-            date: '2025-04-06',
-            hours: 16,
-            minutes: 0,
-            stageName: 'Stage 5',
-            noOfCluster: 3,
-            noOfJudges: 4,
-        },
-    ];
-
     const handleEditClick = (itemId) => {
         // Preserve the festival parameter when navigating
         navigate(`/Edit-festwiseList/${itemId}?festival=${selectedFestival}`);
-    };
-
-    // Format time to display hours and minutes properly
-    const formatTime = (hours, minutes) => {
-        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
     };
 
     return (
@@ -149,13 +192,12 @@ const StageFestivalwise = () => {
                         <table className="min-w-full text-center">
                             <thead>
                                 <tr className="bg-gray-50 ">
-                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700  bg-gray-50 z-10">Sl No</th>
+                                    <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700 bg-gray-50 z-10">Sl No</th>
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Item code</th>
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Item name</th>
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Participants</th>
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Date</th>
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Hours</th>
-
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Min</th>
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Stage</th>
                                     <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Clusters</th>
@@ -164,29 +206,40 @@ const StageFestivalwise = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {dummyStages.map((stage, index) => (
-                                    <tr key={stage.id} className="hover:bg-gray-50  text-gray-700">
-                                        <td className="p-2 md:p-3 text-xs md:text-sm  bg-white z-10">{index + 1}</td>
-                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.itemCode}</td>
-                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.itemName}</td>
-                                        <td className="p-2 md:p-3 text-xs md:text-sm">{stage.noOfParticipants}</td>
-                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.date}</td>
-                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.hours}</td>
-                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.minutes}</td>
-                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.stageName}</td>
-                                        <td className="p-2 md:p-3 text-xs md:text-sm">{stage.noOfCluster}</td>
-                                        <td className="p-2 md:p-3 text-xs md:text-sm">{stage.noOfJudges}</td>
-                                        <td className="p-2 md:p-3 text-xs md:text-sm">
-                                            <button
-                                                className="text-blue-500 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-full p-1"
-                                                onClick={() => handleEditClick(stage.id)}
-                                                aria-label={`Edit ${stage.itemName}`}
-                                            >
-                                                <i className="fa-solid fa-pen-to-square"></i>
-                                            </button>
+                                {filteredItems.length > 0 ? (
+                                    filteredItems.map((stage, index) => (
+                                        <tr key={stage.id} className="hover:bg-gray-50 text-gray-700">
+                                            <td className="p-2 md:p-3 text-xs md:text-sm bg-white z-10">{index + 1}</td>
+                                            <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.itemCode}</td>
+                                            <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.itemName}</td>
+                                            <td className="p-2 md:p-3 text-xs md:text-sm">{stage.noOfParticipants}</td>
+                                            <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.date}</td>
+                                            <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.hours}</td>
+                                            <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.minutes}</td>
+                                            <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.stageName}</td>
+                                            <td className="p-2 md:p-3 text-xs md:text-sm">{stage.noOfCluster}</td>
+                                            <td className="p-2 md:p-3 text-xs md:text-sm">{stage.noOfJudges}</td>
+                                            <td className="p-2 md:p-3 text-xs md:text-sm">
+                                                <button
+                                                    className="text-blue-500 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 rounded-full p-1"
+                                                    onClick={() => handleEditClick(stage.id)}
+                                                    aria-label={`Edit ${stage.itemName}`}
+                                                >
+                                                    <i className="fa-solid fa-pen-to-square"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="11" className="p-6 text-center text-gray-600">
+                                            <div className="flex flex-col items-center justify-center gap-2">
+                                                <i className="fa-solid fa-search text-2xl text-gray-400"></i>
+                                                <p>No items found for {selectedFestival === "ALL Festival" ? "any festival" : selectedFestival}</p>
+                                            </div>
                                         </td>
                                     </tr>
-                                ))}
+                                )}
                             </tbody>
                         </table>
                     </div>
@@ -216,4 +269,4 @@ const StageFestivalwise = () => {
     );
 };
 
-export default StageFestivalwise;
+export default StageFestivalwise

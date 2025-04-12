@@ -245,8 +245,6 @@
 
 
 
-
-// Modify CertificateSclwise.jsx to make school names clickable
 import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'

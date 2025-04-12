@@ -68,6 +68,7 @@ import AddcertfitDetail from './pages/AddcertfitDetail';
 import CertificateRegno from './pages/CertificateRegno';
 import CertificatePartcipate from './pages/CertificatePartcipate';
 import Higherlvlcomp from './pages/Higherlvlcomp';
+import ExportDatabase from './pages/ExportDatabase';
 
 
 
@@ -154,6 +155,7 @@ function App() {
           <Route path="/CertificateRegno" element={<CertificateRegno/>} />
           <Route path="/CertificateParticipate" element={<CertificatePartcipate/>} />
           <Route path="/Higherlvlcomp" element={<Higherlvlcomp/>} />
+          <Route path="/ExportDatabase" element={<ExportDatabase/>} />
          
         </Route>
 

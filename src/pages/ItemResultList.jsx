@@ -5,45 +5,130 @@ import { useSearchParams } from 'react-router-dom'
 import { getAllitemtentryListAPI } from '../services/allAPI'
 
 const ItemResultList = () => {
-    const [Allitemresult, setItemresult] = useState([]);
-    const printRef = useRef();
     const [searchParams, setSearchParams] = useSearchParams();
+    const [Allitemresult, setItemresult] = useState([]);
+    const [filteredResults, setFilteredResults] = useState([]);
+    const printRef = useRef();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     
-   
-    const selectedFestival = searchParams.get('festival') || "UP Kalaivizha";
+    // Get festival from URL query params, default to "ALL Festival" if not present
+    const [selectedFestival, setSelectedFestival] = useState(searchParams.get('festival') || "ALL Festival");
+
+    // Sample data for demonstration
+    const resultData = [
+        { slNo: 1, regNo: "301 - Story Writing", code: "301", itemName: "Story Writing", itemType: "Single", studentsCount: 5, resultEntered: 3, resultNotEntered: 2, confirmed: "Yes", status: "Completed" },
+        { slNo: 2, regNo: "305 - Recitation", code: "305", itemName: "Recitation", itemType: "Single", studentsCount: 8, resultEntered: 8, resultNotEntered: 0, confirmed: "Yes", status: "Completed" },
+        { slNo: 3, regNo: "410 - Group Song", code: "410", itemName: "Group Song", itemType: "Group", studentsCount: 12, resultEntered: 10, resultNotEntered: 2, confirmed: "No", status: "In Progress" },
+        { slNo: 4, regNo: "415 - Folk Dance", code: "415", itemName: "Folk Dance", itemType: "Group", studentsCount: 15, resultEntered: 15, resultNotEntered: 0, confirmed: "Yes", status: "Completed" },
+        { slNo: 5, regNo: "502 - Essay Writing", code: "502", itemName: "Essay Writing", itemType: "Single", studentsCount: 10, resultEntered: 8, resultNotEntered: 2, confirmed: "No", status: "In Progress" },
+        { slNo: 6, regNo: "507 - Debate", code: "507", itemName: "Debate", itemType: "Single", studentsCount: 6, resultEntered: 6, resultNotEntered: 0, confirmed: "Yes", status: "Completed" },
+        { slNo: 7, regNo: "608 - Quiz", code: "608", itemName: "Quiz", itemType: "Group", studentsCount: 9, resultEntered: 0, resultNotEntered: 9, confirmed: "No", status: "Not Started" },
+        { slNo: 8, regNo: "612 - Elocution", code: "612", itemName: "Elocution", itemType: "Single", studentsCount: 7, resultEntered: 5, resultNotEntered: 2, confirmed: "No", status: "In Progress" }
+    ];
 
     useEffect(() => {
-        //getAllItemResult();
+        getAllItemResult();
     }, []);
 
     const getAllItemResult = async () => {
+        setLoading(true);
         const token = sessionStorage.getItem("token");
-        if (token) {
-            const reqHeader = {
-                "Authorization": `Bearer ${token}`
-            }
-            try {
-                const result = await getAllitemtentryListAPI(reqHeader)
-                if (result.status === 200) {
-                    setItemresult(result.data)
+        
+        try {
+            let data = [];
+            
+            if (token) {
+                const reqHeader = {
+                    "Authorization": `Bearer ${token}`
+                };
+                
+                try {
+                    const result = await getAllitemtentryListAPI(reqHeader);
+                    if (result.status === 200) {
+                        data = result.data.map((item, index) => ({
+                            slNo: index + 1,
+                            regNo: `${item.code} - ${item.itemName}`,
+                            code: item.code,
+                            itemName: item.itemName,
+                            itemType: item.itemType || 'Single',
+                            studentsCount: item.studentsCount || 0,
+                            resultEntered: item.resultEntered || 0,
+                            resultNotEntered: item.resultNotEntered || 0,
+                            confirmed: item.confirmed || 'No',
+                            status: item.status || 'Not Started'
+                        }));
+                    }
+                } catch (apiErr) {
+                    console.error("API call failed, using only dummy data:", apiErr);
+                    data = resultData;
                 }
-            } catch (err) {
-                console.log(err);
+            } else {
+                data = resultData;
             }
+            
+            setItemresult(data);
+            setError(null);
+        } catch (err) {
+            console.error("Error in getAllItemResult:", err);
+            setError("Could not load data. Using sample data instead.");
+            setItemresult(resultData);
+        } finally {
+            setLoading(false);
         }
-    }
+    };
 
-    const resultData = [
-        { slNo: 1, regNo: "301 - Story Writing", code: "Single", mark1: 5, mark2: 8, mark3: 2, total: "yes", markPercentage: 85, rank: 2, grade: "A", point: 9.5 },
-        { slNo: 2, regNo: "301 - Story Writing", code: "Single", mark1: 9, mark2: 8, mark3: 5, total: "yes", markPercentage: 91, rank: 1, grade: "A+", point: 10.0 },
-        { slNo: 3, regNo: "301 - Story Writing", code: "Single", mark1: 7, mark2: 2, mark3: 8, total: "yes", markPercentage: 82, rank: 3, grade: "A-", point: 9.0 },
-        { slNo: 4, regNo: "34", code: "Group", mark1: 8, mark2: 2, mark3: 7, total: "yes", markPercentage: 72, rank: 7, grade: "B+", point: 8.0 },
-        { slNo: 5, regNo: "67", code: "234", mark1: 2, mark2: 0, mark3: 8, total: "yes", markPercentage: 87, rank: 4, grade: "A", point: 9.5 },
-        { slNo: 6, regNo: "890", code: "123", mark1: 8, mark2: 7, mark3: 8, total: "yes", markPercentage: 78, rank: 5, grade: "B+", point: 8.5 },
-        { slNo: 7, regNo: "45", code: "456", mark1: 5, mark2: 0, mark3: 8, total: 203, markPercentage: 68, rank: 8, grade: "B", point: 7.5 },
-        { slNo: 8, regNo: "678", code: "976", mark1: 0, mark2: 6, mark3: 0, total: 226, markPercentage: 75, rank: 6, grade: "B+", point: 8.0 }
-    ];
+    useEffect(() => {
+        // Apply festival filtering when the list or selected festival changes
+        applyFestivalFilter(selectedFestival);
+    }, [Allitemresult, selectedFestival]);
 
+    const applyFestivalFilter = (festival) => {
+        if (!Allitemresult.length) return;
+
+        let filtered = [];
+        
+        if (festival !== "ALL Festival") {
+            switch (festival) {
+                case "UP Kalaivizha":
+                    filtered = Allitemresult.filter(item => {
+                        const itemCode = parseInt(item.code);
+                        return itemCode >= 300 && itemCode < 400;
+                    });
+                    break;
+                case "Lp Kalaivizha":
+                    filtered = Allitemresult.filter(item => {
+                        const itemCode = parseInt(item.code);
+                        return itemCode >= 400 && itemCode < 500;
+                    });
+                    break;
+                case "Hs Kalaivizha":
+                    filtered = Allitemresult.filter(item => {
+                        const itemCode = parseInt(item.code);
+                        return itemCode >= 500 && itemCode < 600;
+                    });
+                    break;
+                case "Hss Kalaivizha":
+                    filtered = Allitemresult.filter(item => {
+                        const itemCode = parseInt(item.code);
+                        return itemCode >= 600 && itemCode < 700;
+                    });
+                    break;
+                default:
+                    filtered = [...Allitemresult];
+            }
+        } else {
+            filtered = [...Allitemresult];
+        }
+
+        // Update the serial numbers after filtering
+        filtered = filtered.map((item, index) => ({
+            ...item,
+            slNo: index + 1
+        }));
+
+        setFilteredResults(filtered);
+    };
 
     const getPrintTitle = () => {
         switch (selectedFestival) {
@@ -56,137 +141,181 @@ const ItemResultList = () => {
             case "Hss Kalaivizha":
                 return "HSS Tamil Kalaivizha - Item Result List";
             default:
-                return "Item Result List";
+                return "ALL Festival - Item Result List";
         }
     };
 
     const handleFestivalChange = (e) => {
-       
-        setSearchParams({ festival: e.target.value });
+        const festival = e.target.value;
+        setSelectedFestival(festival);
+        // Update URL when festival changes
+        setSearchParams({ festival });
+        applyFestivalFilter(festival);
     };
 
     const handlePrint = () => {
-        const originalContents = document.body.innerHTML;
         const printContents = printRef.current.innerHTML;
-
-        document.body.innerHTML = `
-            <style type="text/css" media="print">
-                @page {
-                    size: auto;
-                    margin: 0;
-                }
-                body {
-                    padding: 20px;
-                    font-family: sans-serif;
-                }
-                .print-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                }
-                .print-table th, .print-table td {
-                    border: 1px solid #ddd;
-                    padding: 8px;
-                    text-align: center;
-                }
-                .print-table th {
-                    background-color: #f2f2f2;
-                    font-weight: bold;
-                }
-                .print-title {
-                    text-align: center;
-                    margin-bottom: 20px;
-                    font-size: 18px;
-                    font-weight: bold;
-                    display: block !important;
-                }
-                .no-print {
-                    display: none !important;
-                }
-            </style>
-            ${printContents}
-        `;
-        window.print();
-        document.body.innerHTML = originalContents;
-        window.location.reload();
+        const printWindow = window.open('', '_blank');
+        
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>${getPrintTitle()}</title>
+                <style type="text/css">
+                    @page {
+                        size: landscape;
+                        margin: 0.5cm;
+                    }
+                    body {
+                        padding: 20px;
+                        font-family: Arial, sans-serif;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    table th, table td {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                        text-align: center;
+                    }
+                    table th {
+                        background-color: #f2f2f2;
+                        font-weight: bold;
+                    }
+                    .print-title {
+                        text-align: center;
+                        margin-bottom: 20px;
+                        font-size: 18px;
+                        font-weight: bold;
+                    }
+                    .no-print {
+                        display: none !important;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="print-title">${getPrintTitle()}</div>
+                ${printContents}
+            </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+        
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 250);
     };
 
-   
-    const filteredData = resultData; 
+    const handleReset = (itemCode) => {
+        // Implement reset functionality here
+        console.log(`Reset item with code: ${itemCode}`);
+        // You would typically make an API call here to reset the item
+        // and then refresh the data
+    };
 
     return (
         <>
             <Header />
             <div className="flex flex-col md:flex-row min-h-screen">
                 <Dash />
-                <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-hidden">
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
-                        <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
+                <div className="flex-1 p-3 sm:p-4 lg:p-6 w-full overflow-hidden">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                        <h2 className="text-lg md:text-xl font-semibold tracking-wide">
                             Item Result List
                         </h2>
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
-                            <div className="relative w-full sm:w-40">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+                            <div className="relative w-full sm:w-40 md:w-48">
                                 <select
-                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
+                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 focus:outline-none focus:ring-2 focus:ring-blue-300"
                                     onChange={handleFestivalChange}
                                     value={selectedFestival}
+                                    aria-label="Select Festival"
                                 >
+                                    <option value="ALL Festival">ALL Festival</option>
                                     <option value="UP Kalaivizha">UP Kalaivizha</option>
                                     <option value="Lp Kalaivizha">Lp Kalaivizha</option>
                                     <option value="Hs Kalaivizha">Hs Kalaivizha</option>
                                     <option value="Hss Kalaivizha">Hss Kalaivizha</option>
                                 </select>
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
                                     <i className="fa-solid fa-chevron-down"></i>
                                 </div>
                             </div>
                             <button
                                 onClick={handlePrint}
-                                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
+                                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-4 sm:px-6 md:px-8 py-2 rounded-full text-sm md:text-base transition duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+                                aria-label="Print Item Result List"
                             >
                                 Print
                             </button>
                         </div>
                     </div>
 
-                    <div ref={printRef} className="w-full">
-                        <div className="print-title hidden">{getPrintTitle()}</div>
-                        <div className="overflow-x-auto -mx-4 sm:mx-0">
-                            <div className="inline-block min-w-full align-middle px-4 sm:px-0">
-                                <div className="shadow overflow-hidden border-gray-200 sm:rounded-lg">
-                                    <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
-                                        <thead className="bg-gray-50">
-                                            <tr className="text-gray-700">
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Item Code & Item Name</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Item Type</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">No of Students</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Result Entered</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Result Not Entered</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Confirmed</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm no-print">Reset</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
-                                            {filteredData.map((result) => (
-                                                <tr key={result.slNo} className="hover:bg-gray-100">
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.slNo}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.regNo}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.code}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.mark1}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.mark2}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.mark3}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.total}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap no-print">
-                                                        <i className="text-blue-500 fa-solid fa-arrow-rotate-right"></i>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                    {loading ? (
+                        <div className="flex justify-center items-center h-64">
+                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                         </div>
-                    </div>
+                    ) : error ? (
+                        <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-lg mb-4">
+                            <p className="flex items-center">
+                                <i className="fa-solid fa-triangle-exclamation mr-2"></i>
+                                {error}
+                            </p>
+                        </div>
+                    ) : (
+                        <div ref={printRef} className="overflow-x-auto rounded-lg bg-white">
+                            <table className="min-w-full text-center">
+                                <thead>
+                                    <tr className="bg-gray-50">
+                                        <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700 bg-gray-50 z-10">Sl No</th>
+                                        <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Item Code & Name</th>
+                                        <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Item Type</th>
+                                        <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">No of Students</th>
+                                        <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Result Entered</th>
+                                        <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Result Not Entered</th>
+                                        <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Confirmed</th>
+                                        <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700 no-print">Reset</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredResults && filteredResults.length > 0 ? (
+                                        filteredResults.map((result) => (
+                                            <tr key={result.slNo} className="hover:bg-gray-50 b text-gray-700">
+                                                <td className="p-2 md:p-3 text-xs md:text-sm bg-white z-10">{result.slNo}</td>
+                                                <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{result.regNo}</td>
+                                                <td className="p-2 md:p-3 text-xs md:text-sm">{result.itemType}</td>
+                                                <td className="p-2 md:p-3 text-xs md:text-sm">{result.studentsCount}</td>
+                                                <td className="p-2 md:p-3 text-xs md:text-sm">{result.resultEntered}</td>
+                                                <td className="p-2 md:p-3 text-xs md:text-sm">{result.resultNotEntered}</td>
+                                                <td className="p-2 md:p-3 text-xs md:text-sm">{result.confirmed}</td>
+                                                <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap no-print">
+                                                    <button 
+                                                        onClick={() => handleReset(result.code)}
+                                                        className="text-blue-500 hover:text-blue-700 focus:outline-none"
+                                                        aria-label={`Reset results for ${result.itemName}`}
+                                                    >
+                                                        <i className="fa-solid fa-arrow-rotate-right"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="8" className="p-6 text-center text-gray-600">
+                                                <div className="flex flex-col items-center justify-center gap-2">
+                                                    <i className="fa-solid fa-clipboard-list text-2xl text-gray-400"></i>
+                                                    <p>No results found for {selectedFestival === "ALL Festival" ? "any festival" : selectedFestival}</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

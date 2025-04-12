@@ -5,6 +5,20 @@ import { getAllPartcipteSclListAPI } from '../services/allAPI';
 import { useSearchParams } from 'react-router-dom';
 
 const ParticipatingSclList = () => {
+  // Dummy data for development and fallback
+  const dummyData = [
+    {   itemCodeName: "301 ",schoolCode: "UP001", schoolName: "Government UP School Thiruvananthapuram" },
+    { itemCodeName: "304 ", schoolCode: "LP002", schoolName: "St. Mary's LP School Kochi" },
+    {itemCodeName: "401 ", schoolCode: "HS003", schoolName: "Model HS Kozhikode" },
+    { itemCodeName: "501 ",schoolCode: "HSS004", schoolName: "Sacred Heart HSS Thrissur" },
+    { itemCodeName: "503 ",schoolCode: "UP005", schoolName: "Govt. UP School Kollam" },
+    { itemCodeName: "601 ",schoolCode: "LP006", schoolName: "Little Flower LP School Alappuzha" },
+    {itemCodeName: "606 ", schoolCode: "HS007", schoolName: "St. Joseph's HS Kannur" },
+    { schoolCode: "HSS008", schoolName: "Loyola HSS Palakkad" },
+    { schoolCode: "UP009", schoolName: "Sree Narayana UP School Malappuram" },
+    { schoolCode: "HSS010", schoolName: "Don Bosco HSS Idukki" }
+  ];
+
   const [Alllist, setList] = useState([]);
   const printRef = useRef();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -28,10 +42,18 @@ const ParticipatingSclList = () => {
         const result = await getAllPartcipteSclListAPI(reqHeader);
         if (result?.status === 200) {
           setList(result.data);
+        } else {
+          // Use dummy data if API fails
+          setList(dummyData);
         }
       } catch (err) {
         console.log(err);
+        // Use dummy data if API throws an error
+        setList(dummyData);
       }
+    } else {
+      // Use dummy data if no token is available
+      setList(dummyData);
     }
   };
 
@@ -101,14 +123,21 @@ const ParticipatingSclList = () => {
     window.location.reload();
   };
 
-  // Filter the list based on selected festival if needed
+  // Filter the list based on selected festival
   const filteredList = selectedFestival === "ALL Festival" 
     ? Alllist 
     : Alllist.filter(item => {
-        // Add your filtering logic here based on the selectedFestival
-        // For example, if schools have a festival property:
-        // return item.festival === selectedFestival;
-        return Alllist; // Replace with actual filtering logic
+        // Filter based on school code prefix that matches the festival type
+        if (selectedFestival === "UP") {
+          return item.schoolCode.startsWith("UP");
+        } else if (selectedFestival === "Lp") {
+          return item.schoolCode.startsWith("LP");
+        } else if (selectedFestival === "Hs") {
+          return item.schoolCode.startsWith("HS") && !item.schoolCode.startsWith("HSS");
+        } else if (selectedFestival === "Hss") {
+          return item.schoolCode.startsWith("HSS");
+        }
+        return true;
       });
 
   return (
@@ -170,9 +199,7 @@ const ParticipatingSclList = () => {
                       ))
                     ) : (
                       <tr className="hover:bg-gray-100">
-                        <td className="p-2 md:p-3">8</td>
-                        <td className="p-2 md:p-3">9</td>
-                        <td className="p-2 md:p-3">name</td>
+                        <td colSpan="3" className="p-2 md:p-3">No schools found for this festival.</td>
                       </tr>
                     )}
                   </tbody>

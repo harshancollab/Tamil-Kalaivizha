@@ -146,6 +146,8 @@ const EligibleSclList = () => {
   const [Alllist, setList] = useState([]);
   const printRef = useRef();
   
+  console.log(Alllist);
+  
   useEffect(() => {
     getAllitemise();
   }, []);
@@ -168,87 +170,69 @@ const EligibleSclList = () => {
   };
   
   const handlePrint = () => {
-    // Create a new window for printing
-    const printWindow = window.open('', '_blank');
+    const originalContents = document.body.innerHTML;
+    const printContents = printRef.current.innerHTML;
+
+    document.body.innerHTML = `
+      <style type="text/css">
+        @page {
+          size: auto;
+          margin: 10mm;
+        }
+        body {
+          padding: 10px;
+          font-family: sans-serif;
+        }
+        .print-table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        .print-table th, .print-table td {
+          border: 1px solid #ddd;
+          padding: 8px;
+          text-align: center;
+        }
+        .print-table th {
+          background-color: #f2f2f2;
+          font-weight: bold;
+        }
+        .print-title {
+          text-align: center;
+          margin-bottom: 20px;
+          font-size: 18px;
+          font-weight: bold;
+          display: block !important;
+        }
+        .no-print {
+          display: none !important;
+        }
+        
+        /* Mobile-specific styles */
+        @media only screen and (max-width: 600px) {
+          body {
+            padding: 5px;
+          }
+          .print-table th, .print-table td {
+            padding: 4px;
+            font-size: 12px;
+          }
+          .print-title {
+            font-size: 16px;
+          }
+        }
+      </style>
+      <div class="print-title">List Of Eligible Schools</div>
+      ${printContents}
+    `;
     
-    if (!printWindow) {
-      alert("Please allow pop-ups to print the list");
-      return;
-    }
-    
-    // Get the print content
-    const printContent = printRef.current.innerHTML;
-    
-    // Write the print-optimized HTML to the new window
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Eligible Schools List</title>
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <style>
-            @media print {
-              @page {
-                size: auto;
-                margin: 0.5cm;
-              }
-            }
-            body {
-              font-family: Arial, sans-serif;
-              padding: 15px;
-              font-size: 12px;
-            }
-            .print-title {
-              text-align: center;
-              margin-bottom: 20px;
-              font-size: 18px;
-              font-weight: bold;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              margin-bottom: 20px;
-            }
-            th, td {
-              border: 1px solid #ddd;
-              padding: 8px;
-              text-align: center;
-            }
-            th {
-              background-color: #f2f2f2;
-              font-weight: bold;
-            }
-            @media screen and (max-width: 480px) {
-              body {
-                padding: 5px;
-                font-size: 10px;
-              }
-              th, td {
-                padding: 4px;
-              }
-              .print-title {
-                font-size: 16px;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="print-title">List Of Eligible Schools</div>
-          ${printContent}
-          <script>
-            // Auto print when loaded
-            window.onload = function() {
-              setTimeout(function() {
-                window.print();
-                // Don't close the window automatically on mobile to allow for printer selection
-              }, 500);
-            }
-          </script>
-        </body>
-      </html>
-    `);
-    
-    printWindow.document.close();
+    // Short delay to ensure styles are applied
+    setTimeout(() => {
+      window.print();
+      
+      // Restore original content
+      document.body.innerHTML = originalContents;
+      window.location.reload();
+    }, 300);
   };
 
   return (
@@ -271,10 +255,10 @@ const EligibleSclList = () => {
               </button>
             </div>
           </div>
-          <div className="w-full">
-            <div className="overflow-x-auto -mx-4 sm:mx-0">
-              <div className="inline-block min-w-full align-middle px-4 sm:px-0" ref={printRef}>
-                <table className="min-w-full text-center border-separate border-spacing-y-2">
+          <div ref={printRef} className="w-full">
+            <div className="overflow-x-auto -mx-4 sm:mx-0 ">
+              <div className="inline-block min-w-full align-middle px-4 sm:px-0">
+                <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
                   <thead className="text-xs sm:text-sm">
                     <tr className="text-gray-700">
                       <th className="p-2 md:p-3">Sl No</th>
@@ -295,7 +279,7 @@ const EligibleSclList = () => {
                       <tr className="hover:bg-gray-100">
                         <td className="p-2 md:p-3">1</td>
                         <td className="p-2 md:p-3">9</td>
-                        <td className="p-2 md:p-3">School Name</td>
+                        <td className="p-2 md:p-3"> School Name</td>
                       </tr>
                     )}
                   </tbody>

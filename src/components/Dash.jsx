@@ -642,6 +642,16 @@ const Dash = () => {
                     >
                      Higher Level Competition
                     </Link>
+                    <Link
+                      to="/ExportDatabase"
+                      className={`block py-2 text-gray-300 ${isActive('/ExportDatabase')
+                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                    Export Database
+                    </Link>
               
                     
 
