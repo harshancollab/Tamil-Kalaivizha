@@ -210,46 +210,96 @@ const Higherlvlcomp = () => {
         setSearchParams({ festival });
     };
 
+    // Improved print function for better mobile compatibility
     const handlePrint = () => {
+        // Create a hidden iframe for printing
+        const printFrame = document.createElement('iframe');
+        printFrame.style.position = 'fixed';
+        printFrame.style.right = '0';
+        printFrame.style.bottom = '0';
+        printFrame.style.width = '0';
+        printFrame.style.height = '0';
+        printFrame.style.border = '0';
+        
+        document.body.appendChild(printFrame);
+        
+        // Get the content to print
         const printContent = document.getElementById('higher-level-table-container');
-
-        const printWindow = window.open('', '_blank');
-        printWindow.document.open();
-
-        printWindow.document.write(`
+        const title = getPrintTitle();
+        
+        // Write to the iframe
+        printFrame.contentDocument.write(`
+            <!DOCTYPE html>
             <html>
             <head>
-                <title>${getPrintTitle()}</title>
+                <title>${title}</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <style>
-                    body { font-family: Arial, sans-serif; }
-                    table { width: 100%; border-collapse: collapse; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-                    th { background-color: #f2f2f2; }
-                    h2 { text-align: center; margin-bottom: 20px; }
-
-                    /* Media query for print styles */
-                    @media print {
-                        @page { size: portrait; /* Use portrait for mobile */ }
-                        th, td { font-size: 10px; padding: 6px; } /* Adjust font and padding */
-                        /* You might need to adjust column widths or hide some columns for better mobile print */
+                    @page {
+                        size: auto;
+                        margin: 10mm;
+                    }
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 10px;
+                    }
+                    h2 {
+                        text-align: center;
+                        font-size: 16px;
+                        margin-bottom: 15px;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 10px;
+                    }
+                    th, td {
+                        border: 1px solid #ddd;
+                        padding: 4px;
+                        text-align: center;
+                    }
+                    th {
+                        background-color: #f2f2f2;
+                    }
+                    
+                    /* Mobile-specific adjustments */
+                    @media only screen and (max-width: 600px) {
+                        table {
+                            font-size: 8px;
+                        }
+                        th, td {
+                            padding: 2px;
+                        }
                     }
                 </style>
             </head>
             <body>
-                <h2>${getPrintTitle()}</h2>
+                <h2>${title}</h2>
                 ${printContent.innerHTML}
             </body>
             </html>
         `);
-
-        printWindow.document.close();
-
-        setTimeout(() => {
-            printWindow.print();
-            printWindow.close();
-        }, 250);
+        
+        printFrame.contentDocument.close();
+        
+        // Wait for content to load before printing
+        printFrame.onload = function() {
+            try {
+                printFrame.contentWindow.focus();
+                printFrame.contentWindow.print();
+                
+                // Remove the iframe after printing (or after a timeout)
+                setTimeout(() => {
+                    document.body.removeChild(printFrame);
+                }, 1000);
+            } catch (error) {
+                console.error('Print error:', error);
+                alert('Printing failed. Please try again or use a different device.');
+                document.body.removeChild(printFrame);
+            }
+        };
     };
-
 
     const displayData = filteredItems.length > 0 ? filteredItems :
         (Allitemresult.length > 0 ? Allitemresult : resultData);
