@@ -226,11 +226,40 @@ const SclGradewise = () => {
             <head>
                 <title>${getPrintTitle()}</title>
                 <style>
-                    body { font-family: Arial, sans-serif; margin: 0; padding: 10px; }
-                    table { width: 100%; border-collapse: collapse; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-                    th { background-color: #f2f2f2; }
-                    h2 { text-align: center; margin-bottom: 20px; }
+                    html, body { 
+                        font-family: Arial, sans-serif; 
+                        margin: 0; 
+                        padding: 10px; 
+                        background-color: white !important; 
+                        color: black !important;
+                    }
+                    table { 
+                        width: 100%; 
+                        border-collapse: collapse; 
+                        background-color: white !important;
+                    }
+                    th, td { 
+                        border: 1px solid #ddd; 
+                        padding: 8px; 
+                        text-align: center; 
+                        background-color: white !important;
+                        color: black !important;
+                    }
+                    th { 
+                        background-color: #f2f2f2 !important; 
+                        color: black !important;
+                    }
+                    h2 { 
+                        text-align: center; 
+                        margin-bottom: 20px; 
+                        color: black !important;
+                    }
+                    * { 
+                        background-color: white !important; 
+                        color: black !important;
+                        print-color-adjust: exact;
+                        -webkit-print-color-adjust: exact;
+                    }
                     @media print {
                         @page { size: landscape; }
                         body { width: 100%; }
