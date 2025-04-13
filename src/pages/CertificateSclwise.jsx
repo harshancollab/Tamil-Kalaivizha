@@ -340,27 +340,77 @@ const CertificateSclwise = () => {
         navigate(`/Add-certificate?school=${encodeURIComponent(schoolNameOnly)}`);
     };
 
+    // const handlePrint = () => {
+    //     const printContent = document.getElementById('certificate-table-container');
+    //     const originalContents = document.body.innerHTML;
+
+    //     // Create a new window for printing
+    //     const printWindow = window.open('', '_blank');
+    //     printWindow.document.open();
+
+    //     // Set up the print document with only what we need
+    //     printWindow.document.write(`
+    //         <html>
+    //         <head>
+    //             <title>${selectedFestival} - Certificate School Wise Report</title>
+    //             <style>
+    //                 body { font-family: Arial, sans-serif; }
+    //                 table { width: 100%; border-collapse: collapse; }
+    //                 th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    //                 th { background-color: #f2f2f2; }
+    //                 h2 { text-align: center; margin-bottom: 20px; }
+    //                 @media print {
+    //                     @page { size: landscape; }
+    //                 }
+    //             </style>
+    //         </head>
+    //         <body>
+    //             <h2>${selectedFestival} - Certificate School Wise Report</h2>
+    //             ${printContent.innerHTML}
+    //         </body>
+    //         </html>
+    //     `);
+
+    //     printWindow.document.close();
+
+    //     // Remove date/time from the print dialog
+    //     setTimeout(() => {
+    //         printWindow.print();
+    //         printWindow.close();
+    //     }, 250);
+    // };
+
+    // Properly structured dummy data with correct fields for certificate item wise report
+    
+    
+    
     const handlePrint = () => {
         const printContent = document.getElementById('certificate-table-container');
-        const originalContents = document.body.innerHTML;
-
-        // Create a new window for printing
-        const printWindow = window.open('', '_blank');
-        printWindow.document.open();
-
-        // Set up the print document with only what we need
-        printWindow.document.write(`
+        
+        // Create a hidden iframe for mobile-compatible printing
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        
+        // Write the content to the iframe
+        iframe.contentDocument.write(`
             <html>
             <head>
                 <title>${selectedFestival} - Certificate School Wise Report</title>
                 <style>
-                    body { font-family: Arial, sans-serif; }
+                    body { font-family: Arial, sans-serif; margin: 0; padding: 10px; }
                     table { width: 100%; border-collapse: collapse; }
                     th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
                     th { background-color: #f2f2f2; }
                     h2 { text-align: center; margin-bottom: 20px; }
                     @media print {
                         @page { size: landscape; }
+                        body { width: 100%; }
+                        table { page-break-inside: avoid; }
+                    }
+                    @media only screen and (max-width: 600px) {
+                        table { font-size: 10px; }
+                        th, td { padding: 4px; }
                     }
                 </style>
             </head>
@@ -370,17 +420,21 @@ const CertificateSclwise = () => {
             </body>
             </html>
         `);
-
-        printWindow.document.close();
-
-        // Remove date/time from the print dialog
+        
+        iframe.contentDocument.close();
+        
+        // Print the iframe after a short delay to ensure content is loaded
         setTimeout(() => {
-            printWindow.print();
-            printWindow.close();
-        }, 250);
+            iframe.contentWindow.print();
+            
+            // Remove the iframe after printing
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 500);
+        }, 500);
     };
-
-    // Properly structured dummy data with correct fields for certificate item wise report
+    
+    
     const certificateItemData = [
         {
             slNo: 1,

@@ -95,27 +95,73 @@ const Certificateitmwise = () => {
         navigate(`/CertificateParticipate?itemCode=${itemCode}&itemName=${itemName}&festival=${selectedFestival}`);
     };
 
-    const handlePrint = () => {
-        const printContent = document.getElementById('certificate-table-container');
-        const originalContents = document.body.innerHTML;
+    // const handlePrint = () => {
+    //     const printContent = document.getElementById('certificate-table-container');
+    //     const originalContents = document.body.innerHTML;
         
        
-        const printWindow = window.open('', '_blank');
-        printWindow.document.open();
+    //     const printWindow = window.open('', '_blank');
+    //     printWindow.document.open();
         
     
-        printWindow.document.write(`
+    //     printWindow.document.write(`
+    //         <html>
+    //         <head>
+    //             <title>${selectedFestival} - Certificate Item Wise Report</title>
+    //             <style>
+    //                 body { font-family: Arial, sans-serif; }
+    //                 table { width: 100%; border-collapse: collapse; }
+    //                 th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    //                 th { background-color: #f2f2f2; }
+    //                 h2 { text-align: center; margin-bottom: 20px; }
+    //                 @media print {
+    //                     @page { size: landscape; }
+    //                 }
+    //             </style>
+    //         </head>
+    //         <body>
+    //             <h2>${selectedFestival} - Certificate Item Wise Report</h2>
+    //             ${printContent.innerHTML}
+    //         </body>
+    //         </html>
+    //     `);
+        
+    //     printWindow.document.close();
+        
+    //     // Remove date/time from the print dialog
+    //     setTimeout(() => {
+    //         printWindow.print();
+    //         printWindow.close();
+    //     }, 250);
+    // };
+
+    const handlePrint = () => {
+        const printContent = document.getElementById('certificate-table-container');
+        
+        // Create a hidden iframe for mobile-compatible printing
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        
+        // Write the content to the iframe
+        iframe.contentDocument.write(`
             <html>
             <head>
                 <title>${selectedFestival} - Certificate Item Wise Report</title>
                 <style>
-                    body { font-family: Arial, sans-serif; }
+                    body { font-family: Arial, sans-serif; margin: 0; padding: 10px; }
                     table { width: 100%; border-collapse: collapse; }
                     th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
                     th { background-color: #f2f2f2; }
                     h2 { text-align: center; margin-bottom: 20px; }
                     @media print {
                         @page { size: landscape; }
+                        body { width: 100%; }
+                        table { page-break-inside: avoid; }
+                    }
+                    @media only screen and (max-width: 600px) {
+                        table { font-size: 10px; }
+                        th, td { padding: 4px; }
                     }
                 </style>
             </head>
@@ -126,16 +172,18 @@ const Certificateitmwise = () => {
             </html>
         `);
         
-        printWindow.document.close();
+        iframe.contentDocument.close();
         
-        // Remove date/time from the print dialog
+        // Print the iframe after a short delay to ensure content is loaded
         setTimeout(() => {
-            printWindow.print();
-            printWindow.close();
-        }, 250);
+            iframe.contentWindow.print();
+            
+            // Remove the iframe after printing
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 500);
+        }, 500);
     };
-
-   
     const certificateItemData = [
         { 
             slNo: 1, 

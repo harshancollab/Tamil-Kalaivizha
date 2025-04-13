@@ -173,24 +173,72 @@ const SclGradewise = () => {
         sessionStorage.setItem("selectedGrade", newGrade);
     };
 
+    // const handlePrint = () => {
+    //     const printContent = document.getElementById('school-grade-table-container');
+
+    //     const printWindow = window.open('', '_blank');
+    //     printWindow.document.open();
+
+    //     printWindow.document.write(`
+    //         <html>
+    //         <head>
+    //             <title>${getPrintTitle()}</title>
+    //             <style>
+    //                 body { font-family: Arial, sans-serif; }
+    //                 table { width: 100%; border-collapse: collapse; }
+    //                 th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    //                 th { background-color: #f2f2f2; }
+    //                 h2 { text-align: center; margin-bottom: 20px; }
+    //                 @media print {
+    //                     @page { size: landscape; }
+    //                 }
+    //             </style>
+    //         </head>
+    //         <body>
+    //             <h2>${getPrintTitle()}</h2>
+    //             ${printContent.innerHTML}
+    //         </body>
+    //         </html>
+    //     `);
+
+    //     printWindow.document.close();
+
+    //     // Remove date/time from the print dialog
+    //     setTimeout(() => {
+    //         printWindow.print();
+    //         printWindow.close();
+    //     }, 250);
+    // };
+
+    // Initialize filtered data at component mount
+    
     const handlePrint = () => {
         const printContent = document.getElementById('school-grade-table-container');
-
-        const printWindow = window.open('', '_blank');
-        printWindow.document.open();
-
-        printWindow.document.write(`
+        
+        // Create a hidden iframe for mobile-compatible printing
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        
+        // Write the content to the iframe
+        iframe.contentDocument.write(`
             <html>
             <head>
                 <title>${getPrintTitle()}</title>
                 <style>
-                    body { font-family: Arial, sans-serif; }
+                    body { font-family: Arial, sans-serif; margin: 0; padding: 10px; }
                     table { width: 100%; border-collapse: collapse; }
                     th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
                     th { background-color: #f2f2f2; }
                     h2 { text-align: center; margin-bottom: 20px; }
                     @media print {
                         @page { size: landscape; }
+                        body { width: 100%; }
+                        table { page-break-inside: avoid; }
+                    }
+                    @media only screen and (max-width: 600px) {
+                        table { font-size: 10px; }
+                        th, td { padding: 4px; }
                     }
                 </style>
             </head>
@@ -200,17 +248,20 @@ const SclGradewise = () => {
             </body>
             </html>
         `);
-
-        printWindow.document.close();
-
-        // Remove date/time from the print dialog
+        
+        iframe.contentDocument.close();
+        
+        // Print the iframe after a short delay to ensure content is loaded
         setTimeout(() => {
-            printWindow.print();
-            printWindow.close();
-        }, 250);
+            iframe.contentWindow.print();
+            
+            // Remove the iframe after printing
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 500);
+        }, 500);
     };
-
-    // Initialize filtered data at component mount
+    
     useEffect(() => {
         if (allResultData.length === 0 && dummyResultData.length > 0) {
             setAllResultData(dummyResultData);
@@ -266,7 +317,7 @@ const SclGradewise = () => {
                             </div>
                             <button
                                 onClick={handlePrint}
-                                className="bg-gradient-to-r from-blue-900 to-blue-400 text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
+                                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
                             >
                                 Print
                             </button>
