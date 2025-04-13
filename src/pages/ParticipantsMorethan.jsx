@@ -12,6 +12,90 @@ const ParticipantsMorethan = () => {
   const selectedItems = searchParams.get('items') || "ALL";
   const selectedFestival = searchParams.get('festival') || "ALL Festival";
 
+  // Dummy data with item codes matching festival categories
+  const dummyParticipants = [
+    {
+      regNo: "UP001",
+      name: "Amal Kumar",
+      gender: "Male",
+      class: "5",
+      schoolCode: "30075",
+      schoolName: "G. M. R. S. Peermedu",
+      itemCode: "301",
+      itemCount: 3
+    },
+    {
+      regNo: "UP002",
+      name: "Meera Nair",
+      gender: "Female",
+      class: "4",
+      schoolCode: "30075",
+      schoolName: "G. M. R. S. Peermedu",
+      itemCode: "302",
+      itemCount: 2
+    },
+    {
+      regNo: "LP001",
+      name: "Rohit Menon",
+      gender: "Male",
+      class: "7",
+      schoolCode: "30081",
+      schoolName: "G. H. S. Vanchivayal",
+      itemCode: "401",
+      itemCount: 4
+    },
+    {
+      regNo: "LP002",
+      name: "Anjali Raj",
+      gender: "Female",
+      class: "6",
+      schoolCode: "30081",
+      schoolName: "G. H. S. Vanchivayal",
+      itemCode: "405",
+      itemCount: 5
+    },
+    {
+      regNo: "HS001",
+      name: "Vishnu Prasad",
+      gender: "Male",
+      class: "9",
+      schoolCode: "30043",
+      schoolName: "G. H. S. S. Anakara",
+      itemCode: "501",
+      itemCount: 1
+    },
+    {
+      regNo: "HS002",
+      name: "Lakshmi Suresh",
+      gender: "Female",
+      class: "8",
+      schoolCode: "30043",
+      schoolName: "G. H. S. S. Anakara",
+      itemCode: "502",
+      itemCount: 3
+    },
+    {
+      regNo: "HSS001",
+      name: "Arun Thomas",
+      gender: "Male",
+      class: "11",
+      schoolCode: "30083",
+      schoolName: "G. H. S. Udumbhancola",
+      itemCode: "601",
+      itemCount: 2
+    },
+    {
+      regNo: "HSS002",
+      name: "Divya Mohan",
+      gender: "Female",
+      class: "12",
+      schoolCode: "30083",
+      schoolName: "G. H. S. Udumbhancola",
+      itemCode: "605",
+      itemCount: 4
+    }
+  ];
+
   useEffect(() => {
     getAllParticipants();
   }, []);
@@ -26,10 +110,18 @@ const ParticipantsMorethan = () => {
         const result = await (reqHeader);
         if (result?.status === 200) {
           setParticipants(result.data);
+        } else {
+          // Fall back to dummy data if API call fails
+          setParticipants(dummyParticipants);
         }
       } catch (err) {
         console.log(err);
+        // Fall back to dummy data if API call fails
+        setParticipants(dummyParticipants);
       }
+    } else {
+      // Use dummy data when no token is available
+      setParticipants(dummyParticipants);
     }
   };
 
@@ -51,8 +143,24 @@ const ParticipantsMorethan = () => {
 
   // Generate appropriate title based on selections
   const getPrintTitle = () => {
-    const festivalText = selectedFestival === "ALL Festival" ? 
-      "ALL Festival" : `${selectedFestival} Festival`;
+    let festivalText;
+    switch(selectedFestival) {
+      case "UP":
+        festivalText = "UP Kalaivizha";
+        break;
+      case "Lp":
+        festivalText = "LP Kalaivizha";
+        break;
+      case "Hs":
+        festivalText = "HS Kalaivizha";
+        break;
+      case "Hss":
+        festivalText = "HSS Kalaivizha";
+        break;
+      default:
+        festivalText = "ALL Festival";
+    }
+    
     const itemsText = selectedItems === "ALL" ? 
       "" : ` - More Than ${selectedItems} Items`;
     
@@ -99,6 +207,7 @@ const ParticipantsMorethan = () => {
           display: none !important;
         }
       </style>
+      <div class="print-title">${getPrintTitle()}</div>
       ${printContents}
     `;
     window.print();
@@ -108,24 +217,41 @@ const ParticipantsMorethan = () => {
 
   // Filter the list based on selected criteria
   const filteredParticipants = participants.filter(participant => {
-    // Add your filtering logic here based on selectedItems and selectedFestival
-    // This is just a placeholder - implement your actual filter logic
+    // Filter by number of items
     let passesItemFilter = true;
-    let passesFestivalFilter = true;
-    
     if (selectedItems !== "ALL") {
-      // Example logic: filter participants with more than X items
-      // Replace with your actual logic
-      // passesItemFilter = participant.itemCount > parseInt(selectedItems);
+      const itemCount = participant.itemCount || 0;
+      passesItemFilter = itemCount > parseInt(selectedItems);
     }
     
+    // Filter by festival using the item code ranges
+    let passesFestivalFilter = true;
     if (selectedFestival !== "ALL Festival") {
-      // Example logic: filter by festival
-      // passesFestivalFilter = participant.festival === selectedFestival;
+      const itemCode = parseInt(participant.itemCode || "0");
+      
+      switch (selectedFestival) {
+        case "UP":
+          passesFestivalFilter = itemCode >= 300 && itemCode < 400;
+          break;
+        case "Lp":
+          passesFestivalFilter = itemCode >= 400 && itemCode < 500;
+          break;
+        case "Hs":
+          passesFestivalFilter = itemCode >= 500 && itemCode < 600;
+          break;
+        case "Hss":
+          passesFestivalFilter = itemCode >= 600 && itemCode < 700;
+          break;
+        default:
+          passesFestivalFilter = true;
+      }
     }
     
     return passesItemFilter && passesFestivalFilter;
-  });
+  }).map((participant, index) => ({
+    ...participant,
+    slNo: index + 1
+  }));
 
   return (
     <>
@@ -146,10 +272,10 @@ const ParticipantsMorethan = () => {
                   value={selectedItems}
                 >
                   <option value="ALL">Select no of item</option>
+                  <option value="1">1</option>
                   <option value="2">2</option>
                   <option value="3">3</option>
                   <option value="4">4</option>
-                  <option value="5">5</option>
                 </select>
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                   <i className="fa-solid fa-chevron-down"></i>
@@ -162,10 +288,10 @@ const ParticipantsMorethan = () => {
                   value={selectedFestival}
                 >
                   <option value="ALL Festival">ALL Festival</option>
-                  <option value="UP">UP</option>
-                  <option value="Lp">Lp</option>
-                  <option value="Hs">Hs</option>
-                  <option value="Hss">Hss</option>
+                  <option value="UP">UP Kalaivizha</option>
+                  <option value="Lp">LP Kalaivizha</option>
+                  <option value="Hs">HS Kalaivizha</option>
+                  <option value="Hss">HSS Kalaivizha</option>
                 </select>
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                   <i className="fa-solid fa-chevron-down"></i>
@@ -188,35 +314,35 @@ const ParticipantsMorethan = () => {
                     <tr className="text-gray-700">
                       <th className="p-2 md:p-3">Sl No</th>
                       <th className="p-2 md:p-3">Reg No</th>
-                      <th className="p-2 md:p-3"> Name</th>
+                      <th className="p-2 md:p-3">Name</th>
                       <th className="p-2 md:p-3">Gender</th>
                       <th className="p-2 md:p-3">Class</th>
                       <th className="p-2 md:p-3">School code</th>
                       <th className="p-2 md:p-3">School Name</th>
+                     
                     </tr>
                   </thead>
                   <tbody className="text-xs sm:text-sm">
-                    {filteredParticipants && filteredParticipants.length > 0 ? (
-                      filteredParticipants.map((participant, index) => (
-                        <tr key={index} className="hover:bg-gray-100">
-                          <td className="p-2 md:p-3">{index + 1}</td>
+                    {filteredParticipants.length > 0 ? (
+                      filteredParticipants.map((participant) => (
+                        <tr key={participant.slNo} className="hover:bg-gray-100">
+                          <td className="p-2 md:p-3">{participant.slNo}</td>
                           <td className="p-2 md:p-3">{participant.regNo || "-"}</td>
                           <td className="p-2 md:p-3">{participant.name || "-"}</td>
                           <td className="p-2 md:p-3">{participant.gender || "-"}</td>
                           <td className="p-2 md:p-3">{participant.class || "-"}</td>
                           <td className="p-2 md:p-3">{participant.schoolCode || "-"}</td>
                           <td className="p-2 md:p-3">{participant.schoolName || "-"}</td>
+                       
+                          
                         </tr>
                       ))
                     ) : (
-                      <tr className="hover:bg-gray-100">
-                        <td className="p-2 md:p-3">8</td>
-                        <td className="p-2 md:p-3">9</td>
-                        <td className="p-2 md:p-3">nazme</td>
-                        <td className="p-2 md:p-3">Boy</td>
-                        <td className="p-2 md:p-3">9</td>
-                        <td className="p-2 md:p-3">933</td>
-                        <td className="p-2 md:p-3">school 1</td>
+                      <tr>
+                        <td colSpan="9" className="p-3 text-center text-gray-500">
+                          No records found for {selectedFestival === "ALL Festival" ? "All Festivals" : selectedFestival} 
+                          {selectedItems !== "ALL" ? ` with more than ${selectedItems} items` : ""}
+                        </td>
                       </tr>
                     )}
                   </tbody>

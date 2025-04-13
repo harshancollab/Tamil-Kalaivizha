@@ -9,6 +9,15 @@ const Higherlvlcomp = () => {
     const [filteredItems, setFilteredItems] = useState([]);
     const printRef = useRef();
     const [searchParams, setSearchParams] = useSearchParams();
+    const [festivalOptions, setFestivalOptions] = useState([]);
+
+    // Festival mapping with codes and names
+    const festivalMapping = {
+        "UP Kalaivizha": { min: 300, max: 399 },
+        "LP Kalaivizha": { min: 400, max: 499 },
+        "HS Kalaivizha": { min: 500, max: 599 },
+        "HSS Kalaivizha": { min: 600, max: 899 },
+    };
 
     const selectedFestival = searchParams.get('festival') || "UP Kalaivizha";
 
@@ -17,8 +26,33 @@ const Higherlvlcomp = () => {
     }, []);
 
     useEffect(() => {
-        filterItemsByFestival(selectedFestival);
+        if (Allitemresult.length > 0) {
+            // Generate festival options from the actual data
+            generateFestivalOptions();
+            filterItemsByFestival(selectedFestival);
+        }
     }, [selectedFestival, Allitemresult]);
+
+    // Generate festival options based on data
+    const generateFestivalOptions = () => {
+        const festivals = new Set();
+
+        // Add "All Festival" option by default
+        festivals.add("All Festival");
+
+        // Add festivals based on item codes in the data
+        Allitemresult.forEach(item => {
+            const itemCode = parseInt(item.itemCode);
+
+            Object.entries(festivalMapping).forEach(([festival, range]) => {
+                if (itemCode >= range.min && itemCode <= range.max) {
+                    festivals.add(festival);
+                }
+            });
+        });
+
+        setFestivalOptions(Array.from(festivals));
+    };
 
     const getAllItemResult = async () => {
         const token = sessionStorage.getItem("token");
@@ -29,51 +63,52 @@ const Higherlvlcomp = () => {
             try {
                 const result = await getAllHigherlvlcompAPI(reqHeader)
                 if (result.status === 200) {
-                    setItemresult(result.data)
+                    setItemresult(result.data);
                 }
             } catch (err) {
                 console.log(err);
                 setItemresult(resultData);
+                generateFestivalOptionsFromDummy();
             }
         } else {
             setItemresult(resultData);
+            generateFestivalOptionsFromDummy();
         }
     }
+
+    // Generate festival options from dummy data when API fails
+    const generateFestivalOptionsFromDummy = () => {
+        const festivals = new Set();
+
+        // Add "All Festival" option by default
+        festivals.add("All Festival");
+
+        // Add festivals based on item codes in dummy data
+        resultData.forEach(item => {
+            const itemCode = parseInt(item.itemCode);
+
+            Object.entries(festivalMapping).forEach(([festival, range]) => {
+                if (itemCode >= range.min && itemCode <= range.max) {
+                    festivals.add(festival);
+                }
+            });
+        });
+
+        setFestivalOptions(Array.from(festivals));
+    };
 
     const filterItemsByFestival = (festival) => {
         if (!Allitemresult.length) return;
 
         let filtered;
-        switch (festival) {
-            case "UP Kalaivizha":
-                filtered = Allitemresult.filter(item => {
-                    const itemCode = parseInt(item.itemCode);
-                    return itemCode >= 300 && itemCode < 400;
-                });
-                break;
-            case "LP Kalaivizha":
-                filtered = Allitemresult.filter(item => {
-                    const itemCode = parseInt(item.itemCode);
-                    return itemCode >= 400 && itemCode < 500;
-                });
-                break;
-            case "HS Kalaivizha":
-                filtered = Allitemresult.filter(item => {
-                    const itemCode = parseInt(item.itemCode);
-                    return itemCode >= 500 && itemCode < 600;
-                });
-                break;
-            case "HSS Kalaivizha":
-                filtered = Allitemresult.filter(item => {
-                    const itemCode = parseInt(item.itemCode);
-                    return itemCode >= 600 && itemCode < 700;
-                });
-                break;
-            case "All Festival":
-                filtered = [...Allitemresult];
-                break;
-            default:
-                filtered = [...Allitemresult];
+        if (festival === "All Festival") {
+            filtered = [...Allitemresult];
+        } else {
+            const range = festivalMapping[festival];
+            filtered = Allitemresult.filter(item => {
+                const itemCode = parseInt(item.itemCode);
+                return itemCode >= range.min && itemCode <= range.max;
+            });
         }
 
         // Add sequential numbering to filtered results
@@ -85,7 +120,7 @@ const Higherlvlcomp = () => {
         setFilteredItems(filtered);
     }
 
-    // Updated dummy data that matches the table headers and includes proper item codes
+
     const resultData = [
         {
             slNo: 1,
@@ -182,43 +217,48 @@ const Higherlvlcomp = () => {
         printWindow.document.open();
 
         printWindow.document.write(`
-      <html>
-      <head>
-        <title>${getPrintTitle()}</title>
-        <style>
-          body { font-family: Arial, sans-serif; }
-          table { width: 100%; border-collapse: collapse; }
-          th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-          th { background-color: #f2f2f2; }
-          h2 { text-align: center; margin-bottom: 20px; }
-          @media print {
-            @page { size: landscape; }
-          }
-        </style>
-      </head>
-      <body>
-        <h2>${getPrintTitle()}</h2>
-        ${printContent.innerHTML}
-      </body>
-      </html>
-    `);
+            <html>
+            <head>
+                <title>${getPrintTitle()}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; }
+                    table { width: 100%; border-collapse: collapse; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                    th { background-color: #f2f2f2; }
+                    h2 { text-align: center; margin-bottom: 20px; }
+
+                    /* Media query for print styles */
+                    @media print {
+                        @page { size: portrait; /* Use portrait for mobile */ }
+                        th, td { font-size: 10px; padding: 6px; } /* Adjust font and padding */
+                        /* You might need to adjust column widths or hide some columns for better mobile print */
+                    }
+                </style>
+            </head>
+            <body>
+                <h2>${getPrintTitle()}</h2>
+                ${printContent.innerHTML}
+            </body>
+            </html>
+        `);
 
         printWindow.document.close();
 
-        // Remove date/time from the print dialog
         setTimeout(() => {
             printWindow.print();
             printWindow.close();
         }, 250);
     };
 
-    // Determine what data to display
+
     const displayData = filteredItems.length > 0 ? filteredItems :
         (Allitemresult.length > 0 ? Allitemresult : resultData);
 
-    // Initialize filtered data at component mount
+
     useEffect(() => {
         if (Allitemresult.length === 0 && resultData.length > 0) {
+            setItemresult(resultData);
+            generateFestivalOptionsFromDummy();
             filterItemsByFestival(selectedFestival);
         }
     }, []);
@@ -240,12 +280,11 @@ const Higherlvlcomp = () => {
                                     onChange={handleFestivalChange}
                                     value={selectedFestival}
                                 >
-                                    <option value="All Festival">All Festival</option>
-                                    <option value="UP Kalaivizha">UP Kalaivizha</option>
-                                    <option value="LP Kalaivizha">LP Kalaivizha</option>
-                                    <option value="HS Kalaivizha">HS Kalaivizha</option>
-                                    <option value="HSS Kalaivizha">HSS Kalaivizha</option>
-
+                                    {festivalOptions.map((festival) => (
+                                        <option key={festival} value={festival}>
+                                            {festival}
+                                        </option>
+                                    ))}
                                 </select>
                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                                     <i className="fa-solid fa-chevron-down"></i>
