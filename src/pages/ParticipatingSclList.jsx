@@ -7,24 +7,24 @@ import { useSearchParams } from 'react-router-dom';
 const ParticipatingSclList = () => {
   // Dummy data for development and fallback
   const dummyData = [
-    {   itemCodeName: "301 ",schoolCode: "UP001", schoolName: "Government UP School Thiruvananthapuram" },
-    { itemCodeName: "304 ", schoolCode: "LP002", schoolName: "St. Mary's LP School Kochi" },
-    {itemCodeName: "401 ", schoolCode: "HS003", schoolName: "Model HS Kozhikode" },
-    { itemCodeName: "501 ",schoolCode: "HSS004", schoolName: "Sacred Heart HSS Thrissur" },
-    { itemCodeName: "503 ",schoolCode: "UP005", schoolName: "Govt. UP School Kollam" },
-    { itemCodeName: "601 ",schoolCode: "LP006", schoolName: "Little Flower LP School Alappuzha" },
-    {itemCodeName: "606 ", schoolCode: "HS007", schoolName: "St. Joseph's HS Kannur" },
-    { schoolCode: "HSS008", schoolName: "Loyola HSS Palakkad" },
-    { schoolCode: "UP009", schoolName: "Sree Narayana UP School Malappuram" },
-    { schoolCode: "HSS010", schoolName: "Don Bosco HSS Idukki" }
+    { itemCodeName: "301", schoolCode: "001", schoolName: "Government UP School Thiruvananthapuram" },
+    { itemCodeName: "304", schoolCode: "002", schoolName: "St. Mary's LP School Kochi" },
+    { itemCodeName: "401", schoolCode: "003", schoolName: "Model HS Kozhikode" },
+    { itemCodeName: "501", schoolCode: "S004", schoolName: "Sacred Heart HSS Thrissur" },
+    { itemCodeName: "503", schoolCode: "005", schoolName: "Govt. UP School Kollam" },
+    { itemCodeName: "601", schoolCode: "006", schoolName: "Little Flower LP School Alappuzha" },
+    { itemCodeName: "606", schoolCode: "007", schoolName: "St. Joseph's HS Kannur" },
+    { itemCodeName: "302", schoolCode: "008", schoolName: "Loyola HSS Palakkad" },
+    { itemCodeName: "402", schoolCode: "009", schoolName: "Sree Narayana UP School Malappuram" },
+    { itemCodeName: "602", schoolCode: "010", schoolName: "Don Bosco HSS Idukki" }
   ];
 
   const [Alllist, setList] = useState([]);
   const printRef = useRef();
   const [searchParams, setSearchParams] = useSearchParams();
   
-  // Get festival from URL query params, default to "ALL Festival" if not present
-  const selectedFestival = searchParams.get('festival') || "ALL Festival";
+  // Get festival from URL query params, default to "All Festival" if not present
+  const selectedFestival = searchParams.get('festival') || "All Festival";
   
   console.log(Alllist);
 
@@ -65,13 +65,13 @@ const ParticipatingSclList = () => {
   // Generate the appropriate title based on the selected festival
   const getPrintTitle = () => {
     switch(selectedFestival) {
-      case "UP":
+      case "UP Kalaivizha":
         return "UP Tamil Kalaivizha - List of Participating Schools";
-      case "Lp":
+      case "LP Kalaivizha":
         return "LP Tamil Kalaivizha - List of Participating Schools";
-      case "Hs":
+      case "HS Kalaivizha":
         return "HS Tamil Kalaivizha - List of Participating Schools";
-      case "Hss":
+      case "HSS Kalaivizha":
         return "HSS Tamil Kalaivizha - List of Participating Schools";
       default:
         return "ALL Festival - List of Participating Schools";
@@ -123,19 +123,28 @@ const ParticipatingSclList = () => {
     window.location.reload();
   };
 
-  // Filter the list based on selected festival
-  const filteredList = selectedFestival === "ALL Festival" 
+  // Filter the list based on selected festival using itemCodeName range
+  const filteredList = selectedFestival === "All Festival" 
     ? Alllist 
     : Alllist.filter(item => {
-        // Filter based on school code prefix that matches the festival type
-        if (selectedFestival === "UP") {
-          return item.schoolCode.startsWith("UP");
-        } else if (selectedFestival === "Lp") {
-          return item.schoolCode.startsWith("LP");
-        } else if (selectedFestival === "Hs") {
-          return item.schoolCode.startsWith("HS") && !item.schoolCode.startsWith("HSS");
-        } else if (selectedFestival === "Hss") {
-          return item.schoolCode.startsWith("HSS");
+        // Check if itemCodeName exists and is a valid value
+        if (!item.itemCodeName) return false;
+        
+        // Convert to integer if it's a string with possible spaces
+        const itemCode = parseInt(item.itemCodeName.trim());
+        
+        // Skip items with invalid codes
+        if (isNaN(itemCode)) return false;
+        
+        // Filter based on item code ranges that match the festival type
+        if (selectedFestival === "UP Kalaivizha") {
+          return itemCode >= 300 && itemCode < 400;
+        } else if (selectedFestival === "LP Kalaivizha") {
+          return itemCode >= 400 && itemCode < 500;
+        } else if (selectedFestival === "HS Kalaivizha") {
+          return itemCode >= 500 && itemCode < 600;
+        } else if (selectedFestival === "HSS Kalaivizha") {
+          return itemCode >= 600 && itemCode < 700;
         }
         return true;
       });
@@ -158,11 +167,11 @@ const ParticipatingSclList = () => {
                   onChange={handleFestivalChange}
                   value={selectedFestival}
                 >
-                  <option value="ALL Festival">ALL Festival</option>
-                  <option value="UP">UP</option>
-                  <option value="Lp">Lp</option>
-                  <option value="Hs">Hs</option>
-                  <option value="Hss">Hss</option>
+                  <option value="All Festival">All Festival</option>
+                  <option value="UP Kalaivizha">UP Kalaivizha</option>
+                  <option value="LP Kalaivizha">LP Kalaivizha</option>
+                  <option value="HS Kalaivizha">HS Kalaivizha</option>
+                  <option value="HSS Kalaivizha">HSS Kalaivizha</option>
                 </select>
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                   <i className="fa-solid fa-chevron-down"></i>
@@ -184,6 +193,7 @@ const ParticipatingSclList = () => {
                   <thead className="text-xs sm:text-sm">
                     <tr className="text-gray-700 ">
                       <th className="p-2 md:p-3">Sl No</th>
+                   
                       <th className="p-2 md:p-3">School Code</th>
                       <th className="p-2 md:p-3">School Name</th>
                     </tr>
@@ -193,13 +203,14 @@ const ParticipatingSclList = () => {
                       filteredList.map((item, index) => (
                         <tr key={index} className="hover:bg-gray-100">
                           <td className="p-2 md:p-3">{index + 1}</td>
+                       
                           <td className="p-2 md:p-3">{item.schoolCode || "-"}</td>
                           <td className="p-2 md:p-3">{item.schoolName || "-"}</td>
                         </tr>
                       ))
                     ) : (
                       <tr className="hover:bg-gray-100">
-                        <td colSpan="3" className="p-2 md:p-3">No schools found for this festival.</td>
+                        <td colSpan="4" className="p-2 md:p-3">No schools found for this festival.</td>
                       </tr>
                     )}
                   </tbody>

@@ -6,13 +6,16 @@ import { getAllItemwisepointAPI } from '../services/allAPI';
 const ItemWisePoint = () => {
   const [schoolCode, setSchoolCode] = useState('');
   const [selectedFestival, setSelectedFestival] = useState('All Festival');
-  const printRef = useRef();
   const [Allitemwiswpoint, setItemwiswpoint] = useState([]);
-
+  const [filteredItems, setFilteredItems] = useState([]);
 
   useEffect(() => {
     getAllItemwiswpoint();
   }, []);
+
+  useEffect(() => {
+    filterItemsByFestival(selectedFestival);
+  }, [selectedFestival, Allitemwiswpoint]);
 
   const getAllItemwiswpoint = async () => {
     const token = sessionStorage.getItem("token");
@@ -27,24 +30,87 @@ const ItemWisePoint = () => {
         }
       } catch (err) {
         console.log(err);
+        setItemwiswpoint(resultData);
       }
+    } else {
+      setItemwiswpoint(resultData);
     }
   }
 
+  const filterItemsByFestival = (festival) => {
+    if (!Allitemwiswpoint.length) return;
+    
+    let filtered;
+    switch (festival) {
+      case "UP Kalaivizha":
+        filtered = Allitemwiswpoint.filter(item => {
+          // Extracting the item code number from "301 - Story Writing" format
+          const itemCodeStr = item.itemCode.split(' ')[0];
+          const itemCode = parseInt(itemCodeStr);
+          return itemCode >= 300 && itemCode < 400;
+        });
+        break;
+      case "LP Kalaivizha":
+        filtered = Allitemwiswpoint.filter(item => {
+          const itemCodeStr = item.itemCode.split(' ')[0];
+          const itemCode = parseInt(itemCodeStr);
+          return itemCode >= 400 && itemCode < 500;
+        });
+        break;
+      case "HS Kalaivizha":
+        filtered = Allitemwiswpoint.filter(item => {
+          const itemCodeStr = item.itemCode.split(' ')[0];
+          const itemCode = parseInt(itemCodeStr);
+          return itemCode >= 500 && itemCode < 600;
+        });
+        break;
+      case "HSS Kalaivizha":
+        filtered = Allitemwiswpoint.filter(item => {
+          const itemCodeStr = item.itemCode.split(' ')[0];
+          const itemCode = parseInt(itemCodeStr);
+          return itemCode >= 600 && itemCode < 700;
+        });
+        break;
+      case "All Festival":
+        filtered = [...Allitemwiswpoint];
+        break;
+      default:
+        filtered = [...Allitemwiswpoint];
+    }
+    
+    // Add sequential numbering to filtered results
+    filtered = filtered.map((item, index) => ({
+      ...item,
+      slNo: index + 1
+    }));
+    
+    // Further filter by school code if provided
+    if (schoolCode.trim() !== '') {
+      filtered = filtered.filter(item => 
+        item.school.toLowerCase().includes(schoolCode.toLowerCase())
+      );
+    }
+    
+    setFilteredItems(filtered);
+  }
 
   const resultData = [
     { slNo: 1, itemCode: "301 - Story Writing", school: "GHSS Kozhikode", studentName: "Rahul K", grade: "A", point: 9.5, totalPoint: 9.5 },
-    { slNo: 2, itemCode: "301 - Story Writing", school: "St. Joseph HSS", studentName: "Anjali S", grade: "A+", point: 10.0, totalPoint: 10.0 },
-    { slNo: 3, itemCode: "301 - Story Writing", school: "MES HSS", studentName: "Arun P", grade: "A-", point: 9.0, totalPoint: 9.0 },
-    { slNo: 4, itemCode: "302 - Essay Writing", school: "Govt HSS", studentName: "Meera T", grade: "B+", point: 8.0, totalPoint: 8.0 },
-    { slNo: 5, itemCode: "303 - Poem Recitation", school: "Sacred Heart HSS", studentName: "Vishnu M", grade: "A", point: 9.5, totalPoint: 9.5 },
-    { slNo: 6, itemCode: "304 - Elocution", school: "Kendriya Vidyalaya", studentName: "Sameera N", grade: "B+", point: 8.5, totalPoint: 8.5 },
-    { slNo: 7, itemCode: "305 - Group Song", school: "Christ HSS", studentName: "Team A", grade: "B", point: 7.5, totalPoint: 7.5 },
-    { slNo: 8, itemCode: "306 - Folk Dance", school: "St. Mary's HSS", studentName: "Dance Group", grade: "B+", point: 8.0, totalPoint: 8.0 }
+    { slNo: 2, itemCode: "302 - Essay Writing", school: "St. Joseph HSS", studentName: "Anjali S", grade: "A", point: 10.0, totalPoint: 10.0 },
+    { slNo: 3, itemCode: "401 - LP Story Writing", school: "MES HSS", studentName: "Arun P", grade: "A", point: 9.0, totalPoint: 9.0 },
+    { slNo: 4, itemCode: "402 - LP Essay Writing", school: "Govt HSS", studentName: "Meera T", grade: "B", point: 8.0, totalPoint: 8.0 },
+    { slNo: 5, itemCode: "403 - LP Poem Recitation", school: "Sacred Heart HSS", studentName: "Vishnu M", grade: "A", point: 9.5, totalPoint: 9.5 },
+    { slNo: 6, itemCode: "504 - HS Elocution", school: "Kendriya Vidyalaya", studentName: "Sameera N", grade: "B", point: 8.5, totalPoint: 8.5 },
+    { slNo: 7, itemCode: "605 - HSS Group Song", school: "Christ HSS", studentName: "Team A", grade: "B", point: 7.5, totalPoint: 7.5 },
+    { slNo: 8, itemCode: "606 - HSS Folk Dance", school: "St. Mary's HSS", studentName: "Dance Group", grade: "B", point: 8.0, totalPoint: 8.0 }
   ];
 
   const handleSchoolCodeChange = (e) => {
     setSchoolCode(e.target.value);
+    // Trigger filtering whenever school code changes
+    setTimeout(() => {
+      filterItemsByFestival(selectedFestival);
+    }, 100);
   };
 
   const handleFestivalChange = (e) => {
@@ -55,61 +121,67 @@ const ItemWisePoint = () => {
     switch (selectedFestival) {
       case "UP Kalaivizha":
         return "UP Tamil Kalaivizha - Item Wise Point List";
-      case "Lp Kalaivizha":
+      case "LP Kalaivizha":
         return "LP Tamil Kalaivizha - Item Wise Point List";
-      case "Hs Kalaivizha":
+      case "HS Kalaivizha":
         return "HS Tamil Kalaivizha - Item Wise Point List";
-      case "Hss Kalaivizha":
+      case "HSS Kalaivizha":
         return "HSS Tamil Kalaivizha - Item Wise Point List";
+      case "All Festival":
+        return "All Festival Tamil Kalaivizha - Item Wise Point List";
       default:
         return "Item Wise Point List";
     }
   };
 
   const handlePrint = () => {
-    const originalContents = document.body.innerHTML;
-    const printContents = printRef.current.innerHTML;
-
-    document.body.innerHTML = `
-      <style type="text/css" media="print">
-        @page {
-          size: auto;
-          margin: 0;
-        }
-        body {
-          padding: 20px;
-          font-family: sans-serif;
-        }
-        .print-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-        .print-table th, .print-table td {
-          border: 1px solid #ddd;
-          padding: 8px;
-          text-align: center;
-        }
-        .print-table th {
-          background-color: #f2f2f2;
-          font-weight: bold;
-        }
-        .print-title {
-          text-align: center;
-          margin-bottom: 20px;
-          font-size: 18px;
-          font-weight: bold;
-          display: block !important;
-        }
-        .no-print {
-          display: none !important;
-        }
-      </style>
-      ${printContents}
-    `;
-    window.print();
-    document.body.innerHTML = originalContents;
-    window.location.reload();
+    const printContent = document.getElementById('item-wise-point-table');
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.open();
+    
+    printWindow.document.write(`
+      <html>
+      <head>
+        <title>${getPrintTitle()}</title>
+        <style>
+          body { font-family: Arial, sans-serif; }
+          table { width: 100%; border-collapse: collapse; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+          th { background-color: #f2f2f2; }
+          h2 { text-align: center; margin-bottom: 20px; }
+          @media print {
+            @page { size: landscape; }
+          }
+        </style>
+      </head>
+      <body>
+        <h2>${getPrintTitle()}</h2>
+        ${printContent.innerHTML}
+      </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    
+    // Remove date/time from the print dialog
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
   };
+  
+  // Initialize filtered data at component mount
+  useEffect(() => {
+    if (Allitemwiswpoint.length === 0 && resultData.length > 0) {
+      setItemwiswpoint(resultData);
+      filterItemsByFestival(selectedFestival);
+    }
+  }, []);
+
+  // Determine what data to display
+  const displayData = filteredItems.length > 0 ? filteredItems : 
+                     (Allitemwiswpoint.length > 0 ? Allitemwiswpoint : resultData);
 
   return (
     <>
@@ -137,6 +209,12 @@ const ItemWisePoint = () => {
                 className={`border-blue-800 border text-blue-900 py-2 px-4 rounded-full min-w-max whitespace-nowrap ${schoolCode.trim() !== '' ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 disabled={schoolCode.trim() !== ''}
+                onClick={() => {
+                  setSchoolCode('');
+                  setTimeout(() => {
+                    filterItemsByFestival(selectedFestival);
+                  }, 100);
+                }}
               >
                 All School
               </button>
@@ -150,9 +228,9 @@ const ItemWisePoint = () => {
                 >
                   <option value="All Festival">All Festival</option>
                   <option value="UP Kalaivizha">UP Kalaivizha</option>
-                  <option value="Lp Kalaivizha">Lp Kalaivizha</option>
-                  <option value="Hs Kalaivizha">Hs Kalaivizha</option>
-                  <option value="Hss Kalaivizha">Hss Kalaivizha</option>
+                  <option value="LP Kalaivizha">LP Kalaivizha</option>
+                  <option value="HS Kalaivizha">HS Kalaivizha</option>
+                  <option value="HSS Kalaivizha">HSS Kalaivizha</option>
                 </select>
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
                   <i className="fa-solid fa-chevron-down"></i>
@@ -169,12 +247,11 @@ const ItemWisePoint = () => {
             </div>
           </div>
 
-          <div ref={printRef} className="w-full mt-6">
-            <div className="print-title hidden">{getPrintTitle()}</div>
+          <div className="w-full mt-6">
             <div className="overflow-x-auto">
               <div className="inline-block min-w-full align-middle">
                 <div className="shadow overflow-hidden border-gray-200 sm:rounded-lg">
-                  <div className="overflow-x-scroll md:overflow-hidden">
+                  <div id="item-wise-point-table" className="overflow-x-scroll md:overflow-hidden">
                     <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
                       <thead className="bg-gray-50">
                         <tr className="text-gray-700">
@@ -188,17 +265,26 @@ const ItemWisePoint = () => {
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
-                        {resultData.map((result) => (
-                          <tr key={result.slNo} className="hover:bg-gray-100">
-                            <td className="p-2 md:p-3 whitespace-nowrap">{result.slNo}</td>
-                            <td className="p-2 md:p-3 whitespace-nowrap">{result.itemCode}</td>
-                            <td className="p-2 md:p-3 whitespace-nowrap">{result.school}</td>
-                            <td className="p-2 md:p-3 whitespace-nowrap">{result.studentName}</td>
-                            <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
-                            <td className="p-2 md:p-3 whitespace-nowrap">{result.point}</td>
-                            <td className="p-2 md:p-3 whitespace-nowrap">{result.totalPoint}</td>
+                        {displayData.length > 0 ? (
+                          displayData.map((result) => (
+                            <tr key={result.slNo} className="hover:bg-gray-100">
+                              <td className="p-2 md:p-3 whitespace-nowrap">{result.slNo}</td>
+                              <td className="p-2 md:p-3 whitespace-nowrap">{result.itemCode}</td>
+                              <td className="p-2 md:p-3 whitespace-nowrap">{result.school}</td>
+                              <td className="p-2 md:p-3 whitespace-nowrap">{result.studentName}</td>
+                              <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
+                              <td className="p-2 md:p-3 whitespace-nowrap">{result.point}</td>
+                              <td className="p-2 md:p-3 whitespace-nowrap">{result.totalPoint}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan="7" className="p-4 text-center">
+                              No items found for {selectedFestival}
+                              {schoolCode.trim() !== '' ? ` with school code "${schoolCode}"` : ''}
+                            </td>
                           </tr>
-                        ))}
+                        )}
                       </tbody>
                     </table>
                   </div>

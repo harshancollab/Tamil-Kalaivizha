@@ -244,22 +244,26 @@
 // export default CertificateSclwise
 
 
-
 import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { getAllCertificateSclwiseAPI } from '../services/allAPI';
+import { useSearchParams, useNavigate } from 'react-router-dom'
+import { getAllCertificateSclwiseAPI } from '../services/allAPI'
 
 const CertificateSclwise = () => {
-    const [Allitemresult, setItemresult] = useState([]);
+    const [allItemResult, setAllItemResult] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
     const [searchParams, setSearchParams] = useSearchParams();
     const selectedFestival = searchParams.get('festival') || "UP Kalaivizha";
     const navigate = useNavigate();
 
     useEffect(() => {
         getAllItemResult();
-    }, [selectedFestival]);
+    }, []);
+
+    useEffect(() => {
+        filterDataByFestival();
+    }, [selectedFestival, allItemResult]);
 
     const getAllItemResult = async () => {
         const token = sessionStorage.getItem("token");
@@ -270,15 +274,60 @@ const CertificateSclwise = () => {
             try {
                 const result = await getAllCertificateSclwiseAPI(reqHeader)
                 if (result.status === 200) {
-                    setItemresult(result.data)
+                    setAllItemResult(result.data)
                 }
             } catch (err) {
                 console.log(err);
-                setItemresult(certificateItemData);
+                setAllItemResult(certificateItemData);
             }
         } else {
-            setItemresult(certificateItemData);
+            setAllItemResult(certificateItemData);
         }
+    }
+
+    const filterDataByFestival = () => {
+        if (!allItemResult.length) return;
+
+        let filtered;
+        switch (selectedFestival) {
+            case "UP Kalaivizha":
+                filtered = allItemResult.filter(item => {
+                    const itemCode = parseInt(item.itemCode);
+                    return itemCode >= 300 && itemCode < 400;
+                });
+                break;
+            case "LP Kalaivizha":
+                filtered = allItemResult.filter(item => {
+                    const itemCode = parseInt(item.itemCode);
+                    return itemCode >= 400 && itemCode < 500;
+                });
+                break;
+            case "HS Kalaivizha":
+                filtered = allItemResult.filter(item => {
+                    const itemCode = parseInt(item.itemCode);
+                    return itemCode >= 500 && itemCode < 600;
+                });
+                break;
+            case "HSS Kalaivizha":
+                filtered = allItemResult.filter(item => {
+                    const itemCode = parseInt(item.itemCode);
+                    return itemCode >= 600 && itemCode < 700;
+                });
+                break;
+            case "All Festival":
+                filtered = [...allItemResult];
+                break;
+            default:
+                filtered = [...allItemResult];
+        }
+
+        // Add sequential numbering to filtered results
+        filtered = filtered.map((item, index) => ({
+            ...item,
+            slNo: index + 1
+        }));
+
+        setFilteredData(filtered);
     }
 
     const handleFestivalChange = (e) => {
@@ -303,7 +352,7 @@ const CertificateSclwise = () => {
         printWindow.document.write(`
             <html>
             <head>
-                <title>${selectedFestival} - Certificate Item Wise Report</title>
+                <title>${selectedFestival} - Certificate School Wise Report</title>
                 <style>
                     body { font-family: Arial, sans-serif; }
                     table { width: 100%; border-collapse: collapse; }
@@ -398,6 +447,20 @@ const CertificateSclwise = () => {
             gradeB: 5,
             gradeC: 2
         },
+        
+        {
+            slNo: 6,
+            printed: "30443 - G. H. S. Chemmannu",
+            itemCode: "601",
+            itemName: "Drawing",
+            itemType: "Single",
+            totalStudents: 20,
+            participation: 18,
+            nonParticipant: 2,
+            gradeA: 9,
+            gradeB: 7,
+            gradeC: 2
+        },
         {
             slNo: 6,
             printed: "30443 - G. H. S. Chemmannu",
@@ -413,8 +476,16 @@ const CertificateSclwise = () => {
         }
     ];
 
+    // Initialize filtered data at component mount
+    useEffect(() => {
+        if (allItemResult.length === 0 && certificateItemData.length > 0) {
+            setAllItemResult(certificateItemData);
+        }
+    }, []);
 
-    const filteredData = Allitemresult.length > 0 ? Allitemresult : certificateItemData;
+    // Determine what data to display
+    const displayData = filteredData.length > 0 ? filteredData : 
+        (allItemResult.length > 0 ? allItemResult : certificateItemData);
 
     return (
         <>
@@ -433,11 +504,11 @@ const CertificateSclwise = () => {
                                     onChange={handleFestivalChange}
                                     value={selectedFestival}
                                 >
+                                    <option value="All Festival">All Festival</option>
                                     <option value="UP Kalaivizha">UP Kalaivizha</option>
                                     <option value="LP Kalaivizha">LP Kalaivizha</option>
                                     <option value="HS Kalaivizha">HS Kalaivizha</option>
                                     <option value="HSS Kalaivizha">HSS Kalaivizha</option>
-                                    <option value="All Festival">All Festival</option>
                                 </select>
                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                                     <i className="fa-solid fa-chevron-down"></i>
@@ -467,20 +538,28 @@ const CertificateSclwise = () => {
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
-                                            {filteredData.map((item) => (
-                                                <tr key={item.slNo} className="hover:bg-gray-100">
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{item.slNo}</td>
-                                                    <td 
-                                                        className="p-2 md:p-3 text-blue-500 whitespace-nowrap cursor-pointer hover:underline"
-                                                        onClick={() => handleSchoolClick(item.printed)}
-                                                    >
-                                                        {item.printed}
+                                            {displayData.length > 0 ? (
+                                                displayData.map((item) => (
+                                                    <tr key={item.slNo} className="hover:bg-gray-100">
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{item.slNo}</td>
+                                                        <td 
+                                                            className="p-2 md:p-3 text-blue-500 whitespace-nowrap cursor-pointer hover:underline"
+                                                            onClick={() => handleSchoolClick(item.printed)}
+                                                        >
+                                                            {item.printed}
+                                                        </td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{item.totalStudents}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{item.participation}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{item.nonParticipant}</td>
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan="5" className="p-3 text-center text-gray-500">
+                                                        No records found for {selectedFestival}
                                                     </td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{item.totalStudents}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{item.participation}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{item.nonParticipant}</td>
                                                 </tr>
-                                            ))}
+                                            )}
                                         </tbody>
                                     </table>
                                 </div>

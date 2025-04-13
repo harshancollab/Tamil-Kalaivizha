@@ -11,13 +11,11 @@ const PublishResultList = () => {
     const selectedResultType = searchParams.get('resultType') || "Declared Result";
     const [searchTerm, setSearchTerm] = useState(searchParams.get('code') || '');
     const [filteredData, setFilteredData] = useState([]);
+    const [filteredResultData, setFilteredResultData] = useState([]);
     const [noResults, setNoResults] = useState(false);
-    const [Allresultentry, setResultentry] = useState([]);
+    const [allResultEntry, setResultEntry] = useState([]);
 
-
-
-
- useEffect(() => {
+    useEffect(() => {
         // getAllresultentry();
     }, []);
 
@@ -30,21 +28,25 @@ const PublishResultList = () => {
             try {
                 const result = await getAllPublishentryListAPI(reqHeader)
                 if (result.status === 200) {
-                    setResultentry(result.data)
+                    setResultEntry(result.data)
                 }
             } catch (err) {
                 console.log(err);
+                // Set dummy data if API fails
+                setResultEntry(resultData);
             }
+        } else {
+            // Set dummy data if no token
+            setResultEntry(resultData);
         }
     }
-
-
 
     // Dummy data for the result list
     const resultData = [
         {
             slNo: 1,
             itemCodeName: "301 - Story Writing",
+            itemCode: "301",
             regNo: "1001",
             codeNo: "SN-101",
             name: "Rahul Kumar",
@@ -57,6 +59,7 @@ const PublishResultList = () => {
         {
             slNo: 2,
             itemCodeName: "302 - Essay Writing",
+            itemCode: "302",
             regNo: "1002",
             codeNo: "SN-102",
             name: "Priya Singh",
@@ -69,6 +72,7 @@ const PublishResultList = () => {
         {
             slNo: 3,
             itemCodeName: "303 - Elocution",
+            itemCode: "303",
             regNo: "1003",
             codeNo: "SN-103",
             name: "Ahmed Khan",
@@ -80,7 +84,8 @@ const PublishResultList = () => {
         },
         {
             slNo: 4,
-            itemCodeName: "304 - Group Dance",
+            itemCodeName: "401 - Group Dance",
+            itemCode: "401",
             regNo: "1004",
             codeNo: "GR-104",
             name: "Dance Team A",
@@ -92,7 +97,8 @@ const PublishResultList = () => {
         },
         {
             slNo: 5,
-            itemCodeName: "305 -  Music",
+            itemCodeName: "402 - Music",
+            itemCode: "402",
             regNo: "1005",
             codeNo: "SN-105",
             name: "Meera Patel",
@@ -104,7 +110,8 @@ const PublishResultList = () => {
         },
         {
             slNo: 6,
-            itemCodeName: "306 - Quiz ",
+            itemCodeName: "501 - Quiz",
+            itemCode: "501",
             regNo: "1006",
             codeNo: "GR-106",
             name: "Quiz Team B",
@@ -116,7 +123,8 @@ const PublishResultList = () => {
         },
         {
             slNo: 7,
-            itemCodeName: "307 - Painting",
+            itemCodeName: "502 - Painting",
+            itemCode: "502",
             regNo: "007",
             codeNo: "SN-107",
             name: "Sofia Thomas",
@@ -128,7 +136,8 @@ const PublishResultList = () => {
         },
         {
             slNo: 8,
-            itemCodeName: "308 - Drama",
+            itemCodeName: "601 - Drama",
+            itemCode: "601",
             regNo: "1008",
             codeNo: "GR-108",
             name: "Drama Team C",
@@ -140,7 +149,84 @@ const PublishResultList = () => {
         }
     ];
 
-    const schoolPointsData = getSchoolPointsData();
+    // Filter result data based on selected festival
+    useEffect(() => {
+        filterResultDataByFestival();
+    }, [selectedFestival, allResultEntry]);
+
+    const filterResultDataByFestival = () => {
+        let dataToFilter = allResultEntry.length > 0 ? allResultEntry : resultData;
+        
+        let filtered;
+        switch (selectedFestival) {
+            case "UP Kalaivizha":
+                filtered = dataToFilter.filter(item => {
+                    const itemCode = parseInt(item.itemCode);
+                    return itemCode >= 300 && itemCode < 400;
+                });
+                break;
+            case "Lp Kalaivizha":
+                filtered = dataToFilter.filter(item => {
+                    const itemCode = parseInt(item.itemCode);
+                    return itemCode >= 400 && itemCode < 500;
+                });
+                break;
+            case "Hs Kalaivizha":
+                filtered = dataToFilter.filter(item => {
+                    const itemCode = parseInt(item.itemCode);
+                    return itemCode >= 500 && itemCode < 600;
+                });
+                break;
+            case "Hss Kalaivizha":
+                filtered = dataToFilter.filter(item => {
+                    const itemCode = parseInt(item.itemCode);
+                    return itemCode >= 600 && itemCode < 700;
+                });
+                break;
+            case "Status View":
+            default:
+                filtered = [...dataToFilter];
+        }
+
+        // Add sequential numbering to filtered results
+        filtered = filtered.map((item, index) => ({
+            ...item,
+            slNo: index + 1
+        }));
+
+        setFilteredResultData(filtered);
+        
+        // Generate school points from the filtered data
+        const schoolPointsData = getSchoolPointsData(filtered);
+        setFilteredData(schoolPointsData);
+        
+        // Update search results if search term exists
+        if (searchTerm.trim()) {
+            filterSchools(searchTerm, schoolPointsData);
+        }
+    };
+
+    function getSchoolPointsData(data = []) {
+        const dataToUse = data.length > 0 ? data : 
+            (filteredResultData.length > 0 ? filteredResultData : resultData);
+        
+        const schoolMap = {};
+
+        dataToUse.forEach(item => {
+            if (!schoolMap[item.schoolName]) {
+                schoolMap[item.schoolName] = {
+                    slNo: Object.keys(schoolMap).length + 1,
+                    schoolCode: item.schoolCode,
+                    schoolName: item.schoolName,
+                    point: item.point
+                };
+            } else {
+                schoolMap[item.schoolName].point += item.point;
+            }
+        });
+
+        return Object.values(schoolMap).sort((a, b) => b.point - a.point);
+    };
 
     useEffect(() => {
         const initialSearchTerm = searchParams.get('code') || '';
@@ -159,40 +245,23 @@ const PublishResultList = () => {
         filterSchools(newSearchTerm);
     };
 
-    const filterSchools = (term) => {
+    const filterSchools = (term, schoolData = null) => {
+        const dataToFilter = schoolData || filteredData.length > 0 ? filteredData : getSchoolPointsData();
         const lowercasedTerm = term.toLowerCase();
+        
         if (!term.trim()) {
-            setFilteredData(schoolPointsData);
+            setFilteredData(dataToFilter);
             setNoResults(false);
             return;
         }
         
-        const results = schoolPointsData.filter(school =>
+        const results = dataToFilter.filter(school =>
             school.schoolCode.toLowerCase().includes(lowercasedTerm) ||
             school.schoolName.toLowerCase().includes(lowercasedTerm)
         );
         
         setFilteredData(results);
         setNoResults(results.length === 0);
-    };
-
-    function getSchoolPointsData() {
-        const schoolMap = {};
-
-        resultData.forEach(item => {
-            if (!schoolMap[item.schoolName]) {
-                schoolMap[item.schoolName] = {
-                    slNo: Object.keys(schoolMap).length + 1,
-                    schoolCode: item.schoolCode,
-                    schoolName: item.schoolName,
-                    point: item.point
-                };
-            } else {
-                schoolMap[item.schoolName].point += item.point;
-            }
-        });
-
-        return Object.values(schoolMap).sort((a, b) => b.point - a.point);
     };
 
     const getPageHeading = () => {
@@ -306,10 +375,15 @@ const PublishResultList = () => {
         window.location.reload();
     };
 
-    // Initialize filtered data on component mount
+    // Initialize data at component mount
     useEffect(() => {
-        setFilteredData(schoolPointsData);
+        if (allResultEntry.length === 0) {
+            setResultEntry(resultData);
+        }
     }, []);
+
+    // Determine what data to display
+    const displayResultData = filteredResultData.length > 0 ? filteredResultData : resultData;
 
     return (
         <>
@@ -398,14 +472,22 @@ const PublishResultList = () => {
                                                     </tr>
                                                 </thead>
                                                 <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
-                                                    {filteredData.map((school, index) => (
-                                                        <tr key={index} className="hover:bg-gray-100">
-                                                            <td className="p-2 md:p-3 whitespace-nowrap">{index + 1}</td>
-                                                            <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolCode}</td>
-                                                            <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolName}</td>
-                                                            <td className="p-2 md:p-3 whitespace-nowrap">{school.point.toFixed(1)}</td>
+                                                    {filteredData.length > 0 ? (
+                                                        filteredData.map((school, index) => (
+                                                            <tr key={index} className="hover:bg-gray-100">
+                                                                <td className="p-2 md:p-3 whitespace-nowrap">{index + 1}</td>
+                                                                <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolCode}</td>
+                                                                <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolName}</td>
+                                                                <td className="p-2 md:p-3 whitespace-nowrap">{school.point.toFixed(1)}</td>
+                                                            </tr>
+                                                        ))
+                                                    ) : (
+                                                        <tr>
+                                                            <td colSpan="4" className="p-3 text-center text-gray-500">
+                                                                No records found for {selectedFestival}
+                                                            </td>
                                                         </tr>
-                                                    ))}
+                                                    )}
                                                 </tbody>
                                             </table>
                                             {noResults && (
@@ -431,19 +513,27 @@ const PublishResultList = () => {
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
-                                                {resultData.map((result) => (
-                                                    <tr key={result.slNo} className="hover:bg-gray-100">
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.slNo}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.itemCodeName}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.regNo}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.codeNo}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.name}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.noOfParticipate}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.schoolName}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.point}</td>
+                                                {displayResultData.length > 0 ? (
+                                                    displayResultData.map((result) => (
+                                                        <tr key={result.slNo} className="hover:bg-gray-100">
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.slNo}</td>
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.itemCodeName}</td>
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.regNo}</td>
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.codeNo}</td>
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.name}</td>
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.noOfParticipate}</td>
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.schoolName}</td>
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.point}</td>
+                                                        </tr>
+                                                    ))
+                                                ) : (
+                                                    <tr>
+                                                        <td colSpan="9" className="p-3 text-center text-gray-500">
+                                                            No records found for {selectedFestival}
+                                                        </td>
                                                     </tr>
-                                                ))}
+                                                )}
                                             </tbody>
                                         </table>
                                     )}

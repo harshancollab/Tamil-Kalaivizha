@@ -200,7 +200,6 @@
 
 // export default SclWisePoint
 
-
 import React, { useEffect, useState, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
@@ -208,8 +207,8 @@ import { useSearchParams } from 'react-router-dom';
 import { getAllsclwisepoitAPI } from '../services/allAPI';
 
 const SclWisePoint = () => {
-
-    const [Allitemresult, setItemresult] = useState([]);
+    const [allResultData, setAllResultData] = useState([]);
+    const [filteredData, setFilteredData] = useState([]);
     const printRef = useRef();
     const iframeRef = useRef(null);
     const [searchParams, setSearchParams] = useSearchParams();
@@ -217,9 +216,25 @@ const SclWisePoint = () => {
 
     const selectedFestival = searchParams.get('festival') || "UP Kalaivizha";
 
+    // Dummy data with festival-related information (using itemCode to determine festival)
+    const dummyResultData = [
+        { slNo: 1, regNo: "3016", code: "GHSS Kozhikode", mark1: 5, mark2: 8, mark3: 2, total: "67", markPercentage: 85, rank: 2, grade: "A", point: 9.5, itemCode: "301" },
+        { slNo: 2, regNo: "3015", code: "MES HSS", mark1: 9, mark2: 8, mark3: 5, total: "66", markPercentage: 91, rank: 1, grade: "A+", point: 10.0, itemCode: "302" },
+        { slNo: 3, regNo: "3016", code: "G. H. S. S Anakara", mark1: 7, mark2: 2, mark3: 8, total: "45", markPercentage: 82, rank: 3, grade: "A-", point: 9.0, itemCode: "303" },
+        { slNo: 4, regNo: "3445", code: "G. H. S. S Kumily", mark1: 8, mark2: 2, mark3: 7, total: "43", markPercentage: 72, rank: 7, grade: "B+", point: 8.0, itemCode: "401" },
+        { slNo: 5, regNo: "675", code: "G. H. S. S. Vaguvurrai", mark1: 2, mark2: 0, mark3: 8, total: "45", markPercentage: 87, rank: 4, grade: "A", point: 9.5, itemCode: "402" },
+        { slNo: 6, regNo: "8905", code: "St. Mary's School", mark1: 8, mark2: 7, mark3: 8, total: "33", markPercentage: 78, rank: 5, grade: "B+", point: 8.5, itemCode: "501" },
+        { slNo: 7, regNo: "4589", code: "DAV Public School", mark1: 5, mark2: 0, mark3: 8, total: "55", markPercentage: 68, rank: 8, grade: "B", point: 7.5, itemCode: "502" },
+        { slNo: 8, regNo: "6787", code: "Kendriya Vidyalaya", mark1: 0, mark2: 6, mark3: 0, total: "26", markPercentage: 75, rank: 6, grade: "B+", point: 8.0, itemCode: "601" }
+    ];
+
     useEffect(() => {
-        //getAllItemResult();
+        getAllResultData();
     }, []);
+
+    useEffect(() => {
+        filterDataByFestival();
+    }, [selectedFestival, allResultData]);
 
     // Effect to handle printing after iframe is loaded
     useEffect(() => {
@@ -234,7 +249,7 @@ const SclWisePoint = () => {
         }
     }, [printReady]);
 
-    const getAllItemResult = async () => {
+    const getAllResultData = async () => {
         const token = sessionStorage.getItem("token");
         if (token) {
             const reqHeader = {
@@ -243,37 +258,76 @@ const SclWisePoint = () => {
             try {
                 const result = await getAllsclwisepoitAPI(reqHeader)
                 if (result.status === 200) {
-                    setItemresult(result.data)
+                    setAllResultData(result.data);
                 }
             } catch (err) {
                 console.log(err);
+                setAllResultData(dummyResultData);
             }
+        } else {
+            setAllResultData(dummyResultData);
         }
     }
 
-    const resultData = [
-        { slNo: 1, regNo: "3016", code: "GHSS Kozhikode", mark1: 5, mark2: 8, mark3: 2, total: "67", markPercentage: 85, rank: 2, grade: "A", point: 9.5 },
-        { slNo: 2, regNo: "3015", code: "MES HSS", mark1: 9, mark2: 8, mark3: 5, total: "66", markPercentage: 91, rank: 1, grade: "A+", point: 10.0 },
-        { slNo: 3, regNo: "3016", code: "G. H. S. S Anakara", mark1: 7, mark2: 2, mark3: 8, total: "45", markPercentage: 82, rank: 3, grade: "A-", point: 9.0 },
-        { slNo: 4, regNo: "3445", code: "G. H. S. S Kumily", mark1: 8, mark2: 2, mark3: 7, total: "43", markPercentage: 72, rank: 7, grade: "B+", point: 8.0 },
-        { slNo: 5, regNo: "675", code: "G. H. S. S. Vaguvurrai", mark1: 2, mark2: 0, mark3: 8, total: "45", markPercentage: 87, rank: 4, grade: "A", point: 9.5 },
-        { slNo: 6, regNo: "8905", code: "123", mark1: 8, mark2: 7, mark3: 8, total: "33", markPercentage: 78, rank: 5, grade: "B+", point: 8.5 },
-        { slNo: 7, regNo: "4589", code: "456", mark1: 5, mark2: 0, mark3: 8, total: 203, markPercentage: 68, rank: 8, grade: "B", point: 7.5 },
-        { slNo: 8, regNo: "6787", code: "976", mark1: 0, mark2: 6, mark3: 0, total: 226, markPercentage: 75, rank: 6, grade: "B+", point: 8.0 }
-    ];
+    const filterDataByFestival = () => {
+        if (!allResultData.length) return;
+
+        let filtered;
+        switch (selectedFestival) {
+            case "UP Kalaivizha":
+                filtered = allResultData.filter(item => {
+                    const itemCode = parseInt(item.itemCode);
+                    return itemCode >= 300 && itemCode < 400;
+                });
+                break;
+            case "LP Kalaivizha":
+                filtered = allResultData.filter(item => {
+                    const itemCode = parseInt(item.itemCode);
+                    return itemCode >= 400 && itemCode < 500;
+                });
+                break;
+            case "HS Kalaivizha":
+                filtered = allResultData.filter(item => {
+                    const itemCode = parseInt(item.itemCode);
+                    return itemCode >= 500 && itemCode < 600;
+                });
+                break;
+            case "HSS Kalaivizha":
+                filtered = allResultData.filter(item => {
+                    const itemCode = parseInt(item.itemCode);
+                    return itemCode >= 600 && itemCode < 700;
+                });
+                break;
+            case "All Festival":
+                filtered = [...allResultData];
+                break;
+            default:
+                filtered = [...allResultData];
+        }
+
+        // Add sequential numbering to filtered results
+        filtered = filtered.map((item, index) => ({
+            ...item,
+            slNo: index + 1
+        }));
+
+        setFilteredData(filtered);
+    }
 
     const getPrintTitle = () => {
         switch (selectedFestival) {
             case "UP Kalaivizha":
                 return "UP Tamil Kalaivizha - School Wise Point Report";
-            case "Lp Kalaivizha":
+            case "LP Kalaivizha":
                 return "LP Tamil Kalaivizha - School Wise Point Report";
-            case "Hs Kalaivizha":
+            case "HS Kalaivizha":
                 return "HS Tamil Kalaivizha - School Wise Point Report";
-            case "Hss Kalaivizha":
+            case "HSS Kalaivizha":
                 return "HSS Tamil Kalaivizha - School Wise Point Report";
+            case "All Festival":
+                return "All Festival Tamil Kalaivizha - School Wise Point Report";
             default:
-                return "Item Result List";
+                return "School Wise Point Report";
         }
     };
 
@@ -348,7 +402,17 @@ const SclWisePoint = () => {
         // Print will be triggered by the useEffect when iframe is loaded
     };
 
-    const filteredData = resultData;
+    // Initialize filtered data at component mount
+    useEffect(() => {
+        if (allResultData.length === 0 && dummyResultData.length > 0) {
+            setAllResultData(dummyResultData);
+        }
+    }, []);
+
+    // Determine what data to display
+    const displayData = filteredData.length > 0 ? filteredData : 
+        (allResultData.length > 0 ? allResultData : dummyResultData);
+
     return (
         <>
             <Header />
@@ -368,9 +432,9 @@ const SclWisePoint = () => {
                                 >
                                     <option value="All Festival">All Festival</option>
                                     <option value="UP Kalaivizha">UP Kalaivizha</option>
-                                    <option value="Lp Kalaivizha">Lp Kalaivizha</option>
-                                    <option value="Hs Kalaivizha">Hs Kalaivizha</option>
-                                    <option value="Hss Kalaivizha">Hss Kalaivizha</option>
+                                    <option value="LP Kalaivizha">LP Kalaivizha</option>
+                                    <option value="HS Kalaivizha">HS Kalaivizha</option>
+                                    <option value="HSS Kalaivizha">HSS Kalaivizha</option>
                                 </select>
                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
                                     <i className="fa-solid fa-chevron-down"></i>
@@ -400,17 +464,25 @@ const SclWisePoint = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
-                                    {filteredData.map((result) => (
-                                        <tr key={result.slNo} className="hover:bg-gray-100">
-                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.slNo}</td>
-                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.regNo}</td>
-                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.code}</td>
-                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.mark1}</td>
-                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.mark2}</td>
-                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.mark3}</td>
-                                            <td className="p-2 md:p-3 whitespace-nowrap">{result.total}</td>
+                                    {displayData.length > 0 ? (
+                                        displayData.map((result) => (
+                                            <tr key={result.slNo} className="hover:bg-gray-100">
+                                                <td className="p-2 md:p-3 whitespace-nowrap">{result.slNo}</td>
+                                                <td className="p-2 md:p-3 whitespace-nowrap">{result.regNo}</td>
+                                                <td className="p-2 md:p-3 whitespace-nowrap">{result.code}</td>
+                                                <td className="p-2 md:p-3 whitespace-nowrap">{result.mark1}</td>
+                                                <td className="p-2 md:p-3 whitespace-nowrap">{result.mark2}</td>
+                                                <td className="p-2 md:p-3 whitespace-nowrap">{result.mark3}</td>
+                                                <td className="p-2 md:p-3 whitespace-nowrap">{result.total}</td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="7" className="p-3 text-center text-gray-500">
+                                                No records found for {selectedFestival}
+                                            </td>
                                         </tr>
-                                    ))}
+                                    )}
                                 </tbody>
                             </table>
                         </div>
