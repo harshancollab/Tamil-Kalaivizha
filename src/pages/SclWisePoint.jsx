@@ -335,17 +335,16 @@ const SclWisePoint = () => {
         setSearchParams({ festival: e.target.value });
     };
 
-    // New iframe-based print method
     const handlePrint = () => {
         if (!iframeRef.current) {
-            // Create iframe if it doesn't exist
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.onload = () => setPrintReady(true);
-            document.body.appendChild(iframe);
-            iframeRef.current = iframe;
+          // Create iframe if it doesn't exist
+          const iframe = document.createElement('iframe');
+          iframe.style.display = 'none';
+          iframe.onload = () => setPrintReady(true);
+          document.body.appendChild(iframe);
+          iframeRef.current = iframe;
         }
-
+        
         // Get table content and title
         const tableData = printRef.current.innerHTML;
         const title = getPrintTitle();
@@ -354,53 +353,87 @@ const SclWisePoint = () => {
         const iframeDoc = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
         iframeDoc.open();
         iframeDoc.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>${title}</title>
-                <style>
-                    @page {
-                        margin: 1cm;
-                    }
-                    body {
-                        font-family: Arial, sans-serif;
-                        margin: 0;
-                        padding: 15px;
-                    }
-                    .print-header {
-                        text-align: center;
-                        margin-bottom: 20px;
-                        font-size: 18px;
-                        font-weight: bold;
-                    }
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                    }
-                    th, td {
-                        border: 1px solid #ddd;
-                        padding: 8px;
-                        text-align: center;
-                    }
-                    th {
-                        background-color: #f2f2f2;
-                        font-weight: bold;
-                    }
-                    tr:nth-child(even) {
-                        background-color: #f9f9f9;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="print-header">${title}</div>
-                ${tableData}
-            </body>
-            </html>
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>${title}</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+              @media print {
+                body {
+                  -webkit-print-color-adjust: exact !important;
+                  print-color-adjust: exact !important;
+                  background-color: white !important;
+                }
+                
+                @page {
+                  margin: 1cm;
+                  size: auto;
+                }
+              }
+              
+              body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 15px;
+                background-color: white;
+              }
+              
+              .print-header {
+                text-align: center;
+                margin-bottom: 20px;
+                font-size: 18px;
+                font-weight: bold;
+                display: block !important;
+              }
+              
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                page-break-inside: auto;
+              }
+              
+              tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+              }
+              
+              th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: center;
+              }
+              
+              th {
+                background-color: #f2f2f2 !important;
+                font-weight: bold;
+              }
+              
+              tr:nth-child(even) {
+                background-color: #f9f9f9 !important;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="print-header">${title}</div>
+            ${tableData}
+          </body>
+          </html>
         `);
         iframeDoc.close();
         
-        // Print will be triggered by the useEffect when iframe is loaded
-    };
+        // Add a slight delay to ensure styles are applied before printing
+        setTimeout(() => {
+          if (iframeRef.current) {
+            try {
+              iframeRef.current.contentWindow.focus();
+              iframeRef.current.contentWindow.print();
+            } catch (err) {
+              console.error('Print error:', err);
+            }
+          }
+        }, 500);
+      };
 
     // Initialize filtered data at component mount
     useEffect(() => {

@@ -95,17 +95,16 @@ const Certificateitmwise = () => {
         navigate(`/CertificateParticipate?itemCode=${itemCode}&itemName=${itemName}&festival=${selectedFestival}`);
     };
 
+
     const handlePrint = () => {
         const printContent = document.getElementById('certificate-table-container');
+        const pageTitle = `${selectedFestival} - Certificate Item Wise Report`;
         
         // Create a hidden iframe for mobile-compatible printing
         const iframe = document.createElement('iframe');
+        iframe.name = 'printIframe';
+        iframe.id = 'printIframe';
         iframe.style.display = 'none';
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        iframe.style.position = 'absolute';
-        iframe.style.left = '0';
-        iframe.style.top = '0';
         document.body.appendChild(iframe);
         
         // Write the content to the iframe with improved mobile compatibility
@@ -113,108 +112,139 @@ const Certificateitmwise = () => {
             <!DOCTYPE html>
             <html>
             <head>
-                <title>${selectedFestival} - Certificate Item Wise Report</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+                <title>${pageTitle}</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <style>
-                    body { 
-                        font-family: Arial, sans-serif; 
-                        margin: 0; 
-                        padding: 10px; 
-                        background-color: white !important;
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
-                    }
-                    table { 
-                        width: 100%; 
-                        border-collapse: collapse; 
-                        background-color: white !important;
-                    }
-                    th, td { 
-                        border: 1px solid #000; 
-                        padding: 8px; 
-                        text-align: center; 
-                    }
-                    th { 
-                        background-color: #f2f2f2 !important; 
-                    }
-                    h2 { 
-                        text-align: center; 
-                        margin-bottom: 20px; 
-                    }
-                    
-                    /* Force backgrounds to print correctly */
+                    /* Reset styles */
                     * {
+                        box-sizing: border-box;
                         -webkit-print-color-adjust: exact !important;
                         print-color-adjust: exact !important;
                         color-adjust: exact !important;
-                        color: #000 !important;
                     }
                     
+                    /* Base styles */
+                    html, body {
+                        margin: 0;
+                        padding: 0;
+                        background-color: #ffffff !important;
+                        font-family: Arial, sans-serif;
+                        width: 100%;
+                    }
+                    
+                    /* Header styling */
+                    .print-header {
+                        text-align: center;
+                        padding: 10px;
+                        margin-bottom: 15px;
+                        border-bottom: 2px solid #003566;
+                        background-color: #ffffff !important;
+                    }
+                    
+                    .print-header h1 {
+                        margin: 0;
+                        color: #003566 !important;
+                        font-size: 18px;
+                    }
+                    
+                    .print-header p {
+                        margin: 5px 0 0;
+                        font-size: 14px;
+                        color: #333333 !important;
+                    }
+                    
+                    /* Table styling */
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        background-color: #ffffff !important;
+                        margin-bottom: 20px;
+                    }
+                    
+                    th, td {
+                        border: 1px solid #000000;
+                        padding: 6px;
+                        text-align: center;
+                        font-size: 11px;
+                        color: #000000 !important;
+                    }
+                    
+                    th {
+                        background-color: #f2f2f2 !important;
+                        font-weight: bold;
+                    }
+                    
+                    /* Print-specific rules */
                     @media print {
-                        @page { 
-                            size: landscape; 
-                            margin: 5mm;
+                        @page {
+                            size: landscape;
+                            margin: 0.5cm;
                         }
-                        html, body { 
-                            width: 100%;
-                            height: 100%;
-                            margin: 0;
-                            padding: 5px;
-                            background-color: white !important;
+                        
+                        html, body {
+                            background-color: #ffffff !important;
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
                         }
-                        table { 
-                            page-break-inside: avoid; 
+                        
+                        .print-header, table, th, td {
+                            page-break-inside: avoid;
                         }
-                        tr { 
-                            page-break-inside: avoid; 
-                        }
-                        td, th {
-                            font-size: 12px !important;
-                        }
-                    }
-                    
-                    @media only screen and (max-width: 600px) {
-                        body {
-                            width: 100% !important;
-                            margin: 0 !important;
-                            padding: 5px !important;
-                        }
-                        table { 
-                            font-size: 9px !important;
-                            width: 100% !important;
-                        }
-                        th, td { 
-                            padding: 3px !important;
+                        
+                        th {
+                            background-color: #f2f2f2 !important;
                         }
                     }
                 </style>
             </head>
-            <body ontouchstart="">
-                <div class="certificate-container">
-                    <h2>${selectedFestival} - Certificate Item Wise Report</h2>
+            <body>
+                <!-- Custom header -->
+                <div class="print-header">
+                    <h1>Certificate Item Wise Report</h1>
+                    <p>${selectedFestival}</p>
+                    <p>Date: ${new Date().toLocaleDateString()}</p>
+                </div>
+                
+                <!-- Table content -->
+                <div style="overflow-x: auto; background-color: #ffffff !important;">
                     ${printContent.innerHTML}
                 </div>
+                
                 <script>
-                    // Force background printing in various browsers
+                    // Force background color and other print settings
                     function preparePrint() {
+                        // Set explicit background color on all elements
+                        const allElements = document.querySelectorAll('*');
+                        allElements.forEach(el => {
+                            if (el.tagName === 'TH') {
+                                el.style.backgroundColor = '#f2f2f2';
+                            } else {
+                                el.style.backgroundColor = '#ffffff';
+                            }
+                        });
+                        
+                        // Force print background colors
                         document.body.style.webkitPrintColorAdjust = 'exact';
+                        document.body.style.colorAdjust = 'exact';
                         document.body.style.printColorAdjust = 'exact';
                         
-                        // Fix any potential table layout issues
-                        const tables = document.querySelectorAll('table');
-                        tables.forEach(table => {
-                            table.style.width = '100%';
-                            table.style.tableLayout = 'fixed';
-                        });
+                        // Additional fixes for mobile printing
+                        const tableContainer = document.querySelector('table');
+                        if (tableContainer) {
+                            tableContainer.style.width = '100%';
+                            tableContainer.style.backgroundColor = '#ffffff';
+                            
+                            const rows = tableContainer.querySelectorAll('tr');
+                            rows.forEach(row => {
+                                row.style.backgroundColor = '#ffffff';
+                            });
+                        }
                     }
                     
-                    // Run the preparation function
-                    preparePrint();
-                    
-                    // Auto-trigger print on load for mobile devices
+                    // Run preparation and print
                     window.onload = function() {
+                        preparePrint();
                         setTimeout(function() {
-                            window.focus();
                             window.print();
                         }, 500);
                     };
@@ -225,42 +255,30 @@ const Certificateitmwise = () => {
         
         iframe.contentDocument.close();
         
-        // Add event listener for after print to clean up
-        iframe.contentWindow.addEventListener('afterprint', () => {
-            setTimeout(() => {
-                document.body.removeChild(iframe);
-            }, 500);
-        });
-        
-        // Print with fallback for mobile browser compatibility
+        // Print with timeout to ensure content is loaded
         setTimeout(() => {
             try {
                 iframe.contentWindow.focus();
                 iframe.contentWindow.print();
                 
-                // Remove the iframe after a timeout as fallback
+                // Cleanup iframe after printing
                 setTimeout(() => {
                     if (document.body.contains(iframe)) {
                         document.body.removeChild(iframe);
                     }
-                }, 5000);
+                }, 3000);
             } catch (error) {
                 console.error('Print error:', error);
                 alert('Printing failed. Please try again.');
                 
-                // Alternative print method for some mobile browsers
-                try {
-                    window.frames["printIframe"].focus();
-                    window.frames["printIframe"].print();
-                } catch (e) {
-                    console.error('Alternative print method failed:', e);
-                    if (document.body.contains(iframe)) {
-                        document.body.removeChild(iframe);
-                    }
+                if (document.body.contains(iframe)) {
+                    document.body.removeChild(iframe);
                 }
             }
         }, 1000);
     };
+
+
     const certificateItemData = [
         { 
             slNo: 1, 
