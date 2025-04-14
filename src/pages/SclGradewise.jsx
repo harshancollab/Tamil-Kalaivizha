@@ -212,160 +212,202 @@ const SclGradewise = () => {
 
     // Initialize filtered data at component mount
     
+   
+
+
+
+
+
     const handlePrint = () => {
         const printContent = document.getElementById('school-grade-table-container');
+        const pageTitle = `${selectedFestival} - School  ${selectedGrade}  Grade Wise  Report`;
         
-        // Create a new print window
-        const printWindow = window.open('', '_blank');
+        // Create a hidden iframe for mobile-compatible printing
+        const iframe = document.createElement('iframe');
+        iframe.name = 'printIframe';
+        iframe.id = 'printIframe';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
         
-        if (!printWindow) {
-            alert('Please allow popup windows for printing functionality');
-            return;
-        }
-        
-        // Get the title for the print
-        const title = getPrintTitle();
-        
-        // Write the content to the new window with optimized mobile styling
-        printWindow.document.write(`
+        // Write the content to the iframe with improved mobile compatibility
+        iframe.contentDocument.write(`
             <!DOCTYPE html>
             <html>
             <head>
-                <title>${title}</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+                <title>${pageTitle}</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <style>
-                    /* Core print styles */
+                    /* Reset styles */
+                    * {
+                        box-sizing: border-box;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                        color-adjust: exact !important;
+                    }
+                    
+                    /* Base styles */
+                    html, body {
+                        margin: 0;
+                        padding: 0;
+                        background-color: #ffffff !important;
+                        font-family: Arial, sans-serif;
+                        width: 100%;
+                    }
+                    
+                    /* Header styling */
+                    .print-header {
+                        text-align: center;
+                        padding: 10px;
+                        margin-bottom: 15px;
+                        border-bottom: 2px solid #003566;
+                        background-color: #ffffff !important;
+                    }
+                    
+                    .print-header h1 {
+                        margin: 0;
+                        color: #003566 !important;
+                        font-size: 18px;
+                    }
+                    
+                    .print-header p {
+                        margin: 5px 0 0;
+                        font-size: 14px;
+                        color: #333333 !important;
+                    }
+                    
+                    /* Table styling */
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        background-color: #ffffff !important;
+                        margin-bottom: 20px;
+                    }
+                    
+                    th, td {
+                        border: 1px solid #000000;
+                        padding: 6px;
+                        text-align: center;
+                        font-size: 11px;
+                        color: #000000 !important;
+                    }
+                    
+                    th {
+                        background-color: #f2f2f2 !important;
+                        font-weight: bold;
+                    }
+                    
+                    /* Print-specific rules */
                     @media print {
+                        @page {
+                            size: landscape;
+                            margin: 0.5cm;
+                        }
+                        
                         html, body {
-                            width: 100%;
-                            height: auto;
-                            margin: 0;
-                            padding: 0;
-                            font-family: Arial, sans-serif;
-                        }
-                        
-                        body {
+                            background-color: #ffffff !important;
                             -webkit-print-color-adjust: exact !important;
-                            color-adjust: exact !important;
+                            print-color-adjust: exact !important;
                         }
                         
-                        table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            page-break-inside: auto;
-                        }
-                        
-                        tr {
+                        .print-header, table, th, td {
                             page-break-inside: avoid;
-                            page-break-after: auto;
-                        }
-                        
-                        th, td {
-                            border: 1px solid #000;
-                            padding: 4px;
-                            text-align: center;
-                            font-size: 10px;
                         }
                         
                         th {
                             background-color: #f2f2f2 !important;
                         }
-                        
-                        h2 {
-                            text-align: center;
-                            margin: 10px 0;
-                            font-size: 14px;
-                        }
-                        
-                        @page {
-                            size: landscape;
-                            margin: 10mm 5mm;
-                        }
-                    }
-                    
-                    /* Non-print preview styles */
-                    html, body {
-                        margin: 0;
-                        padding: 5px;
-                        font-family: Arial, sans-serif;
-                        background-color: white;
-                    }
-                    
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-bottom: 10px;
-                    }
-                    
-                    th, td {
-                        border: 1px solid #000;
-                        padding: 4px;
-                        text-align: center;
-                        font-size: 10px;
-                    }
-                    
-                    th {
-                        background-color: #f2f2f2;
-                    }
-                    
-                    h2 {
-                        text-align: center;
-                        margin: 10px 0;
-                        font-size: 14px;
-                    }
-                    
-                    .print-button {
-                        display: block;
-                        width: 100%;
-                        max-width: 300px;
-                        margin: 15px auto;
-                        padding: 10px;
-                        background-color: #007bff;
-                        color: white;
-                        border: none;
-                        border-radius: 5px;
-                        font-size: 16px;
-                        cursor: pointer;
-                        text-align: center;
-                    }
-                    
-                    /* Mobile-specific styles */
-                    @media screen and (max-width: 768px) {
-                        body {
-                            padding: 3px;
-                        }
-                        
-                        table {
-                            font-size: 9px;
-                        }
-                        
-                        th, td {
-                            padding: 2px;
-                            font-size: 9px;
-                        }
                     }
                 </style>
             </head>
             <body>
-                <h2>${title}</h2>
-                ${printContent.innerHTML}
-             
+                <!-- Custom header -->
+                <div class="print-header">
+                    <h1>School  ${selectedGrade}   Wise  Report</h1>
+                    <p>${selectedFestival}</p>
+                    <p>Date: ${new Date().toLocaleDateString()}</p>
+                </div>
+                
+                <!-- Table content -->
+                <div style="overflow-x: auto; background-color: #ffffff !important;">
+                    ${printContent.innerHTML}
+                </div>
+                
                 <script>
-                    // Auto-print for desktop browsers
-                    if (!(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))) {
-                        window.onload = function() {
-                            window.print();
-                            setTimeout(function(){ window.close(); }, 500);
-                        };
+                    // Force background color and other print settings
+                    function preparePrint() {
+                        // Set explicit background color on all elements
+                        const allElements = document.querySelectorAll('*');
+                        allElements.forEach(el => {
+                            if (el.tagName === 'TH') {
+                                el.style.backgroundColor = '#f2f2f2';
+                            } else {
+                                el.style.backgroundColor = '#ffffff';
+                            }
+                        });
+                        
+                        // Force print background colors
+                        document.body.style.webkitPrintColorAdjust = 'exact';
+                        document.body.style.colorAdjust = 'exact';
+                        document.body.style.printColorAdjust = 'exact';
+                        
+                        // Additional fixes for mobile printing
+                        const tableContainer = document.querySelector('table');
+                        if (tableContainer) {
+                            tableContainer.style.width = '100%';
+                            tableContainer.style.backgroundColor = '#ffffff';
+                            
+                            const rows = tableContainer.querySelectorAll('tr');
+                            rows.forEach(row => {
+                                row.style.backgroundColor = '#ffffff';
+                            });
+                        }
                     }
+                    
+                    // Run preparation and print
+                    window.onload = function() {
+                        preparePrint();
+                        setTimeout(function() {
+                            window.print();
+                        }, 500);
+                    };
                 </script>
             </body>
             </html>
         `);
         
-        printWindow.document.close();
-        printWindow.focus();
+        iframe.contentDocument.close();
+        
+        // Print with timeout to ensure content is loaded
+        setTimeout(() => {
+            try {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+                
+                // Cleanup iframe after printing
+                setTimeout(() => {
+                    if (document.body.contains(iframe)) {
+                        document.body.removeChild(iframe);
+                    }
+                }, 3000);
+            } catch (error) {
+                console.error('Print error:', error);
+                alert('Printing failed. Please try again.');
+                
+                if (document.body.contains(iframe)) {
+                    document.body.removeChild(iframe);
+                }
+            }
+        }, 1000);
     };
+
+
+
+
+
+
+
+
+
     
     useEffect(() => {
         if (allResultData.length === 0 && dummyResultData.length > 0) {

@@ -339,16 +339,19 @@ const SclWisePoint = () => {
         const tableData = printRef.current.innerHTML;
         const title = getPrintTitle();
         
-        // Create a new window for printing
-        const printWindow = window.open('', '_blank');
+        // Create a hidden iframe for printing (works better on mobile)
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.top = '-9999px';
+        iframe.style.left = '-9999px';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        document.body.appendChild(iframe);
         
-        if (!printWindow) {
-          alert("Please allow pop-ups for printing functionality");
-          return;
-        }
-        
-        // Write content to the new window
-        printWindow.document.write(`
+        // Write content to the iframe
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write(`
           <!DOCTYPE html>
           <html>
           <head>
@@ -425,23 +428,28 @@ const SclWisePoint = () => {
           <body>
             <div class="print-header">${title}</div>
             ${tableData}
-            <script>
-              // Auto print once loaded
-              window.onload = function() {
-                setTimeout(function() {
-                  window.print();
-                  // Optional: Close window after print dialog closes (won't work on all browsers)
-                  setTimeout(function() {
-                    window.close();
-                  }, 500);
-                }, 500);
-              };
-            </script>
           </body>
           </html>
         `);
+        iframeDoc.close();
         
-        printWindow.document.close();
+        // Try to use the iframe's print function directly
+        try {
+          // Wait a bit for content to fully render
+          setTimeout(() => {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+            
+            // Remove the iframe after printing
+            setTimeout(() => {
+              document.body.removeChild(iframe);
+            }, 1000);
+          }, 500);
+        } catch (err) {
+          console.error('Print failed:', err);
+          alert('Printing failed. Please try again.');
+          document.body.removeChild(iframe);
+        }
       };
 
     // Initialize filtered data at component mount

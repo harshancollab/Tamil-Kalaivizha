@@ -134,44 +134,231 @@ const ItemWisePoint = () => {
     }
   };
 
-  const handlePrint = () => {
-    const printContent = document.getElementById('item-wise-point-table');
+  // const handlePrint = () => {
+  //   const printContent = document.getElementById('item-wise-point-table');
     
-    const printWindow = window.open('', '_blank');
-    printWindow.document.open();
+  //   const printWindow = window.open('', '_blank');
+  //   printWindow.document.open();
     
-    printWindow.document.write(`
-      <html>
-      <head>
-        <title>${getPrintTitle()}</title>
-        <style>
-          body { font-family: Arial, sans-serif; }
-          table { width: 100%; border-collapse: collapse; }
-          th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-          th { background-color: #f2f2f2; }
-          h2 { text-align: center; margin-bottom: 20px; }
-          @media print {
-            @page { size: landscape; }
-          }
-        </style>
-      </head>
-      <body>
-        <h2>${getPrintTitle()}</h2>
-        ${printContent.innerHTML}
-      </body>
-      </html>
-    `);
+  //   printWindow.document.write(`
+  //     <html>
+  //     <head>
+  //       <title>${getPrintTitle()}</title>
+  //       <style>
+  //         body { font-family: Arial, sans-serif; }
+  //         table { width: 100%; border-collapse: collapse; }
+  //         th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+  //         th { background-color: #f2f2f2; }
+  //         h2 { text-align: center; margin-bottom: 20px; }
+  //         @media print {
+  //           @page { size: landscape; }
+  //         }
+  //       </style>
+  //     </head>
+  //     <body>
+  //       <h2>${getPrintTitle()}</h2>
+  //       ${printContent.innerHTML}
+  //     </body>
+  //     </html>
+  //   `);
     
-    printWindow.document.close();
+  //   printWindow.document.close();
     
-    // Remove date/time from the print dialog
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.close();
-    }, 250);
-  };
+  //   // Remove date/time from the print dialog
+  //   setTimeout(() => {
+  //     printWindow.print();
+  //     printWindow.close();
+  //   }, 250);
+  // };
   
   // Initialize filtered data at component mount
+  
+  
+  
+  const handlePrint = () => {
+    const printContent = document.getElementById('item-wise-point-table');
+    const pageTitle = `${getPrintTitle()}`;
+    
+    // Create a hidden iframe for mobile-compatible printing
+    const iframe = document.createElement('iframe');
+    iframe.name = 'printIframe';
+    iframe.id = 'printIframe';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+    
+    // Write the content to the iframe with improved mobile compatibility
+    iframe.contentDocument.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>${pageTitle}</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                /* Reset styles */
+                * {
+                    box-sizing: border-box;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                    color-adjust: exact !important;
+                }
+                
+                /* Base styles */
+                html, body {
+                    margin: 0;
+                    padding: 0;
+                    background-color: #ffffff !important;
+                    font-family: Arial, sans-serif;
+                    width: 100%;
+                }
+                
+                /* Header styling */
+                .print-header {
+                    text-align: center;
+                    padding: 10px;
+                    margin-bottom: 15px;
+                    border-bottom: 2px solid #003566;
+                    background-color: #ffffff !important;
+                }
+                
+                .print-header h1 {
+                    margin: 0;
+                    color: #003566 !important;
+                    font-size: 18px;
+                }
+                
+                .print-header p {
+                    margin: 5px 0 0;
+                    font-size: 14px;
+                    color: #333333 !important;
+                }
+                
+                /* Table styling */
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    background-color: #ffffff !important;
+                    margin-bottom: 20px;
+                }
+                
+                th, td {
+                    border: 1px solid #000000;
+                    padding: 6px;
+                    text-align: center;
+                    font-size: 11px;
+                    color: #000000 !important;
+                }
+                
+                th {
+                    background-color: #f2f2f2 !important;
+                    font-weight: bold;
+                }
+                
+                /* Print-specific rules */
+                @media print {
+                    @page {
+                        size: landscape;
+                        margin: 0.5cm;
+                    }
+                    
+                    html, body {
+                        background-color: #ffffff !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    
+                    .print-header, table, th, td {
+                        page-break-inside: avoid;
+                    }
+                    
+                    th {
+                        background-color: #f2f2f2 !important;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <!-- Custom header -->
+            <div class="print-header">
+                <h1>${getPrintTitle()}</h1>
+               
+                
+            </div>
+            
+            <!-- Table content -->
+            <div style="overflow-x: auto; background-color: #ffffff !important;">
+                ${printContent.innerHTML}
+            </div>
+            
+            <script>
+                // Force background color and other print settings
+                function preparePrint() {
+                    // Set explicit background color on all elements
+                    const allElements = document.querySelectorAll('*');
+                    allElements.forEach(el => {
+                        if (el.tagName === 'TH') {
+                            el.style.backgroundColor = '#f2f2f2';
+                        } else {
+                            el.style.backgroundColor = '#ffffff';
+                        }
+                    });
+                    
+                    // Force print background colors
+                    document.body.style.webkitPrintColorAdjust = 'exact';
+                    document.body.style.colorAdjust = 'exact';
+                    document.body.style.printColorAdjust = 'exact';
+                    
+                    // Additional fixes for mobile printing
+                    const tableContainer = document.querySelector('table');
+                    if (tableContainer) {
+                        tableContainer.style.width = '100%';
+                        tableContainer.style.backgroundColor = '#ffffff';
+                        
+                        const rows = tableContainer.querySelectorAll('tr');
+                        rows.forEach(row => {
+                            row.style.backgroundColor = '#ffffff';
+                        });
+                    }
+                }
+                
+                // Run preparation and print
+                window.onload = function() {
+                    preparePrint();
+                    setTimeout(function() {
+                        window.print();
+                    }, 500);
+                };
+            </script>
+        </body>
+        </html>
+    `);
+    
+    iframe.contentDocument.close();
+    
+    // Print with timeout to ensure content is loaded
+    setTimeout(() => {
+        try {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+            
+            // Cleanup iframe after printing
+            setTimeout(() => {
+                if (document.body.contains(iframe)) {
+                    document.body.removeChild(iframe);
+                }
+            }, 3000);
+        } catch (error) {
+            console.error('Print error:', error);
+            alert('Printing failed. Please try again.');
+            
+            if (document.body.contains(iframe)) {
+                document.body.removeChild(iframe);
+            }
+        }
+    }, 1000);
+};
+  
+  
+  
   useEffect(() => {
     if (Allitemwiswpoint.length === 0 && resultData.length > 0) {
       setItemwiswpoint(resultData);

@@ -153,86 +153,203 @@ const ItemResultList = () => {
         applyFestivalFilter(festival);
     };
 
-  
-
     const handlePrint = () => {
-        const printContents = printRef.current.innerHTML;
+        // Get the table content using ref
+        const printContent = printRef.current;
+        if (!printContent) {
+            console.error("Print content not found");
+            return;
+        }
         
-        // Create an iframe element (hidden)
+        const pageTitle = getPrintTitle();
+        
+        // Create a hidden iframe for mobile-compatible printing
         const iframe = document.createElement('iframe');
-        iframe.style.position = 'absolute';
-        iframe.style.top = '-9999px';
-        iframe.style.left = '-9999px';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
+        iframe.name = 'printIframe';
+        iframe.id = 'printIframe';
+        iframe.style.display = 'none';
         document.body.appendChild(iframe);
         
-        // Write the print content to the iframe
-        const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-        iframeDocument.open();
-        iframeDocument.write(`
-          <html>
-          <head>
-            <title>${getPrintTitle()}</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style type="text/css">
-              @media print {
-                @page {
-                  size: landscape;
-                  margin: 0.5cm;
-                }
-              }
-              body {
-                padding: 20px;
-                font-family: Arial, sans-serif;
-              }
-              table {
-                width: 100%;
-                border-collapse: collapse;
-              }
-              table th, table td {
-                border: 1px solid #ddd;
-                padding: 8px;
-                text-align: center;
-              }
-              table th {
-                background-color: #f2f2f2;
-                font-weight: bold;
-              }
-              .print-title {
-                text-align: center;
-                margin-bottom: 20px;
-                font-size: 18px;
-                font-weight: bold;
-              }
-              .no-print {
-                display: none !important;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="print-title">${getPrintTitle()}</div>
-            ${printContents}
-          </body>
-          </html>
+        // Write the content to the iframe with improved mobile compatibility
+        iframe.contentDocument.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>${pageTitle}</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    /* Reset styles */
+                    * {
+                        box-sizing: border-box;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                        color-adjust: exact !important;
+                    }
+                    
+                    /* Base styles */
+                    html, body {
+                        margin: 0;
+                        padding: 0;
+                        background-color: #ffffff !important;
+                        font-family: Arial, sans-serif;
+                        width: 100%;
+                    }
+                    
+                    /* Header styling */
+                    .print-header {
+                        text-align: center;
+                        padding: 10px;
+                        margin-bottom: 15px;
+                        border-bottom: 2px solid #003566;
+                        background-color: #ffffff !important;
+                    }
+                    
+                    .print-header h1 {
+                        margin: 0;
+                        color: #003566 !important;
+                        font-size: 18px;
+                    }
+                    
+                    .print-header p {
+                        margin: 5px 0 0;
+                        font-size: 14px;
+                        color: #333333 !important;
+                    }
+                    
+                    /* Table styling */
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        background-color: #ffffff !important;
+                        margin-bottom: 20px;
+                    }
+                    
+                    th, td {
+                        border: 1px solid #000000;
+                        padding: 6px;
+                        text-align: center;
+                        font-size: 11px;
+                        color: #000000 !important;
+                    }
+                    
+                    th {
+                        background-color: #f2f2f2 !important;
+                        font-weight: bold;
+                    }
+                    
+                    /* Hide reset column when printing */
+                    .no-print {
+                        display: none;
+                    }
+                    
+                    /* Print-specific rules */
+                    @media print {
+                        @page {
+                            size: landscape;
+                            margin: 0.5cm;
+                        }
+                        
+                        html, body {
+                            background-color: #ffffff !important;
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                        }
+                        
+                        .print-header, table, th, td {
+                            page-break-inside: avoid;
+                        }
+                        
+                        th {
+                            background-color: #f2f2f2 !important;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <!-- Custom header -->
+                <div class="print-header">
+                    <h1>${pageTitle}</h1>
+                    <p>Date: ${new Date().toLocaleDateString()}</p>
+                </div>
+                
+                <!-- Table content -->
+                <div style="overflow-x: auto; background-color: #ffffff !important;">
+                    ${printContent.innerHTML}
+                </div>
+                
+                <script>
+                    // Force background color and other print settings
+                    function preparePrint() {
+                        // Set explicit background color on all elements
+                        const allElements = document.querySelectorAll('*');
+                        allElements.forEach(el => {
+                            if (el.tagName === 'TH') {
+                                el.style.backgroundColor = '#f2f2f2';
+                            } else {
+                                el.style.backgroundColor = '#ffffff';
+                            }
+                        });
+                        
+                        // Force print background colors
+                        document.body.style.webkitPrintColorAdjust = 'exact';
+                        document.body.style.colorAdjust = 'exact';
+                        document.body.style.printColorAdjust = 'exact';
+                        
+                        // Additional fixes for mobile printing
+                        const tableContainer = document.querySelector('table');
+                        if (tableContainer) {
+                            tableContainer.style.width = '100%';
+                            tableContainer.style.backgroundColor = '#ffffff';
+                            
+                            const rows = tableContainer.querySelectorAll('tr');
+                            rows.forEach(row => {
+                                row.style.backgroundColor = '#ffffff';
+                            });
+                        }
+                        
+                        // Hide the reset button column
+                        const resetCells = document.querySelectorAll('.no-print');
+                        resetCells.forEach(cell => {
+                            cell.style.display = 'none';
+                        });
+                    }
+                    
+                    // Run preparation and print
+                    window.onload = function() {
+                        preparePrint();
+                        setTimeout(function() {
+                            window.print();
+                        }, 500);
+                    };
+                </script>
+            </body>
+            </html>
         `);
-        iframeDocument.close();
         
-        // Wait for content to load
+        iframe.contentDocument.close();
+        
+        // Print with timeout to ensure content is loaded
         setTimeout(() => {
-          // Focus on the iframe
-          iframe.contentWindow.focus();
-          
-          // Trigger print
-          iframe.contentWindow.print();
-          
-          // Remove the iframe after printing (or after a delay)
-          setTimeout(() => {
-            document.body.removeChild(iframe);
-          }, 1000);
-        }, 250);
-      };
-
+            try {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+                
+                // Cleanup iframe after printing
+                setTimeout(() => {
+                    if (document.body.contains(iframe)) {
+                        document.body.removeChild(iframe);
+                    }
+                }, 3000);
+            } catch (error) {
+                console.error('Print error:', error);
+                alert('Printing failed. Please try again.');
+                
+                if (document.body.contains(iframe)) {
+                    document.body.removeChild(iframe);
+                }
+            }
+        }, 1000);
+    };
 
     const handleReset = (itemCode) => {
         // Implement reset functionality here
@@ -274,7 +391,7 @@ const ItemResultList = () => {
                                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-4 sm:px-6 md:px-8 py-2 rounded-full text-sm md:text-base transition duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300"
                                 aria-label="Print Item Result List"
                             >
-                                Print
+                                 Print
                             </button>
                         </div>
                     </div>
@@ -292,7 +409,7 @@ const ItemResultList = () => {
                         </div>
                     ) : (
                         <div ref={printRef} className="overflow-x-auto rounded-lg bg-white">
-                            <table className="min-w-full text-center">
+                            <table id="printTable" className="min-w-full text-center">
                                 <thead>
                                     <tr className="bg-gray-50">
                                         <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700 bg-gray-50 z-10">Sl No</th>
