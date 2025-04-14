@@ -361,47 +361,66 @@ const CertificateSclwise = () => {
                         font-family: Arial, sans-serif; 
                         margin: 0; 
                         padding: 10px; 
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
-                        color-adjust: exact !important;
+                        background-color: white !important;
                     }
                     table { 
                         width: 100%; 
-                        border-collapse: collapse; 
+                        border-collapse: collapse;
+                        background-color: white !important;
                     }
                     th, td { 
                         border: 1px solid #ddd; 
                         padding: 8px; 
-                        text-align: center; 
+                        text-align: center;
+                        background-color: white !important;
                     }
                     th { 
-                        background-color: #f2f2f2; 
+                        background-color: #f2f2f2 !important; 
                     }
                     h2 { 
                         text-align: center; 
-                        margin-bottom: 20px; 
+                        margin-bottom: 20px;
+                        background-color: white !important;
                     }
                     
-                    /* Force background colors to print */
-                    * {
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
-                        color-adjust: exact !important;
+                    /* Force the background color on all elements */
+                    #certificate-table-container,
+                    #certificate-table-container * {
+                        background-color: white !important;
+                        color: black !important;
+                    }
+                    
+                    /* Override any session background */
+                    .session-bg, 
+                    .MuiTableContainer-root,
+                    .MuiPaper-root {
+                        background-color: white !important;
                     }
                     
                     @media print {
                         @page { 
                             size: landscape; 
                             margin: 10mm;
+                            background-color: white;
                         }
-                        body { 
+                        html, body { 
                             width: 100%; 
+                            background-color: white !important;
                         }
                         table { 
                             page-break-inside: avoid; 
+                            background-color: white !important;
                         }
-                        tr {
+                        tr, td, th {
                             page-break-inside: avoid;
+                            background-color: white !important;
+                        }
+                        /* Force backgrounds to print */
+                        * {
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                            color-adjust: exact !important;
+                            background-color: white !important;
                         }
                     }
                     
@@ -417,7 +436,9 @@ const CertificateSclwise = () => {
             </head>
             <body>
                 <h2>${selectedFestival} - Certificate School Wise Report</h2>
-                ${printContent.innerHTML}
+                <div id="print-container" style="background-color: white !important;">
+                    ${printContent.innerHTML}
+                </div>
             </body>
             </html>
         `);
@@ -439,7 +460,7 @@ const CertificateSclwise = () => {
                 alert('Printing failed. Please try again.');
                 document.body.removeChild(iframe);
             }
-        }, 600);
+        }, 1000); // Increased delay to ensure proper rendering on mobile
     };
     
     const certificateItemData = [

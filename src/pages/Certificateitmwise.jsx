@@ -114,9 +114,7 @@ const Certificateitmwise = () => {
                         font-family: Arial, sans-serif; 
                         margin: 0; 
                         padding: 10px; 
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
-                        color-adjust: exact !important;
+                        background-color: white;
                     }
                     table { 
                         width: 100%; 
@@ -128,33 +126,47 @@ const Certificateitmwise = () => {
                         text-align: center; 
                     }
                     th { 
-                        background-color: #f2f2f2; 
+                        background-color: #f2f2f2 !important; 
                     }
                     h2 { 
                         text-align: center; 
                         margin-bottom: 20px; 
                     }
                     
-                    * { 
-                        background-color: white !important; 
+                    /* Force the background color on all elements */
+                    .certificate-container * { 
+                        background-color: inherit !important;
                         color: black !important;
-                        print-color-adjust: exact;
-                        -webkit-print-color-adjust: exact;
+                    }
+                    
+                    /* Override any session background */
+                    .session-bg {
+                        background-color: white !important;
                     }
                     
                     @media print {
                         @page { 
                             size: landscape; 
                             margin: 10mm;
+                            background-color: white;
                         }
                         body { 
                             width: 100%; 
+                            background-color: white !important;
                         }
                         table { 
                             page-break-inside: avoid; 
+                            background-color: white !important;
                         }
                         tr {
                             page-break-inside: avoid;
+                            background-color: white !important;
+                        }
+                        /* Force backgrounds to print */
+                        * {
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                            color-adjust: exact !important;
                         }
                     }
                     
@@ -169,8 +181,10 @@ const Certificateitmwise = () => {
                 </style>
             </head>
             <body>
-                <h2>${selectedFestival} - Certificate Item Wise Report</h2>
-                ${printContent.innerHTML}
+                <div class="certificate-container">
+                    <h2>${selectedFestival} - Certificate Item Wise Report</h2>
+                    ${printContent.innerHTML}
+                </div>
             </body>
             </html>
         `);
@@ -192,8 +206,9 @@ const Certificateitmwise = () => {
                 alert('Printing failed. Please try again.');
                 document.body.removeChild(iframe);
             }
-        }, 600); // Slightly longer delay to ensure proper rendering
+        }, 1000); // Increased delay to ensure proper rendering on mobile
     };
+
     const certificateItemData = [
         { 
             slNo: 1, 
