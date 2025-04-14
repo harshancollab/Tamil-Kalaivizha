@@ -216,196 +216,159 @@ const SclGradewise = () => {
 
 
 
-
-
     const handlePrint = () => {
         const printContent = document.getElementById('school-grade-table-container');
-        const pageTitle = `${selectedFestival} - School  ${selectedGrade}  Grade Wise  Report`;
+        const pageTitle = `${selectedFestival} - School ${selectedGrade} Grade Wise Report`;
         
-        // Create a hidden iframe for mobile-compatible printing
-        const iframe = document.createElement('iframe');
-        iframe.name = 'printIframe';
-        iframe.id = 'printIframe';
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
+        // Create a new window for printing that works reliably across devices
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            alert("Please allow popups for this website to enable printing.");
+            return;
+        }
         
-        // Write the content to the iframe with improved mobile compatibility
-        iframe.contentDocument.write(`
+        // Write mobile-friendly content to the print window
+        printWindow.document.write(`
             <!DOCTYPE html>
             <html>
             <head>
                 <title>${pageTitle}</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <style>
-                    /* Reset styles */
+                    /* Reset and base styles */
                     * {
                         box-sizing: border-box;
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
-                        color-adjust: exact !important;
-                    }
-                    
-                    /* Base styles */
-                    html, body {
                         margin: 0;
                         padding: 0;
-                        background-color: #ffffff !important;
+                    }
+                    
+                    body {
                         font-family: Arial, sans-serif;
+                        background-color: #ffffff;
+                        padding: 10px;
                         width: 100%;
                     }
                     
-                    /* Header styling */
+                    /* Print header */
                     .print-header {
                         text-align: center;
-                        padding: 10px;
+                        padding: 10px 0;
                         margin-bottom: 15px;
                         border-bottom: 2px solid #003566;
-                        background-color: #ffffff !important;
                     }
                     
                     .print-header h1 {
-                        margin: 0;
-                        color: #003566 !important;
-                        font-size: 18px;
+                        font-size: 16px;
+                        color: #003566;
+                        margin-bottom: 5px;
                     }
                     
                     .print-header p {
-                        margin: 5px 0 0;
                         font-size: 14px;
-                        color: #333333 !important;
+                        color: #333;
                     }
                     
-                    /* Table styling */
+                    /* Table styles optimized for mobile */
                     table {
                         width: 100%;
                         border-collapse: collapse;
-                        background-color: #ffffff !important;
                         margin-bottom: 20px;
+                        font-size: 12px;
                     }
                     
                     th, td {
-                        border: 1px solid #000000;
-                        padding: 6px;
+                        border: 1px solid #000;
+                        padding: 5px 3px;
                         text-align: center;
-                        font-size: 11px;
-                        color: #000000 !important;
                     }
                     
                     th {
-                        background-color: #f2f2f2 !important;
+                        background-color: #f2f2f2;
                         font-weight: bold;
                     }
                     
-                    /* Print-specific rules */
+                    /* Print-specific styles */
                     @media print {
                         @page {
                             size: landscape;
                             margin: 0.5cm;
                         }
                         
-                        html, body {
-                            background-color: #ffffff !important;
+                        body {
                             -webkit-print-color-adjust: exact !important;
                             print-color-adjust: exact !important;
-                        }
-                        
-                        .print-header, table, th, td {
-                            page-break-inside: avoid;
                         }
                         
                         th {
                             background-color: #f2f2f2 !important;
                         }
+                        
+                        .print-header, table {
+                            page-break-inside: avoid;
+                        }
+                        
+                        /* Ensure text is readable on small screens */
+                        table {
+                            font-size: 10px;
+                        }
+                    }
+                    
+                    /* Small screen optimizations */
+                    @media screen and (max-width: 600px) {
+                        table {
+                            font-size: 10px;
+                        }
+                        
+                        th, td {
+                            padding: 3px 2px;
+                        }
                     }
                 </style>
             </head>
             <body>
-                <!-- Custom header -->
                 <div class="print-header">
-                    <h1>School  ${selectedGrade}   Wise  Report</h1>
+                    <h1>School ${selectedGrade} Wise Report</h1>
                     <p>${selectedFestival}</p>
                     <p>Date: ${new Date().toLocaleDateString()}</p>
                 </div>
                 
-                <!-- Table content -->
-                <div style="overflow-x: auto; background-color: #ffffff !important;">
+                <div class="table-container">
                     ${printContent.innerHTML}
                 </div>
                 
                 <script>
-                    // Force background color and other print settings
+                    // Function to prepare and trigger print
                     function preparePrint() {
-                        // Set explicit background color on all elements
-                        const allElements = document.querySelectorAll('*');
-                        allElements.forEach(el => {
-                            if (el.tagName === 'TH') {
-                                el.style.backgroundColor = '#f2f2f2';
-                            } else {
-                                el.style.backgroundColor = '#ffffff';
-                            }
+                        // Ensure table headers have background
+                        const headers = document.querySelectorAll('th');
+                        headers.forEach(header => {
+                            header.style.backgroundColor = '#f2f2f2';
                         });
                         
-                        // Force print background colors
-                        document.body.style.webkitPrintColorAdjust = 'exact';
-                        document.body.style.colorAdjust = 'exact';
-                        document.body.style.printColorAdjust = 'exact';
-                        
-                        // Additional fixes for mobile printing
-                        const tableContainer = document.querySelector('table');
-                        if (tableContainer) {
-                            tableContainer.style.width = '100%';
-                            tableContainer.style.backgroundColor = '#ffffff';
-                            
-                            const rows = tableContainer.querySelectorAll('tr');
-                            rows.forEach(row => {
-                                row.style.backgroundColor = '#ffffff';
-                            });
-                        }
+                        // Auto-print after content is fully loaded
+                        window.onload = function() {
+                            setTimeout(function() {
+                                window.print();
+                                // Don't close the window automatically on mobile
+                                // as this can cause issues on some devices
+                            }, 500);
+                        };
                     }
                     
-                    // Run preparation and print
-                    window.onload = function() {
-                        preparePrint();
-                        setTimeout(function() {
-                            window.print();
-                        }, 500);
-                    };
+                    // Run preparation
+                    preparePrint();
                 </script>
             </body>
             </html>
         `);
         
-        iframe.contentDocument.close();
-        
-        // Print with timeout to ensure content is loaded
+        printWindow.document.close();
+    
+        // Optional: Add a message to guide users on mobile
         setTimeout(() => {
-            try {
-                iframe.contentWindow.focus();
-                iframe.contentWindow.print();
-                
-                // Cleanup iframe after printing
-                setTimeout(() => {
-                    if (document.body.contains(iframe)) {
-                        document.body.removeChild(iframe);
-                    }
-                }, 3000);
-            } catch (error) {
-                console.error('Print error:', error);
-                alert('Printing failed. Please try again.');
-                
-                if (document.body.contains(iframe)) {
-                    document.body.removeChild(iframe);
-                }
-            }
-        }, 1000);
+            alert("If the print dialog doesn't appear automatically, please use your browser's menu to print the page.");
+        }, 2000);
     };
-
-
-
-
-
-
-
 
 
     
