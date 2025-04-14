@@ -246,13 +246,12 @@ const SclGradewise = () => {
                         color: black !important;
                     }
                     th { 
-                        background-color: #f2f2f2 !important; 
-                        color: black !important;
+                        background-color: #f2f2f2; 
                     }
                     h2 { 
                         text-align: center; 
                         margin-bottom: 20px; 
-                        color: black !important;
+                      
                     }
                     * { 
                         background-color: white !important; 

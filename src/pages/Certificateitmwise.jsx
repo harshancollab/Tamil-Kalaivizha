@@ -95,46 +95,6 @@ const Certificateitmwise = () => {
         navigate(`/CertificateParticipate?itemCode=${itemCode}&itemName=${itemName}&festival=${selectedFestival}`);
     };
 
-    // const handlePrint = () => {
-    //     const printContent = document.getElementById('certificate-table-container');
-    //     const originalContents = document.body.innerHTML;
-        
-       
-    //     const printWindow = window.open('', '_blank');
-    //     printWindow.document.open();
-        
-    
-    //     printWindow.document.write(`
-    //         <html>
-    //         <head>
-    //             <title>${selectedFestival} - Certificate Item Wise Report</title>
-    //             <style>
-    //                 body { font-family: Arial, sans-serif; }
-    //                 table { width: 100%; border-collapse: collapse; }
-    //                 th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-    //                 th { background-color: #f2f2f2; }
-    //                 h2 { text-align: center; margin-bottom: 20px; }
-    //                 @media print {
-    //                     @page { size: landscape; }
-    //                 }
-    //             </style>
-    //         </head>
-    //         <body>
-    //             <h2>${selectedFestival} - Certificate Item Wise Report</h2>
-    //             ${printContent.innerHTML}
-    //         </body>
-    //         </html>
-    //     `);
-        
-    //     printWindow.document.close();
-        
-    //     // Remove date/time from the print dialog
-    //     setTimeout(() => {
-    //         printWindow.print();
-    //         printWindow.close();
-    //     }, 250);
-    // };
-
     const handlePrint = () => {
         const printContent = document.getElementById('certificate-table-container');
         
@@ -148,20 +108,63 @@ const Certificateitmwise = () => {
             <html>
             <head>
                 <title>${selectedFestival} - Certificate Item Wise Report</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <style>
-                    body { font-family: Arial, sans-serif; margin: 0; padding: 10px; }
-                    table { width: 100%; border-collapse: collapse; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-                    th { background-color: #f2f2f2; }
-                    h2 { text-align: center; margin-bottom: 20px; }
-                    @media print {
-                        @page { size: landscape; }
-                        body { width: 100%; }
-                        table { page-break-inside: avoid; }
+                    body { 
+                        font-family: Arial, sans-serif; 
+                        margin: 0; 
+                        padding: 10px; 
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                        color-adjust: exact !important;
                     }
+                    table { 
+                        width: 100%; 
+                        border-collapse: collapse; 
+                    }
+                    th, td { 
+                        border: 1px solid #ddd; 
+                        padding: 8px; 
+                        text-align: center; 
+                    }
+                    th { 
+                        background-color: #f2f2f2; 
+                    }
+                    h2 { 
+                        text-align: center; 
+                        margin-bottom: 20px; 
+                    }
+                    
+                    * { 
+                        background-color: white !important; 
+                        color: black !important;
+                        print-color-adjust: exact;
+                        -webkit-print-color-adjust: exact;
+                    }
+                    
+                    @media print {
+                        @page { 
+                            size: landscape; 
+                            margin: 10mm;
+                        }
+                        body { 
+                            width: 100%; 
+                        }
+                        table { 
+                            page-break-inside: avoid; 
+                        }
+                        tr {
+                            page-break-inside: avoid;
+                        }
+                    }
+                    
                     @media only screen and (max-width: 600px) {
-                        table { font-size: 10px; }
-                        th, td { padding: 4px; }
+                        table { 
+                            font-size: 10px; 
+                        }
+                        th, td { 
+                            padding: 4px; 
+                        }
                     }
                 </style>
             </head>
@@ -176,13 +179,20 @@ const Certificateitmwise = () => {
         
         // Print the iframe after a short delay to ensure content is loaded
         setTimeout(() => {
-            iframe.contentWindow.print();
-            
-            // Remove the iframe after printing
-            setTimeout(() => {
+            try {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+                
+                // Remove the iframe after printing
+                setTimeout(() => {
+                    document.body.removeChild(iframe);
+                }, 1000);
+            } catch (error) {
+                console.error('Print error:', error);
+                alert('Printing failed. Please try again.');
                 document.body.removeChild(iframe);
-            }, 500);
-        }, 500);
+            }
+        }, 600); // Slightly longer delay to ensure proper rendering
     };
     const certificateItemData = [
         { 
