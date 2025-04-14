@@ -1,249 +1,3 @@
-// import React, { useEffect, useState } from 'react'
-// import Header from '../components/Header'
-// import Dash from '../components/Dash'
-// import { useSearchParams } from 'react-router-dom';
-// import { getAllCertificateSclwiseAPI } from '../services/allAPI';
-
-
-// const CertificateSclwise = () => {
-//     const [Allitemresult, setItemresult] = useState([]);
-//     const [searchParams, setSearchParams] = useSearchParams();
-//     const selectedFestival = searchParams.get('festival') || "UP Kalaivizha";
-
-//     useEffect(() => {
-//         getAllItemResult();
-//     }, [selectedFestival]);
-
-//     const getAllItemResult = async () => {
-//         const token = sessionStorage.getItem("token");
-//         if (token) {
-//             const reqHeader = {
-//                 "Authorization": `Bearer ${token}`
-//             }
-//             try {
-//                 const result = await getAllCertificateSclwiseAPI(reqHeader)
-//                 if (result.status === 200) {
-//                     setItemresult(result.data)
-//                 }
-//             } catch (err) {
-//                 console.log(err);
-
-//                 setItemresult(certificateItemData);
-//             }
-//         } else {
-
-//             setItemresult(certificateItemData);
-//         }
-//     }
-
-//     const handleFestivalChange = (e) => {
-//         setSearchParams({ festival: e.target.value });
-//     };
-
-//     const handlePrint = () => {
-//         const printContent = document.getElementById('certificate-table-container');
-//         const originalContents = document.body.innerHTML;
-
-//         // Create a new window for printing
-//         const printWindow = window.open('', '_blank');
-//         printWindow.document.open();
-
-//         // Set up the print document with only what we need
-//         printWindow.document.write(`
-//             <html>
-//             <head>
-//                 <title>${selectedFestival} - Certificate Item Wise Report</title>
-//                 <style>
-//                     body { font-family: Arial, sans-serif; }
-//                     table { width: 100%; border-collapse: collapse; }
-//                     th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-//                     th { background-color: #f2f2f2; }
-//                     h2 { text-align: center; margin-bottom: 20px; }
-//                     @media print {
-//                         @page { size: landscape; }
-//                     }
-//                 </style>
-//             </head>
-//             <body>
-//                 <h2>${selectedFestival} - Certificate School Wise Report</h2>
-//                 ${printContent.innerHTML}
-//             </body>
-//             </html>
-//         `);
-
-//         printWindow.document.close();
-
-//         // Remove date/time from the print dialog
-//         setTimeout(() => {
-//             printWindow.print();
-//             printWindow.close();
-//         }, 250);
-//     };
-
-//     // Properly structured dummy data with correct fields for certificate item wise report
-//     const certificateItemData = [
-//         {
-//             slNo: 1,
-//             printed: "30075 - G. M. R. S. Peermedu",
-//             itemCode: "301",
-//             itemName: "Story Writing",
-//             itemType: "Single",
-//             totalStudents: 24,
-//             participation: 22,
-//             nonParticipant: 2,
-//             gradeA: 10,
-//             gradeB: 8,
-//             gradeC: 4
-//         },
-//         {
-//             slNo: 2,
-//             printed: "30081 - G. H. S. Vanchivayal",
-//             itemCode: "302",
-//             itemName: "Essay Writing",
-//             itemType: "Single",
-//             totalStudents: 18,
-//             participation: 16,
-//             nonParticipant: 2,
-//             gradeA: 7,
-//             gradeB: 5,
-//             gradeC: 4
-//         },
-//         {
-//             slNo: 3,
-//             printed: "30043 - G. H. S. S. Anakara",
-//             itemCode: "303",
-//             itemName: "Poetry Writing",
-//             itemType: "Single",
-//             totalStudents: 15,
-//             participation: 15,
-//             nonParticipant: 0,
-//             gradeA: 8,
-//             gradeB: 5,
-//             gradeC: 2
-//         },
-//         {
-//             slNo: 4,
-//             printed: "30083 - G. H. S.Udumbhancola",
-//             itemCode: "401",
-//             itemName: "Group Dance",
-//             itemType: "Group",
-//             totalStudents: 32,
-//             participation: 30,
-//             nonParticipant: 2,
-//             gradeA: 15,
-//             gradeB: 12,
-//             gradeC: 3
-//         },
-//         {
-//             slNo: 5,
-//             printed: "30443 - G. H. S. Chemmannu",
-//             itemCode: "402",
-//             itemName: "Group Song",
-//             itemType: "Group",
-//             totalStudents: 28,
-//             participation: 25,
-//             nonParticipant: 3,
-//             gradeA: 18,
-//             gradeB: 5,
-//             gradeC: 2
-//         },
-//         {
-//             slNo: 6,
-//             printed: "30443 - G. H. S. Chemmannu",
-//             itemCode: "501",
-//             itemName: "Drawing",
-//             itemType: "Single",
-//             totalStudents: 20,
-//             participation: 18,
-//             nonParticipant: 2,
-//             gradeA: 9,
-//             gradeB: 7,
-//             gradeC: 2
-//         }
-//     ];
-
-
-//     const filteredData = Allitemresult.length > 0 ? Allitemresult : certificateItemData;
-
-//     return (
-//         <>
-//             <Header />
-//             <div className="flex flex-col md:flex-row min-h-screen">
-//                 <Dash />
-//                 <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-hidden">
-//                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
-//                         <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
-//                             Certificate School Wise
-//                         </h2>
-//                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
-//                             <div className="relative w-full sm:w-40">
-//                                 <select
-//                                     className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
-//                                     onChange={handleFestivalChange}
-//                                     value={selectedFestival}
-//                                 >
-//                                     <option value="UP Kalaivizha">UP Kalaivizha</option>
-//                                     <option value="LP Kalaivizha">LP Kalaivizha</option>
-//                                     <option value="HS Kalaivizha">HS Kalaivizha</option>
-//                                     <option value="HSS Kalaivizha">HSS Kalaivizha</option>
-//                                     <option value="All Festival">All Festival</option>
-//                                 </select>
-//                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-//                                     <i className="fa-solid fa-chevron-down"></i>
-//                                 </div>
-//                             </div>
-//                             <button
-//                                 onClick={handlePrint}
-//                                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
-//                             >
-//                                 Print
-//                             </button>
-//                         </div>
-//                     </div>
-
-//                     <div className="w-full">
-//                         <div className="overflow-x-auto -mx-4 sm:mx-0">
-//                             <div className="inline-block min-w-full align-middle px-4 sm:px-0">
-//                                 <div id="certificate-table-container" className="shadow overflow-hidden border-gray-200 sm:rounded-lg">
-//                                     <table className="min-w-full text-center border-separate border-spacing-y-2">
-//                                         <thead className="bg-gray-50">
-//                                             <tr className="text-gray-700">
-//                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
-//                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School</th>
-
-//                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">No of Students</th>
-//                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Participation</th>
-//                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Non-Participant</th>
-
-//                                             </tr>
-//                                         </thead>
-//                                         <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
-//                                             {filteredData.map((item) => (
-//                                                 <tr key={item.slNo} className="hover:bg-gray-100">
-//                                                     <td className="p-2 md:p-3 whitespace-nowrap">{item.slNo}</td>
-//                                                     <td className="p-2 md:p-3 text-blue-500 whitespace-nowrap">{item.printed}</td>
-//                                                     <td className="p-2 md:p-3 whitespace-nowrap">{item.totalStudents}</td>
-//                                                     <td className="p-2 md:p-3 whitespace-nowrap">{item.participation}</td>
-//                                                     <td className="p-2 md:p-3 whitespace-nowrap">{item.nonParticipant}</td>
-
-//                                                 </tr>
-//                                             ))}
-//                                         </tbody>
-//                                     </table>
-//                                 </div>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-//             </div>
-//         </>
-//     )
-// }
-
-
-// export default CertificateSclwise
-
-
 import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
@@ -371,171 +125,134 @@ const CertificateSclwise = () => {
                 headingText = "Certificate School Wise Report";
         }
         
-        // Extract and clean table HTML - remove any background styling
+        // Extract table HTML
         let tableHtml = printContent.innerHTML;
         
-        // Write the content to the iframe with aggressive background styling
+        // Write the content to the iframe with appropriate mobile styling
         iframe.contentDocument.write(`
+            <!DOCTYPE html>
             <html>
             <head>
                 <title>${headingText}</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
                 <style>
-                    /* Reset all styles first */
-                    * {
-                        margin: 0;
-                        padding: 0;
-                        box-sizing: border-box;
-                        background: #ffffff !important;
-                        color: #000000 !important;
-                        border-color: #000000 !important;
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
-                        color-adjust: exact !important;
+                    @media print {
+                        @page {
+                            size: auto;  /* Auto is the initial value */
+                            margin: 0mm; /* This affects the margin in the printer settings */
+                        }
+                        
+                        html {
+                            background-color: #FFFFFF;
+                            margin: 0; /* This affects the margin on the HTML before sending to printer */
+                        }
+                        
+                        body {
+                            margin: 10mm 5mm; /* margin you want for the content */
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                        }
                     }
                     
-                    html, body {
-                        background: #ffffff !important;
-                        width: 100%;
-                        height: 100%;
+                    body {
                         font-family: Arial, sans-serif;
-                        padding: 10px;
+                        background-color: white;
+                        color: black;
+                        font-size: 12px;
                     }
                     
                     .print-heading {
                         text-align: center;
                         font-size: 16px;
                         font-weight: bold;
-                        margin: 10px 0 15px 0;
-                        background: #ffffff !important;
-                        color: #000000 !important;
+                        margin-bottom: 15px;
                     }
                     
                     table {
                         width: 100%;
                         border-collapse: collapse;
-                        background: #ffffff !important;
                         margin-top: 10px;
                     }
                     
                     th, td {
-                        border: 1px solid #000000;
-                        padding: 6px;
+                        border: 1px solid black;
+                        padding: 5px;
                         text-align: center;
-                        background: #ffffff !important;
-                        color: #000000 !important;
                     }
                     
                     th {
-                        background: #f2f2f2 !important;
+                        background-color: #f2f2f2;
                         font-weight: bold;
                     }
                     
-                    /* Specific overrides for mobile */
-                    @media only screen and (max-width: 768px) {
+                    /* Force backgrounds on all elements */
+                    * {
+                        background-color: white !important;
+                        color: black !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    
+                    /* Mobile-specific adjustments */
+                    @media only screen and (max-width: 600px) {
                         body {
-                            background: #ffffff !important; 
+                            font-size: 10px;
                         }
                         
-                        table, th, td, tr, tbody, thead {
-                            background: #ffffff !important;
+                        .print-heading {
+                            font-size: 14px;
                         }
                         
                         th, td {
-                            font-size: 10px !important;
-                            padding: 4px !important;
+                            padding: 3px;
                         }
-                    }
-                    
-                    /* Print-specific styles */
-                    @media print {
-                        @page {
-                            size: landscape;
-                            margin: 8mm;
-                        }
-                        
-                        html {
-                            background: #ffffff !important;
-                        }
-                        
-                        body {
-                            width: 100%;
-                            height: 100%;
-                            background: #ffffff !important;
-                        }
-                        
-                        .print-container {
-                            background: #ffffff !important;
-                        }
-                        
-                        table {
-                            page-break-inside: avoid;
-                            background: #ffffff !important;
-                        }
-                        
-                        tr {
-                            page-break-inside: avoid;
-                            background: #ffffff !important;
-                        }
-                        
-                        th, td {
-                            background: #ffffff !important;
-                        }
-                    }
-                    
-                    /* Additional selector overrides */
-                    .bg-gray-50, .bg-white, .bg-gray-100, .session-bg, 
-                    .MuiTableContainer-root, .MuiPaper-root,
-                    [class*="bg-"] {
-                        background: #ffffff !important;
-                    }
-                    
-                    .print-container {
-                        background: #ffffff !important;
-                        padding: 10px;
                     }
                 </style>
             </head>
             <body>
-                <div class="print-container" style="background: #ffffff !important;">
-                    <div class="print-heading" style="background: #ffffff !important;">${headingText}</div>
-                    <div style="background: #ffffff !important;">${tableHtml}</div>
+                <div class="print-container">
+                    <div class="print-heading">${headingText}</div>
+                    ${tableHtml}
                 </div>
+                <script>
+                    // Force background colors through JavaScript after load
+                    window.onload = function() {
+                        const allElements = document.querySelectorAll('*');
+                        allElements.forEach(el => {
+                            el.style.backgroundColor = 'white';
+                            el.style.color = 'black';
+                        });
+                        
+                        // Auto-print after ensuring styles are applied
+                        setTimeout(function() {
+                            window.print();
+                        }, 500);
+                    };
+                </script>
             </body>
             </html>
         `);
         
         iframe.contentDocument.close();
         
-        // After the document is loaded, manually find and force background colors
+        // Remove the iframe after printing dialog closes
+        const printListener = () => {
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 1000);
+            window.removeEventListener('afterprint', printListener);
+        };
+        
+        window.addEventListener('afterprint', printListener);
+        
+        // If afterprint doesn't fire (some mobile browsers), 
+        // clean up the iframe after a reasonable delay
         setTimeout(() => {
-            try {
-                // Force background colors through JavaScript as well
-                const doc = iframe.contentDocument;
-                const allElements = doc.querySelectorAll('*');
-                allElements.forEach(el => {
-                    el.style.backgroundColor = '#ffffff';
-                    if (el.tagName !== 'TH') {
-                        el.style.color = '#000000';
-                    }
-                });
-                
-                // Focus and print
-                iframe.contentWindow.focus();
-                iframe.contentWindow.print();
-                
-                // Remove the iframe after printing
-                setTimeout(() => {
-                    document.body.removeChild(iframe);
-                }, 1000);
-            } catch (error) {
-                console.error('Print error:', error);
-                alert('Printing failed. Please try again.');
+            if (document.body.contains(iframe)) {
                 document.body.removeChild(iframe);
             }
-        }, 1000); // Longer delay to ensure DOM manipulation completes
+        }, 10000); // 10-second fallback cleanup
     };
-
     const certificateItemData = [
         {
             slNo: 1,
