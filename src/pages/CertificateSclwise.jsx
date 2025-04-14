@@ -362,6 +362,7 @@ const CertificateSclwise = () => {
                         margin: 0; 
                         padding: 10px; 
                         background-color: white !important;
+                        color: black !important;
                     }
                     table { 
                         width: 100%; 
@@ -369,13 +370,14 @@ const CertificateSclwise = () => {
                         background-color: white !important;
                     }
                     th, td { 
-                        border: 1px solid #ddd; 
+                        border: 1px solid #000; 
                         padding: 8px; 
                         text-align: center;
                         background-color: white !important;
                     }
                     th { 
                         background-color: #f2f2f2 !important; 
+                        font-weight: bold;
                     }
                     h2 { 
                         text-align: center; 
@@ -384,61 +386,51 @@ const CertificateSclwise = () => {
                     }
                     
                     /* Force the background color on all elements */
-                    #certificate-table-container,
-                    #certificate-table-container * {
+                    * {
                         background-color: white !important;
                         color: black !important;
-                    }
-                    
-                    /* Override any session background */
-                    .session-bg, 
-                    .MuiTableContainer-root,
-                    .MuiPaper-root {
-                        background-color: white !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
                     }
                     
                     @media print {
                         @page { 
                             size: landscape; 
                             margin: 10mm;
-                            background-color: white;
                         }
                         html, body { 
                             width: 100%; 
-                            background-color: white !important;
+                            height: 100%;
                         }
                         table { 
                             page-break-inside: avoid; 
-                            background-color: white !important;
                         }
-                        tr, td, th {
-                            page-break-inside: avoid;
-                            background-color: white !important;
-                        }
-                        /* Force backgrounds to print */
-                        * {
-                            -webkit-print-color-adjust: exact !important;
-                            print-color-adjust: exact !important;
-                            color-adjust: exact !important;
-                            background-color: white !important;
+                        tr { 
+                            page-break-inside: avoid; 
                         }
                     }
                     
-                    @media only screen and (max-width: 600px) {
-                        table { 
-                            font-size: 10px; 
-                        }
-                        th, td { 
-                            padding: 4px; 
-                        }
+                    .print-header {
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }
+                    
+                    .print-date {
+                        text-align: right;
+                        margin-bottom: 10px;
+                        font-size: 12px;
                     }
                 </style>
             </head>
             <body>
-                <h2>${selectedFestival} - Certificate School Wise Report</h2>
-                <div id="print-container" style="background-color: white !important;">
+               
+                <div class="print-header">
+                    <h2>${selectedFestival} - Certificate School Wise Report</h2>
+                </div>
+                <div>
                     ${printContent.innerHTML}
                 </div>
+              
             </body>
             </html>
         `);
@@ -460,9 +452,9 @@ const CertificateSclwise = () => {
                 alert('Printing failed. Please try again.');
                 document.body.removeChild(iframe);
             }
-        }, 1000); // Increased delay to ensure proper rendering on mobile
+        }, 500);
     };
-    
+
     const certificateItemData = [
         {
             slNo: 1,
