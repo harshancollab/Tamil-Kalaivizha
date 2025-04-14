@@ -341,7 +341,6 @@ const CertificateSclwise = () => {
     };
 
   
-    
     const handlePrint = () => {
         const printContent = document.getElementById('certificate-table-container');
         
@@ -350,87 +349,122 @@ const CertificateSclwise = () => {
         iframe.style.display = 'none';
         document.body.appendChild(iframe);
         
+        // Get the heading text based on selected festival
+        let headingText = "";
+        switch (selectedFestival) {
+            case "UP Kalaivizha":
+                headingText = "UP Kalaivizha - Certificate School Wise Report";
+                break;
+            case "LP Kalaivizha":
+                headingText = "LP Kalaivizha - Certificate School Wise Report";
+                break;
+            case "HS Kalaivizha":
+                headingText = "HS Kalaivizha - Certificate School Wise Report";
+                break;
+            case "HSS Kalaivizha":
+                headingText = "HSS Kalaivizha - Certificate School Wise Report";
+                break;
+            case "All Festival":
+                headingText = "All Festival - Certificate School Wise Report";
+                break;
+            default:
+                headingText = "Certificate School Wise Report";
+        }
+        
         // Write the content to the iframe
         iframe.contentDocument.write(`
             <html>
             <head>
-                <title>${selectedFestival} - Certificate School Wise Report</title>
+                <title>${headingText}</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <style>
-                    body { 
-                        font-family: Arial, sans-serif; 
-                        margin: 0; 
-                        padding: 10px; 
-                        background-color: white !important;
-                        color: black !important;
-                    }
-                    table { 
-                        width: 100%; 
-                        border-collapse: collapse;
-                        background-color: white !important;
-                    }
-                    th, td { 
-                        border: 1px solid #000; 
-                        padding: 8px; 
-                        text-align: center;
-                        background-color: white !important;
-                    }
-                    th { 
-                        background-color: #f2f2f2 !important; 
-                        font-weight: bold;
-                    }
-                    h2 { 
-                        text-align: center; 
-                        margin-bottom: 20px;
-                        background-color: white !important;
+                    html, body {
+                        background-color: #ffffff !important;
+                        margin: 0;
+                        padding: 0;
+                        color: #000000 !important;
+                        font-family: Arial, sans-serif;
                     }
                     
-                    /* Force the background color on all elements */
-                    * {
-                        background-color: white !important;
-                        color: black !important;
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
+                    .print-heading {
+                        text-align: center;
+                        font-size: 16px;
+                        font-weight: bold;
+                        margin: 10px 0 15px 0;
+                        background-color: #ffffff !important;
+                        color: #000000 !important;
+                    }
+                    
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        background-color: #ffffff !important;
+                    }
+                    
+                    th, td {
+                        border: 1px solid #000000;
+                        padding: 6px;
+                        text-align: center;
+                        background-color: #ffffff !important;
+                        color: #000000 !important;
+                    }
+                    
+                    th {
+                        background-color: #f2f2f2 !important;
+                        font-weight: bold;
+                    }
+                    
+                    /* Force white background on all elements */
+                    body * {
+                        background-color: #ffffff !important;
+                        color: #000000 !important;
                     }
                     
                     @media print {
-                        @page { 
-                            size: landscape; 
-                            margin: 10mm;
+                        @page {
+                            size: landscape;
+                            margin: 8mm;
                         }
-                        html, body { 
-                            width: 100%; 
+                        
+                        html, body {
+                            width: 100%;
                             height: 100%;
+                            background-color: #ffffff !important;
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                            color-adjust: exact !important;
                         }
-                        table { 
-                            page-break-inside: avoid; 
+                        
+                        .print-heading {
+                            margin-bottom: 15px;
                         }
-                        tr { 
-                            page-break-inside: avoid; 
+                        
+                        table {
+                            page-break-inside: avoid;
+                        }
+                        
+                        tr {
+                            page-break-inside: avoid;
+                        }
+                        
+                        /* Enhanced mobile compatibility */
+                        th, td {
+                            font-size: 10px !important;
                         }
                     }
                     
-                    .print-header {
-                        text-align: center;
-                        margin-bottom: 20px;
-                    }
-                    
-                    .print-date {
-                        text-align: right;
-                        margin-bottom: 10px;
-                        font-size: 12px;
+                    /* Override any other styling that might interfere */
+                    .MuiTableContainer-root,
+                    .session-bg,
+                    .bg-gray-50,
+                    .bg-white {
+                        background-color: #ffffff !important;
                     }
                 </style>
             </head>
             <body>
-               
-                <div class="print-header">
-                    <h2>${selectedFestival} - Certificate School Wise Report</h2>
-                </div>
-                <div>
-                    ${printContent.innerHTML}
-                </div>
-              
+                <div class="print-heading">${headingText}</div>
+                ${printContent.innerHTML}
             </body>
             </html>
         `);
@@ -452,7 +486,7 @@ const CertificateSclwise = () => {
                 alert('Printing failed. Please try again.');
                 document.body.removeChild(iframe);
             }
-        }, 500);
+        }, 700); // Slightly longer delay for mobile
     };
 
     const certificateItemData = [
