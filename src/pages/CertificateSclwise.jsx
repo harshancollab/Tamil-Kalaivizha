@@ -371,19 +371,35 @@ const CertificateSclwise = () => {
                 headingText = "Certificate School Wise Report";
         }
         
-        // Write the content to the iframe
+        // Extract and clean table HTML - remove any background styling
+        let tableHtml = printContent.innerHTML;
+        
+        // Write the content to the iframe with aggressive background styling
         iframe.contentDocument.write(`
             <html>
             <head>
                 <title>${headingText}</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <style>
-                    html, body {
-                        background-color: #ffffff !important;
+                    /* Reset all styles first */
+                    * {
                         margin: 0;
                         padding: 0;
+                        box-sizing: border-box;
+                        background: #ffffff !important;
                         color: #000000 !important;
+                        border-color: #000000 !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                        color-adjust: exact !important;
+                    }
+                    
+                    html, body {
+                        background: #ffffff !important;
+                        width: 100%;
+                        height: 100%;
                         font-family: Arial, sans-serif;
+                        padding: 10px;
                     }
                     
                     .print-heading {
@@ -391,89 +407,120 @@ const CertificateSclwise = () => {
                         font-size: 16px;
                         font-weight: bold;
                         margin: 10px 0 15px 0;
-                        background-color: #ffffff !important;
+                        background: #ffffff !important;
                         color: #000000 !important;
                     }
                     
                     table {
                         width: 100%;
                         border-collapse: collapse;
-                        background-color: #ffffff !important;
+                        background: #ffffff !important;
+                        margin-top: 10px;
                     }
                     
                     th, td {
                         border: 1px solid #000000;
                         padding: 6px;
                         text-align: center;
-                        background-color: #ffffff !important;
+                        background: #ffffff !important;
                         color: #000000 !important;
                     }
                     
                     th {
-                        background-color: #f2f2f2 !important;
+                        background: #f2f2f2 !important;
                         font-weight: bold;
                     }
                     
-                    /* Force white background on all elements */
-                    body * {
-                        background-color: #ffffff !important;
-                        color: #000000 !important;
+                    /* Specific overrides for mobile */
+                    @media only screen and (max-width: 768px) {
+                        body {
+                            background: #ffffff !important; 
+                        }
+                        
+                        table, th, td, tr, tbody, thead {
+                            background: #ffffff !important;
+                        }
+                        
+                        th, td {
+                            font-size: 10px !important;
+                            padding: 4px !important;
+                        }
                     }
                     
+                    /* Print-specific styles */
                     @media print {
                         @page {
                             size: landscape;
                             margin: 8mm;
                         }
                         
-                        html, body {
-                            width: 100%;
-                            height: 100%;
-                            background-color: #ffffff !important;
-                            -webkit-print-color-adjust: exact !important;
-                            print-color-adjust: exact !important;
-                            color-adjust: exact !important;
+                        html {
+                            background: #ffffff !important;
                         }
                         
-                        .print-heading {
-                            margin-bottom: 15px;
+                        body {
+                            width: 100%;
+                            height: 100%;
+                            background: #ffffff !important;
+                        }
+                        
+                        .print-container {
+                            background: #ffffff !important;
                         }
                         
                         table {
                             page-break-inside: avoid;
+                            background: #ffffff !important;
                         }
                         
                         tr {
                             page-break-inside: avoid;
+                            background: #ffffff !important;
                         }
                         
-                        /* Enhanced mobile compatibility */
                         th, td {
-                            font-size: 10px !important;
+                            background: #ffffff !important;
                         }
                     }
                     
-                    /* Override any other styling that might interfere */
-                    .MuiTableContainer-root,
-                    .session-bg,
-                    .bg-gray-50,
-                    .bg-white {
-                        background-color: #ffffff !important;
+                    /* Additional selector overrides */
+                    .bg-gray-50, .bg-white, .bg-gray-100, .session-bg, 
+                    .MuiTableContainer-root, .MuiPaper-root,
+                    [class*="bg-"] {
+                        background: #ffffff !important;
+                    }
+                    
+                    .print-container {
+                        background: #ffffff !important;
+                        padding: 10px;
                     }
                 </style>
             </head>
             <body>
-                <div class="print-heading">${headingText}</div>
-                ${printContent.innerHTML}
+                <div class="print-container" style="background: #ffffff !important;">
+                    <div class="print-heading" style="background: #ffffff !important;">${headingText}</div>
+                    <div style="background: #ffffff !important;">${tableHtml}</div>
+                </div>
             </body>
             </html>
         `);
         
         iframe.contentDocument.close();
         
-        // Print the iframe after a short delay to ensure content is loaded
+        // After the document is loaded, manually find and force background colors
         setTimeout(() => {
             try {
+                // Force background colors through JavaScript as well
+                const doc = iframe.contentDocument;
+                const allElements = doc.querySelectorAll('*');
+                allElements.forEach(el => {
+                    el.style.backgroundColor = '#ffffff';
+                    if (el.tagName !== 'TH') {
+                        el.style.color = '#000000';
+                    }
+                });
+                
+                // Focus and print
                 iframe.contentWindow.focus();
                 iframe.contentWindow.print();
                 
@@ -486,7 +533,7 @@ const CertificateSclwise = () => {
                 alert('Printing failed. Please try again.');
                 document.body.removeChild(iframe);
             }
-        }, 700); // Slightly longer delay for mobile
+        }, 1000); // Longer delay to ensure DOM manipulation completes
     };
 
     const certificateItemData = [
