@@ -211,6 +211,95 @@ const Higherlvlcomp = () => {
     };
 
     // Improved print function for better mobile compatibility
+    // const handlePrint = () => {
+    //     // Create a hidden iframe for printing
+    //     const printFrame = document.createElement('iframe');
+    //     printFrame.style.position = 'fixed';
+    //     printFrame.style.right = '0';
+    //     printFrame.style.bottom = '0';
+    //     printFrame.style.width = '0';
+    //     printFrame.style.height = '0';
+    //     printFrame.style.border = '0';
+        
+    //     document.body.appendChild(printFrame);
+        
+    //     // Get the content to print
+    //     const printContent = document.getElementById('higher-level-table-container');
+    //     const title = getPrintTitle();
+        
+    //     // Write to the iframe
+    //     printFrame.contentDocument.write(`
+    //         <!DOCTYPE html>
+    //         <html>
+    //         <head>
+    //             <title>${title}</title>
+    //             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    //             <style>
+    //                 @page {
+    //                     size: auto;
+    //                     margin: 10mm;
+    //                 }
+    //                 body {
+    //                     font-family: Arial, sans-serif;
+    //                     margin: 0;
+    //                     padding: 10px;
+    //                 }
+    //                 h2 {
+    //                     text-align: center;
+    //                     font-size: 16px;
+    //                     margin-bottom: 15px;
+    //                 }
+    //                 table {
+    //                     width: 100%;
+    //                     border-collapse: collapse;
+    //                     font-size: 10px;
+    //                 }
+    //                 th, td {
+    //                     border: 1px solid #ddd;
+    //                     padding: 4px;
+    //                     text-align: center;
+    //                 }
+    //                 th {
+    //                     background-color: #f2f2f2;
+    //                 }
+                    
+    //                 /* Mobile-specific adjustments */
+    //                 @media only screen and (max-width: 600px) {
+    //                     table {
+    //                         font-size: 8px;
+    //                     }
+    //                     th, td {
+    //                         padding: 2px;
+    //                     }
+    //                 }
+    //             </style>
+    //         </head>
+    //         <body>
+    //             <h2>${title}</h2>
+    //             ${printContent.innerHTML}
+    //         </body>
+    //         </html>
+    //     `);
+        
+    //     printFrame.contentDocument.close();
+        
+    //     // Wait for content to load before printing
+    //     printFrame.onload = function() {
+    //         try {
+    //             printFrame.contentWindow.focus();
+    //             printFrame.contentWindow.print();
+                
+    //             // Remove the iframe after printing (or after a timeout)
+    //             setTimeout(() => {
+    //                 document.body.removeChild(printFrame);
+    //             }, 1000);
+    //         } catch (error) {
+    //             console.error('Print error:', error);
+    //             alert('Printing failed. Please try again or use a different device.');
+    //             document.body.removeChild(printFrame);
+    //         }
+    //     };
+    // };
     const handlePrint = () => {
         // Create a hidden iframe for printing
         const printFrame = document.createElement('iframe');
@@ -226,6 +315,10 @@ const Higherlvlcomp = () => {
         // Get the content to print
         const printContent = document.getElementById('higher-level-table-container');
         const title = getPrintTitle();
+        
+        // Extract background colors from the original table
+        const tableRows = printContent.querySelectorAll('tr');
+        let preservedHTML = printContent.innerHTML;
         
         // Write to the iframe
         printFrame.contentDocument.write(`
@@ -243,6 +336,9 @@ const Higherlvlcomp = () => {
                         font-family: Arial, sans-serif;
                         margin: 0;
                         padding: 10px;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                        color-adjust: exact !important;
                     }
                     h2 {
                         text-align: center;
@@ -263,6 +359,13 @@ const Higherlvlcomp = () => {
                         background-color: #f2f2f2;
                     }
                     
+                    /* Force background colors to print */
+                    * {
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                        color-adjust: exact !important;
+                    }
+                    
                     /* Mobile-specific adjustments */
                     @media only screen and (max-width: 600px) {
                         table {
@@ -272,11 +375,25 @@ const Higherlvlcomp = () => {
                             padding: 2px;
                         }
                     }
+                    
+                    /* Print-specific styles */
+                    @media print {
+                        * {
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                            color-adjust: exact !important;
+                        }
+                        body {
+                            width: 100%;
+                            margin: 0;
+                            padding: 0;
+                        }
+                    }
                 </style>
             </head>
             <body>
                 <h2>${title}</h2>
-                ${printContent.innerHTML}
+                ${preservedHTML}
             </body>
             </html>
         `);
@@ -286,13 +403,16 @@ const Higherlvlcomp = () => {
         // Wait for content to load before printing
         printFrame.onload = function() {
             try {
-                printFrame.contentWindow.focus();
-                printFrame.contentWindow.print();
-                
-                // Remove the iframe after printing (or after a timeout)
+                // Give it a moment to render properly
                 setTimeout(() => {
-                    document.body.removeChild(printFrame);
-                }, 1000);
+                    printFrame.contentWindow.focus();
+                    printFrame.contentWindow.print();
+                    
+                    // Remove the iframe after printing
+                    setTimeout(() => {
+                        document.body.removeChild(printFrame);
+                    }, 1000);
+                }, 300);
             } catch (error) {
                 console.error('Print error:', error);
                 alert('Printing failed. Please try again or use a different device.');
@@ -300,7 +420,6 @@ const Higherlvlcomp = () => {
             }
         };
     };
-
     const displayData = filteredItems.length > 0 ? filteredItems :
         (Allitemresult.length > 0 ? Allitemresult : resultData);
 
