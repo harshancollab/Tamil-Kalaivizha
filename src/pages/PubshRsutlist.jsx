@@ -315,64 +315,89 @@ const PublishResultList = () => {
             return newParams;
         });
     };
-
     const handlePrint = () => {
-        const originalContents = document.body.innerHTML;
-        const printContents = printRef.current.innerHTML;
-
-        document.body.innerHTML = `
-            <style type="text/css" media="print">
-                @page {
-                    size: auto;
-                    margin: 0;
-                }
-                body {
-                    padding: 20px;
-                    font-family: sans-serif;
-                }
-                .print-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                }
-                .print-table th, .print-table td {
-                    border: 1px solid #ddd;
-                    padding: 8px;
-                    text-align: center;
-                }
-                .print-table th {
-                    background-color: #f2f2f2;
-                    font-weight: bold;
-                }
-                .print-title {
-                    text-align: center;
-                    margin-bottom: 20px;
-                    font-size: 18px;
-                    font-weight: bold;
-                    display: block !important;
-                }
-                .no-print {
-                    display: none !important;
-                }
-                .print-container {
-                    width: 100%;
-                    overflow: visible !important;
-                }
-                /* Hide scrollbars */
-                ::-webkit-scrollbar {
-                    display: none;
-                }
-                * {
-                    overflow: visible !important;
-                }
-                html, body {
-                    overflow: visible !important;
-                }
-            </style>
-            ${printContents}
-        `;
-        window.print();
-        document.body.innerHTML = originalContents;
-        window.location.reload();
+        // Create a new hidden iframe for printing
+        const printFrame = document.createElement('iframe');
+        printFrame.style.position = 'fixed';
+        printFrame.style.right = '0';
+        printFrame.style.bottom = '0';
+        printFrame.style.width = '0';
+        printFrame.style.height = '0';
+        printFrame.style.border = '0';
+        document.body.appendChild(printFrame);
+        
+        // Add content to the iframe
+        const frameDoc = printFrame.contentWindow.document;
+        frameDoc.open();
+        frameDoc.write(`
+            <html>
+            <head>
+                <title>Print</title>
+                <style type="text/css" media="print">
+                    @page {
+                        size: auto;
+                        margin: 0;
+                    }
+                    body {
+                        padding: 20px;
+                        font-family: sans-serif;
+                    }
+                    .print-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    .print-table th, .print-table td {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                        text-align: center;
+                    }
+                    .print-table th {
+                        background-color: #f2f2f2;
+                        font-weight: bold;
+                    }
+                    .print-title {
+                        text-align: center;
+                        margin-bottom: 20px;
+                        font-size: 18px;
+                        font-weight: bold;
+                        display: block !important;
+                    }
+                    .no-print {
+                        display: none !important;
+                    }
+                    .print-container {
+                        width: 100%;
+                        overflow: visible !important;
+                    }
+                    * {
+                        overflow: visible !important;
+                    }
+                    html, body {
+                        overflow: visible !important;
+                    }
+                </style>
+            </head>
+            <body>${printRef.current.innerHTML}</body>
+            </html>
+        `);
+        frameDoc.close();
+        
+        // Wait for all resources to load before printing
+        printFrame.onload = function() {
+            try {
+                // Focus and print
+                printFrame.contentWindow.focus();
+                printFrame.contentWindow.print();
+                
+                // Remove the iframe after printing
+                setTimeout(() => {
+                    document.body.removeChild(printFrame);
+                }, 500);
+            } catch (e) {
+                console.error('Printing failed:', e);
+                document.body.removeChild(printFrame);
+            }
+        };
     };
 
     // Initialize data at component mount

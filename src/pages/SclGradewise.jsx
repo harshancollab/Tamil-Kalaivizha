@@ -215,32 +215,30 @@ const SclGradewise = () => {
     const handlePrint = () => {
         const printContent = document.getElementById('school-grade-table-container');
         
-        // Create a hidden iframe for mobile-compatible printing
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'fixed';
-        iframe.style.right = '0';
-        iframe.style.bottom = '0';
-        iframe.style.width = '0px';
-        iframe.style.height = '0px';
-        iframe.style.border = 'none';
-        document.body.appendChild(iframe);
+        // Create a new print window
+        const printWindow = window.open('', '_blank');
         
-        // Get the iframe document
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        if (!printWindow) {
+            alert('Please allow popup windows for printing functionality');
+            return;
+        }
         
-        // Write the content to the iframe with improved mobile compatibility
-        iframeDoc.open();
-        iframeDoc.write(`
+        // Get the title for the print
+        const title = getPrintTitle();
+        
+        // Write the content to the new window with optimized mobile styling
+        printWindow.document.write(`
             <!DOCTYPE html>
             <html>
             <head>
-                <title>${getPrintTitle()}</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>${title}</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
                 <style>
+                    /* Core print styles */
                     @media print {
                         html, body {
                             width: 100%;
-                            height: 100%;
+                            height: auto;
                             margin: 0;
                             padding: 0;
                             font-family: Arial, sans-serif;
@@ -248,7 +246,7 @@ const SclGradewise = () => {
                         
                         body {
                             -webkit-print-color-adjust: exact !important;
-                            print-color-adjust: exact !important;
+                            color-adjust: exact !important;
                         }
                         
                         table {
@@ -285,16 +283,18 @@ const SclGradewise = () => {
                         }
                     }
                     
-                    /* Non-print styles */
+                    /* Non-print preview styles */
                     html, body {
                         margin: 0;
                         padding: 5px;
                         font-family: Arial, sans-serif;
+                        background-color: white;
                     }
                     
                     table {
                         width: 100%;
                         border-collapse: collapse;
+                        margin-bottom: 10px;
                     }
                     
                     th, td {
@@ -313,65 +313,58 @@ const SclGradewise = () => {
                         margin: 10px 0;
                         font-size: 14px;
                     }
+                    
+                    .print-button {
+                        display: block;
+                        width: 100%;
+                        max-width: 300px;
+                        margin: 15px auto;
+                        padding: 10px;
+                        background-color: #007bff;
+                        color: white;
+                        border: none;
+                        border-radius: 5px;
+                        font-size: 16px;
+                        cursor: pointer;
+                        text-align: center;
+                    }
+                    
+                    /* Mobile-specific styles */
+                    @media screen and (max-width: 768px) {
+                        body {
+                            padding: 3px;
+                        }
+                        
+                        table {
+                            font-size: 9px;
+                        }
+                        
+                        th, td {
+                            padding: 2px;
+                            font-size: 9px;
+                        }
+                    }
                 </style>
             </head>
             <body>
-                <h2>${getPrintTitle()}</h2>
+                <h2>${title}</h2>
                 ${printContent.innerHTML}
+             
+                <script>
+                    // Auto-print for desktop browsers
+                    if (!(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))) {
+                        window.onload = function() {
+                            window.print();
+                            setTimeout(function(){ window.close(); }, 500);
+                        };
+                    }
+                </script>
             </body>
             </html>
         `);
-        iframeDoc.close();
         
-        // Give the browser a moment to process the document before printing
-        setTimeout(() => {
-            try {
-                // Focus the iframe window
-                iframe.contentWindow.focus();
-                
-                // Trigger print
-                iframe.contentWindow.print();
-                
-                // Remove the iframe after printing (or after a timeout as fallback)
-                if (navigator.userAgent.match(/Android/i)) {
-                    // For Android, we need a longer timeout
-                    setTimeout(() => document.body.removeChild(iframe), 2000);
-                } else {
-                    iframe.onafterprint = () => {
-                        document.body.removeChild(iframe);
-                    };
-                    
-                    // Fallback if onafterprint doesn't trigger
-                    setTimeout(() => {
-                        if (document.body.contains(iframe)) {
-                            document.body.removeChild(iframe);
-                        }
-                    }, 5000);
-                }
-            } catch (err) {
-                console.error('Print error:', err);
-                
-                // Attempt alternative printing approach for problematic mobile browsers
-                try {
-                    const printWindow = window.open('', '_blank');
-                    printWindow.document.write(iframeDoc.documentElement.outerHTML);
-                    printWindow.document.close();
-                    printWindow.focus();
-                    setTimeout(() => {
-                        printWindow.print();
-                        setTimeout(() => printWindow.close(), 500);
-                    }, 500);
-                } catch (e) {
-                    console.error('Alternative print method failed:', e);
-                    alert('Print function encountered an issue. Please try again or use a desktop browser.');
-                } finally {
-                    // Clean up the iframe
-                    if (document.body.contains(iframe)) {
-                        document.body.removeChild(iframe);
-                    }
-                }
-            }
-        }, 500);
+        printWindow.document.close();
+        printWindow.focus();
     };
     
     useEffect(() => {

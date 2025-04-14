@@ -334,25 +334,21 @@ const SclWisePoint = () => {
     const handleFestivalChange = (e) => {
         setSearchParams({ festival: e.target.value });
     };
-
     const handlePrint = () => {
-        if (!iframeRef.current) {
-          // Create iframe if it doesn't exist
-          const iframe = document.createElement('iframe');
-          iframe.style.display = 'none';
-          iframe.onload = () => setPrintReady(true);
-          document.body.appendChild(iframe);
-          iframeRef.current = iframe;
-        }
-        
         // Get table content and title
         const tableData = printRef.current.innerHTML;
         const title = getPrintTitle();
         
-        // Write content to iframe
-        const iframeDoc = iframeRef.current.contentDocument || iframeRef.current.contentWindow.document;
-        iframeDoc.open();
-        iframeDoc.write(`
+        // Create a new window for printing
+        const printWindow = window.open('', '_blank');
+        
+        if (!printWindow) {
+          alert("Please allow pop-ups for printing functionality");
+          return;
+        }
+        
+        // Write content to the new window
+        printWindow.document.write(`
           <!DOCTYPE html>
           <html>
           <head>
@@ -363,12 +359,13 @@ const SclWisePoint = () => {
                 body {
                   -webkit-print-color-adjust: exact !important;
                   print-color-adjust: exact !important;
+                  color-adjust: exact !important;
                   background-color: white !important;
                 }
                 
                 @page {
                   margin: 1cm;
-                  size: auto;
+                  size: portrait;
                 }
               }
               
@@ -412,27 +409,39 @@ const SclWisePoint = () => {
               tr:nth-child(even) {
                 background-color: #f9f9f9 !important;
               }
+              
+              /* Mobile responsive adjustments */
+              @media screen and (max-width: 600px) {
+                table {
+                  font-size: 12px;
+                }
+                
+                th, td {
+                  padding: 5px;
+                }
+              }
             </style>
           </head>
           <body>
             <div class="print-header">${title}</div>
             ${tableData}
+            <script>
+              // Auto print once loaded
+              window.onload = function() {
+                setTimeout(function() {
+                  window.print();
+                  // Optional: Close window after print dialog closes (won't work on all browsers)
+                  setTimeout(function() {
+                    window.close();
+                  }, 500);
+                }, 500);
+              };
+            </script>
           </body>
           </html>
         `);
-        iframeDoc.close();
         
-        // Add a slight delay to ensure styles are applied before printing
-        setTimeout(() => {
-          if (iframeRef.current) {
-            try {
-              iframeRef.current.contentWindow.focus();
-              iframeRef.current.contentWindow.print();
-            } catch (err) {
-              console.error('Print error:', err);
-            }
-          }
-        }, 500);
+        printWindow.document.close();
       };
 
     // Initialize filtered data at component mount

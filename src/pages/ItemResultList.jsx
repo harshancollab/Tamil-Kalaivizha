@@ -153,61 +153,86 @@ const ItemResultList = () => {
         applyFestivalFilter(festival);
     };
 
+  
+
     const handlePrint = () => {
         const printContents = printRef.current.innerHTML;
-        const printWindow = window.open('', '_blank');
         
-        printWindow.document.write(`
-            <html>
-            <head>
-                <title>${getPrintTitle()}</title>
-                <style type="text/css">
-                    @page {
-                        size: landscape;
-                        margin: 0.5cm;
-                    }
-                    body {
-                        padding: 20px;
-                        font-family: Arial, sans-serif;
-                    }
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                    }
-                    table th, table td {
-                        border: 1px solid #ddd;
-                        padding: 8px;
-                        text-align: center;
-                    }
-                    table th {
-                        background-color: #f2f2f2;
-                        font-weight: bold;
-                    }
-                    .print-title {
-                        text-align: center;
-                        margin-bottom: 20px;
-                        font-size: 18px;
-                        font-weight: bold;
-                    }
-                    .no-print {
-                        display: none !important;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="print-title">${getPrintTitle()}</div>
-                ${printContents}
-            </body>
-            </html>
+        // Create an iframe element (hidden)
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.top = '-9999px';
+        iframe.style.left = '-9999px';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        document.body.appendChild(iframe);
+        
+        // Write the print content to the iframe
+        const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+        iframeDocument.open();
+        iframeDocument.write(`
+          <html>
+          <head>
+            <title>${getPrintTitle()}</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style type="text/css">
+              @media print {
+                @page {
+                  size: landscape;
+                  margin: 0.5cm;
+                }
+              }
+              body {
+                padding: 20px;
+                font-family: Arial, sans-serif;
+              }
+              table {
+                width: 100%;
+                border-collapse: collapse;
+              }
+              table th, table td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: center;
+              }
+              table th {
+                background-color: #f2f2f2;
+                font-weight: bold;
+              }
+              .print-title {
+                text-align: center;
+                margin-bottom: 20px;
+                font-size: 18px;
+                font-weight: bold;
+              }
+              .no-print {
+                display: none !important;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="print-title">${getPrintTitle()}</div>
+            ${printContents}
+          </body>
+          </html>
         `);
+        iframeDocument.close();
         
-        printWindow.document.close();
-        
+        // Wait for content to load
         setTimeout(() => {
-            printWindow.print();
-            printWindow.close();
+          // Focus on the iframe
+          iframe.contentWindow.focus();
+          
+          // Trigger print
+          iframe.contentWindow.print();
+          
+          // Remove the iframe after printing (or after a delay)
+          setTimeout(() => {
+            document.body.removeChild(iframe);
+          }, 1000);
         }, 250);
-    };
+      };
+
 
     const handleReset = (itemCode) => {
         // Implement reset functionality here
