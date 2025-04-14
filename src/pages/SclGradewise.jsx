@@ -218,76 +218,180 @@ const SclGradewise = () => {
         // Create a hidden iframe for mobile-compatible printing
         const iframe = document.createElement('iframe');
         iframe.style.display = 'none';
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.position = 'absolute';
+        iframe.style.left = '0';
+        iframe.style.top = '0';
+        iframe.setAttribute('id', 'printIframe');
         document.body.appendChild(iframe);
         
-        // Write the content to the iframe
+        // Write the content to the iframe with improved mobile compatibility
         iframe.contentDocument.write(`
+            <!DOCTYPE html>
             <html>
             <head>
                 <title>${getPrintTitle()}</title>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
                 <style>
-                    html, body { 
-                        font-family: Arial, sans-serif; 
-                        margin: 0; 
-                        padding: 10px; 
-                        background-color: white !important; 
-                        color: black !important;
-                    }
-                    table { 
-                        width: 100%; 
-                        border-collapse: collapse; 
-                        background-color: white !important;
-                    }
-                    th, td { 
-                        border: 1px solid #ddd; 
-                        padding: 8px; 
-                        text-align: center; 
+                    html, body {
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 10px;
                         background-color: white !important;
                         color: black !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                        color-adjust: exact !important;
                     }
-                    th { 
-                        background-color: #f2f2f2; 
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        background-color: white !important;
                     }
-                    h2 { 
-                        text-align: center; 
-                        margin-bottom: 20px; 
-                      
-                    }
-                    * { 
-                        background-color: white !important; 
+                    th, td {
+                        border: 1px solid #000;
+                        padding: 8px;
+                        text-align: center;
+                        background-color: white !important;
                         color: black !important;
-                        print-color-adjust: exact;
-                        -webkit-print-color-adjust: exact;
                     }
+                    th {
+                        background-color: #f2f2f2 !important;
+                    }
+                    h2 {
+                        text-align: center;
+                        margin-bottom: 20px;
+                        color: black !important;
+                    }
+                    * {
+                        background-color: white !important;
+                        color: black !important;
+                        print-color-adjust: exact !important;
+                        -webkit-print-color-adjust: exact !important;
+                    }
+                    
                     @media print {
-                        @page { size: landscape; }
-                        body { width: 100%; }
-                        table { page-break-inside: avoid; }
+                        @page { 
+                            size: landscape; 
+                            margin: 5mm;
+                        }
+                        html, body { 
+                            width: 100%;
+                            height: 100%;
+                            margin: 0;
+                            padding: 5px;
+                        }
+                        table { 
+                            page-break-inside: avoid; 
+                            width: 100% !important;
+                        }
+                        tr { 
+                            page-break-inside: avoid; 
+                        }
+                        th, td {
+                            border: 1px solid #000 !important;
+                        }
                     }
+                    
                     @media only screen and (max-width: 600px) {
-                        table { font-size: 10px; }
-                        th, td { padding: 4px; }
+                        body {
+                            width: 100% !important;
+                            margin: 0 !important;
+                            padding: 5px !important;
+                        }
+                        table { 
+                            font-size: 10px; 
+                            width: 100% !important;
+                        }
+                        th, td { 
+                            padding: 4px; 
+                        }
                     }
                 </style>
             </head>
-            <body>
+            <body ontouchstart="">
                 <h2>${getPrintTitle()}</h2>
                 ${printContent.innerHTML}
+                <script>
+                    // Force background printing in various browsers
+                    function preparePrint() {
+                        // Set print color properties
+                        document.body.style.webkitPrintColorAdjust = 'exact';
+                        document.body.style.printColorAdjust = 'exact';
+                        
+                        // Ensure all table elements have correct styling
+                        const tables = document.querySelectorAll('table');
+                        tables.forEach(table => {
+                            table.style.width = '100%';
+                            table.style.backgroundColor = 'white';
+                            table.style.color = 'black';
+                        });
+                        
+                        const cells = document.querySelectorAll('th, td');
+                        cells.forEach(cell => {
+                            cell.style.backgroundColor = 'white';
+                            cell.style.color = 'black';
+                            cell.style.border = '1px solid #000';
+                        });
+                    }
+                    
+                    // Run preparation function
+                    preparePrint();
+                    
+                    // Auto-trigger print on load for mobile devices
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.focus();
+                            window.print();
+                        }, 500);
+                    };
+                </script>
             </body>
             </html>
         `);
         
         iframe.contentDocument.close();
         
-        // Print the iframe after a short delay to ensure content is loaded
-        setTimeout(() => {
-            iframe.contentWindow.print();
-            
-            // Remove the iframe after printing
+        // Add event listener for after print to clean up
+        iframe.contentWindow.addEventListener('afterprint', () => {
             setTimeout(() => {
                 document.body.removeChild(iframe);
             }, 500);
-        }, 500);
+        });
+        
+        // Print with fallback mechanisms
+        setTimeout(() => {
+            try {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+                
+                // Remove the iframe after a timeout as fallback
+                setTimeout(() => {
+                    if (document.body.contains(iframe)) {
+                        document.body.removeChild(iframe);
+                    }
+                }, 2000);
+            } catch (error) {
+                console.error('Print error:', error);
+                
+                // Try alternative print methods
+                try {
+                    window.frames["printIframe"].focus();
+                    window.frames["printIframe"].print();
+                } catch (e) {
+                    console.error('Alternative print method failed:', e);
+                    alert('Print function encountered an issue. Please try again.');
+                } finally {
+                    // Ensure cleanup happens in any case
+                    setTimeout(() => {
+                        if (document.body.contains(iframe)) {
+                            document.body.removeChild(iframe);
+                        }
+                    }, 1000);
+                }
+            }
+        }, 800);
     };
     
     useEffect(() => {

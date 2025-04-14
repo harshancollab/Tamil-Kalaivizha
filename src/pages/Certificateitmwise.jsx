@@ -101,27 +101,36 @@ const Certificateitmwise = () => {
         // Create a hidden iframe for mobile-compatible printing
         const iframe = document.createElement('iframe');
         iframe.style.display = 'none';
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.position = 'absolute';
+        iframe.style.left = '0';
+        iframe.style.top = '0';
         document.body.appendChild(iframe);
         
-        // Write the content to the iframe
+        // Write the content to the iframe with improved mobile compatibility
         iframe.contentDocument.write(`
+            <!DOCTYPE html>
             <html>
             <head>
                 <title>${selectedFestival} - Certificate Item Wise Report</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
                 <style>
                     body { 
                         font-family: Arial, sans-serif; 
                         margin: 0; 
                         padding: 10px; 
-                        background-color: white;
+                        background-color: white !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
                     }
                     table { 
                         width: 100%; 
                         border-collapse: collapse; 
+                        background-color: white !important;
                     }
                     th, td { 
-                        border: 1px solid #ddd; 
+                        border: 1px solid #000; 
                         padding: 8px; 
                         text-align: center; 
                     }
@@ -133,82 +142,125 @@ const Certificateitmwise = () => {
                         margin-bottom: 20px; 
                     }
                     
-                    /* Force the background color on all elements */
-                    .certificate-container * { 
-                        background-color: inherit !important;
-                        color: black !important;
-                    }
-                    
-                    /* Override any session background */
-                    .session-bg {
-                        background-color: white !important;
+                    /* Force backgrounds to print correctly */
+                    * {
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                        color-adjust: exact !important;
+                        color: #000 !important;
                     }
                     
                     @media print {
                         @page { 
                             size: landscape; 
-                            margin: 10mm;
-                            background-color: white;
+                            margin: 5mm;
                         }
-                        body { 
-                            width: 100%; 
+                        html, body { 
+                            width: 100%;
+                            height: 100%;
+                            margin: 0;
+                            padding: 5px;
                             background-color: white !important;
                         }
                         table { 
                             page-break-inside: avoid; 
-                            background-color: white !important;
                         }
-                        tr {
-                            page-break-inside: avoid;
-                            background-color: white !important;
+                        tr { 
+                            page-break-inside: avoid; 
                         }
-                        /* Force backgrounds to print */
-                        * {
-                            -webkit-print-color-adjust: exact !important;
-                            print-color-adjust: exact !important;
-                            color-adjust: exact !important;
+                        td, th {
+                            font-size: 12px !important;
                         }
                     }
                     
                     @media only screen and (max-width: 600px) {
+                        body {
+                            width: 100% !important;
+                            margin: 0 !important;
+                            padding: 5px !important;
+                        }
                         table { 
-                            font-size: 10px; 
+                            font-size: 9px !important;
+                            width: 100% !important;
                         }
                         th, td { 
-                            padding: 4px; 
+                            padding: 3px !important;
                         }
                     }
                 </style>
             </head>
-            <body>
+            <body ontouchstart="">
                 <div class="certificate-container">
                     <h2>${selectedFestival} - Certificate Item Wise Report</h2>
                     ${printContent.innerHTML}
                 </div>
+                <script>
+                    // Force background printing in various browsers
+                    function preparePrint() {
+                        document.body.style.webkitPrintColorAdjust = 'exact';
+                        document.body.style.printColorAdjust = 'exact';
+                        
+                        // Fix any potential table layout issues
+                        const tables = document.querySelectorAll('table');
+                        tables.forEach(table => {
+                            table.style.width = '100%';
+                            table.style.tableLayout = 'fixed';
+                        });
+                    }
+                    
+                    // Run the preparation function
+                    preparePrint();
+                    
+                    // Auto-trigger print on load for mobile devices
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.focus();
+                            window.print();
+                        }, 500);
+                    };
+                </script>
             </body>
             </html>
         `);
         
         iframe.contentDocument.close();
         
-        // Print the iframe after a short delay to ensure content is loaded
+        // Add event listener for after print to clean up
+        iframe.contentWindow.addEventListener('afterprint', () => {
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 500);
+        });
+        
+        // Print with fallback for mobile browser compatibility
         setTimeout(() => {
             try {
                 iframe.contentWindow.focus();
                 iframe.contentWindow.print();
                 
-                // Remove the iframe after printing
+                // Remove the iframe after a timeout as fallback
                 setTimeout(() => {
-                    document.body.removeChild(iframe);
-                }, 1000);
+                    if (document.body.contains(iframe)) {
+                        document.body.removeChild(iframe);
+                    }
+                }, 5000);
             } catch (error) {
                 console.error('Print error:', error);
                 alert('Printing failed. Please try again.');
-                document.body.removeChild(iframe);
+                
+                // Alternative print method for some mobile browsers
+                try {
+                    window.frames["printIframe"].focus();
+                    window.frames["printIframe"].print();
+                } catch (e) {
+                    console.error('Alternative print method failed:', e);
+                    if (document.body.contains(iframe)) {
+                        document.body.removeChild(iframe);
+                    }
+                }
             }
-        }, 1000); // Increased delay to ensure proper rendering on mobile
+        }, 1000);
     };
-
     const certificateItemData = [
         { 
             slNo: 1, 
