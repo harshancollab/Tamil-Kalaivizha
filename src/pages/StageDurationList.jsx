@@ -250,6 +250,59 @@ const StageDurationList = () => {
     }
   };
 
+  // const handlePrint = () => {
+  //   const printContents = printRef.current.innerHTML;
+  //   const printWindow = window.open('', '_blank');
+    
+  //   printWindow.document.write(`
+  //     <html>
+  //     <head>
+  //       <title>${getPrintTitle()}</title>
+  //       <style type="text/css">
+  //         @page {
+  //           size: landscape;
+  //           margin: 0.5cm;
+  //         }
+  //         body {
+  //           padding: 20px;
+  //           font-family: Arial, sans-serif;
+  //         }
+  //         table {
+  //           width: 100%;
+  //           border-collapse: collapse;
+  //         }
+  //         table th, table td {
+  //           border: 1px solid #ddd;
+  //           padding: 8px;
+  //           text-align: center;
+  //         }
+  //         table th {
+  //           background-color: #f2f2f2;
+  //           font-weight: bold;
+  //         }
+  //         .print-title {
+  //           text-align: center;
+  //           margin-bottom: 20px;
+  //           font-size: 18px;
+  //           font-weight: bold;
+  //         }
+  //       </style>
+  //     </head>
+  //     <body>
+  //       <div class="print-title">${getPrintTitle()}</div>
+  //       ${printContents}
+  //     </body>
+  //     </html>
+  //   `);
+    
+  //   printWindow.document.close();
+    
+  //   setTimeout(() => {
+  //     printWindow.print();
+  //     printWindow.close();
+  //   }, 250);
+  // };
+
   const handlePrint = () => {
     const printContents = printRef.current.innerHTML;
     const printWindow = window.open('', '_blank');
@@ -258,23 +311,35 @@ const StageDurationList = () => {
       <html>
       <head>
         <title>${getPrintTitle()}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style type="text/css">
           @page {
             size: landscape;
             margin: 0.5cm;
           }
           body {
-            padding: 20px;
+            padding: 10px;
             font-family: Arial, sans-serif;
           }
           table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
           }
           table th, table td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 4px;
             text-align: center;
+            font-size: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          @media screen and (max-width: 600px) {
+            table th, table td {
+              padding: 2px;
+              font-size: 8px;
+            }
           }
           table th {
             background-color: #f2f2f2;
@@ -282,9 +347,25 @@ const StageDurationList = () => {
           }
           .print-title {
             text-align: center;
-            margin-bottom: 20px;
-            font-size: 18px;
+            margin-bottom: 15px;
+            font-size: 16px;
             font-weight: bold;
+          }
+          @media print {
+            body {
+              width: 100%;
+              padding: 5px;
+            }
+            table {
+              page-break-inside: auto;
+            }
+            tr {
+              page-break-inside: avoid;
+              page-break-after: auto;
+            }
+            @page {
+              size: landscape;
+            }
           }
         </style>
       </head>
@@ -297,13 +378,15 @@ const StageDurationList = () => {
     
     printWindow.document.close();
     
+    // Wait for content to load before printing
     setTimeout(() => {
       printWindow.print();
-      printWindow.close();
-    }, 250);
+      // Only close the window after printing on non-mobile devices
+      if (window.innerWidth > 768) {
+        printWindow.close();
+      }
+    }, 500);
   };
-
- 
   const clearSearch = () => {
     setSearchTerm('');
     setSearchParams(new URLSearchParams({ festival: selectedFestival }));

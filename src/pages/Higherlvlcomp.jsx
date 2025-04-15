@@ -211,6 +211,128 @@ const Higherlvlcomp = () => {
     };
 
    
+    // const handlePrint = () => {
+    //     // Create a hidden iframe for printing
+    //     const printFrame = document.createElement('iframe');
+    //     printFrame.style.position = 'fixed';
+    //     printFrame.style.right = '0';
+    //     printFrame.style.bottom = '0';
+    //     printFrame.style.width = '0';
+    //     printFrame.style.height = '0';
+    //     printFrame.style.border = '0';
+        
+    //     document.body.appendChild(printFrame);
+        
+    //     // Get the content to print
+    //     const printContent = document.getElementById('higher-level-table-container');
+    //     const title = getPrintTitle();
+        
+    //     // Extract background colors from the original table
+    //     const tableRows = printContent.querySelectorAll('tr');
+    //     let preservedHTML = printContent.innerHTML;
+        
+    //     // Write to the iframe
+    //     printFrame.contentDocument.write(`
+    //         <!DOCTYPE html>
+    //         <html>
+    //         <head>
+    //             <title>${title}</title>
+    //             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    //             <style>
+    //                 @page {
+    //                     size: auto;
+    //                     margin: 10mm;
+    //                 }
+    //                 body {
+    //                     font-family: Arial, sans-serif;
+    //                     margin: 0;
+    //                     padding: 10px;
+    //                     -webkit-print-color-adjust: exact !important;
+    //                     print-color-adjust: exact !important;
+    //                     color-adjust: exact !important;
+    //                 }
+    //                 h2 {
+    //                     text-align: center;
+    //                     font-size: 16px;
+    //                     margin-bottom: 15px;
+    //                 }
+    //                 table {
+    //                     width: 100%;
+    //                     border-collapse: collapse;
+    //                     font-size: 10px;
+    //                 }
+    //                 th, td {
+    //                     border: 1px solid #ddd;
+    //                     padding: 4px;
+    //                     text-align: center;
+    //                 }
+    //                 th {
+    //                     background-color: #f2f2f2;
+    //                 }
+                    
+    //                 /* Force background colors to print */
+    //                 * {
+    //                     -webkit-print-color-adjust: exact !important;
+    //                     print-color-adjust: exact !important;
+    //                     color-adjust: exact !important;
+    //                 }
+                    
+    //                 /* Mobile-specific adjustments */
+    //                 @media only screen and (max-width: 600px) {
+    //                     table {
+    //                         font-size: 8px;
+    //                     }
+    //                     th, td {
+    //                         padding: 2px;
+    //                     }
+    //                 }
+                    
+    //                 /* Print-specific styles */
+    //                 @media print {
+    //                     * {
+    //                         -webkit-print-color-adjust: exact !important;
+    //                         print-color-adjust: exact !important;
+    //                         color-adjust: exact !important;
+    //                     }
+    //                     body {
+    //                         width: 100%;
+    //                         margin: 0;
+    //                         padding: 0;
+    //                     }
+    //                 }
+    //             </style>
+    //         </head>
+    //         <body>
+    //             <h2>${title}</h2>
+    //             ${preservedHTML}
+    //         </body>
+    //         </html>
+    //     `);
+        
+    //     printFrame.contentDocument.close();
+        
+    //     // Wait for content to load before printing
+    //     printFrame.onload = function() {
+    //         try {
+    //             // Give it a moment to render properly
+    //             setTimeout(() => {
+    //                 printFrame.contentWindow.focus();
+    //                 printFrame.contentWindow.print();
+                    
+    //                 // Remove the iframe after printing
+    //                 setTimeout(() => {
+    //                     document.body.removeChild(printFrame);
+    //                 }, 1000);
+    //             }, 300);
+    //         } catch (error) {
+    //             console.error('Print error:', error);
+    //             alert('Printing failed. Please try again or use a different device.');
+    //             document.body.removeChild(printFrame);
+    //         }
+    //     };
+    // };
+   
+   
     const handlePrint = () => {
         // Create a hidden iframe for printing
         const printFrame = document.createElement('iframe');
@@ -227,47 +349,52 @@ const Higherlvlcomp = () => {
         const printContent = document.getElementById('higher-level-table-container');
         const title = getPrintTitle();
         
-        // Extract background colors from the original table
-        const tableRows = printContent.querySelectorAll('tr');
-        let preservedHTML = printContent.innerHTML;
+        // Get the table content
+        const preservedHTML = printContent.innerHTML;
         
-        // Write to the iframe
+        // Write to the iframe with improved mobile styles
         printFrame.contentDocument.write(`
             <!DOCTYPE html>
             <html>
             <head>
                 <title>${title}</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
                 <style>
                     @page {
                         size: auto;
-                        margin: 10mm;
+                        margin: 5mm;  /* Reduced margin for mobile */
                     }
                     body {
                         font-family: Arial, sans-serif;
                         margin: 0;
-                        padding: 10px;
+                        padding: 5px;
                         -webkit-print-color-adjust: exact !important;
                         print-color-adjust: exact !important;
                         color-adjust: exact !important;
                     }
                     h2 {
                         text-align: center;
-                        font-size: 16px;
-                        margin-bottom: 15px;
+                        font-size: 14px;
+                        margin-bottom: 10px;
+                        font-weight: bold;
                     }
                     table {
                         width: 100%;
                         border-collapse: collapse;
-                        font-size: 10px;
+                        table-layout: fixed;  /* Fixed layout for better mobile rendering */
                     }
                     th, td {
-                        border: 1px solid #ddd;
-                        padding: 4px;
+                        border: 1px solid #000;  /* Darker border for better visibility */
+                        padding: 3px;
                         text-align: center;
+                        overflow: hidden;
+                        white-space: normal;  /* Allow text to wrap */
+                        word-wrap: break-word;
+                        font-size: 9px;  /* Smaller font size for mobile */
                     }
                     th {
-                        background-color: #f2f2f2;
+                        background-color: #f2f2f2 !important;
+                        font-weight: bold;
                     }
                     
                     /* Force background colors to print */
@@ -279,11 +406,19 @@ const Higherlvlcomp = () => {
                     
                     /* Mobile-specific adjustments */
                     @media only screen and (max-width: 600px) {
+                        body {
+                            width: 100% !important;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                        }
                         table {
-                            font-size: 8px;
+                            width: 100% !important;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            font-size: 8px !important;
                         }
                         th, td {
-                            padding: 2px;
+                            padding: 2px !important;
                         }
                     }
                     
@@ -294,10 +429,18 @@ const Higherlvlcomp = () => {
                             print-color-adjust: exact !important;
                             color-adjust: exact !important;
                         }
-                        body {
+                        html, body {
                             width: 100%;
+                            height: auto;
                             margin: 0;
                             padding: 0;
+                        }
+                        table {
+                            page-break-inside: auto;
+                        }
+                        tr {
+                            page-break-inside: avoid;
+                            page-break-after: auto;
                         }
                     }
                 </style>
@@ -314,16 +457,16 @@ const Higherlvlcomp = () => {
         // Wait for content to load before printing
         printFrame.onload = function() {
             try {
-                // Give it a moment to render properly
+                // Give it more time to render properly on mobile
                 setTimeout(() => {
                     printFrame.contentWindow.focus();
                     printFrame.contentWindow.print();
                     
-                    // Remove the iframe after printing
+                    // Remove the iframe after printing with longer timeout for mobile
                     setTimeout(() => {
                         document.body.removeChild(printFrame);
-                    }, 1000);
-                }, 300);
+                    }, 2000);
+                }, 500);
             } catch (error) {
                 console.error('Print error:', error);
                 alert('Printing failed. Please try again or use a different device.');
@@ -331,6 +474,8 @@ const Higherlvlcomp = () => {
             }
         };
     };
+   
+   
     const displayData = filteredItems.length > 0 ? filteredItems :
         (Allitemresult.length > 0 ? Allitemresult : resultData);
 
