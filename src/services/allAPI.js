@@ -264,3 +264,12 @@ export const getAllCertificateSclwiseAPI = async (reqHeader) => {
 export const getAllHigherlvlcompAPI = async (reqHeader) => {
   return await commonAPI("GET", `${SERVER_URL}/all-Higherlvlcomp`, {}, reqHeader);
 };
+// Get all certificate participants
+export const getAllParticipantsAPI = async (reqHeader) => {
+  return await commonAPI('GET', `${BASE_URL}/participants`, null, reqHeader);
+};
+
+// Get participant by ID
+export const getParticipantByIdAPI = async (id, reqHeader) => {
+  return await commonAPI('GET', `${BASE_URL}/participants/${id}`, null, reqHeader);
+};

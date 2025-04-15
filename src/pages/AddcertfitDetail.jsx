@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import Header from '../components/Header';
-import Dash from '../components/Dash';
-import { useSearchParams } from 'react-router-dom';
+import React, { useState, useRef } from 'react'
+import Header from '../components/Header'
+import Dash from '../components/Dash'
+import { useSearchParams } from 'react-router-dom'
+import html2pdf from 'html2pdf.js'
 
 const AddcertfitDetail = () => {
     const [searchParams] = useSearchParams();
@@ -13,6 +14,7 @@ const AddcertfitDetail = () => {
     const [selectedGroupParticipant, setSelectedGroupParticipant] = useState("");
     const [showCertificate, setShowCertificate] = useState(false);
     const [certificateData, setCertificateData] = useState(null);
+    const certificateRef = useRef(null);
     
     const festivalTypes = [
         { value: "", label: "Select Festival" },
@@ -108,6 +110,30 @@ const AddcertfitDetail = () => {
     const handleBackToSelection = () => {
         setShowCertificate(false);
         setCertificateData(null);
+    };
+
+    const handleDownloadPDF = () => {
+        if (!certificateRef.current) return;
+        
+        const element = certificateRef.current;
+        const filename = selectedParticipant === "All Participants" 
+            ? `${schoolName}-${selectedFestival}-${selectedItem}-all-certificates.pdf`
+            : `${schoolName}-${selectedParticipant}-certificate.pdf`;
+            
+        const options = {
+            margin: 10,
+            filename: filename,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        
+        // If multiple certificates, ensure they all fit well
+        if (certificateData && certificateData.length > 1) {
+            options.pagebreak = { mode: ['avoid-all', 'css', 'legacy'] };
+        }
+        
+        html2pdf().set(options).from(element).save();
     };
 
     return (
@@ -210,7 +236,7 @@ const AddcertfitDetail = () => {
                                 </>
                             ) : (
                                 <>
-                                    <div className="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
+                                    <div ref={certificateRef} className="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
                                         {/* Certificate Title */}
                                         <h1 className="text-xl font-bold text-center mb-6">Certificate Details Report</h1>
                                         
@@ -254,12 +280,18 @@ const AddcertfitDetail = () => {
                                         ))}
                                     </div>
                                     
-                                    <div className="mt-6 flex justify-center">
+                                    <div className="mt-6 flex justify-center space-x-4">
                                         <button
                                             onClick={handleBackToSelection}
-                                            className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-8 py-2 rounded-full"
+                                            className="border border-blue-500 text-blue-700 px-8 py-2 rounded-full"
                                         >
                                             Back
+                                        </button>
+                                        <button
+                                            onClick={handleDownloadPDF}
+                                            className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-8 py-2 rounded-full"
+                                        >
+                                            Download PDF
                                         </button>
                                     </div>
                                 </>
@@ -272,4 +304,4 @@ const AddcertfitDetail = () => {
     );
 };
 
-export default AddcertfitDetail;
+export default AddcertfitDetail
