@@ -3,6 +3,7 @@ import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { getAllConfidentialAPI } from '../services/allAPI';
 import { useSearchParams } from 'react-router-dom';
+import html2pdf from 'html2pdf.js';
 
 const ConfidentialResult = () => {
     const printRef = useRef();
@@ -123,7 +124,10 @@ const ConfidentialResult = () => {
     };
 
     const getPrintTitle = () => {
-        return `${selectedFestival} - ${selectedItem} Result`;
+        if (selectedItem) {
+            return `${selectedFestival} - ${selectedItem} Result`;
+        }
+        return `${selectedFestival} - Confidential Result`;
     };
 
     const handleFestivalChange = (e) => {
@@ -131,87 +135,176 @@ const ConfidentialResult = () => {
         setSearchParams({ festival });
     };
 
-    const handlePrint = () => {
-        const originalContents = document.body.innerHTML;
-        const printContents = printRef.current.innerHTML;
+    // New method for generating PDF using html2pdf
+    const generatePDF = () => {
+        // Create a new div for PDF content
+        const pdfContent = document.createElement('div');
         
-        const itemHeading = selectedItem || "";
-    
-        document.body.innerHTML = `
-            <style type="text/css" media="print">
-                @page {
-                    size: auto;
-                    margin: 0;
-                }
-                body {
-                    padding: 20px;
-                    font-family: sans-serif;
-                }
-                .print-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                }
-                .print-table th, .print-table td {
-                    border: 1px solid #ddd;
-                    padding: 8px;
-                    text-align: center;
-                }
-                .print-table th {
-                    background-color: #f2f2f2;
-                    font-weight: bold;
-                }
-                .print-title {
-                    text-align: center;
-                    margin-bottom: 10px;
-                    font-size: 18px;
-                    font-weight: bold;
-                    display: block !important;
-                }
-                .print-header {
-                    text-align: right;
-                    margin-bottom: 10px;
-                    font-size: 14px;
-                }
-                .print-footer {
-                    margin-top: 20px;
-                    font-size: 12px;
-                }
-                .no-print {
-                    display: none !important;
-                }
-                .absentee-info {
-                    margin-top: 20px;
-                    font-size: 14px;
-                    text-align: left;
-                }
-                .item-heading {
-                    text-align: center;
-                    margin-bottom: 15px;
-                    font-size: 16px;
-                    font-weight: bold;
-                    display: block !important;
-                }
-            </style>
-            <div class="print-title">${selectedFestival} - Result</div>
-            <div class="item-heading">${itemHeading}</div>
-            <div class="print-header">Stage 8 on 07 Dec 2023</div>
-            ${printContents}
-            <div class="absentee-info">
-                <p>Absentee Reg No.: 117, 212, 300</p>
-                <p>No of Absentees: 2</p>
-                <p>No of Withheld Participants: 0</p>
-                <p>No of Appeal Entry: 0</p>
-            </div>
-        `;
-        window.print();
-        document.body.innerHTML = originalContents;
-        window.location.reload();
+        // Add title
+        const titleElement = document.createElement('h2');
+        titleElement.textContent = getPrintTitle();
+        titleElement.style.textAlign = 'center';
+        titleElement.style.margin = '20px 0';
+        titleElement.style.fontWeight = 'bold';
+        pdfContent.appendChild(titleElement);
+        
+        // Add event info
+        const eventInfo = document.createElement('div');
+        eventInfo.textContent = 'Stage 8 on 07 Dec 2023';
+        eventInfo.style.textAlign = 'right';
+        eventInfo.style.marginBottom = '10px';
+        eventInfo.style.fontSize = '14px';
+        pdfContent.appendChild(eventInfo);
+        
+        // Create table
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.style.marginTop = '20px';
+        
+        // Create table header
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        
+        let headers;
+        
+        if (selectedItem && detailResultsData[selectedItem]) {
+            // For item details view
+            headers = [
+                'Sl No', 'Reg No', 'Code No', 'Name', 'School', 
+                'Mark 1', 'Mark 2', 'Mark 3', 'Total', 'Mark %',
+                'Rank', 'Grade', 'Point'
+            ];
+        } else {
+            // For main list view
+            headers = ['Sl No', 'Item Code & Item Name', 'Item Type'];
+        }
+        
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            th.style.border = '1px solid #ddd';
+            th.style.padding = '8px';
+            th.style.backgroundColor = '#f2f2f2';
+            th.style.fontWeight = 'bold';
+            headerRow.appendChild(th);
+        });
+        
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        
+        // Create table body
+        const tbody = document.createElement('tbody');
+        
+        if (selectedItem && detailResultsData[selectedItem]) {
+            // For item details view
+            detailResultsData[selectedItem].forEach(result => {
+                const row = document.createElement('tr');
+                
+                const cellData = [
+                    result.slNo,
+                    result.regNo,
+                    result.codeNo,
+                    result.name,
+                    result.school,
+                    result.mark1,
+                    result.mark2,
+                    result.mark3,
+                    result.total,
+                    result.markPercentage,
+                    result.rank,
+                    result.grade,
+                    result.point
+                ];
+                
+                cellData.forEach(text => {
+                    const td = document.createElement('td');
+                    td.textContent = text;
+                    td.style.border = '1px solid #ddd';
+                    td.style.padding = '8px';
+                    td.style.textAlign = 'center';
+                    row.appendChild(td);
+                });
+                
+                tbody.appendChild(row);
+            });
+        } else {
+            // For main list view
+            const dataToUse = filteredResults.length > 0 ? filteredResults : 
+                        (Allitemresult.length > 0 ? Allitemresult : resultData);
+                        
+            dataToUse.forEach(result => {
+                const row = document.createElement('tr');
+                
+                const cellData = [
+                    result.slNo,
+                    result.regNo,
+                    result.code
+                ];
+                
+                cellData.forEach(text => {
+                    const td = document.createElement('td');
+                    td.textContent = text;
+                    td.style.border = '1px solid #ddd';
+                    td.style.padding = '8px';
+                    td.style.textAlign = 'center';
+                    row.appendChild(td);
+                });
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        table.appendChild(tbody);
+        pdfContent.appendChild(table);
+        
+        // Add absentee info - only if this is an item detail view
+        if (selectedItem && detailResultsData[selectedItem]) {
+            const absenteeInfo = document.createElement('div');
+            absenteeInfo.style.marginTop = '20px';
+            absenteeInfo.style.fontSize = '14px';
+            absenteeInfo.style.textAlign = 'left';
+            
+            const absenteeLines = [
+                'Absentee Reg No.: 117, 212, 300',
+                'No of Absentees: 2',
+                'No of Withheld Participants: 0',
+                'No of Appeal Entry: 0'
+            ];
+            
+            absenteeLines.forEach(line => {
+                const p = document.createElement('p');
+                p.textContent = line;
+                p.style.margin = '5px 0';
+                absenteeInfo.appendChild(p);
+            });
+            
+            pdfContent.appendChild(absenteeInfo);
+        }
+        
+        // PDF filename
+        const fileName = selectedItem ? 
+            `${selectedFestival}_${selectedItem.replace(/ /g, '_')}_Result.pdf` : 
+            `${selectedFestival}_Confidential_Result.pdf`;
+        
+        // PDF options
+        const options = {
+            margin: 10,
+            filename: fileName,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        
+        // Generate and download PDF
+        html2pdf().from(pdfContent).set(options).save();
     };
     
+    // Handle item click to show detail view
     const handleItemClick = (itemName) => {
         setSelectedItem(itemName);
         setTimeout(() => {
-            handlePrint();
+            generatePDF();
         }, 300);
     };
 
@@ -222,80 +315,6 @@ const ConfidentialResult = () => {
         }
     }, []);
   
-    const renderPrintTable = () => {
-        if (selectedItem && detailResultsData[selectedItem]) {
-          
-            return (
-                <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
-                    <thead className="bg-gray-50">
-                        <tr className="text-gray-700">
-                            <th className="p-2 md:p-3">Sl No</th>
-                            <th className="p-2 md:p-3">Reg No</th>
-                            <th className="p-2 md:p-3">Code No</th>
-                            <th className="p-2 md:p-3">Name</th>
-                            <th className="p-2 md:p-3">School</th>
-                            <th className="p-2 md:p-3">Mark 1</th>
-                            <th className="p-2 md:p-3">Mark 2</th>
-                            <th className="p-2 md:p-3">Mark 3</th>
-                            <th className="p-2 md:p-3">Total</th>
-                            <th className="p-2 md:p-3">Mark %</th>
-                            <th className="p-2 md:p-3">Rank</th>
-                            <th className="p-2 md:p-3">Grade</th>
-                            <th className="p-2 md:p-3">Point</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
-                        {detailResultsData[selectedItem].map((result) => (
-                            <tr key={result.slNo} className="hover:bg-gray-100">
-                                <td className="p-2 md:p-3">{result.slNo}</td>
-                                <td className="p-2 md:p-3">{result.regNo}</td>
-                                <td className="p-2 md:p-3">{result.codeNo}</td>
-                                <td className="p-2 md:p-3">{result.name}</td>
-                                <td className="p-2 md:p-3">{result.school}</td>
-                                <td className="p-2 md:p-3">{result.mark1}</td>
-                                <td className="p-2 md:p-3">{result.mark2}</td>
-                                <td className="p-2 md:p-3">{result.mark3}</td>
-                                <td className="p-2 md:p-3">{result.total}</td>
-                                <td className="p-2 md:p-3">{result.markPercentage}</td>
-                                <td className="p-2 md:p-3">{result.rank}</td>
-                                <td className="p-2 md:p-3">{result.grade}</td>
-                                <td className="p-2 md:p-3">{result.point}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            );
-        } else {
-        
-            return (
-                <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
-                    <thead className="bg-gray-50">
-                        <tr className="text-gray-700">
-                            <th className="p-2 md:p-3">Sl No</th>
-                            <th className="p-2 md:p-3">Item Code & Item Name</th>
-                            <th className="p-2 md:p-3">Item Type</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
-                        {filteredResults.length > 0 ? filteredResults.map((result) => (
-                            <tr key={result.slNo} className="hover:bg-gray-100">
-                                <td className="p-2 md:p-3">{result.slNo}</td>
-                                <td className="p-2 md:p-3">{result.regNo}</td>
-                                <td className="p-2 md:p-3">{result.code}</td>
-                            </tr>
-                        )) : (
-                            <tr>
-                                <td colSpan="3" className="p-4 text-center">
-                                    No items found for {selectedFestival}
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            );
-        }
-    };
-
     // Determine what data to display
     const displayData = filteredResults.length > 0 ? filteredResults : 
                        (Allitemresult.length > 0 ? Allitemresult : resultData);
@@ -327,6 +346,12 @@ const ConfidentialResult = () => {
                                     <i className="fa-solid fa-chevron-down"></i>
                                 </div>
                             </div>
+                            <button
+                                onClick={generatePDF}
+                                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
+                            >
+                                Print
+                            </button>
                         </div>
                     </div>
 
@@ -366,10 +391,6 @@ const ConfidentialResult = () => {
                                 </table>
                             </div>
                         </div>
-                    </div>
-
-                    <div ref={printRef} className="hidden">
-                        {renderPrintTable()}
                     </div>
                 </div>
             </div>

@@ -15,6 +15,15 @@ const StageDurationList = () => {
   const [schools, setSchools] = useState([]);
   const [filteredSchools, setFilteredSchools] = useState([]);
   
+  // Festival mappings
+  const festivalOptions = [
+    { value: "ALL Festival", display: "ALL Festival" },
+    { value: "UP", display: "UP Kalaivizha", range: { min: 300, max: 399 } },
+    { value: "Lp", display: "LP Kalaivizha", range: { min: 400, max: 499 } },
+    { value: "Hs", display: "HS Kalaivizha", range: { min: 500, max: 599 } },
+    { value: "Hss", display: "HSS Kalaivizha", range: { min: 600, max: 699 } }
+  ];
+  
   const dummyData = [
     { 
       slno: 1, 
@@ -180,36 +189,20 @@ const StageDurationList = () => {
     let festivalFiltered = [];
     
     if (festival !== "ALL Festival") {
-      switch (festival) {
-        case "UP":
-          festivalFiltered = schools.filter(item => {
-            const itemCode = parseInt(item.code);
-            return itemCode >= 300 && itemCode < 400;
-          });
-          break;
-        case "Lp":
-          festivalFiltered = schools.filter(item => {
-            const itemCode = parseInt(item.code);
-            return itemCode >= 400 && itemCode < 500;
-          });
-          break;
-        case "Hs":
-          festivalFiltered = schools.filter(item => {
-            const itemCode = parseInt(item.code);
-            return itemCode >= 500 && itemCode < 600;
-          });
-          break;
-        case "Hss":
-          festivalFiltered = schools.filter(item => {
-            const itemCode = parseInt(item.code);
-            return itemCode >= 600 && itemCode < 700;
-          });
-          break;
-        default:
-          festivalFiltered = [...schools];
+      // Find the festival option with the matching value
+      const festivalOption = festivalOptions.find(option => option.value === festival);
+      
+      if (festivalOption && festivalOption.range) {
+        // Filter by festival code range
+        festivalFiltered = schools.filter(item => {
+          const itemCode = parseInt(item.code);
+          return itemCode >= festivalOption.range.min && itemCode <= festivalOption.range.max;
+        });
+      } else {
+        festivalFiltered = [...schools]; // No matching festival range found
       }
     } else {
-      festivalFiltered = [...schools];
+      festivalFiltered = [...schools]; // "ALL Festival" selected
     }
 
     if (term) {
@@ -232,18 +225,15 @@ const StageDurationList = () => {
   };
 
   const getPrintTitle = () => {
-    switch(selectedFestival) {
-      case "UP":
-        return "UP Festival - Stage Duration List";
-      case "Lp":
-        return "LP Festival - Stage Duration List";
-      case "Hs":
-        return "HS Festival - Stage Duration List";
-      case "Hss":
-        return "HSS Festival - Stage Duration List";
-      default:
+    const festival = festivalOptions.find(option => option.value === selectedFestival);
+    if (festival) {
+      if (festival.value === "ALL Festival") {
         return "ALL Festival - Stage Duration List";
+      } else {
+        return `${festival.display.split(" ")[0]} Festival - Stage Duration List`;
+      }
     }
+    return "Festival - Stage Duration List";
   };
 
   const handlePrint = () => {
@@ -349,6 +339,12 @@ const StageDurationList = () => {
     applyFilters('', selectedFestival);
   };
 
+  // Helper function to get display name for a festival value
+  const getFestivalDisplayName = (value) => {
+    const festival = festivalOptions.find(option => option.value === value);
+    return festival ? festival.display : value;
+  };
+
   return (
     <>
       <Header />
@@ -367,11 +363,11 @@ const StageDurationList = () => {
                   value={selectedFestival}
                   aria-label="Select Festival"
                 >
-                  <option value="ALL Festival">ALL Festival</option>
-                  <option value="UP">UP Kalaivizha</option>
-                  <option value="Lp">LP Kalaivizha</option>
-                  <option value="Hs">HS Kalaivizha</option>
-                  <option value="Hss">HSS Kalaivizha</option>
+                  {festivalOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.display}
+                    </option>
+                  ))}
                 </select>
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
                   <i className="fa-solid fa-chevron-down"></i>
@@ -454,7 +450,7 @@ const StageDurationList = () => {
                           <td colSpan="9" className="p-6 text-center text-gray-600">
                             <div className="flex flex-col items-center justify-center gap-2">
                               <i className="fa-solid fa-search text-2xl text-gray-400"></i>
-                              <p>No items found for {selectedFestival === "ALL Festival" ? "any festival" : selectedFestival}</p>
+                              <p>No items found for {getFestivalDisplayName(selectedFestival)}</p>
                               {searchTerm && (
                                 <button
                                   onClick={clearSearch}

@@ -5,18 +5,22 @@ import { getAllItemwisepointAPI } from '../services/allAPI';
 import html2pdf from 'html2pdf.js';
 
 const ItemWisePoint = () => {
-  const [schoolCode, setSchoolCode] = useState('');
+  const [schoolSearch, setSchoolSearch] = useState('');
   const [selectedFestival, setSelectedFestival] = useState('All Festival');
   const [Allitemwiswpoint, setItemwiswpoint] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     getAllItemwiswpoint();
   }, []);
 
   useEffect(() => {
-    filterItemsByFestival(selectedFestival);
-  }, [selectedFestival, Allitemwiswpoint]);
+    filterItemsByFestivalAndSchool(selectedFestival, schoolSearch);
+    
+    // Update search state based on input value
+    setIsSearching(schoolSearch.trim() !== '');
+  }, [selectedFestival, Allitemwiswpoint, schoolSearch]);
 
   const getAllItemwiswpoint = async () => {
     const token = sessionStorage.getItem("token");
@@ -38,9 +42,10 @@ const ItemWisePoint = () => {
     }
   }
 
-  const filterItemsByFestival = (festival) => {
+  const filterItemsByFestivalAndSchool = (festival, schoolName) => {
     if (!Allitemwiswpoint.length) return;
     
+    // First filter by festival
     let filtered;
     switch (festival) {
       case "UP Kalaivizha":
@@ -79,18 +84,18 @@ const ItemWisePoint = () => {
         filtered = [...Allitemwiswpoint];
     }
     
-    // Add sequential numbering to filtered results
+    // Then filter by school name if provided
+    if (schoolName.trim() !== '') {
+      filtered = filtered.filter(item => 
+        item.school.toLowerCase().includes(schoolName.toLowerCase())
+      );
+    }
+    
+    // Add sequential numbering to filtered results AFTER both filters have been applied
     filtered = filtered.map((item, index) => ({
       ...item,
       slNo: index + 1
     }));
-    
-    // Further filter by school code if provided
-    if (schoolCode.trim() !== '') {
-      filtered = filtered.filter(item => 
-        item.school.toLowerCase().includes(schoolCode.toLowerCase())
-      );
-    }
     
     setFilteredItems(filtered);
   }
@@ -106,16 +111,53 @@ const ItemWisePoint = () => {
     { slNo: 8, itemCode: "606 - HSS Folk Dance", school: "St. Mary's HSS", studentName: "Dance Group", grade: "B", point: 8.0, totalPoint: 8.0 }
   ];
 
-  const handleSchoolCodeChange = (e) => {
-    setSchoolCode(e.target.value);
-    // Trigger filtering whenever school code changes
-    setTimeout(() => {
-      filterItemsByFestival(selectedFestival);
-    }, 100);
+  const handleSchoolSearchChange = (e) => {
+    setSchoolSearch(e.target.value);
+    // Set isSearching directly based on current input value
+    setIsSearching(e.target.value.trim() !== '');
+    // Update URL with search parameters
+    updateURLParams(e.target.value, selectedFestival);
   };
 
   const handleFestivalChange = (e) => {
     setSelectedFestival(e.target.value);
+    // Update URL with festival parameter
+    updateURLParams(schoolSearch, e.target.value);
+  };
+
+  // Function to update URL parameters
+  const updateURLParams = (school, festival) => {
+    const url = new URL(window.location);
+    
+    if (school.trim() !== '') {
+      url.searchParams.set('school', school);
+    } else {
+      url.searchParams.delete('school');
+    }
+    
+    if (festival !== 'All Festival') {
+      url.searchParams.set('festival', festival);
+    } else {
+      url.searchParams.delete('festival');
+    }
+    
+    window.history.replaceState({}, '', url);
+  };
+
+  // Function to read URL parameters on component mount
+  const readURLParams = () => {
+    const url = new URL(window.location);
+    const schoolParam = url.searchParams.get('school');
+    const festivalParam = url.searchParams.get('festival');
+    
+    if (schoolParam) {
+      setSchoolSearch(schoolParam);
+      setIsSearching(true); // Set isSearching immediately when loading from URL params
+    }
+    
+    if (festivalParam) {
+      setSelectedFestival(festivalParam);
+    }
   };
 
   const getPrintTitle = () => {
@@ -188,11 +230,21 @@ const ItemWisePoint = () => {
     html2pdf().from(pdfContent).set(options).save();
   };
   
+  const clearSearch = () => {
+    setSchoolSearch('');
+    setIsSearching(false); // Explicitly set isSearching to false when clearing
+    // Also clear from URL
+    updateURLParams('', selectedFestival);
+  };
+  
   useEffect(() => {
     if (Allitemwiswpoint.length === 0 && resultData.length > 0) {
       setItemwiswpoint(resultData);
-      filterItemsByFestival(selectedFestival);
+      filterItemsByFestivalAndSchool(selectedFestival, schoolSearch);
     }
+    
+    // Read URL parameters on component mount
+    readURLParams();
   }, []);
 
   // Determine what data to display
@@ -211,28 +263,22 @@ const ItemWisePoint = () => {
             </h2>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
               <div className="flex items-center gap-2 w-full sm:w-auto">
-                <label className="text-blue-700 whitespace-nowrap min-w-max">School Code</label>
+                <label className="text-blue-700 whitespace-nowrap min-w-max">School Name</label>
                 <input
                   type="text"
                   className="rounded-full border border-blue-700 px-2 py-2 flex-grow"
-                  placeholder="Enter School Code..."
-                  value={schoolCode}
-                  onChange={handleSchoolCodeChange}
+                  placeholder="Search by school name..."
+                  value={schoolSearch}
+                  onChange={handleSchoolSearchChange}
                 />
               </div>
 
               <button
-                className={`border-blue-800 border text-blue-900 py-2 px-4 rounded-full min-w-max whitespace-nowrap ${schoolCode.trim() !== '' ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                disabled={schoolCode.trim() !== ''}
-                onClick={() => {
-                  setSchoolCode('');
-                  setTimeout(() => {
-                    filterItemsByFestival(selectedFestival);
-                  }, 100);
-                }}
+                className={`border-blue-800 border text-blue-900 py-2 px-4 rounded-full min-w-max whitespace-nowrap ${isSearching ? 'opacity-100' : 'opacity-50 cursor-not-allowed'}`}
+                disabled={!isSearching}
+                onClick={clearSearch}
               >
-                All School
+                All Schools
               </button>
 
               <div className="relative w-full sm:w-40">
@@ -296,8 +342,21 @@ const ItemWisePoint = () => {
                         ) : (
                           <tr>
                             <td colSpan="7" className="p-4 text-center">
-                              No items found for {selectedFestival}
-                              {schoolCode.trim() !== '' ? ` with school code "${schoolCode}"` : ''}
+                              <div className="flex flex-col items-center justify-center p-6">
+                                <p className="text-red-500 font-medium mb-2">No results found</p>
+                                <p>
+                                  No items found for {selectedFestival}
+                                  {isSearching ? ` with school name containing "${schoolSearch}"` : ''}
+                                </p>
+                                {isSearching && (
+                                  <button 
+                                    onClick={clearSearch}
+                                    className="mt-4 bg-blue-100 text-blue-700 hover:bg-blue-200 font-medium py-2 px-4 rounded-full"
+                                  >
+                                    Clear Search
+                                  </button>
+                                )}
+                              </div>
                             </td>
                           </tr>
                         )}

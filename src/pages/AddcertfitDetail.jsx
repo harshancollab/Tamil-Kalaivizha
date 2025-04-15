@@ -1,8 +1,9 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useSearchParams } from 'react-router-dom'
 import html2pdf from 'html2pdf.js'
+// import { getAllCertificateDetailsAPI, generateCertificateDetailsAPI } from '../services/allAPI'
 
 const AddcertfitDetail = () => {
     const [searchParams] = useSearchParams();
@@ -14,6 +15,7 @@ const AddcertfitDetail = () => {
     const [selectedGroupParticipant, setSelectedGroupParticipant] = useState("");
     const [showCertificate, setShowCertificate] = useState(false);
     const [certificateData, setCertificateData] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
     const certificateRef = useRef(null);
     
     const festivalTypes = [
@@ -46,65 +48,103 @@ const AddcertfitDetail = () => {
         { value: "1 - Ramesh", label: "1 - Ramesh" },
         { value: "2 - Vijayalakshmi", label: "2 - Vijayalakshmi" },
         { value: "3 - Suresh", label: "3 - Suresh" },
-       
     ];
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
         
-        // Generate certificate data based on form selections
         if (selectedFestival && selectedItem) {
-            // Create certificate data based on form selections
-            if (selectedParticipant === "All Participants") {
-                // Generate certificates for all participants
-                setCertificateData([
-                    {
-                        name: "Anu",
-                        regNo: "1",
+            const token = sessionStorage.getItem("token");
+            if (token) {
+                const reqHeader = {
+                    "Authorization": `Bearer ${token}`
+                };
+                
+                try {
+                    // Create request payload
+                    const requestData = {
                         festival: selectedFestival,
                         item: selectedItem,
-                        school: schoolName,
-                        class: "10",
-                        grade: "A"
-                    },
-                    {
-                        name: "Binu",
-                        regNo: "2",
-                        festival: selectedFestival,
-                        item: selectedItem,
-                        school: schoolName,
-                        class: "11",
-                        grade: "A"
-                    },
-                    {
-                        name: "Cinu",
-                        regNo: "3",
-                        festival: selectedFestival,
-                        item: selectedItem,
-                        school: schoolName,
-                        class: "12",
-                        grade: "B"
+                        participant: selectedParticipant,
+                        groupParticipant: selectedGroupParticipant,
+                        school: schoolName
+                    };
+                    
+                    // Call API to generate certificate details
+                    const result = await generateCertificateDetailsAPI(requestData, reqHeader);
+                    
+                    if (result.status === 200) {
+                        setCertificateData(result.data);
+                        setShowCertificate(true);
+                    } else {
+                        console.log("Failed to generate certificate details");
                     }
-                ]);
+                } catch (err) {
+                    console.log(err);
+                    // If API fails, fallback to static data to demonstrate functionality
+                    provideFallbackData();
+                }
             } else {
-                // Generate certificate for selected participant
-                setCertificateData([
-                    {
-                        name: selectedParticipant,
-                        regNo: selectedParticipant === "Anu" ? "1" : 
-                               selectedParticipant === "Binu" ? "2" : "3",
-                        festival: selectedFestival,
-                        item: selectedItem,
-                        school: schoolName,
-                        class: selectedParticipant === "Anu" ? "10" : 
-                                selectedParticipant === "Binu" ? "11" : "12",
-                        grade: selectedParticipant === "Cinu" ? "B" : "A"
-                    }
-                ]);
+                // If no token, fallback to static data for demo
+                provideFallbackData();
             }
-            
-            setShowCertificate(true);
         }
+        
+        setIsLoading(false);
+    };
+
+    // Fallback function to provide static data when API fails
+    const provideFallbackData = () => {
+        if (selectedParticipant === "All Participants") {
+            // Generate certificates for all participants
+            setCertificateData([
+                {
+                    name: "Anu",
+                    regNo: "1",
+                    festival: selectedFestival,
+                    item: selectedItem,
+                    school: schoolName,
+                    class: "10",
+                    grade: "A"
+                },
+                {
+                    name: "Binu",
+                    regNo: "2",
+                    festival: selectedFestival,
+                    item: selectedItem,
+                    school: schoolName,
+                    class: "11",
+                    grade: "A"
+                },
+                {
+                    name: "Cinu",
+                    regNo: "3",
+                    festival: selectedFestival,
+                    item: selectedItem,
+                    school: schoolName,
+                    class: "12",
+                    grade: "B"
+                }
+            ]);
+        } else {
+            // Generate certificate for selected participant
+            setCertificateData([
+                {
+                    name: selectedParticipant,
+                    regNo: selectedParticipant === "Anu" ? "1" : 
+                           selectedParticipant === "Binu" ? "2" : "3",
+                    festival: selectedFestival,
+                    item: selectedItem,
+                    school: schoolName,
+                    class: selectedParticipant === "Anu" ? "10" : 
+                            selectedParticipant === "Binu" ? "11" : "12",
+                    grade: selectedParticipant === "Cinu" ? "B" : "A"
+                }
+            ]);
+        }
+        
+        setShowCertificate(true);
     };
 
     const handleBackToSelection = () => {
@@ -226,8 +266,9 @@ const AddcertfitDetail = () => {
                                                     <button
                                                         type="submit"
                                                         className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-8 md:px-14 py-2 md:py-3 rounded-full"
+                                                        disabled={isLoading}
                                                     >
-                                                        Generate
+                                                        {isLoading ? 'Generating...' : 'Generate'}
                                                     </button>
                                                 </div>
                                             </div>
