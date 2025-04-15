@@ -161,10 +161,13 @@ import React, { useEffect, useState, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { getAllElgibleSclListAPI } from '../services/allAPI'
+import html2pdf from 'html2pdf.js'
 
 const EligibleSclList = () => {
   const [Alllist, setList] = useState([]);
   const printRef = useRef();
+  
+  console.log(Alllist);
   
   useEffect(() => {
     getAllitemise();
@@ -187,149 +190,88 @@ const EligibleSclList = () => {
     }
   };
   
-  const handlePrint = () => {
-    // Create a new window for printing
-    const printWindow = window.open('', '_blank');
+  // New PDF generation using html2pdf
+  const generatePDF = () => {
+    // Create a clone of the table for PDF generation
+    const pdfContent = document.createElement('div');
     
-    if (!printWindow) {
-      alert("Please allow pop-ups for printing functionality");
-      return;
-    }
+    // Add title
+    const titleElement = document.createElement('h2');
+    titleElement.textContent = "List Of Eligible Schools";
+    titleElement.style.textAlign = 'center';
+    titleElement.style.margin = '20px 0';
+    titleElement.style.fontWeight = 'bold';
+    pdfContent.appendChild(titleElement);
+
+    // Create table clone
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    table.style.marginTop = '20px';
     
-    // Write print-optimized content to the new window
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Eligible Schools List</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-          @media print {
-            @page {
-              size: auto;
-              margin: 10mm;
-            }
-          }
-          
-          body {
-            font-family: Arial, sans-serif;
-            padding: 15px;
-            margin: 0;
-          }
-          
-          .print-title {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 18px;
-            font-weight: bold;
-          }
-          
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-          }
-          
-          th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-          }
-          
-          th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-          }
-          
-          .no-print-message {
-            display: none;
-          }
-          
-          @media only screen and (max-width: 600px) {
-            body {
-              padding: 5px;
-            }
-            
-            table {
-              font-size: 12px;
-            }
-            
-            th, td {
-              padding: 4px;
-            }
-            
-            .print-title {
-              font-size: 16px;
-            }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="print-title">List Of Eligible Schools</div>
-        <table>
-          <thead>
-            <tr>
-              <th>Sl No</th>
-              <th>School Code</th>
-              <th>School Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${Array.isArray(Alllist) && Alllist.length > 0 
-              ? Alllist.map((item, index) => `
-                <tr>
-                  <td>${index + 1}</td>
-                  <td>${item.schoolCode || "-"}</td>
-                  <td>${item.schoolName || "-"}</td>
-                </tr>
-              `).join('')
-              : `
-                <tr>
-                  <td>1</td>
-                  <td>9</td>
-                  <td>School Name</td>
-                </tr>
-              `
-            }
-          </tbody>
-        </table>
-        <script>
-          // Auto-close this window if it loses focus without printing
-          // This handles the case when user clicks "Cancel" in the print dialog
-          let printed = false;
-          
-          window.addEventListener('beforeprint', function() {
-            printed = true;
-          });
-          
-          window.addEventListener('afterprint', function() {
-            window.close();
-          });
-          
-          // Set a timer to check if printing happened
-          setTimeout(function() {
-            if (!printed) {
-              window.close();
-            }
-          }, 1000);
-          
-          // Close on click anywhere (alternative for mobile devices)
-          document.addEventListener('click', function() {
-            if (!printed) {
-              window.close();
-            }
-          });
-        </script>
-      </body>
-      </html>
-    `);
+    // Create table header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
     
-    printWindow.document.close();
+    const headers = ['Sl No', 'School Code', 'School Name'];
+    headers.forEach(headerText => {
+      const th = document.createElement('th');
+      th.textContent = headerText;
+      th.style.border = '1px solid #ddd';
+      th.style.padding = '8px';
+      th.style.backgroundColor = '#f2f2f2';
+      th.style.fontWeight = 'bold';
+      headerRow.appendChild(th);
+    });
     
-    // Add a slight delay to ensure content is loaded before printing
-    setTimeout(() => {
-      printWindow.print();
-    }, 500);
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    
+    // Create table body
+    const tbody = document.createElement('tbody');
+    
+    // Use Alllist data or fallback to sample data if empty
+    const dataToUse = Alllist && Alllist.length > 0 ? Alllist : [{ schoolCode: '9', schoolName: 'School Name' }];
+    
+    dataToUse.forEach((item, index) => {
+      const row = document.createElement('tr');
+      
+      // Add cells
+      const cellData = [
+        index + 1,
+        item.schoolCode || "-",
+        item.schoolName || "-"
+      ];
+      
+      cellData.forEach(text => {
+        const td = document.createElement('td');
+        td.textContent = text;
+        td.style.border = '1px solid #ddd';
+        td.style.padding = '8px';
+        td.style.textAlign = 'center';
+        row.appendChild(td);
+      });
+      
+      tbody.appendChild(row);
+    });
+    
+    table.appendChild(tbody);
+    pdfContent.appendChild(table);
+    
+    // PDF filename
+    const fileName = 'Eligible_Schools_List.pdf';
+    
+    // PDF options
+    const options = {
+      margin: 10,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    // Generate and download PDF
+    html2pdf().from(pdfContent).set(options).save();
   };
 
   return (
@@ -345,15 +287,15 @@ const EligibleSclList = () => {
             </h2>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
               <button
-                onClick={handlePrint}
+                onClick={generatePDF}
                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
               >
-                Print
+               Print
               </button>
             </div>
           </div>
           <div ref={printRef} className="w-full">
-            <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <div className="overflow-x-auto -mx-4 sm:mx-0 ">
               <div className="inline-block min-w-full align-middle px-4 sm:px-0">
                 <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
                   <thead className="text-xs sm:text-sm">
@@ -376,7 +318,7 @@ const EligibleSclList = () => {
                       <tr className="hover:bg-gray-100">
                         <td className="p-2 md:p-3">1</td>
                         <td className="p-2 md:p-3">9</td>
-                        <td className="p-2 md:p-3">School Name</td>
+                        <td className="p-2 md:p-3"> School Name</td>
                       </tr>
                     )}
                   </tbody>

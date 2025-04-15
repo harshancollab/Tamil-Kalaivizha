@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Header from '../components/Header';
 import Dash from '../components/Dash';
 import { getAllSchoolContactAPI } from '../services/allAPI';
+import html2pdf from 'html2pdf.js';
 
 const SclContactList = () => {
   const [Alllist, setList] = useState([]);
@@ -155,83 +156,120 @@ const SclContactList = () => {
     return teachers;
   };
 
-  const handlePrint = () => {
-    const originalContents = document.body.innerHTML;
+  // New PDF generation function using html2pdf
+  const generatePDF = () => {
+    // Create a container for PDF content
+    const pdfContent = document.createElement('div');
+    
+    // Add title
+    const titleElement = document.createElement('h2');
+    titleElement.textContent = "School Contacts List";
+    titleElement.style.textAlign = 'center';
+    titleElement.style.margin = '20px 0';
+    titleElement.style.fontWeight = 'bold';
+    titleElement.style.fontSize = '18px';
+    pdfContent.appendChild(titleElement);
 
-    // Create a simple table for printing
-    let printTableHTML = `
-      <table border="1" cellpadding="8" cellspacing="0">
-        <thead>
-          <tr>
-            <th>Sl. No.</th>
-            <th>School ID</th>
-            <th>School Name</th>
-            <th>Contact Details</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
-
-    schoolContacts.forEach((school, index) => {
-      printTableHTML += `
-        <tr>
-          <td>${index + 1}</td>
-          <td>${school.id}</td>
-          <td>${school.name}</td>
-          <td>
-            <div>Headmaster: ${school.headmaster.phone}</div>
-            <div>Team Manager: ${school.teamManager.phone}</div>
-            <div>Chairman: ${school.chairman.phone}</div>
-            <div>Escorting Teachers: ${getAllEscortingTeachers(school).join(', ')}</div>
-          </td>
-        </tr>
-      `;
+    // Create table
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    table.style.marginTop = '20px';
+    
+    // Create table header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    
+    const headers = ['Sl. No.', 'School ID', 'School Name', 'Contact Details'];
+    headers.forEach(headerText => {
+      const th = document.createElement('th');
+      th.textContent = headerText;
+      th.style.border = '1px solid #ddd';
+      th.style.padding = '8px';
+      th.style.backgroundColor = '#f2f2f2';
+      th.style.fontWeight = 'bold';
+      th.style.textAlign = 'left';
+      headerRow.appendChild(th);
     });
-
-    printTableHTML += `
-        </tbody>
-      </table>
-    `;
-
-    document.body.innerHTML = `
-      <style type="text/css" media="print">
-        @page {
-          size: auto;
-          margin: 0.5cm;
-        }
-        body {
-          padding: 20px;
-          font-family: sans-serif;
-        }
-        .print-title {
-          text-align: center;
-          margin-bottom: 20px;
-          font-size: 18px;
-          font-weight: bold;
-          display: block !important;
-        }
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 15px;
-        }
-        th, td {
-          border: 1px solid #ddd;
-          padding: 8px;
-          text-align: left;
-        }
-        th {
-          background-color: #f2f2f2;
-          font-weight: bold;
-        }
-      </style>
-      <div class="print-title">School Contacts List</div>
-      ${printTableHTML}
-    `;
-
-    window.print();
-    document.body.innerHTML = originalContents;
-    window.location.reload();
+    
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    
+    // Create table body
+    const tbody = document.createElement('tbody');
+    
+    // Use schoolContacts data (in production, you would use Alllist)
+    schoolContacts.forEach((school, index) => {
+      const row = document.createElement('tr');
+      
+      // Add cells
+      const indexCell = document.createElement('td');
+      indexCell.textContent = index + 1;
+      indexCell.style.border = '1px solid #ddd';
+      indexCell.style.padding = '8px';
+      row.appendChild(indexCell);
+      
+      const idCell = document.createElement('td');
+      idCell.textContent = school.id;
+      idCell.style.border = '1px solid #ddd';
+      idCell.style.padding = '8px';
+      row.appendChild(idCell);
+      
+      const nameCell = document.createElement('td');
+      nameCell.textContent = school.name;
+      nameCell.style.border = '1px solid #ddd';
+      nameCell.style.padding = '8px';
+      row.appendChild(nameCell);
+      
+      const contactsCell = document.createElement('td');
+      contactsCell.style.border = '1px solid #ddd';
+      contactsCell.style.padding = '8px';
+      
+      // Create contact details entries
+      const contactDetails = document.createElement('div');
+      
+      const headmasterDiv = document.createElement('div');
+      headmasterDiv.textContent = `Headmaster: ${school.headmaster.phone}`;
+      headmasterDiv.style.marginBottom = '4px';
+      contactDetails.appendChild(headmasterDiv);
+      
+      const teamManagerDiv = document.createElement('div');
+      teamManagerDiv.textContent = `Team Manager: ${school.teamManager.phone}`;
+      teamManagerDiv.style.marginBottom = '4px';
+      contactDetails.appendChild(teamManagerDiv);
+      
+      const chairmanDiv = document.createElement('div');
+      chairmanDiv.textContent = `Chairman: ${school.chairman.phone}`;
+      chairmanDiv.style.marginBottom = '4px';
+      contactDetails.appendChild(chairmanDiv);
+      
+      const escortingTeachersDiv = document.createElement('div');
+      escortingTeachersDiv.textContent = `Escorting Teachers: ${getAllEscortingTeachers(school).join(', ')}`;
+      contactDetails.appendChild(escortingTeachersDiv);
+      
+      contactsCell.appendChild(contactDetails);
+      row.appendChild(contactsCell);
+      
+      tbody.appendChild(row);
+    });
+    
+    table.appendChild(tbody);
+    pdfContent.appendChild(table);
+    
+    // PDF filename
+    const fileName = 'School_Contacts_List.pdf';
+    
+    // PDF options
+    const options = {
+      margin: 10,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } // Use landscape for better fit
+    };
+    
+    // Generate and download PDF
+    html2pdf().from(pdfContent).set(options).save();
   };
 
   return (
@@ -243,37 +281,35 @@ const SclContactList = () => {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl md:text-2xl font-bold">School Contacts List</h2>
             <button
-              onClick={handlePrint}
+              onClick={generatePDF}
               className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full"
             >
-              Print
+            Print
             </button>
           </div>
           <div ref={printRef} className="w-full">
             <div className="overflow-x-auto -mx-4 sm:mx-0">
               <div className="inline-block min-w-full align-middle px-4 sm:px-0">
                 <div className="shadow overflow-hidden border-gray-200 sm:rounded-lg">
-                  <table className="min-w-full text-center   print-table">
-                    <thead className=" min-h-screen  ">
+                  <table className="min-w-full text-center print-table">
+                    <thead className="min-h-screen">
                       <tr className="text-gray-700">
-                        <th className="p-2 md:p-3  text-xs sm:text-sm">Sl No</th>
-                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code </th>
+                        <th className="p-2 md:p-3 text-xs sm:text-sm">Sl No</th>
+                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code</th>
                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
-                        
                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Status</th>
-                        
                       </tr>
                     </thead>
-                    <tbody className=" text-xs sm:text-sm">
+                    <tbody className="text-xs sm:text-sm">
                     {schoolContacts.map((school, index) => (
                         <tr key={index} className="hover:bg-gray-100">
                           <td className="p-2 md:p-3 whitespace-nowrap">{index + 1}</td>
                           <td className="p-2 md:p-3 whitespace-nowrap">{school.id}</td>
-                          <td className="p-2 md:p-3 whitespace-nowrap ">{school.name}</td>
+                          <td className="p-2 md:p-3 whitespace-nowrap">{school.name}</td>
                           <td className="p-2 md:p-3 whitespace-nowrap">
                             <button
                               onClick={() => openModal(school)}
-                              className="text-[#114568]  py-1 px-3 rounded-md "
+                              className="text-[#114568] py-1 px-3 rounded-md"
                             >
                               View More
                             </button>
@@ -294,7 +330,6 @@ const SclContactList = () => {
                   <h3 className="text-xl font-bold text-gray-800">
                     {selectedSchool.id} - {selectedSchool.name}
                   </h3>
-                 
                 </div>
 
                 <div className="space-y-4">

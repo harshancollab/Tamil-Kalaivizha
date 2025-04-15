@@ -231,6 +231,7 @@ import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { getAllPartcipteSclListAPI } from '../services/allAPI';
 import { useSearchParams } from 'react-router-dom';
+import html2pdf from 'html2pdf.js';
 
 const ParticipatingSclList = () => {
   // Dummy data for development and fallback
@@ -306,124 +307,85 @@ const ParticipatingSclList = () => {
     }
   };
 
-  // Improved mobile-friendly print function
-  const handlePrint = () => {
-    // Create a new iframe element
-    const printIframe = document.createElement('iframe');
+  // PDF generation using html2pdf which has better browser compatibility
+  const generatePDF = () => {
+    // Create a clone of the table for PDF generation
+    const pdfContent = document.createElement('div');
     
-    // Set attributes to make it invisible
-    printIframe.style.position = 'absolute';
-    printIframe.style.width = '0px';
-    printIframe.style.height = '0px';
-    printIframe.style.border = '0';
+    // Add title
+    const titleElement = document.createElement('h2');
+    titleElement.textContent = getPrintTitle();
+    titleElement.style.textAlign = 'center';
+    titleElement.style.margin = '20px 0';
+    titleElement.style.fontWeight = 'bold';
+    pdfContent.appendChild(titleElement);
+
+    // Create table clone
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    table.style.marginTop = '20px';
     
-    // Append iframe to the body
-    document.body.appendChild(printIframe);
+    // Create table header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
     
-    // Get reference to iframe document
-    const iframeDoc = printIframe.contentWindow.document;
+    const headers = ['Sl No', 'School Code', 'School Name'];
+    headers.forEach(headerText => {
+      const th = document.createElement('th');
+      th.textContent = headerText;
+      th.style.border = '1px solid #ddd';
+      th.style.padding = '8px';
+      th.style.backgroundColor = '#f2f2f2';
+      th.style.fontWeight = 'bold';
+      headerRow.appendChild(th);
+    });
     
-    // Write print content to iframe document
-    iframeDoc.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>${getPrintTitle()}</title>
-          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-          <style>
-            @media print {
-              @page {
-                size: auto;
-                margin: 10mm;
-              }
-              
-              body {
-                font-family: Arial, sans-serif;
-                padding: 0;
-                margin: 0;
-              }
-              
-              .print-container {
-                width: 100%;
-                padding: 10px;
-              }
-              
-              .print-title {
-                text-align: center;
-                font-size: 16px;
-                font-weight: bold;
-                margin-bottom: 15px;
-              }
-              
-              .print-table {
-                width: 100%;
-                border-collapse: collapse;
-                font-size: 12px;
-              }
-              
-              .print-table th, .print-table td {
-                border: 1px solid #000;
-                padding: 5px;
-                text-align: center;
-              }
-              
-              .print-table th {
-                background-color: #f2f2f2;
-                font-weight: bold;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="print-container">
-            <div class="print-title">${getPrintTitle()}</div>
-            <table class="print-table">
-              <thead>
-                <tr>
-                  <th>Sl No</th>
-                  <th>School Code</th>
-                  <th>School Name</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${filteredList && filteredList.length > 0 ? 
-                  filteredList.map((item, index) => `
-                    <tr>
-                      <td>${index + 1}</td>
-                      <td>${item.schoolCode || "-"}</td>
-                      <td>${item.schoolName || "-"}</td>
-                    </tr>
-                  `).join('') : 
-                  `<tr><td colspan="3">No schools found for this festival.</td></tr>`
-                }
-              </tbody>
-            </table>
-          </div>
-        </body>
-      </html>
-    `);
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
     
-    iframeDoc.close();
+    // Create table body
+    const tbody = document.createElement('tbody');
     
-    // Wait for iframe content to load before printing
-    printIframe.onload = function() {
-      try {
-        // Focus and print
-        printIframe.contentWindow.focus();
-        printIframe.contentWindow.print();
-        
-        // Remove iframe after printing (delayed to ensure print dialog appears)
-        setTimeout(() => {
-          document.body.removeChild(printIframe);
-        }, 500);
-      } catch (error) {
-        console.error('Print error:', error);
-        document.body.removeChild(printIframe);
-        
-        // Fallback to window.print() if iframe method fails
-        window.print();
-      }
+    filteredList.forEach((item, index) => {
+      const row = document.createElement('tr');
+      
+      // Add cells
+      const cellData = [
+        index + 1,
+        item.schoolCode || "-",
+        item.schoolName || "-"
+      ];
+      
+      cellData.forEach(text => {
+        const td = document.createElement('td');
+        td.textContent = text;
+        td.style.border = '1px solid #ddd';
+        td.style.padding = '8px';
+        td.style.textAlign = 'center';
+        row.appendChild(td);
+      });
+      
+      tbody.appendChild(row);
+    });
+    
+    table.appendChild(tbody);
+    pdfContent.appendChild(table);
+    
+    // PDF filename
+    const fileName = `${selectedFestival.replace(/ /g, '_')}_Schools_List.pdf`;
+    
+    // PDF options
+    const options = {
+      margin: 10,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
+    
+    // Generate and download PDF
+    html2pdf().from(pdfContent).set(options).save();
   };
 
   // Filter the list based on selected festival using itemCodeName range
@@ -481,19 +443,19 @@ const ParticipatingSclList = () => {
                 </div>
               </div>
               <button
-                onClick={handlePrint}
+                onClick={generatePDF}
                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
               >
-                Print
+               Print
               </button>
             </div>
           </div>
           <div ref={printRef} className="w-full">
-            <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <div className="overflow-x-auto -mx-4 sm:mx-0 ">
               <div className="inline-block min-w-full align-middle px-4 sm:px-0">
-                <table className="min-w-full text-center border-separate border-spacing-y-2">
+                <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
                   <thead className="text-xs sm:text-sm">
-                    <tr className="text-gray-700">
+                    <tr className="text-gray-700 ">
                       <th className="p-2 md:p-3">Sl No</th>
                       <th className="p-2 md:p-3">School Code</th>
                       <th className="p-2 md:p-3">School Name</th>
