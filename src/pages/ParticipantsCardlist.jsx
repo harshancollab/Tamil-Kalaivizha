@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useSearchParams } from 'react-router-dom';
+import html2pdf from 'html2pdf.js';
 
 const ParticipantsCardList = () => {
   const [participants, setParticipants] = useState([]);
@@ -47,81 +48,131 @@ const ParticipantsCardList = () => {
     setSearchParams({ photoStatus: e.target.value });
   };
 
-  const handlePrint = () => {
-    const originalContents = document.body.innerHTML;
-    const printContents = printRef.current.innerHTML;
-
-    document.body.innerHTML = `
-      <style type="text/css" media="print">
-        @page {
-          size: auto;
-          margin: 0;
-        }
-        body {
-          padding: 20px;
-          font-family: sans-serif;
-        }
-        .print-title {
-          text-align: center;
-          margin-bottom: 20px;
-          font-size: 18px;
-          font-weight: bold;
-          display: block !important;
-        }
-        .participant-cards-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 10px;
-        }
-        .participant-card {
-          border: 1px solid #000;
-          padding: 10px;
-          margin-bottom: 10px;
-          page-break-inside: avoid;
-          text-align: center;
-        }
-        .card-header {
-          font-weight: bold;
-          margin-bottom: 5px;
-        }
-        .card-school {
-          font-size: 0.8em;
-          margin-bottom: 10px;
-        }
-        .card-photo {
-          width: 80px;
-          height: 80px;
-          background-color: #eee;
-          margin: 0 auto 10px auto;
-        }
-        .card-name {
-          font-weight: 500;
-          margin-bottom: 5px;
-        }
-        .card-details {
-          display: flex;
-          justify-content: center;
-          gap: 10px;
-          margin-bottom: 5px;
-          font-size: 0.9em;
-        }
-        .card-school-details {
-          font-size: 0.9em;
-          margin-bottom: 5px;
-        }
-        .card-event-details {
-          font-size: 0.9em;
-        }
-        .no-print {
-          display: none !important;
-        }
-      </style>
-      <div class="print-title">Participants Card - ${photoStatus}</div>
-      ${printContents}
-    `;
-    window.print();
-    document.body.innerHTML = originalContents;
-    window.location.reload();
+  // Generate PDF using html2pdf library
+  const generatePDF = () => {
+    const data = participants.length > 0 ? participants : sampleParticipants;
+    
+    // Create a container for PDF content
+    const pdfContent = document.createElement('div');
+    
+    // Add title
+    const titleElement = document.createElement('h2');
+    titleElement.textContent = `Participants Card - ${photoStatus}`;
+    titleElement.style.textAlign = 'center';
+    titleElement.style.margin = '20px 0';
+    titleElement.style.fontWeight = 'bold';
+    pdfContent.appendChild(titleElement);
+    
+    // Create card grid container
+    const cardGrid = document.createElement('div');
+    cardGrid.style.display = 'grid';
+    cardGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+    cardGrid.style.gap = '10px';
+    
+    // Generate cards
+    for (let i = 0; i < data.length; i++) {
+      const participant = data[i];
+      
+      // Create card
+      const card = document.createElement('div');
+      card.style.border = '1px solid #000';
+      card.style.padding = '10px';
+      card.style.marginBottom = '10px';
+      card.style.textAlign = 'center';
+      
+      // Card header
+      const cardHeader = document.createElement('div');
+      cardHeader.textContent = 'Tamil Kalaivizha 2024 - 2025';
+      cardHeader.style.fontWeight = 'bold';
+      cardHeader.style.marginBottom = '5px';
+      card.appendChild(cardHeader);
+      
+      // School info
+      const cardSchool = document.createElement('div');
+      cardSchool.textContent = 'Idukki Revenue District SGHSS, KATTAPPANA';
+      cardSchool.style.fontSize = '0.8em';
+      cardSchool.style.marginBottom = '10px';
+      card.appendChild(cardSchool);
+      
+      // Photo placeholder if needed
+      if (photoStatus === "With Photo") {
+        const photoPlaceholder = document.createElement('div');
+        photoPlaceholder.style.width = '80px';
+        photoPlaceholder.style.height = '80px';
+        photoPlaceholder.style.backgroundColor = '#eee';
+        photoPlaceholder.style.margin = '0 auto 10px auto';
+        card.appendChild(photoPlaceholder);
+      }
+      
+      // Participant name
+      const nameElement = document.createElement('div');
+      nameElement.textContent = participant.name;
+      nameElement.style.fontWeight = '500';
+      nameElement.style.marginBottom = '5px';
+      card.appendChild(nameElement);
+      
+      // Participant details
+      const detailsDiv = document.createElement('div');
+      detailsDiv.style.display = 'flex';
+      detailsDiv.style.justifyContent = 'center';
+      detailsDiv.style.gap = '10px';
+      detailsDiv.style.marginBottom = '5px';
+      detailsDiv.style.fontSize = '0.9em';
+      
+      const regNo = document.createElement('div');
+      regNo.textContent = `Reg No : ${participant.regNo}`;
+      detailsDiv.appendChild(regNo);
+      
+      const classInfo = document.createElement('div');
+      classInfo.textContent = `Class : ${participant.class}`;
+      classInfo.style.borderLeft = '1px solid #ccc';
+      classInfo.style.paddingLeft = '8px';
+      detailsDiv.appendChild(classInfo);
+      
+      card.appendChild(detailsDiv);
+      
+      // School details
+      const schoolDetails = document.createElement('div');
+      schoolDetails.textContent = `${participant.schoolCode} ${participant.schoolName}`;
+      schoolDetails.style.fontSize = '0.9em';
+      schoolDetails.style.marginBottom = '5px';
+      card.appendChild(schoolDetails);
+      
+      // Event date
+      const eventDate = document.createElement('div');
+      eventDate.textContent = 'Stage 5 on 7 Dec 2023';
+      eventDate.style.fontSize = '0.9em';
+      eventDate.style.marginBottom = '5px';
+      card.appendChild(eventDate);
+      
+      // Event details
+      const eventDetails = document.createElement('div');
+      eventDetails.innerHTML = '304 - Mono Act, 300 - Versification,<br />301 - Story Writing' + 
+                             (participant.id === 4 ? ', 302 - Drama' : '');
+      eventDetails.style.fontSize = '0.9em';
+      card.appendChild(eventDetails);
+      
+      // Add card to grid
+      cardGrid.appendChild(card);
+    }
+    
+    // Add card grid to PDF content
+    pdfContent.appendChild(cardGrid);
+    
+    // PDF filename
+    const fileName = `Participant_Cards_${photoStatus.replace(/ /g, '_')}.pdf`;
+    
+    // PDF options
+    const options = {
+      margin: 10,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    // Generate and download PDF
+    html2pdf().from(pdfContent).set(options).save();
   };
 
   const getGridRows = () => {
@@ -160,14 +211,14 @@ const ParticipantsCardList = () => {
               </div>
               <button
                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
-                onClick={handlePrint}
+                onClick={generatePDF}
               >
                 Print
               </button>
             </div>
           </div>
 
-     
+          {/* Table view */}
           <div className="w-full">
             <div className="overflow-x-auto -mx-4 sm:mx-0">
               <div className="inline-block min-w-full align-middle px-4 sm:px-0">
@@ -209,7 +260,7 @@ const ParticipantsCardList = () => {
             </div>
           </div>
 
-     
+          {/* Hidden section for card layout (keeping for reference) */}
           <div ref={printRef} className="hidden">
             <div className="participant-cards-grid">
               {getGridRows().map((row, rowIndex) => (

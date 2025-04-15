@@ -3,6 +3,7 @@ import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { deleteresultentryAPI, getAllResultentryListAPI } from '../services/allAPI';
 import { useNavigate } from 'react-router-dom';
+import html2pdf from 'html2pdf.js';
 
 const AllResultEntry = () => {
     const [showRegNo, setShowRegNo] = useState(false);
@@ -58,61 +59,114 @@ const AllResultEntry = () => {
         }
     }
 
-    
-    const handlePrint = () => {
-        const originalContents = document.body.innerHTML;
-        const printContents = printRef.current.innerHTML;
+    const generatePDF = () => {
+        // Create a new div element for PDF content
+        const pdfContent = document.createElement('div');
+        
+        // Add title
+        const titleElement = document.createElement('h2');
+        titleElement.textContent = "Result Entry";
+        titleElement.style.textAlign = 'center';
+        titleElement.style.margin = '20px 0';
+        titleElement.style.fontWeight = 'bold';
+        pdfContent.appendChild(titleElement);
 
-        document.body.innerHTML = `
-            <style type="text/css" media="print">
-                @page {
-                    size: auto;
-                    margin: 0;
-                }
-                body {
-                    padding: 20px;
-                    font-family: sans-serif;
-                }
-                .print-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                }
-                .print-table th, .print-table td {
-                    border: 1px solid #ddd;
-                    padding: 8px;
-                    text-align: center;
-                }
-                .print-table th {
-                    background-color: #f2f2f2;
-                    font-weight: bold;
-                }
-                .print-title {
-                    text-align: center;
-                    margin-bottom: 20px;
-                    font-size: 18px;
-                    font-weight: bold;
-                    display: block !important;
-                }
-                .absentee-info {
-                    margin-top: 20px;
-                    margin-bottom: 10px;
-                    display: block !important;
-                }
-                .no-print {
-                    display: none !important;
-                }
-            </style>
-            ${printContents}
-            <div class="absentee-info">
-                <p><strong>Absentee Reg No:</strong> ${absenteeRegNos.join(', ')}</p>
-                <p><strong>No of Absentees:</strong> ${absenteeRegNos.length}</p>
-                <p><strong>No of Withheld Participants:</strong> 3</p>
-                <p><strong>No of Appeal Entry:</strong> 0</p>
-            </div>
-        `;
-        window.print();
-        document.body.innerHTML = originalContents;
-        window.location.reload();
+        // Create table
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.style.marginBottom = '20px';
+        
+        // Create table header
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        
+        const headers = ['Sl No', 'Reg No', 'Code', 'Mark 1', 'Mark 2', 'Mark 3', 'Total', 'Mark %', 'Rank', 'Grade', 'Point'];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            th.style.border = '1px solid #ddd';
+            th.style.padding = '8px';
+            th.style.backgroundColor = '#f2f2f2';
+            th.style.fontWeight = 'bold';
+            headerRow.appendChild(th);
+        });
+        
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        
+        // Create table body
+        const tbody = document.createElement('tbody');
+        
+        resultData.forEach(result => {
+            const row = document.createElement('tr');
+            
+            // Add cells
+            const cellData = [
+                result.slNo,
+                result.regNo,
+                result.code,
+                result.mark1,
+                result.mark2,
+                result.mark3,
+                result.total,
+                result.markPercentage,
+                result.rank,
+                result.grade,
+                result.point
+            ];
+            
+            cellData.forEach(text => {
+                const td = document.createElement('td');
+                td.textContent = text;
+                td.style.border = '1px solid #ddd';
+                td.style.padding = '8px';
+                td.style.textAlign = 'center';
+                row.appendChild(td);
+            });
+            
+            tbody.appendChild(row);
+        });
+        
+        table.appendChild(tbody);
+        pdfContent.appendChild(table);
+        
+        // Add absentee information
+        const absenteeSection = document.createElement('div');
+        absenteeSection.style.marginTop = '20px';
+        
+        const absenteeInfo = document.createElement('p');
+        absenteeInfo.innerHTML = `<strong>Absentee Reg No:</strong> ${absenteeRegNos.join(', ')}`;
+        absenteeSection.appendChild(absenteeInfo);
+        
+        const absenteeCount = document.createElement('p');
+        absenteeCount.innerHTML = `<strong>No of Absentees:</strong> ${absenteeRegNos.length}`;
+        absenteeSection.appendChild(absenteeCount);
+        
+        const withheldCount = document.createElement('p');
+        withheldCount.innerHTML = '<strong>No of Withheld Participants:</strong> 3';
+        absenteeSection.appendChild(withheldCount);
+        
+        const appealCount = document.createElement('p');
+        appealCount.innerHTML = '<strong>No of Appeal Entry:</strong> 8';
+        absenteeSection.appendChild(appealCount);
+        
+        pdfContent.appendChild(absenteeSection);
+        
+        // PDF filename
+        const fileName = 'Result_Entry.pdf';
+        
+        // PDF options
+        const options = {
+            margin: 10,
+            filename: fileName,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        
+        // Generate and download PDF
+        html2pdf().from(pdfContent).set(options).save();
     };
 
     // Dummy data
@@ -169,7 +223,7 @@ const AllResultEntry = () => {
                             <p className='text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4]'>No of Withheld Participants :<span> 3</span></p>
                             <p className='text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4]'>No of Absentees :<span> {absenteeRegNos.length}</span></p>
                             <button 
-                                onClick={handlePrint}
+                                onClick={generatePDF}
                                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
                             >
                                 Print
@@ -179,11 +233,8 @@ const AllResultEntry = () => {
 
                     <div className="w-full">
                         <div ref={printRef} className="overflow-x-auto -mx-4 sm:mx-0">
-                            {/* This title will only show when printing */}
-                            <div className="print-title hidden">Result Entry</div>
-                            
                             <div className="inline-block min-w-full align-middle px-4 sm:px-0">
-                                <div className="shadow overflow-hidden  sm:rounded-lg">
+                                <div className="shadow overflow-hidden sm:rounded-lg">
                                     <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
                                         <thead className="bg-gray-50">
                                             <tr className="text-gray-700">
@@ -198,8 +249,8 @@ const AllResultEntry = () => {
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Rank</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Point</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm no-print">Edit</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm no-print">Delete</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Edit</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Delete</th>
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
@@ -216,7 +267,7 @@ const AllResultEntry = () => {
                                                     <td className="p-2 md:p-3 whitespace-nowrap">{result.rank}</td>
                                                     <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
                                                     <td className="p-2 md:p-3 whitespace-nowrap">{result.point}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap no-print">
+                                                    <td className="p-2 md:p-3 whitespace-nowrap">
                                                         <button 
                                                             className="text-blue-500 hover:text-blue-700 focus:outline-none"
                                                             onClick={() => handleEditRedirect(result)}
@@ -224,7 +275,7 @@ const AllResultEntry = () => {
                                                             <i className="fa-solid fa-pen-to-square cursor-pointer"></i>
                                                         </button>
                                                     </td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap no-print">
+                                                    <td className="p-2 md:p-3 whitespace-nowrap">
                                                         <button onClick={() => handleDeleteClick(result.slNo)} className="text-red-600 hover:text-red-800 focus:outline-none">
                                                             <i className="fa-solid fa-trash cursor-pointer"></i>
                                                         </button>

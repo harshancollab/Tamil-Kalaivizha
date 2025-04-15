@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useSearchParams } from 'react-router-dom';
+import html2pdf from 'html2pdf.js';
 
 const DateWiseParticipantList = () => {
   const [Alllist, setList] = useState([]);
@@ -43,6 +44,7 @@ const DateWiseParticipantList = () => {
       setSearchParams({ date: newDate });
     }
   };
+  
   const getPrintTitle = () => {
     if (selectedDate === "ALL") {
       return "All Dates - Participants List";
@@ -57,60 +59,212 @@ const DateWiseParticipantList = () => {
     }
   };
 
-  const handlePrint = () => {
-    const originalContents = document.body.innerHTML;
-    const printContents = printRef.current.innerHTML;
-  
-    document.body.innerHTML = `
-     <style type="text/css" media="print">
-      @page {
-        size: auto;
-        margin: 0;
-      }
-      body {
-        padding: 20px;
-        font-family: sans-serif;
-        overflow: hidden !important; /* Hide all scrollbars */
-      }
-      ::-webkit-scrollbar {
-        display: none !important; /* Hide webkit scrollbars */
-      }
-      html, body {
-        overflow: visible !important; /* Ensure content is visible but scrollbars are hidden */
-        height: auto !important; /* Allow content to expand to its natural height */
-      }
-      .print-table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      .print-table th, .print-table td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: center;
-      }
-      .print-table td {
-        border-bottom: none; /* Remove bottom border from td */
-      }
-      .print-table th {
-        background-color: #f2f2f2;
-        font-weight: bold;
-      }
-      .print-title {
-        text-align: center;
-        margin-bottom: 20px;
-        font-size: 18px;
-        font-weight: bold;
-        display: block !important;
-      }
-      .no-print {
-        display: none !important;
-      }
-    </style>
-      ${printContents}
-    `;
-    window.print();
-    document.body.innerHTML = originalContents;
-    window.location.reload();
+  // New PDF generation function using html2pdf
+  const generatePDF = () => {
+    // Create a clone of the content for PDF generation
+    const pdfContent = document.createElement('div');
+    
+    // Add title
+    const titleElement = document.createElement('h2');
+    titleElement.textContent = getPrintTitle();
+    titleElement.style.textAlign = 'center';
+    titleElement.style.margin = '20px 0';
+    titleElement.style.fontWeight = 'bold';
+    pdfContent.appendChild(titleElement);
+
+    // Create table clone
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    table.style.marginTop = '20px';
+    
+    // Create table header
+    const thead = document.createElement('thead');
+    
+    // First header row with category headers
+    const headerRow1 = document.createElement('tr');
+    
+    // Add Sl No header with rowspan 2
+    const slNoHeader = document.createElement('th');
+    slNoHeader.textContent = 'Sl No';
+    slNoHeader.style.border = '1px solid #ddd';
+    slNoHeader.style.padding = '8px';
+    slNoHeader.style.backgroundColor = '#f2f2f2';
+    slNoHeader.style.fontWeight = 'bold';
+    slNoHeader.rowSpan = 2;
+    headerRow1.appendChild(slNoHeader);
+    
+    // Add School Code header with rowspan 2
+    const schoolCodeHeader = document.createElement('th');
+    schoolCodeHeader.textContent = 'School Code';
+    schoolCodeHeader.style.border = '1px solid #ddd';
+    schoolCodeHeader.style.padding = '8px';
+    schoolCodeHeader.style.backgroundColor = '#f2f2f2';
+    schoolCodeHeader.style.fontWeight = 'bold';
+    schoolCodeHeader.rowSpan = 2;
+    headerRow1.appendChild(schoolCodeHeader);
+    
+    // Add School Name header with rowspan 2
+    const schoolNameHeader = document.createElement('th');
+    schoolNameHeader.textContent = 'School Name';
+    schoolNameHeader.style.border = '1px solid #ddd';
+    schoolNameHeader.style.padding = '8px';
+    schoolNameHeader.style.backgroundColor = '#f2f2f2';
+    schoolNameHeader.style.fontWeight = 'bold';
+    schoolNameHeader.rowSpan = 2;
+    headerRow1.appendChild(schoolNameHeader);
+    
+    // Add Category headers with colspan 2
+    const categories = ['UP', 'LP', 'HS', 'HSS'];
+    categories.forEach(category => {
+      const th = document.createElement('th');
+      th.textContent = category;
+      th.style.border = '1px solid #ddd';
+      th.style.padding = '8px';
+      th.style.backgroundColor = '#f2f2f2';
+      th.style.fontWeight = 'bold';
+      th.colSpan = 2;
+      headerRow1.appendChild(th);
+    });
+    
+    // Add Total header with rowspan 2
+    const totalHeader = document.createElement('th');
+    totalHeader.textContent = 'Total';
+    totalHeader.style.border = '1px solid #ddd';
+    totalHeader.style.padding = '8px';
+    totalHeader.style.backgroundColor = '#f2f2f2';
+    totalHeader.style.fontWeight = 'bold';
+    totalHeader.rowSpan = 2;
+    headerRow1.appendChild(totalHeader);
+    
+    // Add first header row to thead
+    thead.appendChild(headerRow1);
+    
+    // Second header row for Boys/Girls
+    const headerRow2 = document.createElement('tr');
+    
+    // Add Boys/Girls headers for each category
+    categories.forEach(() => {
+      const boysTh = document.createElement('th');
+      boysTh.textContent = 'Boys';
+      boysTh.style.border = '1px solid #ddd';
+      boysTh.style.padding = '8px';
+      boysTh.style.backgroundColor = '#f2f2f2';
+      boysTh.style.fontWeight = 'bold';
+      headerRow2.appendChild(boysTh);
+      
+      const girlsTh = document.createElement('th');
+      girlsTh.textContent = 'Girls';
+      girlsTh.style.border = '1px solid #ddd';
+      girlsTh.style.padding = '8px';
+      girlsTh.style.backgroundColor = '#f2f2f2';
+      girlsTh.style.fontWeight = 'bold';
+      headerRow2.appendChild(girlsTh);
+    });
+    
+    // Add second header row to thead
+    thead.appendChild(headerRow2);
+    
+    // Add thead to table
+    table.appendChild(thead);
+    
+    // Create table body
+    const tbody = document.createElement('tbody');
+    
+    // If no data, add a sample row (same as in your code)
+    if (!Alllist || Alllist.length === 0) {
+      const row = document.createElement('tr');
+      
+      // Add cells for the sample row
+      const sampleData = [
+        '1', '933', 'School 1', '8', '9', '6', '4', '5', '3', '7', '2', '44'
+      ];
+      
+      sampleData.forEach(text => {
+        const td = document.createElement('td');
+        td.textContent = text;
+        td.style.border = '1px solid #ddd';
+        td.style.padding = '8px';
+        td.style.textAlign = 'center';
+        row.appendChild(td);
+      });
+      
+      tbody.appendChild(row);
+    } else {
+      // Add rows from actual data
+      Alllist.forEach((item, index) => {
+        const row = document.createElement('tr');
+        
+        // Calculate total
+        const total = (
+          parseInt(item.upBoys || 0) + 
+          parseInt(item.upGirls || 0) + 
+          parseInt(item.lpBoys || 0) + 
+          parseInt(item.lpGirls || 0) + 
+          parseInt(item.hsBoys || 0) + 
+          parseInt(item.hsGirls || 0) + 
+          parseInt(item.hssBoys || 0) + 
+          parseInt(item.hssGirls || 0)
+        );
+        
+        // Add cells
+        const cellData = [
+          index + 1,
+          item.schoolCode || "-",
+          item.schoolName || "-",
+          item.upBoys || "0",
+          item.upGirls || "0",
+          item.lpBoys || "0",
+          item.lpGirls || "0",
+          item.hsBoys || "0",
+          item.hsGirls || "0",
+          item.hssBoys || "0",
+          item.hssGirls || "0",
+          total
+        ];
+        
+        cellData.forEach((text, cellIndex) => {
+          const td = document.createElement('td');
+          td.textContent = text;
+          td.style.border = '1px solid #ddd';
+          td.style.padding = '8px';
+          
+          // Make school name left-aligned
+          if (cellIndex === 2) {
+            td.style.textAlign = 'left';
+          } else {
+            td.style.textAlign = 'center';
+          }
+          
+          row.appendChild(td);
+        });
+        
+        tbody.appendChild(row);
+      });
+    }
+    
+    // Add tbody to table
+    table.appendChild(tbody);
+    
+    // Add table to content
+    pdfContent.appendChild(table);
+    
+    // PDF filename
+    const fileName = selectedDate === "ALL" 
+      ? "All_Dates_Participants_List.pdf" 
+      : `${selectedDate}_Participants_List.pdf`;
+    
+    // PDF options
+    const options = {
+      margin: 10,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } // Use landscape for wide tables
+    };
+    
+    // Generate and download PDF
+    html2pdf().from(pdfContent).set(options).save();
   };
 
   return (
@@ -142,7 +296,7 @@ const DateWiseParticipantList = () => {
                 </div>
               </div>
               <button
-                onClick={handlePrint}
+                onClick={generatePDF}
                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
               >
                 Print
@@ -455,7 +609,7 @@ const DateWiseParticipantList = () => {
                     <tr className="hover:bg-gray-100">
                       <td className="p-3">1</td>
                       <td className="p-3">933</td>
-                      <td className="p-3 ">School 1</td>
+                      <td className="p-3 text-left">School 1</td>
                       <td className="p-3">8</td>
                       <td className="p-3">9</td>
                       <td className="p-3">6</td>

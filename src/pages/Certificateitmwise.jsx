@@ -3,6 +3,7 @@ import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { getAllCertificateitemwiseAPI } from '../services/allAPI';
+import html2pdf from 'html2pdf.js';
 
 const Certificateitmwise = () => {
     const [Allitemresult, setItemresult] = useState([]);
@@ -75,7 +76,6 @@ const Certificateitmwise = () => {
                 filtered = [...Allitemresult];
         }
         
-       
         filtered = filtered.map((item, index) => ({
             ...item,
             slNo: index + 1
@@ -87,197 +87,116 @@ const Certificateitmwise = () => {
     const handleFestivalChange = (e) => {
         const festival = e.target.value;
         setSearchParams({ festival });
-        
     };
 
     const handleItemClick = (itemCode, itemName) => {
-       
         navigate(`/CertificateParticipate?itemCode=${itemCode}&itemName=${itemName}&festival=${selectedFestival}`);
     };
 
-
     const handlePrint = () => {
-        const printContent = document.getElementById('certificate-table-container');
-        const pageTitle = `${selectedFestival} - Certificate Item Wise Report`;
+        // Create a clone of the table for PDF generation
+        const pdfContent = document.createElement('div');
         
-        // Create a hidden iframe for mobile-compatible printing
-        const iframe = document.createElement('iframe');
-        iframe.name = 'printIframe';
-        iframe.id = 'printIframe';
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
+        // Add title
+        const titleElement = document.createElement('h2');
+        titleElement.textContent = `${selectedFestival} - Certificate Item Wise Report`;
+        titleElement.style.textAlign = 'center';
+        titleElement.style.margin = '20px 0';
+        titleElement.style.fontWeight = 'bold';
+        pdfContent.appendChild(titleElement);
         
-        // Write the content to the iframe with improved mobile compatibility
-        iframe.contentDocument.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>${pageTitle}</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                    /* Reset styles */
-                    * {
-                        box-sizing: border-box;
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
-                        color-adjust: exact !important;
-                    }
-                    
-                    /* Base styles */
-                    html, body {
-                        margin: 0;
-                        padding: 0;
-                        background-color: #ffffff !important;
-                        font-family: Arial, sans-serif;
-                        width: 100%;
-                    }
-                    
-                    /* Header styling */
-                    .print-header {
-                        text-align: center;
-                        padding: 10px;
-                        margin-bottom: 15px;
-                        border-bottom: 2px solid #003566;
-                        background-color: #ffffff !important;
-                    }
-                    
-                    .print-header h1 {
-                        margin: 0;
-                        color: #003566 !important;
-                        font-size: 18px;
-                    }
-                    
-                    .print-header p {
-                        margin: 5px 0 0;
-                        font-size: 14px;
-                        color: #333333 !important;
-                    }
-                    
-                    /* Table styling */
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        background-color: #ffffff !important;
-                        margin-bottom: 20px;
-                    }
-                    
-                    th, td {
-                        border: 1px solid #000000;
-                        padding: 6px;
-                        text-align: center;
-                        font-size: 11px;
-                        color: #000000 !important;
-                    }
-                    
-                    th {
-                        background-color: #f2f2f2 !important;
-                        font-weight: bold;
-                    }
-                    
-                    /* Print-specific rules */
-                    @media print {
-                        @page {
-                            size: landscape;
-                            margin: 0.5cm;
-                        }
-                        
-                        html, body {
-                            background-color: #ffffff !important;
-                            -webkit-print-color-adjust: exact !important;
-                            print-color-adjust: exact !important;
-                        }
-                        
-                        .print-header, table, th, td {
-                            page-break-inside: avoid;
-                        }
-                        
-                        th {
-                            background-color: #f2f2f2 !important;
-                        }
-                    }
-                </style>
-            </head>
-            <body>
-                <!-- Custom header -->
-                <div class="print-header">
-                    <h1>Certificate Item Wise Report</h1>
-                    <p>${selectedFestival}</p>
-                    <p>Date: ${new Date().toLocaleDateString()}</p>
-                </div>
-                
-                <!-- Table content -->
-                <div style="overflow-x: auto; background-color: #ffffff !important;">
-                    ${printContent.innerHTML}
-                </div>
-                
-                <script>
-                    // Force background color and other print settings
-                    function preparePrint() {
-                        // Set explicit background color on all elements
-                        const allElements = document.querySelectorAll('*');
-                        allElements.forEach(el => {
-                            if (el.tagName === 'TH') {
-                                el.style.backgroundColor = '#f2f2f2';
-                            } else {
-                                el.style.backgroundColor = '#ffffff';
-                            }
-                        });
-                        
-                        // Force print background colors
-                        document.body.style.webkitPrintColorAdjust = 'exact';
-                        document.body.style.colorAdjust = 'exact';
-                        document.body.style.printColorAdjust = 'exact';
-                        
-                        // Additional fixes for mobile printing
-                        const tableContainer = document.querySelector('table');
-                        if (tableContainer) {
-                            tableContainer.style.width = '100%';
-                            tableContainer.style.backgroundColor = '#ffffff';
-                            
-                            const rows = tableContainer.querySelectorAll('tr');
-                            rows.forEach(row => {
-                                row.style.backgroundColor = '#ffffff';
-                            });
-                        }
-                    }
-                    
-                    // Run preparation and print
-                    window.onload = function() {
-                        preparePrint();
-                        setTimeout(function() {
-                            window.print();
-                        }, 500);
-                    };
-                </script>
-            </body>
-            </html>
-        `);
-        
-        iframe.contentDocument.close();
-        
-        // Print with timeout to ensure content is loaded
-        setTimeout(() => {
-            try {
-                iframe.contentWindow.focus();
-                iframe.contentWindow.print();
-                
-                // Cleanup iframe after printing
-                setTimeout(() => {
-                    if (document.body.contains(iframe)) {
-                        document.body.removeChild(iframe);
-                    }
-                }, 3000);
-            } catch (error) {
-                console.error('Print error:', error);
-                alert('Printing failed. Please try again.');
-                
-                if (document.body.contains(iframe)) {
-                    document.body.removeChild(iframe);
-                }
-            }
-        }, 1000);
-    };
+        // Add date
+        const dateElement = document.createElement('p');
+        dateElement.style.textAlign = 'center';
+        dateElement.style.margin = '10px 0 20px';
+        pdfContent.appendChild(dateElement);
 
+        // Create table clone
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.style.marginTop = '20px';
+        
+        // Create table header
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        
+        const headers = [
+            'Sl No', 
+            'Printed', 
+            'Item Code & Item Name', 
+            'Item Type', 
+            'No of Students', 
+            'Participation', 
+            'Non-Participant', 
+            'Grade A', 
+            'Grade B', 
+            'Grade C'
+        ];
+        
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            th.style.border = '1px solid #ddd';
+            th.style.padding = '8px';
+            th.style.backgroundColor = '#f2f2f2';
+            th.style.fontWeight = 'bold';
+            headerRow.appendChild(th);
+        });
+        
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        
+        // Create table body
+        const tbody = document.createElement('tbody');
+        
+        displayData.forEach((item) => {
+            const row = document.createElement('tr');
+            
+            // Add cells
+            const cellData = [
+                item.slNo,
+                item.printed,
+                `${item.itemCode} - ${item.itemName}`,
+                item.itemType,
+                item.totalStudents,
+                item.participation,
+                item.nonParticipant,
+                item.gradeA,
+                item.gradeB,
+                item.gradeC
+            ];
+            
+            cellData.forEach((text) => {
+                const td = document.createElement('td');
+                td.textContent = text;
+                td.style.border = '1px solid #ddd';
+                td.style.padding = '8px';
+                td.style.textAlign = 'center';
+                row.appendChild(td);
+            });
+            
+            tbody.appendChild(row);
+        });
+        
+        table.appendChild(tbody);
+        pdfContent.appendChild(table);
+        
+        // PDF filename
+        const fileName = `${selectedFestival.replace(/ /g, '_')}_Certificate_Item_Wise.pdf`;
+        
+        // PDF options with landscape orientation for wider table
+        const options = {
+            margin: 10,
+            filename: fileName,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+        
+        // Generate and download PDF
+        html2pdf().from(pdfContent).set(options).save();
+    };
 
     const certificateItemData = [
         { 

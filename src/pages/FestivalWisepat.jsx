@@ -2,7 +2,9 @@ import React, { useEffect, useState, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useSearchParams } from 'react-router-dom';
-// import { getAllFestivalParticipantsAPI } from '../services/allAPI'; // Uncomment and update API name when available
+import { html2pdf } from 'html2pdf.js';
+
+// import { getAllFestivalParticipantsAPI } from '../services/allAPI'; 
 
 const FestivalWisepat = () => {
   // Dummy data for development and fallback
@@ -81,49 +83,89 @@ const FestivalWisepat = () => {
     }
   };
 
-  const handlePrint = () => {
-    const originalContents = document.body.innerHTML;
-    const printContents = printRef.current.innerHTML;
+  // PDF generation using html2pdf which has better browser compatibility
+  const generatePDF = () => {
+    // Create a clone of the table for PDF generation
+    const pdfContent = document.createElement('div');
+    
+    // Add title
+    const titleElement = document.createElement('h2');
+    titleElement.textContent = getPrintTitle();
+    titleElement.style.textAlign = 'center';
+    titleElement.style.margin = '20px 0';
+    titleElement.style.fontWeight = 'bold';
+    pdfContent.appendChild(titleElement);
 
-    document.body.innerHTML = `
-      <style type="text/css" media="print">
-        @page {
-          size: auto;
-          margin: 0;
-        }
-        body {
-          padding: 20px;
-          font-family: sans-serif;
-        }
-        .print-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-       .print-table th, .print-table td {
-          border: 1px solid #ddd;
-          padding: 8px;
-          text-align: center;
-        }
-        .print-table th {
-          background-color: #f2f2f2;
-          font-weight: bold;
-        }
-        .print-title {
-          text-align: center;
-          margin-bottom: 20px;
-          font-size: 18px;
-          font-weight: bold;
-          display: block !important;
-        }
-        .no-print {
-          display: none !important;
-        }
-      </style>
-      ${printContents}
-    `;
-    window.print();
-    document.body.innerHTML = originalContents;
-    window.location.reload();
+    // Create table clone
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    table.style.marginTop = '20px';
+    
+    // Create table header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    
+    const headers = ['Sl No', 'Reg No', 'Name', 'Gender', 'Class', 'School Code', 'School Name'];
+    headers.forEach(headerText => {
+      const th = document.createElement('th');
+      th.textContent = headerText;
+      th.style.border = '1px solid #ddd';
+      th.style.padding = '8px';
+      th.style.backgroundColor = '#f2f2f2';
+      th.style.fontWeight = 'bold';
+      headerRow.appendChild(th);
+    });
+    
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    
+    // Create table body
+    const tbody = document.createElement('tbody');
+    
+    filteredList.forEach((item, index) => {
+      const row = document.createElement('tr');
+      
+      // Add cells
+      const cellData = [
+        index + 1,
+        item.regNo || "-",
+        item.name || "-",
+        item.gender || "-",
+        item.class || "-",
+        item.schoolCode || "-",
+        item.schoolName || "-"
+      ];
+      
+      cellData.forEach(text => {
+        const td = document.createElement('td');
+        td.textContent = text;
+        td.style.border = '1px solid #ddd';
+        td.style.padding = '8px';
+        td.style.textAlign = 'center';
+        row.appendChild(td);
+      });
+      
+      tbody.appendChild(row);
+    });
+    
+    table.appendChild(tbody);
+    pdfContent.appendChild(table);
+    
+    // PDF filename
+    const fileName = `${selectedFestival.replace(/ /g, '_')}_Participants_List.pdf`;
+    
+    // PDF options
+    const options = {
+      margin: 10,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    // Generate and download PDF
+    html2pdf().from(pdfContent).set(options).save();
   };
 
   // Filter the list based on item code ranges according to selected festival
@@ -180,7 +222,7 @@ const FestivalWisepat = () => {
                 </div>
               </div>
               <button
-                onClick={handlePrint}
+                onClick={generatePDF}
                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
               >
                 Print
@@ -188,7 +230,6 @@ const FestivalWisepat = () => {
             </div>
           </div>
           <div ref={printRef} className="w-full">
-            <div className="print-title hidden">{getPrintTitle()}</div>
             <div className="overflow-x-auto -mx-4 sm:mx-0 ">
               <div className="inline-block min-w-full align-middle px-4 sm:px-0">
                 <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">

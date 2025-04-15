@@ -3,6 +3,7 @@ import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useSearchParams } from 'react-router-dom'
 import { getAllPublishentryListAPI } from '../services/allAPI'
+import html2pdf from 'html2pdf.js'
 
 const PublishResultList = () => {
     const printRef = useRef();
@@ -315,89 +316,130 @@ const PublishResultList = () => {
             return newParams;
         });
     };
-    const handlePrint = () => {
-        // Create a new hidden iframe for printing
-        const printFrame = document.createElement('iframe');
-        printFrame.style.position = 'fixed';
-        printFrame.style.right = '0';
-        printFrame.style.bottom = '0';
-        printFrame.style.width = '0';
-        printFrame.style.height = '0';
-        printFrame.style.border = '0';
-        document.body.appendChild(printFrame);
+
+    // New PDF generation function using html2pdf
+    const generatePDF = () => {
+        // Create a clone of the table for PDF generation
+        const pdfContent = document.createElement('div');
         
-        // Add content to the iframe
-        const frameDoc = printFrame.contentWindow.document;
-        frameDoc.open();
-        frameDoc.write(`
-            <html>
-            <head>
-                <title>Print</title>
-                <style type="text/css" media="print">
-                    @page {
-                        size: auto;
-                        margin: 0;
-                    }
-                    body {
-                        padding: 20px;
-                        font-family: sans-serif;
-                    }
-                    .print-table {
-                        width: 100%;
-                        border-collapse: collapse;
-                    }
-                    .print-table th, .print-table td {
-                        border: 1px solid #ddd;
-                        padding: 8px;
-                        text-align: center;
-                    }
-                    .print-table th {
-                        background-color: #f2f2f2;
-                        font-weight: bold;
-                    }
-                    .print-title {
-                        text-align: center;
-                        margin-bottom: 20px;
-                        font-size: 18px;
-                        font-weight: bold;
-                        display: block !important;
-                    }
-                    .no-print {
-                        display: none !important;
-                    }
-                    .print-container {
-                        width: 100%;
-                        overflow: visible !important;
-                    }
-                    * {
-                        overflow: visible !important;
-                    }
-                    html, body {
-                        overflow: visible !important;
-                    }
-                </style>
-            </head>
-            <body>${printRef.current.innerHTML}</body>
-            </html>
-        `);
-        frameDoc.close();
+        // Add title
+        const titleElement = document.createElement('h2');
+        titleElement.textContent = getPrintTitle();
+        titleElement.style.textAlign = 'center';
+        titleElement.style.margin = '20px 0';
+        titleElement.style.fontWeight = 'bold';
+        pdfContent.appendChild(titleElement);
+
+        // Create table clone
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.style.marginTop = '20px';
         
-        // Wait for all resources to load before printing
-        printFrame.onload = function() {
-            try {
-                // Focus and print
-                printFrame.contentWindow.focus();
-                printFrame.contentWindow.print();
+        // Create table header
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        
+        let headers = [];
+        
+        // Set the appropriate headers based on the selected result type
+        if (selectedResultType === "School Points") {
+            headers = ['Sl No', 'School Code', 'School Name', 'Point'];
+        } else {
+            headers = [
+                'Sl No', 'Item Code & Item Name', 'Reg No', 'Code No', 'Name', 
+                'No of participate', 'School name', 'Grade', 'Point'
+            ];
+        }
+        
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            th.style.border = '1px solid #ddd';
+            th.style.padding = '8px';
+            th.style.backgroundColor = '#f2f2f2';
+            th.style.fontWeight = 'bold';
+            headerRow.appendChild(th);
+        });
+        
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        
+        // Create table body
+        const tbody = document.createElement('tbody');
+        
+        if (selectedResultType === "School Points") {
+            filteredData.forEach((school, index) => {
+                const row = document.createElement('tr');
                 
-                // Remove the iframe after printing
-                setTimeout(() => {
-                    document.body.removeChild(printFrame);
-                }, 500);
-            } catch (e) {
-                console.error('Printing failed:', e);
-                document.body.removeChild(printFrame);
-            }
+                // Add cells
+                const cellData = [
+                    index + 1,
+                    school.schoolCode || "-",
+                    school.schoolName || "-",
+                    school.point.toFixed(1) || "-"
+                ];
+                
+                cellData.forEach(text => {
+                    const td = document.createElement('td');
+                    td.textContent = text;
+                    td.style.border = '1px solid #ddd';
+                    td.style.padding = '8px';
+                    td.style.textAlign = 'center';
+                    row.appendChild(td);
+                });
+                
+                tbody.appendChild(row);
+            });
+        } else {
+            const displayData = filteredResultData.length > 0 ? filteredResultData : resultData;
+            
+            displayData.forEach((result, index) => {
+                const row = document.createElement('tr');
+                
+                // Add cells
+                const cellData = [
+                    index + 1,
+                    result.itemCodeName || "-",
+                    result.regNo || "-",
+                    result.codeNo || "-",
+                    result.name || "-",
+                    result.noOfParticipate || "-",
+                    result.schoolName || "-",
+                    result.grade || "-",
+                    result.point || "-"
+                ];
+                
+                cellData.forEach(text => {
+                    const td = document.createElement('td');
+                    td.textContent = text;
+                    td.style.border = '1px solid #ddd';
+                    td.style.padding = '8px';
+                    td.style.textAlign = 'center';
+                    row.appendChild(td);
+                });
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        table.appendChild(tbody);
+        pdfContent.appendChild(table);
+        
+        // PDF filename
+        const fileName = `${selectedFestival.replace(/ /g, '_')}_${selectedResultType.replace(/ /g, '_')}.pdf`;
+        
+        // PDF options
+        const options = {
+            margin: 10,
+            filename: fileName,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
+        
+        // Generate and download PDF
+        html2pdf().from(pdfContent).set(options).save();
     };
 
     // Initialize data at component mount
@@ -454,7 +496,7 @@ const PublishResultList = () => {
                                 </div>
                             </div>
                             <button
-                                onClick={handlePrint}
+                                onClick={generatePDF}
                                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
                             >
                                 Print
@@ -481,7 +523,6 @@ const PublishResultList = () => {
                     )}
 
                     <div ref={printRef} className="w-full">
-                        <div className="print-title hidden">{getPrintTitle()}</div>
                         <div className="overflow-x-auto -mx-4 sm:mx-0">
                             <div className="inline-block min-w-full align-middle px-4 sm:px-0">
                                 <div className="shadow overflow-hidden border-gray-200 sm:rounded-lg">

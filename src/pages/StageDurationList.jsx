@@ -3,6 +3,7 @@ import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useSearchParams } from 'react-router-dom'
 import { getAllStageDurationsAPI } from '../services/allAPI'
+import html2pdf from 'html2pdf.js'
 
 const StageDurationList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -173,10 +174,8 @@ const StageDurationList = () => {
     applyFilters(searchTerm, festival);
   };
 
- 
   const applyFilters = (term, festival) => {
     if (!schools.length) return;
-
     
     let festivalFiltered = [];
     
@@ -213,7 +212,6 @@ const StageDurationList = () => {
       festivalFiltered = [...schools];
     }
 
-  
     if (term) {
       const lowercasedTerm = term.toLowerCase();
       const results = festivalFiltered.filter(school =>
@@ -225,7 +223,6 @@ const StageDurationList = () => {
       setFilteredSchools(festivalFiltered);
     }
 
-   
     setFilteredSchools(prevFiltered => 
       prevFiltered.map((item, index) => ({
         ...item,
@@ -234,7 +231,6 @@ const StageDurationList = () => {
     );
   };
 
-  
   const getPrintTitle = () => {
     switch(selectedFestival) {
       case "UP":
@@ -250,143 +246,103 @@ const StageDurationList = () => {
     }
   };
 
-  // const handlePrint = () => {
-  //   const printContents = printRef.current.innerHTML;
-  //   const printWindow = window.open('', '_blank');
-    
-  //   printWindow.document.write(`
-  //     <html>
-  //     <head>
-  //       <title>${getPrintTitle()}</title>
-  //       <style type="text/css">
-  //         @page {
-  //           size: landscape;
-  //           margin: 0.5cm;
-  //         }
-  //         body {
-  //           padding: 20px;
-  //           font-family: Arial, sans-serif;
-  //         }
-  //         table {
-  //           width: 100%;
-  //           border-collapse: collapse;
-  //         }
-  //         table th, table td {
-  //           border: 1px solid #ddd;
-  //           padding: 8px;
-  //           text-align: center;
-  //         }
-  //         table th {
-  //           background-color: #f2f2f2;
-  //           font-weight: bold;
-  //         }
-  //         .print-title {
-  //           text-align: center;
-  //           margin-bottom: 20px;
-  //           font-size: 18px;
-  //           font-weight: bold;
-  //         }
-  //       </style>
-  //     </head>
-  //     <body>
-  //       <div class="print-title">${getPrintTitle()}</div>
-  //       ${printContents}
-  //     </body>
-  //     </html>
-  //   `);
-    
-  //   printWindow.document.close();
-    
-  //   setTimeout(() => {
-  //     printWindow.print();
-  //     printWindow.close();
-  //   }, 250);
-  // };
-
   const handlePrint = () => {
-    const printContents = printRef.current.innerHTML;
-    const printWindow = window.open('', '_blank');
+    // Create a new div for PDF content
+    const pdfContent = document.createElement('div');
     
-    printWindow.document.write(`
-      <html>
-      <head>
-        <title>${getPrintTitle()}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style type="text/css">
-          @page {
-            size: landscape;
-            margin: 0.5cm;
-          }
-          body {
-            padding: 10px;
-            font-family: Arial, sans-serif;
-          }
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-          }
-          table th, table td {
-            border: 1px solid #ddd;
-            padding: 4px;
-            text-align: center;
-            font-size: 10px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-          @media screen and (max-width: 600px) {
-            table th, table td {
-              padding: 2px;
-              font-size: 8px;
-            }
-          }
-          table th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-          }
-          .print-title {
-            text-align: center;
-            margin-bottom: 15px;
-            font-size: 16px;
-            font-weight: bold;
-          }
-          @media print {
-            body {
-              width: 100%;
-              padding: 5px;
-            }
-            table {
-              page-break-inside: auto;
-            }
-            tr {
-              page-break-inside: avoid;
-              page-break-after: auto;
-            }
-            @page {
-              size: landscape;
-            }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="print-title">${getPrintTitle()}</div>
-        ${printContents}
-      </body>
-      </html>
-    `);
+    // Add title
+    const titleElement = document.createElement('h2');
+    titleElement.textContent = getPrintTitle();
+    titleElement.style.textAlign = 'center';
+    titleElement.style.margin = '20px 0';
+    titleElement.style.fontWeight = 'bold';
+    pdfContent.appendChild(titleElement);
+
+    // Create table clone
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    table.style.marginTop = '20px';
     
-    printWindow.document.close();
+    // Create table header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
     
-    // Wait for content to load before printing
-    setTimeout(() => {
-      printWindow.print();
-      // Only close the window after printing on non-mobile devices
-      if (window.innerWidth > 768) {
-        printWindow.close();
-      }
-    }, 500);
+    const headers = [
+      'Sl No', 
+      'Item Code', 
+      'Item Name', 
+      'Time', 
+      'Participants', 
+      'Completion Time', 
+      'Stage', 
+      'Date', 
+      'Time'
+    ];
+    
+    headers.forEach(headerText => {
+      const th = document.createElement('th');
+      th.textContent = headerText;
+      th.style.border = '1px solid #ddd';
+      th.style.padding = '8px';
+      th.style.backgroundColor = '#f2f2f2';
+      th.style.fontWeight = 'bold';
+      headerRow.appendChild(th);
+    });
+    
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    
+    // Create table body
+    const tbody = document.createElement('tbody');
+    
+    filteredSchools.forEach((school, index) => {
+      const row = document.createElement('tr');
+      
+      // Add cells
+      const cellData = [
+        index + 1,
+        school.code || "-",
+        school.name || "-",
+        school.time || "-",
+        school.participants || "-",
+        school.completionTime || "-",
+        school.stage || "-",
+        school.date || "-",
+        school.stageTime || "-"
+      ];
+      
+      cellData.forEach(text => {
+        const td = document.createElement('td');
+        td.textContent = text;
+        td.style.border = '1px solid #ddd';
+        td.style.padding = '8px';
+        td.style.textAlign = 'center';
+        row.appendChild(td);
+      });
+      
+      tbody.appendChild(row);
+    });
+    
+    table.appendChild(tbody);
+    pdfContent.appendChild(table);
+    
+    // PDF filename
+    const fileName = `${selectedFestival.replace(/ /g, '_')}_Stage_Duration_List.pdf`;
+    
+    // PDF options
+    const options = {
+      margin: 10,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } // Use landscape for wider tables
+    };
+    
+    // Generate and download PDF
+    html2pdf().from(pdfContent).set(options).save();
   };
+
   const clearSearch = () => {
     setSearchTerm('');
     setSearchParams(new URLSearchParams({ festival: selectedFestival }));
@@ -399,7 +355,6 @@ const StageDurationList = () => {
       <div className="flex flex-col md:flex-row min-h-screen">
         <Dash />
         <div className="flex-1 p-3 sm:p-4 lg:p-6 w-full overflow-hidden">
-       
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
             <h2 className="text-lg md:text-xl font-semibold tracking-wide">
               Stage Duration List
@@ -516,11 +471,6 @@ const StageDurationList = () => {
                   </table>
                 </div>
               </div>
-              
-           
-             
-             
-             
             </div>
           )}
         </div>

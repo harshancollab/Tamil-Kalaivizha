@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
+import html2pdf from 'html2pdf.js';
 
 const ClashReportList = () => {
   const [showTooltip, setShowTooltip] = useState(null);
@@ -166,48 +167,86 @@ const ClashReportList = () => {
   };
 
   const handlePrint = () => {
-    const originalContents = document.body.innerHTML;
-    const printContents = printRef.current.innerHTML;
-
-    document.body.innerHTML = `
-      <style type="text/css" media="print">
-        @page {
-          size: auto;
-          margin: 0;
-        }
-        body {
-          padding: 20px;
-          font-family: sans-serif;
-        }
-        .print-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-       .print-table th, .print-table td {
-          border: 1px solid #ddd;
-          padding: 8px;
-          text-align: center;
-        }
-        .print-table th {
-          background-color: #f2f2f2;
-          font-weight: bold;
-        }
-        .print-title {
-          text-align: center;
-          margin-bottom: 20px;
-          font-size: 18px;
-          font-weight: bold;
-          display: block !important;
-        }
-        .no-print {
-          display: none !important;
-        }
-      </style>
-      ${printContents}
-    `;
-    window.print();
-    document.body.innerHTML = originalContents;
-    window.location.reload();
+    // Create a clone of the table for PDF generation
+    const pdfContent = document.createElement('div');
+    
+    // Add title
+    const titleElement = document.createElement('h2');
+    titleElement.textContent = getPrintTitle();
+    titleElement.style.textAlign = 'center';
+    titleElement.style.margin = '20px 0';
+    titleElement.style.fontWeight = 'bold';
+    pdfContent.appendChild(titleElement);
+  
+    // Create table clone
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    table.style.marginTop = '20px';
+    
+    // Create table header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    
+    const headers = ['Sl No', 'Reg No', 'Name', 'School Code', 'School Name', 'Clash Items'];
+    headers.forEach(headerText => {
+      const th = document.createElement('th');
+      th.textContent = headerText;
+      th.style.border = '1px solid #ddd';
+      th.style.padding = '8px';
+      th.style.backgroundColor = '#f2f2f2';
+      th.style.fontWeight = 'bold';
+      headerRow.appendChild(th);
+    });
+    
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    
+    // Create table body
+    const tbody = document.createElement('tbody');
+    
+    clashReports.forEach((report, index) => {
+      const row = document.createElement('tr');
+      
+      // Add cells
+      const cellData = [
+        index + 1,
+        report.regNo || "-",
+        report.studentName || "-",
+        report.schoolCode || "-",
+        report.schoolName || "-",
+        report.clashItems.join(", ") || "-"
+      ];
+      
+      cellData.forEach(text => {
+        const td = document.createElement('td');
+        td.textContent = text;
+        td.style.border = '1px solid #ddd';
+        td.style.padding = '8px';
+        td.style.textAlign = 'center';
+        row.appendChild(td);
+      });
+      
+      tbody.appendChild(row);
+    });
+    
+    table.appendChild(tbody);
+    pdfContent.appendChild(table);
+    
+    // PDF filename
+    const fileName = `${selectedFestival}_Clash_Report.pdf`;
+    
+    // PDF options
+    const options = {
+      margin: 10,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    // Generate and download PDF
+    html2pdf().from(pdfContent).set(options).save();
   };
 
   return (

@@ -3,6 +3,7 @@ import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { getAllCertificateSclwiseAPI } from '../services/allAPI'
+import html2pdf from 'html2pdf.js'
 
 const CertificateSclwise = () => {
     const [allItemResult, setAllItemResult] = useState([]);
@@ -94,165 +95,108 @@ const CertificateSclwise = () => {
         navigate(`/Add-certificate?school=${encodeURIComponent(schoolNameOnly)}`);
     };
 
-  
-    const handlePrint = () => {
-        const printContent = document.getElementById('certificate-table-container');
-        
-        // Create a hidden iframe for mobile-compatible printing
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-        
-        // Get the heading text based on selected festival
-        let headingText = "";
+    // Get the appropriate title based on the selected festival
+    const getPrintTitle = () => {
         switch (selectedFestival) {
             case "UP Kalaivizha":
-                headingText = "UP Kalaivizha - Certificate School Wise Report";
-                break;
+                return "UP Kalaivizha - Certificate School Wise Report";
             case "LP Kalaivizha":
-                headingText = "LP Kalaivizha - Certificate School Wise Report";
-                break;
+                return "LP Kalaivizha - Certificate School Wise Report";
             case "HS Kalaivizha":
-                headingText = "HS Kalaivizha - Certificate School Wise Report";
-                break;
+                return "HS Kalaivizha - Certificate School Wise Report";
             case "HSS Kalaivizha":
-                headingText = "HSS Kalaivizha - Certificate School Wise Report";
-                break;
-            case "All Festival":
-                headingText = "All Festival - Certificate School Wise Report";
-                break;
+                return "HSS Kalaivizha - Certificate School Wise Report";
             default:
-                headingText = "Certificate School Wise Report";
+                return "All Festival - Certificate School Wise Report";
         }
+    };
+
+    // Updated printing function using html2pdf
+    const handlePrint = () => {
+        // Create a clone of the table for PDF generation
+        const pdfContent = document.createElement('div');
         
-        // Extract table HTML
-        let tableHtml = printContent.innerHTML;
+        // Add title
+        const titleElement = document.createElement('h2');
+        titleElement.textContent = getPrintTitle();
+        titleElement.style.textAlign = 'center';
+        titleElement.style.margin = '20px 0';
+        titleElement.style.fontWeight = 'bold';
+        pdfContent.appendChild(titleElement);
+
+        // Create table clone
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.style.marginTop = '20px';
         
-        // Write the content to the iframe with appropriate mobile styling
-        iframe.contentDocument.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>${headingText}</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-                <style>
-                    @media print {
-                        @page {
-                            size: auto;  /* Auto is the initial value */
-                            margin: 0mm; /* This affects the margin in the printer settings */
-                        }
-                        
-                        html {
-                            background-color: #FFFFFF;
-                            margin: 0; /* This affects the margin on the HTML before sending to printer */
-                        }
-                        
-                        body {
-                            margin: 10mm 5mm; /* margin you want for the content */
-                            -webkit-print-color-adjust: exact !important;
-                            print-color-adjust: exact !important;
-                        }
-                    }
-                    
-                    body {
-                        font-family: Arial, sans-serif;
-                        background-color: white;
-                        color: black;
-                        font-size: 12px;
-                    }
-                    
-                    .print-heading {
-                        text-align: center;
-                        font-size: 16px;
-                        font-weight: bold;
-                        margin-bottom: 15px;
-                    }
-                    
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-top: 10px;
-                    }
-                    
-                    th, td {
-                        border: 1px solid black;
-                        padding: 5px;
-                        text-align: center;
-                    }
-                    
-                    th {
-                        background-color: #f2f2f2;
-                        font-weight: bold;
-                    }
-                    
-                    /* Force backgrounds on all elements */
-                    * {
-                        background-color: white !important;
-                        color: black !important;
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
-                    }
-                    
-                    /* Mobile-specific adjustments */
-                    @media only screen and (max-width: 600px) {
-                        body {
-                            font-size: 10px;
-                        }
-                        
-                        .print-heading {
-                            font-size: 14px;
-                        }
-                        
-                        th, td {
-                            padding: 3px;
-                        }
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="print-container">
-                    <div class="print-heading">${headingText}</div>
-                    ${tableHtml}
-                </div>
-                <script>
-                    // Force background colors through JavaScript after load
-                    window.onload = function() {
-                        const allElements = document.querySelectorAll('*');
-                        allElements.forEach(el => {
-                            el.style.backgroundColor = 'white';
-                            el.style.color = 'black';
-                        });
-                        
-                        // Auto-print after ensuring styles are applied
-                        setTimeout(function() {
-                            window.print();
-                        }, 500);
-                    };
-                </script>
-            </body>
-            </html>
-        `);
+        // Create table header
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
         
-        iframe.contentDocument.close();
+        const headers = ['Sl No', 'School', 'No of Students', 'Participation', 'Non-Participant'];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            th.style.border = '1px solid #ddd';
+            th.style.padding = '8px';
+            th.style.backgroundColor = '#f2f2f2';
+            th.style.fontWeight = 'bold';
+            headerRow.appendChild(th);
+        });
         
-        // Remove the iframe after printing dialog closes
-        const printListener = () => {
-            setTimeout(() => {
-                document.body.removeChild(iframe);
-            }, 1000);
-            window.removeEventListener('afterprint', printListener);
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        
+        // Create table body
+        const tbody = document.createElement('tbody');
+        
+        const displayData = filteredData.length > 0 ? filteredData : 
+            (allItemResult.length > 0 ? allItemResult : certificateItemData);
+            
+        displayData.forEach((item, index) => {
+            const row = document.createElement('tr');
+            
+            // Add cells
+            const cellData = [
+                item.slNo,
+                item.printed,
+                item.totalStudents,
+                item.participation,
+                item.nonParticipant
+            ];
+            
+            cellData.forEach((text, cellIndex) => {
+                const td = document.createElement('td');
+                td.textContent = text;
+                td.style.border = '1px solid #ddd';
+                td.style.padding = '8px';
+                td.style.textAlign = 'center';
+                row.appendChild(td);
+            });
+            
+            tbody.appendChild(row);
+        });
+        
+        table.appendChild(tbody);
+        pdfContent.appendChild(table);
+        
+        // PDF filename
+        const fileName = `${selectedFestival.replace(/ /g, '_')}_Certificate_School_Wise.pdf`;
+        
+        // PDF options
+        const options = {
+            margin: 10,
+            filename: fileName,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
         
-        window.addEventListener('afterprint', printListener);
-        
-        // If afterprint doesn't fire (some mobile browsers), 
-        // clean up the iframe after a reasonable delay
-        setTimeout(() => {
-            if (document.body.contains(iframe)) {
-                document.body.removeChild(iframe);
-            }
-        }, 10000); // 10-second fallback cleanup
+        // Generate and download PDF
+        html2pdf().from(pdfContent).set(options).save();
     };
+
     const certificateItemData = [
         {
             slNo: 1,
@@ -319,7 +263,6 @@ const CertificateSclwise = () => {
             gradeB: 5,
             gradeC: 2
         },
-        
         {
             slNo: 6,
             printed: "30443 - G. H. S. Chemmannu",

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
+import html2pdf from 'html2pdf.js';
 // You'll need to create this API function in your services folder
 // import { getAllStageReportAPI } from '../services/allAPI'
 
@@ -21,7 +22,7 @@ const StageReport = () => {
         Authorization: `Bearer ${token}`,
       };
       try {
-        const result = await (reqHeader);
+        const result = await getAllStageReportAPI(reqHeader);
         if (result?.status === 200) {
           setStageList(result.data);
         }
@@ -31,49 +32,121 @@ const StageReport = () => {
     }
   };
   
-  const handlePrint = () => {
-    const originalContents = document.body.innerHTML;
-    const printContents = printRef.current.innerHTML;
+  const generatePDF = () => {
+    // Create a clone of the table for PDF generation
+    const pdfContent = document.createElement('div');
+    
+    // Add title
+    const titleElement = document.createElement('h2');
+    titleElement.textContent = "Stage List Report";
+    titleElement.style.textAlign = 'center';
+    titleElement.style.margin = '20px 0';
+    titleElement.style.fontWeight = 'bold';
+    pdfContent.appendChild(titleElement);
 
-    document.body.innerHTML = `
-      <style type="text/css" media="print">
-        @page {
-          size: auto;
-          margin: 0;
-        }
-        body {
-          padding: 20px;
-          font-family: sans-serif;
-        }
-        .print-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-        .print-table th, .print-table td {
-          border: 1px solid #ddd;
-          padding: 8px;
-          text-align: center;
-        }
-        .print-table th {
-          background-color: #f2f2f2;
-          font-weight: bold;
-        }
-        .print-title {
-          text-align: center;
-          margin-bottom: 20px;
-          font-size: 18px;
-          font-weight: bold;
-          display: block !important;
-        }
-        .no-print {
-          display: none !important;
-        }
-      </style>
-      ${printContents}
-    `;
-    window.print();
-    document.body.innerHTML = originalContents;
-    window.location.reload();
+    // Add filter information
+    const filterInfo = document.createElement('p');
+    filterInfo.textContent = `Date: ${selectedDate === "ALL" ? "All Dates" : selectedDate} | Stage: ${selectedStage}`;
+    filterInfo.style.textAlign = 'center';
+    filterInfo.style.margin = '10px 0 20px';
+    pdfContent.appendChild(filterInfo);
+
+    // Create table clone
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    table.style.marginTop = '20px';
+    
+    // Create table header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    
+    const headers = ['Sl No', 'Items', 'Festival', 'Participants Team', 'Tentative Time', 'Start Time', 'Remark'];
+    headers.forEach(headerText => {
+      const th = document.createElement('th');
+      th.textContent = headerText;
+      th.style.border = '1px solid #ddd';
+      th.style.padding = '8px';
+      th.style.backgroundColor = '#f2f2f2';
+      th.style.fontWeight = 'bold';
+      headerRow.appendChild(th);
+    });
+    
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    
+    // Create table body
+    const tbody = document.createElement('tbody');
+    
+    // Check if we have data, if not use a placeholder row
+    if (stageList && stageList.length > 0) {
+      stageList.forEach((item, index) => {
+        const row = document.createElement('tr');
+        
+        // Add cells
+        const cellData = [
+          index + 1,
+          `${item.itemCode} - ${item.itemName || "-"}`,
+          item.festival || "-",
+          item.team || "-",
+          item.tentativeTime || "-",
+          item.startTime || "-",
+          item.remark || "-"
+        ];
+        
+        cellData.forEach(text => {
+          const td = document.createElement('td');
+          td.textContent = text;
+          td.style.border = '1px solid #ddd';
+          td.style.padding = '8px';
+          td.style.textAlign = 'center';
+          row.appendChild(td);
+        });
+        
+        tbody.appendChild(row);
+      });
+    } else {
+      // Placeholder row if no data
+      const row = document.createElement('tr');
+      const placeholderData = [
+        "8",
+        "307 - Villupattu",
+        "nazme",
+        "Boy",
+        "9",
+        "933",
+        "school 1"
+      ];
+      
+      placeholderData.forEach(text => {
+        const td = document.createElement('td');
+        td.textContent = text;
+        td.style.border = '1px solid #ddd';
+        td.style.padding = '8px';
+        td.style.textAlign = 'center';
+        row.appendChild(td);
+      });
+      
+      tbody.appendChild(row);
+    }
+    
+    table.appendChild(tbody);
+    pdfContent.appendChild(table);
+    
+    // PDF filename
+    const fileName = `Stage_List_Report_${selectedDate === "ALL" ? "All_Dates" : selectedDate}_${selectedStage.replace(/ /g, '_')}.pdf`;
+    
+    // PDF options
+    const options = {
+      margin: 10,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } // Using landscape for wider tables
+    };
+    
+    // Generate and download PDF
+    html2pdf().from(pdfContent).set(options).save();
   };
 
   const handleDateChange = (e) => {
@@ -131,7 +204,7 @@ const StageReport = () => {
                 </div>
               </div>
               <button
-                onClick={handlePrint}
+                onClick={generatePDF}
                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
               >
                 Print
@@ -139,7 +212,6 @@ const StageReport = () => {
             </div>
           </div>
           <div ref={printRef} className="w-full">
-            <div className="print-title hidden">Stage List Report</div>
             <div className="overflow-x-auto -mx-4 sm:mx-0 ">
               <div className="inline-block min-w-full align-middle px-4 sm:px-0">
                 <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">

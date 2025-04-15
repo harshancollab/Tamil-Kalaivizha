@@ -3,6 +3,7 @@ import Header from '../components/Header';
 import Dash from '../components/Dash';
 import { useSearchParams } from 'react-router-dom';
 import { getAllsclGradewiseAPI } from '../services/allAPI';
+import html2pdf from 'html2pdf.js';
 
 const SclGradewise = () => {
     const [allResultData, setAllResultData] = useState([]);
@@ -173,204 +174,89 @@ const SclGradewise = () => {
         sessionStorage.setItem("selectedGrade", newGrade);
     };
 
-    // const handlePrint = () => {
-    //     const printContent = document.getElementById('school-grade-table-container');
-
-    //     const printWindow = window.open('', '_blank');
-    //     printWindow.document.open();
-
-    //     printWindow.document.write(`
-    //         <html>
-    //         <head>
-    //             <title>${getPrintTitle()}</title>
-    //             <style>
-    //                 body { font-family: Arial, sans-serif; }
-    //                 table { width: 100%; border-collapse: collapse; }
-    //                 th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-    //                 th { background-color: #f2f2f2; }
-    //                 h2 { text-align: center; margin-bottom: 20px; }
-    //                 @media print {
-    //                     @page { size: landscape; }
-    //                 }
-    //             </style>
-    //         </head>
-    //         <body>
-    //             <h2>${getPrintTitle()}</h2>
-    //             ${printContent.innerHTML}
-    //         </body>
-    //         </html>
-    //     `);
-
-    //     printWindow.document.close();
-
-    //     // Remove date/time from the print dialog
-    //     setTimeout(() => {
-    //         printWindow.print();
-    //         printWindow.close();
-    //     }, 250);
-    // };
-
-    // Initialize filtered data at component mount
-    
-   
-
-
-
     const handlePrint = () => {
-        const printContent = document.getElementById('school-grade-table-container');
-        const pageTitle = `${selectedFestival} - School ${selectedGrade} Grade Wise Report`;
+        // Create a clone of the table for PDF generation
+        const pdfContent = document.createElement('div');
         
-        // Create a new window for printing that works reliably across devices
-        const printWindow = window.open('', '_blank');
-        if (!printWindow) {
-            alert("Please allow popups for this website to enable printing.");
-            return;
-        }
-        
-        // Write mobile-friendly content to the print window
-        printWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>${pageTitle}</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                    /* Reset and base styles */
-                    * {
-                        box-sizing: border-box;
-                        margin: 0;
-                        padding: 0;
-                    }
-                    
-                    body {
-                        font-family: Arial, sans-serif;
-                        background-color: #ffffff;
-                        padding: 10px;
-                        width: 100%;
-                    }
-                    
-                    /* Print header */
-                    .print-header {
-                        text-align: center;
-                        padding: 10px 0;
-                        margin-bottom: 15px;
-                        border-bottom: 2px solid #003566;
-                    }
-                    
-                    .print-header h1 {
-                        font-size: 16px;
-                        color: #003566;
-                        margin-bottom: 5px;
-                    }
-                    
-                    .print-header p {
-                        font-size: 14px;
-                        color: #333;
-                    }
-                    
-                    /* Table styles optimized for mobile */
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-bottom: 20px;
-                        font-size: 12px;
-                    }
-                    
-                    th, td {
-                        border: 1px solid #000;
-                        padding: 5px 3px;
-                        text-align: center;
-                    }
-                    
-                    th {
-                        background-color: #f2f2f2;
-                        font-weight: bold;
-                    }
-                    
-                    /* Print-specific styles */
-                    @media print {
-                        @page {
-                            size: landscape;
-                            margin: 0.5cm;
-                        }
-                        
-                        body {
-                            -webkit-print-color-adjust: exact !important;
-                            print-color-adjust: exact !important;
-                        }
-                        
-                        th {
-                            background-color: #f2f2f2 !important;
-                        }
-                        
-                        .print-header, table {
-                            page-break-inside: avoid;
-                        }
-                        
-                        /* Ensure text is readable on small screens */
-                        table {
-                            font-size: 10px;
-                        }
-                    }
-                    
-                    /* Small screen optimizations */
-                    @media screen and (max-width: 600px) {
-                        table {
-                            font-size: 10px;
-                        }
-                        
-                        th, td {
-                            padding: 3px 2px;
-                        }
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="print-header">
-                    <h1>School ${selectedGrade} Wise Report</h1>
-                    <p>${selectedFestival}</p>
-                    <p>Date: ${new Date().toLocaleDateString()}</p>
-                </div>
-                
-                <div class="table-container">
-                    ${printContent.innerHTML}
-                </div>
-                
-                <script>
-                    // Function to prepare and trigger print
-                    function preparePrint() {
-                        // Ensure table headers have background
-                        const headers = document.querySelectorAll('th');
-                        headers.forEach(header => {
-                            header.style.backgroundColor = '#f2f2f2';
-                        });
-                        
-                        // Auto-print after content is fully loaded
-                        window.onload = function() {
-                            setTimeout(function() {
-                                window.print();
-                                // Don't close the window automatically on mobile
-                                // as this can cause issues on some devices
-                            }, 500);
-                        };
-                    }
-                    
-                    // Run preparation
-                    preparePrint();
-                </script>
-            </body>
-            </html>
-        `);
-        
-        printWindow.document.close();
+        // Add title
+        const titleElement = document.createElement('h2');
+        titleElement.textContent = getPrintTitle();
+        titleElement.style.textAlign = 'center';
+        titleElement.style.margin = '20px 0';
+        titleElement.style.fontWeight = 'bold';
+        pdfContent.appendChild(titleElement);
     
-        // Optional: Add a message to guide users on mobile
-        setTimeout(() => {
-            alert("If the print dialog doesn't appear automatically, please use your browser's menu to print the page.");
-        }, 2000);
+        // Create table clone
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.style.marginTop = '20px';
+        
+        // Create table header
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        
+        const headers = ['Sl No', 'Name of Participants', 'School Name', 'Item', 'Points', 'Grade'];
+        headers.forEach(headerText => {
+          const th = document.createElement('th');
+          th.textContent = headerText;
+          th.style.border = '1px solid #ddd';
+          th.style.padding = '8px';
+          th.style.backgroundColor = '#f2f2f2';
+          th.style.fontWeight = 'bold';
+          headerRow.appendChild(th);
+        });
+        
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        
+        // Create table body
+        const tbody = document.createElement('tbody');
+        
+        // Use displayData to populate the PDF
+        displayData.forEach((item, index) => {
+          const row = document.createElement('tr');
+          
+          // Add cells
+          const cellData = [
+            item.slNo,
+            item.participantName || "-",
+            item.schoolName || "-",
+            item.item || "-",
+            item.points || "-",
+            item.grade || "-"
+          ];
+          
+          cellData.forEach(text => {
+            const td = document.createElement('td');
+            td.textContent = text;
+            td.style.border = '1px solid #ddd';
+            td.style.padding = '8px';
+            td.style.textAlign = 'center';
+            row.appendChild(td);
+          });
+          
+          tbody.appendChild(row);
+        });
+        
+        table.appendChild(tbody);
+        pdfContent.appendChild(table);
+        
+        // PDF filename
+        const fileName = `${selectedFestival.replace(/ /g, '_')}_${selectedGrade.replace(/ /g, '_')}_Report.pdf`;
+        
+        // PDF options
+        const options = {
+          margin: 10,
+          filename: fileName,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+        
+        // Generate and download PDF
+        html2pdf().from(pdfContent).set(options).save();
     };
-
-
     
     useEffect(() => {
         if (allResultData.length === 0 && dummyResultData.length > 0) {

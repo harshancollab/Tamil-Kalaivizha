@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Dash from '../components/Dash';
 import { getAllHigherlvlcompAPI } from '../services/allAPI';
+import html2pdf from 'html2pdf.js';
 
 const Higherlvlcomp = () => {
     const [Allitemresult, setItemresult] = useState([]);
@@ -120,7 +121,6 @@ const Higherlvlcomp = () => {
         setFilteredItems(filtered);
     }
 
-
     const resultData = [
         {
             slNo: 1,
@@ -210,134 +210,94 @@ const Higherlvlcomp = () => {
         setSearchParams({ festival });
     };
 
-   
+    // Updated handlePrint function using html2pdf.js
     const handlePrint = () => {
-        // Create a hidden iframe for printing
-        const printFrame = document.createElement('iframe');
-        printFrame.style.position = 'fixed';
-        printFrame.style.right = '0';
-        printFrame.style.bottom = '0';
-        printFrame.style.width = '0';
-        printFrame.style.height = '0';
-        printFrame.style.border = '0';
+        // Create a clone of the table for PDF generation
+        const pdfContent = document.createElement('div');
         
-        document.body.appendChild(printFrame);
+        // Add title
+        const titleElement = document.createElement('h2');
+        titleElement.textContent = getPrintTitle();
+        titleElement.style.textAlign = 'center';
+        titleElement.style.margin = '20px 0';
+        titleElement.style.fontWeight = 'bold';
+        pdfContent.appendChild(titleElement);
+
+        // Create table clone
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.style.marginTop = '20px';
         
-        // Get the content to print
-        const printContent = document.getElementById('higher-level-table-container');
-        const title = getPrintTitle();
+        // Create table header
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
         
-        // Extract background colors from the original table
-        const tableRows = printContent.querySelectorAll('tr');
-        let preservedHTML = printContent.innerHTML;
+        const headers = ['Sl No', 'Item Code & Item Name', 'Name of Participant', 'Class', 'School Name'];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            th.style.border = '1px solid #ddd';
+            th.style.padding = '8px';
+            th.style.backgroundColor = '#f2f2f2';
+            th.style.fontWeight = 'bold';
+            headerRow.appendChild(th);
+        });
         
-        // Write to the iframe
-        printFrame.contentDocument.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>${title}</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                    @page {
-                        size: auto;
-                        margin: 10mm;
-                    }
-                    body {
-                        font-family: Arial, sans-serif;
-                        margin: 0;
-                        padding: 10px;
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
-                        color-adjust: exact !important;
-                    }
-                    h2 {
-                        text-align: center;
-                        font-size: 16px;
-                        margin-bottom: 15px;
-                    }
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        font-size: 10px;
-                    }
-                    th, td {
-                        border: 1px solid #ddd;
-                        padding: 4px;
-                        text-align: center;
-                    }
-                    th {
-                        background-color: #f2f2f2;
-                    }
-                    
-                    /* Force background colors to print */
-                    * {
-                        -webkit-print-color-adjust: exact !important;
-                        print-color-adjust: exact !important;
-                        color-adjust: exact !important;
-                    }
-                    
-                    /* Mobile-specific adjustments */
-                    @media only screen and (max-width: 600px) {
-                        table {
-                            font-size: 8px;
-                        }
-                        th, td {
-                            padding: 2px;
-                        }
-                    }
-                    
-                    /* Print-specific styles */
-                    @media print {
-                        * {
-                            -webkit-print-color-adjust: exact !important;
-                            print-color-adjust: exact !important;
-                            color-adjust: exact !important;
-                        }
-                        body {
-                            width: 100%;
-                            margin: 0;
-                            padding: 0;
-                        }
-                    }
-                </style>
-            </head>
-            <body>
-                <h2>${title}</h2>
-                ${preservedHTML}
-            </body>
-            </html>
-        `);
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
         
-        printFrame.contentDocument.close();
+        // Create table body
+        const tbody = document.createElement('tbody');
         
-        // Wait for content to load before printing
-        printFrame.onload = function() {
-            try {
-                // Give it a moment to render properly
-                setTimeout(() => {
-                    printFrame.contentWindow.focus();
-                    printFrame.contentWindow.print();
-                    
-                    // Remove the iframe after printing
-                    setTimeout(() => {
-                        document.body.removeChild(printFrame);
-                    }, 1000);
-                }, 300);
-            } catch (error) {
-                console.error('Print error:', error);
-                alert('Printing failed. Please try again or use a different device.');
-                document.body.removeChild(printFrame);
-            }
+        const displayData = filteredItems.length > 0 ? filteredItems : 
+            (Allitemresult.length > 0 ? Allitemresult : resultData);
+            
+        displayData.forEach((item) => {
+            const row = document.createElement('tr');
+            
+            // Add cells
+            const cellData = [
+                item.slNo,
+                `${item.itemCode} - ${item.itemName}`,
+                item.participantName,
+                item.class,
+                item.schoolName
+            ];
+            
+            cellData.forEach(text => {
+                const td = document.createElement('td');
+                td.textContent = text;
+                td.style.border = '1px solid #ddd';
+                td.style.padding = '8px';
+                td.style.textAlign = 'center';
+                row.appendChild(td);
+            });
+            
+            tbody.appendChild(row);
+        });
+        
+        table.appendChild(tbody);
+        pdfContent.appendChild(table);
+        
+        // PDF filename
+        const fileName = `${selectedFestival.replace(/ /g, '_')}_Higher_Level_Competition.pdf`;
+        
+        // PDF options
+        const options = {
+            margin: 10,
+            filename: fileName,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
+        
+        // Generate and download PDF
+        html2pdf().from(pdfContent).set(options).save();
     };
-   
-   
- 
-   
+
     const displayData = filteredItems.length > 0 ? filteredItems :
         (Allitemresult.length > 0 ? Allitemresult : resultData);
-
 
     useEffect(() => {
         if (Allitemresult.length === 0 && resultData.length > 0) {

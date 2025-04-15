@@ -546,12 +546,12 @@
 // export default SclWisePoint
 
 
-
 import React, { useEffect, useState, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useSearchParams } from 'react-router-dom';
 import { getAllsclwisepoitAPI } from '../services/allAPI';
+import html2pdf from 'html2pdf.js';
 
 const SclWisePoint = () => {
     const [allResultData, setAllResultData] = useState([]);
@@ -667,112 +667,93 @@ const SclWisePoint = () => {
         setSearchParams({ festival: e.target.value });
     };
 
-    // Improved print function optimized for mobile
-    const handlePrint = () => {
-        const title = getPrintTitle();
-        const printContent = document.createElement('div');
+    // New print function using html2pdf (similar to ParticipatingSclList)
+    const generatePDF = () => {
+        // Create a clone of the table for PDF generation
+        const pdfContent = document.createElement('div');
         
-        // Clone the table to avoid modifying the original
-        const tableClone = printRef.current.cloneNode(true);
+        // Add title
+        const titleElement = document.createElement('h2');
+        titleElement.textContent = getPrintTitle();
+        titleElement.style.textAlign = 'center';
+        titleElement.style.margin = '20px 0';
+        titleElement.style.fontWeight = 'bold';
+        pdfContent.appendChild(titleElement);
+
+        // Create table clone
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.style.marginTop = '20px';
         
-        // Create print-specific styles
-        const printStyles = `
-            @media print {
-                html, body {
-                    width: 100%;
-                    height: 100%;
-                    margin: 0;
-                    padding: 0;
-                    font-size: 12px;
-                    -webkit-print-color-adjust: exact !important;
-                    print-color-adjust: exact !important;
-                }
-                
-                .print-container {
-                    width: 100%;
-                    padding: 10px;
-                    box-sizing: border-box;
-                }
-                
-                .print-header {
-                    text-align: center;
-                    font-size: 16px;
-                    font-weight: bold;
-                    margin-bottom: 15px;
-                }
-                
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    page-break-inside: auto;
-                }
-                
-                tr {
-                    page-break-inside: avoid;
-                    page-break-after: auto;
-                }
-                
-                th, td {
-                    border: 1px solid #ddd;
-                    padding: 6px 4px;
-                    text-align: center;
-                    font-size: 10px;
-                }
-                
-                th {
-                    background-color: #f2f2f2 !important;
-                    font-weight: bold;
-                }
-                
-                @page {
-                    size: portrait;
-                    margin: 0.5cm;
-                }
-            }
-        `;
+        // Create table header
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
         
-        // Create a print window with optimized mobile layout
-        const printWindow = window.open('', '_blank');
+        const headers = ['Sl No', 'School Code', 'School Name', 'Grade A', 'Grade B', 'Grade C', 'Points'];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            th.style.border = '1px solid #ddd';
+            th.style.padding = '8px';
+            th.style.backgroundColor = '#f2f2f2';
+            th.style.fontWeight = 'bold';
+            headerRow.appendChild(th);
+        });
         
-        if (!printWindow) {
-            alert("Please allow pop-ups to print the report");
-            return;
-        }
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
         
-        // Set up the content of the print window
-        printWindow.document.open();
-        printWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>${title}</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-                <style>${printStyles}</style>
-            </head>
-            <body>
-                <div class="print-container">
-                    <div class="print-header">${title}</div>
-                    ${tableClone.outerHTML}
-                </div>
-                <script>
-                    // Function to handle print completion and close the window
-                    function printAndClose() {
-                        setTimeout(function() {
-                            window.print();
-                            setTimeout(function() {
-                                window.close();
-                            }, 500);
-                        }, 300);
-                    }
-                    
-                    // Wait for content to load before printing
-                    window.onload = printAndClose;
-                </script>
-            </body>
-            </html>
-        `);
+        // Create table body
+        const tbody = document.createElement('tbody');
         
-        printWindow.document.close();
+        // Determine what data to display
+        const displayData = filteredData.length > 0 ? filteredData : 
+            (allResultData.length > 0 ? allResultData : dummyResultData);
+        
+        displayData.forEach((item, index) => {
+            const row = document.createElement('tr');
+            
+            // Add cells
+            const cellData = [
+                item.slNo || index + 1,
+                item.regNo || "-",
+                item.code || "-",
+                item.mark1 || "-",
+                item.mark2 || "-",
+                item.mark3 || "-",
+                item.total || "-"
+            ];
+            
+            cellData.forEach(text => {
+                const td = document.createElement('td');
+                td.textContent = text;
+                td.style.border = '1px solid #ddd';
+                td.style.padding = '8px';
+                td.style.textAlign = 'center';
+                row.appendChild(td);
+            });
+            
+            tbody.appendChild(row);
+        });
+        
+        table.appendChild(tbody);
+        pdfContent.appendChild(table);
+        
+        // PDF filename
+        const fileName = `${selectedFestival.replace(/ /g, '_')}_School_Wise_Points.pdf`;
+        
+        // PDF options
+        const options = {
+            margin: 10,
+            filename: fileName,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        
+        // Generate and download PDF
+        html2pdf().from(pdfContent).set(options).save();
     };
 
     // Initialize filtered data at component mount
@@ -814,7 +795,7 @@ const SclWisePoint = () => {
                                 </div>
                             </div>
                             <button
-                                onClick={handlePrint}
+                                onClick={generatePDF}
                                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
                             >
                                 Print
