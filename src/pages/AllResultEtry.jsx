@@ -191,6 +191,10 @@ const AllResultEntry = () => {
 
     const chunkedRegNos = chunkRegNos(absenteeRegNos, 4);
 
+    const handleAddClick = () => {
+        navigate('/result-entry');
+    };
+
     return (
         <>
             <Header />
@@ -202,6 +206,10 @@ const AllResultEntry = () => {
                             Result Entry
                         </h2>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
+                        <button onClick={handleAddClick} className="text-blue-500 border border-blue-500 py-2 px-6 rounded-full flex items-center">
+                            Add Result entry
+                        </button>
+                       
                             <div className="relative">
                                 <p
                                     className='text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4] cursor-pointer'

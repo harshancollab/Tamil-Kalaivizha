@@ -9,6 +9,11 @@ const SclContactList = () => {
   const printRef = useRef();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedSchool, setSelectedSchool] = useState(null);
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  // Search functionality
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     getAllitemise();
@@ -41,6 +46,12 @@ const SclContactList = () => {
     setSelectedSchool(null);
   };
 
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
+
   // Sample data - in production, you would use Alllist instead
   const schoolContacts = [
     {
@@ -61,8 +72,175 @@ const SclContactList = () => {
       additionalContact: {
         phone: "9123456789"
       }
-    },
-    {
+    },{
+      id: "6004",
+      name: "G. H. S. S. Kumily",
+      chairman: {
+        phone: "9022397374"
+      },
+      headmaster: {
+        phone: "9577747847"
+      },
+      teamManager: {
+        phone: "9473489868"
+      },
+      escotingTeacher: {
+        phone: "9604960486"
+      },
+      escotingTeacher2: {
+        phone: "9234567790"
+      },
+      escotingTeacher3: {
+        phone: "9234567790"
+      },
+      escotingTeacher4: {
+        phone: "9234567896"
+      }
+    },{
+      id: "6004",
+      name: "G. H. S. S. Kumily",
+      chairman: {
+        phone: "9022397374"
+      },
+      headmaster: {
+        phone: "9577747847"
+      },
+      teamManager: {
+        phone: "9473489868"
+      },
+      escotingTeacher: {
+        phone: "9604960486"
+      },
+      escotingTeacher2: {
+        phone: "9234567790"
+      },
+      escotingTeacher3: {
+        phone: "9234567790"
+      },
+      escotingTeacher4: {
+        phone: "9234567896"
+      }
+    },{
+      id: "6004",
+      name: "G. H. S. S. Kumily",
+      chairman: {
+        phone: "9022397374"
+      },
+      headmaster: {
+        phone: "9577747847"
+      },
+      teamManager: {
+        phone: "9473489868"
+      },
+      escotingTeacher: {
+        phone: "9604960486"
+      },
+      escotingTeacher2: {
+        phone: "9234567790"
+      },
+      escotingTeacher3: {
+        phone: "9234567790"
+      },
+      escotingTeacher4: {
+        phone: "9234567896"
+      }
+    },{
+      id: "6004",
+      name: "G. H. S. S. Kumily",
+      chairman: {
+        phone: "9022397374"
+      },
+      headmaster: {
+        phone: "9577747847"
+      },
+      teamManager: {
+        phone: "9473489868"
+      },
+      escotingTeacher: {
+        phone: "9604960486"
+      },
+      escotingTeacher2: {
+        phone: "9234567790"
+      },
+      escotingTeacher3: {
+        phone: "9234567790"
+      },
+      escotingTeacher4: {
+        phone: "9234567896"
+      }
+    },{
+      id: "6004",
+      name: "G. H. S. S. Kumily",
+      chairman: {
+        phone: "9022397374"
+      },
+      headmaster: {
+        phone: "9577747847"
+      },
+      teamManager: {
+        phone: "9473489868"
+      },
+      escotingTeacher: {
+        phone: "9604960486"
+      },
+      escotingTeacher2: {
+        phone: "9234567790"
+      },
+      escotingTeacher3: {
+        phone: "9234567790"
+      },
+      escotingTeacher4: {
+        phone: "9234567896"
+      }
+    },{
+      id: "6004",
+      name: "G. H. S. S. Kumily",
+      chairman: {
+        phone: "9022397374"
+      },
+      headmaster: {
+        phone: "9577747847"
+      },
+      teamManager: {
+        phone: "9473489868"
+      },
+      escotingTeacher: {
+        phone: "9604960486"
+      },
+      escotingTeacher2: {
+        phone: "9234567790"
+      },
+      escotingTeacher3: {
+        phone: "9234567790"
+      },
+      escotingTeacher4: {
+        phone: "9234567896"
+      }
+    },{
+      id: "6004",
+      name: "G. H. S. S. Kumily",
+      chairman: {
+        phone: "9022397374"
+      },
+      headmaster: {
+        phone: "9577747847"
+      },
+      teamManager: {
+        phone: "9473489868"
+      },
+      escotingTeacher: {
+        phone: "9604960486"
+      },
+      escotingTeacher2: {
+        phone: "9234567790"
+      },
+      escotingTeacher3: {
+        phone: "9234567790"
+      },
+      escotingTeacher4: {
+        phone: "9234567896"
+      }
+    },{
       id: "6004",
       name: "G. H. S. S. Kumily",
       chairman: {
@@ -154,6 +332,67 @@ const SclContactList = () => {
     }
 
     return teachers;
+  };
+
+  // Filter schools based on search term
+  const filteredSchools = schoolContacts.filter(school => 
+    school.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    school.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Pagination logic
+  const indexOfLastItem = currentPage * rowsPerPage;
+  const indexOfFirstItem = indexOfLastItem - rowsPerPage;
+  const currentItems = filteredSchools.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredSchools.length / rowsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    if (pageNumber > 0 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    // Dynamically adjust number of page buttons based on screen size
+    const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
+    
+    if (totalPages <= maxPageNumbersToShow) {
+      // Show all page numbers
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      // Show limited page numbers with dots
+      if (currentPage <= 2) {
+        // Near the start
+        for (let i = 1; i <= 3; i++) {
+          if (i <= totalPages) pageNumbers.push(i);
+        }
+        if (totalPages > 3) {
+          pageNumbers.push('...');
+          pageNumbers.push(totalPages);
+        }
+      } else if (currentPage >= totalPages - 1) {
+        // Near the end
+        pageNumbers.push(1);
+        pageNumbers.push('...');
+        for (let i = totalPages - 2; i <= totalPages; i++) {
+          if (i > 0) pageNumbers.push(i);
+        }
+      } else {
+        // Middle
+        pageNumbers.push(1);
+        if (currentPage > 3) pageNumbers.push('...');
+        pageNumbers.push(currentPage - 1);
+        pageNumbers.push(currentPage);
+        pageNumbers.push(currentPage + 1);
+        if (currentPage < totalPages - 2) pageNumbers.push('...');
+        pageNumbers.push(totalPages);
+      }
+    }
+    
+    return pageNumbers;
   };
 
   // New PDF generation function using html2pdf
@@ -286,24 +525,38 @@ const SclContactList = () => {
             >
             Print
             </button>
+            
           </div>
+          <div className="relative flex mt-2 items-center w-full sm:w-64 h-9 border border-blue-800 rounded-full px-4">
+            <input
+              type="text"
+              placeholder="Search School Code..."
+              className="w-full bg-transparent outline-none text-sm"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+            <button className="text-gray-500 hover:text-gray-700">
+              <i className="fa-solid fa-magnifying-glass"></i>
+            </button>
+          </div>
+          
           <div ref={printRef} className="w-full">
-            <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <div className="overflow-x-auto  sm:mx-0">
               <div className="inline-block min-w-full align-middle px-4 sm:px-0">
-                <div className="shadow overflow-hidden border-gray-200 sm:rounded-lg">
+                <div className=" overflow-hidden border-gray-200 sm:rounded-lg">
                   <table className="min-w-full text-center print-table">
                     <thead className="min-h-screen">
                       <tr className="text-gray-700">
                         <th className="p-2 md:p-3 text-xs sm:text-sm">Sl No</th>
                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code</th>
                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
-                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Status</th>
+                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Action</th>
                       </tr>
                     </thead>
                     <tbody className="text-xs sm:text-sm">
-                    {schoolContacts.map((school, index) => (
+                    {currentItems.map((school, index) => (
                         <tr key={index} className="hover:bg-gray-100">
-                          <td className="p-2 md:p-3 whitespace-nowrap">{index + 1}</td>
+                          <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
                           <td className="p-2 md:p-3 whitespace-nowrap">{school.id}</td>
                           <td className="p-2 md:p-3 whitespace-nowrap">{school.name}</td>
                           <td className="p-2 md:p-3 whitespace-nowrap">
@@ -319,6 +572,51 @@ const SclContactList = () => {
                     </tbody>
                   </table>
                 </div>
+                   {/* Enhanced Responsive Pagination with icons */}
+                   <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
+                {/* Showing X of Y rows */}
+                <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
+                  {filteredSchools.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredSchools.length)} of ${filteredSchools.length} rows` : '0 rows'}
+                </div>
+                
+                {/* Pagination Controls */}
+                <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                  {/* Previous Button with icon */}
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
+                  >
+                    <i className="fa-solid fa-angle-right transform rotate-180"></i>
+                    <span className="hidden sm:inline p-1">Previous</span>
+                  </button>
+                  
+                  {/* Page Numbers */}
+                  <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+                    {renderPageNumbers().map((page, index) => (
+                      <button
+                        key={index}
+                        onClick={() => page !== '...' && handlePageChange(page)}
+                        className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${
+                          currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                        } ${page === '...' ? 'pointer-events-none' : ''}`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  {/* Next Button with icon */}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages || totalPages === 0}
+                    className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
+                  >
+                    <span className="hidden sm:inline p-1">Next</span>
+                    <i className="fa-solid fa-angle-right"></i>
+                  </button>
+                </div>
+              </div>
               </div>
             </div>
           </div>
@@ -384,4 +682,4 @@ const SclContactList = () => {
   );
 };
 
-export default SclContactList;
+export default SclContactList

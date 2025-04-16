@@ -112,11 +112,12 @@ const ItemWisePoint = () => {
   ];
 
   const handleSchoolSearchChange = (e) => {
-    setSchoolSearch(e.target.value);
-    // Set isSearching directly based on current input value
-    setIsSearching(e.target.value.trim() !== '');
+    const searchValue = e.target.value;
+    setSchoolSearch(searchValue);
+    // Set isSearching based on whether there's text in the search field
+    setIsSearching(searchValue.trim() !== '');
     // Update URL with search parameters
-    updateURLParams(e.target.value, selectedFestival);
+    updateURLParams(searchValue, selectedFestival);
   };
 
   const handleFestivalChange = (e) => {
@@ -274,8 +275,8 @@ const ItemWisePoint = () => {
               </div>
 
               <button
-                className={`border-blue-800 border text-blue-900 py-2 px-4 rounded-full min-w-max whitespace-nowrap ${isSearching ? 'opacity-100' : 'opacity-50 cursor-not-allowed'}`}
-                disabled={!isSearching}
+                className={`border-blue-800 border text-blue-900 py-2 px-4 rounded-full min-w-max whitespace-nowrap ${!isSearching ? 'opacity-100' : 'opacity-50 cursor-not-allowed'}`}
+                disabled={isSearching}
                 onClick={clearSearch}
               >
                 All Schools

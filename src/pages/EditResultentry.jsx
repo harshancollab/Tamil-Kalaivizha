@@ -303,7 +303,7 @@ const EditResultentry = () => {
                 //     setFormData(result.data);
                 // }
 
-                // For now, we'll just show a placeholder message
+               
                 console.log("Would fetch result entry with ID:", id);
             } catch (err) {
                 console.log(err);

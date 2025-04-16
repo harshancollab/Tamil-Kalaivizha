@@ -142,6 +142,10 @@ export const  updateStageItemwiseAPI  = async (id,reqBody, reqHeader) => {
   return await commonAPI("PUT", `${SERVER_URL}/itemwisestages-edit/${id}`,reqBody, reqHeader);
 };
 
+// Get stage item by ID
+export const getStageItemByIdAPI = async (id, reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/stage-itemwise/${id}`, {}, reqHeader);
+};
 
 // all stage  api
 export const getAllItemStageListAPI = async (reqHeader) => {

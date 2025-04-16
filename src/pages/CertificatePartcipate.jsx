@@ -450,7 +450,7 @@ const CertificateParticipate = () => {
                       onClick={handleDownloadPDF}
                       className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-8 py-2 rounded-full"
                     >
-                      Download PDF
+                      Download 
                     </button>
                   </div>
                 </>

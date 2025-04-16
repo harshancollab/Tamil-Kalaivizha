@@ -213,10 +213,11 @@
 
 // export default AddCallsheet
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Dash from '../components/Dash';
 import { AddCallSheetAPI } from '../services/allAPI';
+import html2pdf from 'html2pdf.js';
 
 const AddCallsheet = () => {
     // Create separate states for each form
@@ -230,10 +231,47 @@ const AddCallsheet = () => {
     });
     
     const [dateStageCallsheet, setDateStageCallsheet] = useState({
-        Date: "", // Changed from Festival to Date
-        Stage: "", // Changed from Item to Stage
-        
+        Date: "",
+        Stage: "",
     });
+
+    // Dummy data for dropdown options
+    const dummyData = {
+        festivals: [
+            { id: 1, name: "UP Tamil Kalaivizha" },
+            { id: 2, name: "Lp Tamil Kalaivizha" },
+            { id: 3, name: "Hs Tamil Kalaivizha" },
+           
+        ],
+        items: [
+            { id: 1, name: "Drama" },
+            { id: 2, name: "Essay" },
+            { id: 3, name: "Story" },
+            { id: 4, name: "Music" },
+            { id: 5, name: "Dance" },
+            { id: 6, name: "Poetry" }
+        ],
+        dates: [
+            { id: 1, value: "2023-12-05", display: "5 Dec 2023" },
+            { id: 2, value: "2023-12-10", display: "10 Dec 2023" },
+            { id: 3, value: "2023-12-15", display: "15 Dec 2023" },
+            { id: 4, value: "2023-12-20", display: "20 Dec 2023" },
+            { id: 5, value: "2023-12-27", display: "27 Dec 2023" }
+        ],
+        stages: [
+            { id: 1, name: "Stage 1" },
+            { id: 2, name: "Stage 2" },
+            { id: 3, name: "Stage 3" },
+            { id: 4, name: "Stage 4" },
+            { id: 5, name: "All Stage" }
+        ]
+    };
+
+    // Load html2pdf dynamically (since it's a client-side library)
+    useEffect(() => {
+        // You might want to add a script loader here if not using import
+        // This is just a placeholder in case you need to initialize anything
+    }, []);
 
     // Sample call sheet data for print preview
     const callSheetData = [
@@ -243,9 +281,6 @@ const AddCallsheet = () => {
         { slNo: 4, registerNo: '301', cluster: 1, codeNo: '', signOfParticipants: '', remarks: '' },
         { slNo: 5, registerNo: '340', cluster: 1, codeNo: '', signOfParticipants: '', remarks: '' },
     ];
-
-    // Session time options
-   
 
     // Handle changes for the Item form
     const handleItemChange = (e) => {
@@ -325,21 +360,47 @@ const AddCallsheet = () => {
     const handleDateStageReport = (e) => {
         e.preventDefault();
         if (dateStageCallsheet.Date && dateStageCallsheet.Stage) {
+            // Find the display date from the date value
+            const selectedDate = dummyData.dates.find(date => date.value === dateStageCallsheet.Date);
+            const displayDate = selectedDate ? selectedDate.display : dateStageCallsheet.Date;
+            
             // Print the report directly
-            const formattedDate = formatDate(dateStageCallsheet.Date);
-            
-           
-            
-            handlePrint("dateStage", `${formattedDate} - ${dateStageCallsheet.Stage} `);
+            handlePrint("dateStage", `${displayDate} - ${dateStageCallsheet.Stage}`);
             setDateStageCallsheet({ Date: "", Stage: "" });
         } else {
-            alert("Please select date, stage and session time");
+            alert("Please select date and stage");
         }
     };
 
-    // Print functionality
+    // Print functionality using html2pdf
     const handlePrint = (type, title) => {
-        const originalContents = document.body.innerHTML;
+        // Create report title based on type
+        let reportTitle = "Call Sheet";
+        let stageInfo = "";
+        
+        if (type === "festival") {
+            reportTitle = `Call Sheet - ${title}`;
+        } else if (type === "dateStage") {
+            const [date, stage] = title.split(" - ");
+            reportTitle = `Call Sheet Tamil Kalaivizha - ${title}`;
+            stageInfo = `
+                <div class="stage-info">
+                    <div><b>Stage No : ${stage}</b></div>
+                    <div><b>Date : ${date}</b></div>
+                    <div><b>Max Time : 20 Min</b></div>
+                </div>
+            `;
+        } else if (type === "item") {
+            const [festival, item] = title.split(" - ");
+            reportTitle = `Call Sheet UP Tamil Kalaivizha - 324 ${item}`;
+            stageInfo = `
+                <div class="stage-info">
+                    <div><b>Stage No : Stage 1</b></div>
+                    <div><b>Date : 27 Dec 2023</b></div>
+                    <div><b>Max Time : 20 Min</b></div>
+                </div>
+            `;
+        }
         
         // Table for call sheet data
         let tableHTML = `
@@ -375,42 +436,12 @@ const AddCallsheet = () => {
             </table>
         `;
         
-        // Create report title based on type
-        let reportTitle = "Call Sheet";
-        let stageInfo = "";
-        
-        if (type === "festival") {
-            reportTitle = `Call Sheet - ${title} `;
-        } else if (type === "dateStage") {
-            const [date, stage] = title.split(" - ");
-            reportTitle = `Call Sheet Tamil Kalaivizha - ${title} `;
-            stageInfo = `
-                <div class="stage-info">
-                    <div><b>Stage No : ${stage}</b></div>
-                    <div><b>Date : ${date}</b></div>
-                    <div><b>Max Time : 20 Min</b></div>
-                </div>
-            `;
-        } else if (type === "item") {
-            const [festival, item] = title.split(" - ");
-            reportTitle = `Call Sheet UP Tamil Kalaivizha - 324 ${item}`;
-            stageInfo = `
-                <div class="stage-info">
-                    <div><b>Stage No : Stage 1</b></div>
-                    <div><b>Date : 27 Dec 2023</b></div>
-                    <div><b>Max Time : 20 Min</b></div>
-                </div>
-            `;
-        }
-        
-        
         const headerInfo = `
             <div class="header-info">
                 ${stageInfo}
             </div>
         `;
         
-      
         const footerInfo = `
             <div class="footer-info">
                 <div class="footer-item">
@@ -424,14 +455,11 @@ const AddCallsheet = () => {
             </div>
         `;
         
-        document.body.innerHTML = `
-            <style type="text/css" media="print">
-                @page {
-                    size: auto;
-                    margin: 0.5cm;
-                }
+        // Create a container element for PDF content
+        const element = document.createElement('div');
+        element.innerHTML = `
+            <style>
                 body {
-                    padding: 20px;
                     font-family: sans-serif;
                 }
                 .print-title {
@@ -478,9 +506,19 @@ const AddCallsheet = () => {
             ${footerInfo}
         `;
         
-        window.print();
-        document.body.innerHTML = originalContents;
-        window.location.reload(); // Reload the page after printing to restore all functionalities
+        // Configure html2pdf options
+        const opt = {
+            margin: 10,
+            filename: `${reportTitle.replace(/\s+/g, '_')}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        
+        // Generate PDF
+        html2pdf().from(element).set(opt).save().then(() => {
+            console.log('PDF generated successfully');
+        });
     };
 
     return (
@@ -510,9 +548,11 @@ const AddCallsheet = () => {
                                                     required
                                                 >
                                                     <option value="">Select Festival</option>
-                                                    <option value="Festival">Festival</option>
-                                                    <option value="Festival 4">Festival 4</option>
-                                                    <option value="Festival 5">Festival 5</option>
+                                                    {dummyData.festivals.map(festival => (
+                                                        <option key={festival.id} value={festival.name}>
+                                                            {festival.name}
+                                                        </option>
+                                                    ))}
                                                 </select>
                                             </div>
                                         </div>
@@ -526,10 +566,12 @@ const AddCallsheet = () => {
                                                     className="border border-blue-600 px-2 py-1 rounded-full w-full"
                                                     required
                                                 >
-                                                    <option value="">Select Item </option>
-                                                    <option value="Drama">Drama</option>
-                                                    <option value="Essay">Essay</option>
-                                                    <option value="Story">Story</option>
+                                                    <option value="">Select Item</option>
+                                                    {dummyData.items.map(item => (
+                                                        <option key={item.id} value={item.name}>
+                                                            {item.name}
+                                                        </option>
+                                                    ))}
                                                 </select>
                                             </div>
                                         </div>
@@ -563,9 +605,11 @@ const AddCallsheet = () => {
                                                     required
                                                 >
                                                     <option value="">Select Festival</option>
-                                                    <option value="Festival 1">Festival 1</option>
-                                                    <option value="Festival 2">Festival 2</option>
-                                                    <option value="Festival 3">Festival 3</option>
+                                                    {dummyData.festivals.map(festival => (
+                                                        <option key={festival.id} value={festival.name}>
+                                                            {festival.name}
+                                                        </option>
+                                                    ))}
                                                 </select>
                                             </div>
                                         </div>
@@ -592,14 +636,20 @@ const AddCallsheet = () => {
                                         <div className="flex flex-col md:flex-row mb-6 md:mb-8">
                                             <label className="font-semibold text-blue-900 w-full md:w-40 mb-2 md:mb-0">Date</label>
                                             <div className="w-full md:w-80">
-                                                <input
-                                                    type="date"
+                                                <select
                                                     name="Date"
                                                     value={dateStageCallsheet.Date}
                                                     onChange={handleDateStageChange}
                                                     className="border border-blue-600 px-2 py-1 rounded-full w-full"
                                                     required
-                                                />
+                                                >
+                                                    <option value="">Select Date</option>
+                                                    {dummyData.dates.map(date => (
+                                                        <option key={date.id} value={date.value}>
+                                                            {date.display}
+                                                        </option>
+                                                    ))}
+                                                </select>
                                             </div>
                                         </div>
                                         <div className="flex flex-col md:flex-row mb-6 md:mb-8">
@@ -612,10 +662,12 @@ const AddCallsheet = () => {
                                                     className="border border-blue-600 px-2 py-1 rounded-full w-full"
                                                     required
                                                 >
-                                                    <option value="">Select Stage </option>
-                                                    <option value="Stage 1">Stage 1</option>
-                                                    <option value="Stage 2">Stage 2</option>
-                                                    <option value="Stage 3">Stage 3</option>
+                                                    <option value="">Select Stage</option>
+                                                    {dummyData.stages.map(stage => (
+                                                        <option key={stage.id} value={stage.name}>
+                                                            {stage.name}
+                                                        </option>
+                                                    ))}
                                                 </select>
                                             </div>
                                         </div>
@@ -640,4 +692,4 @@ const AddCallsheet = () => {
     );
 };
 
-export default AddCallsheet;
+export default AddCallsheet

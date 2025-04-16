@@ -45,7 +45,7 @@ const EditFestivalwise = () => {
 
   console.log(formData);
 
-  // Fetch existing data when component mounts
+
   useEffect(() => {
     const fetchItemDetails = async () => {
       const token = sessionStorage.getItem("token");
