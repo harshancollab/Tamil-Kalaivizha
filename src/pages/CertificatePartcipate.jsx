@@ -2,10 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import Header from '../components/Header';
 import Dash from '../components/Dash';
 import html2pdf from 'html2pdf.js';
-import { useNavigate } from 'react-router-dom';
 
 const CertificateParticipate = () => {
-  const navigate = useNavigate();
   const [selectedParticipant, setSelectedParticipant] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -13,10 +11,11 @@ const CertificateParticipate = () => {
   const [certificateData, setCertificateData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const dropdownRef = useRef(null);
   const certificateRef = useRef(null);
 
-  // Dummy data for temporary use
+  // Dummy data for participants
   const dummyParticipants = [
     {
       id: 1,
@@ -77,7 +76,7 @@ const CertificateParticipate = () => {
 
   const [participants, setParticipants] = useState([]);
 
-  // Simulate API call to get participants using the dummy data
+  // Simulate API call to get participants
   useEffect(() => {
     getAllParticipants();
   }, []);
@@ -104,6 +103,18 @@ const CertificateParticipate = () => {
     }
   }, [highlightedIndex]);
 
+  // Trigger PDF generation when certificate data is ready and shown
+  useEffect(() => {
+    if (showCertificate && certificateData) {
+      // Give time for the certificate to render
+      const timer = setTimeout(() => {
+        handleSaveAsPDF();
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [showCertificate, certificateData]);
+
   // Simulate API call to get all participants
   const getAllParticipants = async () => {
     setLoading(true);
@@ -113,17 +124,7 @@ const CertificateParticipate = () => {
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // In a real implementation, this would be:
-      // const token = sessionStorage.getItem("token");
-      // if (token) {
-      //   const reqHeader = { "Authorization": `Bearer ${token}` };
-      //   const result = await getAllParticipantsAPI(reqHeader);
-      //   if (result.status === 200) {
-      //     setParticipants([{ id: "all", name: "All Participants" }, ...result.data]);
-      //   }
-      // }
-      
-      // For now, use dummy data
+      // Use dummy data
       setParticipants(dummyParticipants);
     } catch (err) {
       console.log(err);
@@ -139,17 +140,7 @@ const CertificateParticipate = () => {
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      // In a real implementation, this would be:
-      // const token = sessionStorage.getItem("token");
-      // if (token) {
-      //   const reqHeader = { "Authorization": `Bearer ${token}` };
-      //   const result = await getParticipantByIdAPI(participantId, reqHeader);
-      //   if (result.status === 200) {
-      //     return result.data;
-      //   }
-      // }
-      
-      // For now, find in dummy data
+      // Find in dummy data
       const participant = dummyParticipants.find(p => p.id.toString() === participantId.toString());
       return participant || null;
     } catch (err) {
@@ -211,8 +202,8 @@ const CertificateParticipate = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSaveSuccess(false);
     
-    // Generate certificate based on selected participant
     if (selectedParticipant) {
       try {
         // Simulate API delay
@@ -225,8 +216,6 @@ const CertificateParticipate = () => {
         } else {
           // Find the selected participant in the array
           const participantId = selectedParticipant.split(' - ')[0];
-          
-          // For a real API implementation, you would call getParticipantById
           const participantDetails = await getParticipantById(participantId);
           
           if (participantDetails) {
@@ -238,10 +227,11 @@ const CertificateParticipate = () => {
           }
         }
         setShowCertificate(true);
+        // handleSaveAsPDF will be called automatically via useEffect
+        
       } catch (err) {
         console.error("Error generating certificate:", err);
         setError("Failed to generate certificate. Please try again.");
-      } finally {
         setLoading(false);
       }
     } else {
@@ -250,30 +240,108 @@ const CertificateParticipate = () => {
     }
   };
 
+  // Function to generate PDF and handle save as
+  const handleSaveAsPDF = async () => {
+    if (!certificateRef.current) return;
+    
+    try {
+      setLoading(true);
+      
+      const filename = selectedParticipant === "All Participants" 
+        ? 'all-participants-certificate.pdf'
+        : `${selectedParticipant.split(' - ')[1]}-certificate.pdf`;
+      
+      // Generate PDF first
+      const options = {
+        margin: 10,
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      
+      // If multiple certificates, ensure they all fit well
+      if (certificateData && certificateData.length > 1) {
+        options.pagebreak = { mode: ['avoid-all', 'css', 'legacy'] };
+      }
+      
+      // Generate PDF blob
+      const pdfBlob = await html2pdf()
+        .set(options)
+        .from(certificateRef.current)
+        .output('blob');
+      
+      // Check if browser supports the File System Access API
+      if ('showSaveFilePicker' in window) {
+        try {
+          // File picker options
+          const opts = {
+            suggestedName: filename,
+            types: [{
+              description: 'PDF Files',
+              accept: {'application/pdf': ['.pdf']}
+            }],
+          };
+          
+          // Show the file picker
+          const fileHandle = await window.showSaveFilePicker(opts);
+          
+          // Create a FileSystemWritableFileStream
+          const writable = await fileHandle.createWritable();
+          
+          // Write the blob to the file
+          await writable.write(pdfBlob);
+          
+          // Close the file
+          await writable.close();
+          
+          // Show success message
+          setSaveSuccess(true);
+          
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            console.error("Error saving file:", err);
+            // Fall back to regular download if there's an error other than user cancellation
+            downloadPDF(pdfBlob, filename);
+            setSaveSuccess(true);
+          }
+        }
+      } else {
+        // Fall back to regular download if File System Access API is not supported
+        downloadPDF(pdfBlob, filename);
+        setSaveSuccess(true);
+      }
+    } catch (err) {
+      console.error("Error generating or saving PDF:", err);
+      setError("Failed to save PDF. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Fallback download function using URL.createObjectURL
+  const downloadPDF = (blob, filename) => {
+    // Create a link element
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    
+    // Append to the document
+    document.body.appendChild(link);
+    
+    // Trigger click
+    link.click();
+    
+    // Clean up
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+  };
+
   const handleBackToSelection = () => {
     setShowCertificate(false);
     setCertificateData(null);
     setError(null);
-  };
-
-  const handleDownloadPDF = () => {
-    if (!certificateRef.current) return;
-    
-    const element = certificateRef.current;
-    const options = {
-      margin: 10,
-      filename: 'certificate-report.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    
-    // If multiple certificates, ensure they all fit well
-    if (certificateData && certificateData.length > 1) {
-      options.pagebreak = { mode: ['avoid-all', 'css', 'legacy'] };
-    }
-    
-    html2pdf().set(options).from(element).save();
+    setSaveSuccess(false);
   };
 
   return (
@@ -283,7 +351,6 @@ const CertificateParticipate = () => {
         <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
           <Dash />
           <div className="flex-1 p-4 md:p-2 w-full overflow-x-auto">
-            {/* Certificate Display or Selection Form */}
             <div className="bg-gray-200 p-4 rounded-lg min-h-screen">
               {!showCertificate ? (
                 <>
@@ -362,8 +429,9 @@ const CertificateParticipate = () => {
                                   participants.map((participant, index) => (
                                     <div
                                       key={participant.id}
-                                      className={`px-4 py-2 cursor-pointer ${index === highlightedIndex ? 'bg-blue-100' : 'hover:bg-blue-50'
-                                        } ${participant.id === "all" ? "font-semibold border-b border-gray-200" : ""}`}
+                                      className={`px-4 py-2 cursor-pointer ${
+                                        index === highlightedIndex ? 'bg-blue-100' : 'hover:bg-blue-50'
+                                      } ${participant.id === "all" ? "font-semibold border-b border-gray-200" : ""}`}
                                       onClick={() => handleParticipantSelect(participant)}
                                       role="option"
                                       aria-selected={index === highlightedIndex}
@@ -387,7 +455,7 @@ const CertificateParticipate = () => {
                             className={`bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-14 py-3 rounded-full mt-20 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={loading}
                           >
-                            {loading ? 'Loading...' : 'Generate'}
+                            {loading ? 'Processing...' : 'Generate'}
                           </button>
                         </div>
                       </div>
@@ -395,12 +463,50 @@ const CertificateParticipate = () => {
                   </form>
                 </>
               ) : (
-                <>
+                <div className="flex flex-col">
+                  {/* Display success message when save is successful */}
+                  {saveSuccess && (
+                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 flex justify-between items-center">
+                      <span>Certificate saved successfully!</span>
+                      <button 
+                        onClick={() => setSaveSuccess(false)}
+                        className="text-green-700"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                  
+                  {/* Back button */}
+                  <div className="mb-4">
+                    <button
+                      onClick={handleBackToSelection}
+                      className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded flex items-center"
+                    >
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        className="mr-2"
+                      >
+                        <path d="m15 18-6-6 6-6"/>
+                      </svg>
+                      Back
+                    </button>
+                  </div>
+                  
+                  {/* Certificate content */}
                   <div ref={certificateRef} className="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
-                    {/* Certificate Title */}
                     <h1 className="text-xl font-bold text-center mb-6">Certificate Participant Wise Report</h1>
-
-                    {/* Participants Data */}
                     {certificateData && certificateData.map((participant, index) => (
                       <div key={participant.id} className="mb-8">
                         <div className="mb-6 px-16">
@@ -433,27 +539,21 @@ const CertificateParticipate = () => {
                             </div>
                           </div>
                         </div>
-
                         {index < certificateData.length - 1 && <hr className="my-6" />}
                       </div>
                     ))}
                   </div>
-
-                  <div className="mt-6 flex justify-center space-x-4">
-                    <button
-                      onClick={handleBackToSelection}
-                      className="border border-blue-600 text-blue-800 px-8 py-2 rounded-full"
-                    >
-                      Back
-                    </button>
-                    <button
-                      onClick={handleDownloadPDF}
-                      className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-8 py-2 rounded-full"
-                    >
-                      Download 
-                    </button>
-                  </div>
-                </>
+                  
+                  {/* Loading overlay */}
+                  {loading && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                      <div className="bg-white p-5 rounded-lg flex flex-col items-center">
+                        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500 mb-3"></div>
+                        <p>Saving certificate...</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -463,4 +563,4 @@ const CertificateParticipate = () => {
   );
 };
 
-export default CertificateParticipate
+export default CertificateParticipate;

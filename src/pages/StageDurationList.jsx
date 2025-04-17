@@ -560,14 +560,7 @@ const StageDurationList = () => {
                 <i className="fa-solid fa-magnifying-glass"></i>
               </div>
             </div>
-            {searchTerm && (
-              <button
-                onClick={clearSearch}
-                className="ml-2 text-blue-500 hover:text-blue-700 text-sm"
-              >
-                Clear
-              </button>
-            )}
+           
           </div>
           
           {loading ? (

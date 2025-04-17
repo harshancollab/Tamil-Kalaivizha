@@ -16,6 +16,8 @@ const AddcertfitDetail = () => {
     const [showCertificate, setShowCertificate] = useState(false);
     const [certificateData, setCertificateData] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [saveSuccess, setSaveSuccess] = useState(false);
     const certificateRef = useRef(null);
     
     const festivalTypes = [
@@ -50,9 +52,23 @@ const AddcertfitDetail = () => {
         { value: "3 - Suresh", label: "3 - Suresh" },
     ];
 
+    // Trigger PDF generation when certificate data is ready and shown
+    useEffect(() => {
+        if (showCertificate && certificateData) {
+            // Give time for the certificate to render
+            const timer = setTimeout(() => {
+                handleSaveAsPDF();
+            }, 500);
+            
+            return () => clearTimeout(timer);
+        }
+    }, [showCertificate, certificateData]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
+        setError(null);
+        setSaveSuccess(false);
         
         if (selectedFestival && selectedItem) {
             const token = sessionStorage.getItem("token");
@@ -72,26 +88,32 @@ const AddcertfitDetail = () => {
                     };
                     
                     // Call API to generate certificate details
-                    const result = await generateCertificateDetailsAPI(requestData, reqHeader);
+                    // const result = await generateCertificateDetailsAPI(requestData, reqHeader);
                     
-                    if (result.status === 200) {
-                        setCertificateData(result.data);
-                        setShowCertificate(true);
-                    } else {
-                        console.log("Failed to generate certificate details");
-                    }
+                    // if (result.status === 200) {
+                    //     setCertificateData(result.data);
+                    //     setShowCertificate(true);
+                    // } else {
+                    //     console.log("Failed to generate certificate details");
+                    //     setError("Failed to generate certificate details");
+                    // }
+                    
+                    // Fallback to static data until API is implemented
+                    provideFallbackData();
                 } catch (err) {
                     console.log(err);
-                    // If API fails, fallback to static data to demonstrate functionality
+                    setError("Failed to generate certificate details. Please try again.");
+                    // Fallback to static data to demonstrate functionality
                     provideFallbackData();
                 }
             } else {
                 // If no token, fallback to static data for demo
                 provideFallbackData();
             }
+        } else {
+            setError("Please select Festival and Item");
+            setIsLoading(false);
         }
-        
-        setIsLoading(false);
     };
 
     // Fallback function to provide static data when API fails
@@ -131,49 +153,127 @@ const AddcertfitDetail = () => {
             // Generate certificate for selected participant
             setCertificateData([
                 {
-                    name: selectedParticipant,
+                    name: selectedParticipant || "Default Participant",
                     regNo: selectedParticipant === "Anu" ? "1" : 
-                           selectedParticipant === "Binu" ? "2" : "3",
+                           selectedParticipant === "Binu" ? "2" : 
+                           selectedParticipant === "Cinu" ? "3" : "0",
                     festival: selectedFestival,
                     item: selectedItem,
                     school: schoolName,
                     class: selectedParticipant === "Anu" ? "10" : 
-                            selectedParticipant === "Binu" ? "11" : "12",
+                            selectedParticipant === "Binu" ? "11" : 
+                            selectedParticipant === "Cinu" ? "12" : "N/A",
                     grade: selectedParticipant === "Cinu" ? "B" : "A"
                 }
             ]);
         }
         
         setShowCertificate(true);
+        setIsLoading(false);
     };
 
     const handleBackToSelection = () => {
         setShowCertificate(false);
         setCertificateData(null);
+        setError(null);
+        setSaveSuccess(false);
     };
 
-    const handleDownloadPDF = () => {
+    // Function to generate PDF and handle save as
+    const handleSaveAsPDF = async () => {
         if (!certificateRef.current) return;
         
-        const element = certificateRef.current;
-        const filename = selectedParticipant === "All Participants" 
-            ? `${schoolName}-${selectedFestival}-${selectedItem}-all-certificates.pdf`
-            : `${schoolName}-${selectedParticipant}-certificate.pdf`;
+        try {
+            setIsLoading(true);
             
-        const options = {
-            margin: 10,
-            filename: filename,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        
-        // If multiple certificates, ensure they all fit well
-        if (certificateData && certificateData.length > 1) {
-            options.pagebreak = { mode: ['avoid-all', 'css', 'legacy'] };
+            const filename = selectedParticipant === "All Participants" 
+                ? `${schoolName}-${selectedFestival}-${selectedItem}-all-certificates.pdf`
+                : `${schoolName}-${selectedParticipant || "certificate"}.pdf`;
+                
+            // Generate PDF first
+            const options = {
+                margin: 10,
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            // If multiple certificates, ensure they all fit well
+            if (certificateData && certificateData.length > 1) {
+                options.pagebreak = { mode: ['avoid-all', 'css', 'legacy'] };
+            }
+            
+            // Generate PDF blob
+            const pdfBlob = await html2pdf()
+                .set(options)
+                .from(certificateRef.current)
+                .output('blob');
+            
+            // Check if browser supports the File System Access API
+            if ('showSaveFilePicker' in window) {
+                try {
+                    // File picker options
+                    const opts = {
+                        suggestedName: filename,
+                        types: [{
+                            description: 'PDF Files',
+                            accept: {'application/pdf': ['.pdf']}
+                        }],
+                    };
+                    
+                    // Show the file picker
+                    const fileHandle = await window.showSaveFilePicker(opts);
+                    
+                    // Create a FileSystemWritableFileStream
+                    const writable = await fileHandle.createWritable();
+                    
+                    // Write the blob to the file
+                    await writable.write(pdfBlob);
+                    
+                    // Close the file
+                    await writable.close();
+                    
+                    // Show success message
+                    setSaveSuccess(true);
+                    
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        console.error("Error saving file:", err);
+                        // Fall back to regular download if there's an error other than user cancellation
+                        downloadPDF(pdfBlob, filename);
+                        setSaveSuccess(true);
+                    }
+                }
+            } else {
+                // Fall back to regular download if File System Access API is not supported
+                downloadPDF(pdfBlob, filename);
+                setSaveSuccess(true);
+            }
+        } catch (err) {
+            console.error("Error generating or saving PDF:", err);
+            setError("Failed to save PDF. Please try again.");
+        } finally {
+            setIsLoading(false);
         }
+    };
+    
+    // Fallback download function using URL.createObjectURL
+    const downloadPDF = (blob, filename) => {
+        // Create a link element
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
         
-        html2pdf().set(options).from(element).save();
+        // Append to the document
+        document.body.appendChild(link);
+        
+        // Trigger click
+        link.click();
+        
+        // Clean up
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
     };
 
     return (
@@ -188,6 +288,14 @@ const AddcertfitDetail = () => {
                             {!showCertificate ? (
                                 <>
                                     <h2 className="text-lg font-semibold mb-4">{schoolName} - Certificate Details</h2>
+                                    
+                                    {/* Display error message if exists */}
+                                    {error && (
+                                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                                            {error}
+                                        </div>
+                                    )}
+                                    
                                     <form onSubmit={handleSubmit}>
                                         <div className="flex justify-center mt-8 md:mt-28">
                                             <div className="space-y-4 w-full max-w-xl">
@@ -233,7 +341,6 @@ const AddcertfitDetail = () => {
                                                         <select
                                                             name="participantCaptain"
                                                             className="border border-blue-600 px-2 py-1 rounded-full w-full"
-                                                            required
                                                             value={selectedParticipant}
                                                             onChange={(e) => setSelectedParticipant(e.target.value)}
                                                         >
@@ -276,7 +383,55 @@ const AddcertfitDetail = () => {
                                     </form>
                                 </>
                             ) : (
-                                <>
+                                <div className="flex flex-col">
+                                    {/* Display success message when save is successful */}
+                                    {saveSuccess && (
+                                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 flex justify-between items-center">
+                                            <span>Certificate saved successfully!</span>
+                                            <button 
+                                                onClick={() => setSaveSuccess(false)}
+                                                className="text-green-700"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    )}
+                                    
+                                    {/* Display error message if exists */}
+                                    {error && (
+                                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                                            {error}
+                                        </div>
+                                    )}
+                                    
+                                    {/* Back button */}
+                                    <div className="mb-4">
+                                        <button
+                                            onClick={handleBackToSelection}
+                                            className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded flex items-center"
+                                        >
+                                            <svg 
+                                                xmlns="http://www.w3.org/2000/svg" 
+                                                width="16" 
+                                                height="16" 
+                                                viewBox="0 0 24 24" 
+                                                fill="none" 
+                                                stroke="currentColor" 
+                                                strokeWidth="2" 
+                                                strokeLinecap="round" 
+                                                strokeLinejoin="round" 
+                                                className="mr-2"
+                                            >
+                                                <path d="m15 18-6-6 6-6"/>
+                                            </svg>
+                                            Back
+                                        </button>
+                                    </div>
+                                    
+                                    {/* Certificate content */}
                                     <div ref={certificateRef} className="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
                                         {/* Certificate Title */}
                                         <h1 className="text-xl font-bold text-center mb-6">Certificate Details Report</h1>
@@ -321,21 +476,16 @@ const AddcertfitDetail = () => {
                                         ))}
                                     </div>
                                     
-                                    <div className="mt-6 flex justify-center space-x-4">
-                                        <button
-                                            onClick={handleBackToSelection}
-                                            className="border border-blue-500 text-blue-700 px-8 py-2 rounded-full"
-                                        >
-                                            Back
-                                        </button>
-                                        <button
-                                            onClick={handleDownloadPDF}
-                                            className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-8 py-2 rounded-full"
-                                        >
-                                            Download 
-                                        </button>
-                                    </div>
-                                </>
+                                    {/* Loading overlay */}
+                                    {isLoading && (
+                                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                            <div className="bg-white p-5 rounded-lg flex flex-col items-center">
+                                                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500 mb-3"></div>
+                                                <p>Saving certificate...</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             )}
                         </div>
                     </div>

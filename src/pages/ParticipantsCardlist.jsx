@@ -123,65 +123,235 @@ const ParticipantsCardList = () => {
   };
 
   // Generate PDF using html2pdf library with selected orientation
-  const generatePDF = (orientation) => {
-    const data = participants.length > 0 ? participants : sampleParticipants;
+  // const generatePDF = (orientation) => {
+  //   const data = participants.length > 0 ? participants : sampleParticipants;
     
-    // Close modal
-    setShowOrientationModal(false);
+  //   // Close modal
+  //   setShowOrientationModal(false);
     
-    // Create a container for PDF content
-    const pdfContent = document.createElement('div');
+  //   // Create a container for PDF content
+  //   const pdfContent = document.createElement('div');
     
-    // Add title
-    const titleElement = document.createElement('h2');
-    titleElement.textContent = `Participants Card - ${photoStatus}`;
-    titleElement.style.textAlign = 'center';
-    titleElement.style.margin = '20px 0';
-    titleElement.style.fontWeight = 'bold';
-    pdfContent.appendChild(titleElement);
+  //   // Add title
+  //   const titleElement = document.createElement('h2');
+  //   titleElement.textContent = `Participants Card - ${photoStatus}`;
+  //   titleElement.style.textAlign = 'center';
+  //   titleElement.style.margin = '20px 0';
+  //   titleElement.style.fontWeight = 'bold';
+  //   pdfContent.appendChild(titleElement);
     
-    // Create card grid container
-    const cardGrid = document.createElement('div');
-    cardGrid.style.display = 'grid';
+  //   // Create card grid container
+  //   const cardGrid = document.createElement('div');
+  //   cardGrid.style.display = 'grid';
     
-    // Adjust grid and card dimensions based on orientation
-    let cardWidth, cardHeight, photoSize, fontSize, marginSize;
+  //   // Adjust grid and card dimensions based on orientation
+  //   let cardWidth, cardHeight, photoSize, fontSize, marginSize;
     
-    if (orientation === 'landscape') {
-      // Landscape layout (A4 landscape: 297mm × 210mm)
-      cardGrid.style.gridTemplateColumns = 'repeat(4, 1fr)'; // 4 columns
-      cardGrid.style.gridTemplateRows = 'repeat(2, 1fr)';   // 2 rows (for 8 cards total)
-      cardWidth = '65mm';
-      cardHeight = '85mm';
-      photoSize = '60px';
-      fontSize = '0.8em';
-      marginSize = '8px';
-    } else {
-      // Portrait layout (A4 portrait: 210mm × 297mm)
-      cardGrid.style.gridTemplateColumns = 'repeat(2, 1fr)'; // 2 columns per row
-      cardGrid.style.gridTemplateRows = 'repeat(4, 1fr)';   // 4 rows (for 8 cards total)
-      cardWidth = '90mm';
-      cardHeight = '125mm';  // Adjusted height to fit cards vertically
-      photoSize = '80px';
-      fontSize = '0.9em';
-      marginSize = '10px';
+  //   if (orientation === 'landscape') {
+  //     // Landscape layout (A4 landscape: 297mm × 210mm)
+  //     cardGrid.style.gridTemplateColumns = 'repeat(4, 1fr)'; // 4 columns
+  //     cardGrid.style.gridTemplateRows = 'repeat(2, 1fr)';   // 2 rows (for 8 cards total)
+  //     cardWidth = '65mm';
+  //     cardHeight = '85mm';
+  //     photoSize = '60px';
+  //     fontSize = '0.8em';
+  //     marginSize = '8px';
+  //   } else {
+  //     // Portrait layout (A4 portrait: 210mm × 297mm)
+  //     cardGrid.style.gridTemplateColumns = 'repeat(2, 1fr)'; // 2 columns per row
+  //     cardGrid.style.gridTemplateRows = 'repeat(4, 1fr)';   // 4 rows (for 8 cards total)
+  //     cardWidth = '90mm';
+  //     cardHeight = '125mm';  // Adjusted height to fit cards vertically
+  //     photoSize = '80px';
+  //     fontSize = '0.9em';
+  //     marginSize = '10px';
+  //   }
+    
+  //   cardGrid.style.gap = '10px';
+    
+  //   // Generate cards
+  //   for (let i = 0; i < data.length; i++) {
+  //     const participant = data[i];
+      
+  //     // Create card
+  //     const card = document.createElement('div');
+  //     card.style.border = '1px solid #000';
+  //     card.style.padding = '10px';
+  //     card.style.marginBottom = '10px';
+  //     card.style.textAlign = 'center';
+  //     card.style.width = cardWidth;
+  //     card.style.height = cardHeight;
+  //     card.style.boxSizing = 'border-box';
+      
+  //     // Card header
+  //     const cardHeader = document.createElement('div');
+  //     cardHeader.textContent = 'Tamil Kalaivizha 2024 - 2025';
+  //     cardHeader.style.fontWeight = 'bold';
+  //     cardHeader.style.marginBottom = '5px';
+  //     cardHeader.style.fontSize = fontSize;
+  //     card.appendChild(cardHeader);
+      
+  //     // School info
+  //     const cardSchool = document.createElement('div');
+  //     cardSchool.textContent = 'Idukki Revenue District SGHSS, KATTAPPANA';
+  //     cardSchool.style.fontSize = orientation === 'landscape' ? '0.7em' : '0.8em';
+  //     cardSchool.style.marginBottom = marginSize;
+  //     card.appendChild(cardSchool);
+      
+  //     // Photo placeholder if needed
+  //     if (photoStatus === "With Photo") {
+  //       const photoPlaceholder = document.createElement('div');
+  //       photoPlaceholder.style.width = photoSize;
+  //       photoPlaceholder.style.height = photoSize;
+  //       photoPlaceholder.style.backgroundColor = '#eee';
+  //       photoPlaceholder.style.margin = '0 auto ' + marginSize + ' auto';
+  //       photoPlaceholder.style.border = '1px solid #ccc';
+  //       card.appendChild(photoPlaceholder);
+  //     }
+      
+  //     // Participant name
+  //     const nameElement = document.createElement('div');
+  //     nameElement.textContent = participant.name;
+  //     nameElement.style.fontWeight = '500';
+  //     nameElement.style.marginBottom = '5px';
+  //     nameElement.style.fontSize = fontSize;
+  //     card.appendChild(nameElement);
+      
+  //     // Participant details
+  //     const detailsDiv = document.createElement('div');
+  //     detailsDiv.style.display = 'flex';
+  //     detailsDiv.style.justifyContent = 'center';
+  //     detailsDiv.style.gap = '10px';
+  //     detailsDiv.style.marginBottom = '5px';
+  //     detailsDiv.style.fontSize = orientation === 'landscape' ? '0.7em' : '0.8em';
+      
+  //     const regNo = document.createElement('div');
+  //     regNo.textContent = `Reg No : ${participant.regNo}`;
+  //     detailsDiv.appendChild(regNo);
+      
+  //     const classInfo = document.createElement('div');
+  //     classInfo.textContent = `Class : ${participant.class}`;
+  //     classInfo.style.borderLeft = '1px solid #ccc';
+  //     classInfo.style.paddingLeft = '8px';
+  //     detailsDiv.appendChild(classInfo);
+      
+  //     card.appendChild(detailsDiv);
+      
+  //     // School details
+  //     const schoolDetails = document.createElement('div');
+  //     schoolDetails.textContent = `${participant.schoolCode} ${participant.schoolName}`;
+  //     schoolDetails.style.fontSize = orientation === 'landscape' ? '0.7em' : '0.8em';
+  //     schoolDetails.style.marginBottom = '5px';
+  //     card.appendChild(schoolDetails);
+      
+  //     // Event date
+  //     const eventDate = document.createElement('div');
+  //     eventDate.textContent = 'Stage 5 on 7 Dec 2023';
+  //     eventDate.style.fontSize = orientation === 'landscape' ? '0.7em' : '0.8em';
+  //     eventDate.style.marginBottom = '5px';
+  //     card.appendChild(eventDate);
+      
+  //     // Event details
+  //     const eventDetails = document.createElement('div');
+  //     eventDetails.innerHTML = '304 - Mono Act, 300 - Versification,<br />301 - Story Writing' + 
+  //                            (participant.id === 4 ? ', 302 - Drama' : '');
+  //     eventDetails.style.fontSize = orientation === 'landscape' ? '0.7em' : '0.8em';
+  //     card.appendChild(eventDetails);
+      
+  //     // Add card to grid
+  //     cardGrid.appendChild(card);
+  //   }
+    
+  //   // Add card grid to PDF content
+  //   pdfContent.appendChild(cardGrid);
+    
+  //   // PDF filename
+  //   const fileName = `Participant_Cards_${photoStatus.replace(/ /g, '_')}_${orientation}.pdf`;
+    
+  //   // PDF options
+  //   const options = {
+  //     margin: [10, 10, 10, 10], // top, right, bottom, left
+  //     filename: fileName,
+  //     image: { type: 'jpeg', quality: 0.98 },
+  //     html2canvas: { scale: 2, useCORS: true },
+  //     jsPDF: { unit: 'mm', format: 'a4', orientation: orientation }
+  //   };
+    
+  //   // Generate and download PDF
+  //   html2pdf().from(pdfContent).set(options).save();
+  // };
+
+
+  // Generate PDF using html2pdf library with selected orientation
+const generatePDF = (orientation) => {
+  const data = participants.length > 0 ? participants : sampleParticipants;
+  
+  // Close modal
+  setShowOrientationModal(false);
+  
+  // Create a container for PDF content
+  const pdfContent = document.createElement('div');
+  
+  // Add title
+  const titleElement = document.createElement('h2');
+  titleElement.textContent = `Participants Card - ${photoStatus}`;
+  titleElement.style.textAlign = 'center';
+  titleElement.style.margin = '20px 0';
+  titleElement.style.fontWeight = 'bold';
+  pdfContent.appendChild(titleElement);
+  
+  // Define card dimensions based on orientation
+  let cardWidth, cardHeight, photoSize, fontSize, marginSize, cardsPerRow;
+  
+  if (orientation === 'landscape') {
+    // Landscape layout (A4 landscape: 297mm × 210mm)
+    cardWidth = '65mm';
+    cardHeight = '85mm';
+    photoSize = '60px';
+    fontSize = '0.8em';
+    marginSize = '8px';
+    cardsPerRow = 4;
+  } else {
+    // Portrait layout (A4 portrait: 210mm × 297mm)
+    cardWidth = '90mm';
+    cardHeight = '125mm';
+    photoSize = '80px';
+    fontSize = '0.9em';
+    marginSize = '10px';
+    cardsPerRow = 2;
+  }
+  
+  // Calculate how many cards can fit on a page (based on A4 size)
+  const cardsPerPage = orientation === 'landscape' ? 8 : 4;
+  
+  // Create rows for the cards
+  for (let i = 0; i < data.length; i += cardsPerRow) {
+    const row = document.createElement('div');
+    row.style.display = 'flex';
+    row.style.flexDirection = 'row';
+    row.style.justifyContent = 'center';
+    row.style.gap = '10px';
+    row.style.marginBottom = '10px';
+    
+    // Add page break before row if needed (except for first row)
+    if (i > 0 && i % cardsPerPage === 0) {
+      row.style.pageBreakBefore = 'always';
     }
     
-    cardGrid.style.gap = '10px';
-    
-    // Generate cards
-    for (let i = 0; i < data.length; i++) {
-      const participant = data[i];
+    // Add cards to the row
+    for (let j = 0; j < cardsPerRow && i + j < data.length; j++) {
+      const participant = data[i + j];
       
       // Create card
       const card = document.createElement('div');
       card.style.border = '1px solid #000';
       card.style.padding = '10px';
-      card.style.marginBottom = '10px';
       card.style.textAlign = 'center';
       card.style.width = cardWidth;
       card.style.height = cardHeight;
       card.style.boxSizing = 'border-box';
+      // Make sure cards don't break across pages
+      card.style.pageBreakInside = 'avoid';
       
       // Card header
       const cardHeader = document.createElement('div');
@@ -254,32 +424,33 @@ const ParticipantsCardList = () => {
       // Event details
       const eventDetails = document.createElement('div');
       eventDetails.innerHTML = '304 - Mono Act, 300 - Versification,<br />301 - Story Writing' + 
-                             (participant.id === 4 ? ', 302 - Drama' : '');
+                            (participant.id === 4 ? ', 302 - Drama' : '');
       eventDetails.style.fontSize = orientation === 'landscape' ? '0.7em' : '0.8em';
       card.appendChild(eventDetails);
       
-      // Add card to grid
-      cardGrid.appendChild(card);
+      // Add card to row
+      row.appendChild(card);
     }
     
-    // Add card grid to PDF content
-    pdfContent.appendChild(cardGrid);
-    
-    // PDF filename
-    const fileName = `Participant_Cards_${photoStatus.replace(/ /g, '_')}_${orientation}.pdf`;
-    
-    // PDF options
-    const options = {
-      margin: [10, 10, 10, 10], // top, right, bottom, left
-      filename: fileName,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: orientation }
-    };
-    
-    // Generate and download PDF
-    html2pdf().from(pdfContent).set(options).save();
+    // Add row to PDF content
+    pdfContent.appendChild(row);
+  }
+  
+  // PDF filename
+  const fileName = `Participant_Cards_${photoStatus.replace(/ /g, '_')}_${orientation}.pdf`;
+  
+  // PDF options
+  const options = {
+    margin: [10, 10, 10, 10], // top, right, bottom, left
+    filename: fileName,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: orientation }
   };
+  
+  // Generate and download PDF
+  html2pdf().from(pdfContent).set(options).save();
+};
 
   const getGridRows = () => {
     const data = participants.length > 0 ? participants : sampleParticipants;

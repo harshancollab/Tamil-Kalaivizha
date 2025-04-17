@@ -18,7 +18,7 @@ const Dash = () => {
       // Stage Report menu should be open if current path matches any of its links
       stageReport: ['/AddCallsheet', '/AddTimesheet', '/AddScoresheet', '/AddTabulationsheet', '/Addreport'].some(route => path === route),
       // Pre Fest Report menu should be open if current path matches any of its links
-      preFestReport: ['/eligible-schools', '/Partcipatescllist', '/SclContactList', '/festwiseList', '/DateWiseList', '/ParticipantsCardList', '/ParticipantsMorethan', '/ClashReportList', '/ClusterReport', '/StageReport'].some(route => path === route),
+      preFestReport: ['/eligible-schools', '/Partcipatescllist', '/SclContactList', '/festwiseList', '/DateWiseList', '/ParticipantsCardList', '/ParticipantsMorethan','/ClusterReport', '/StageReport'].some(route => path === route),
       // Result menu should be open if current path matches any of its links
       results: ['/All-resultentry', '/item-result', '/Itemresult-list', '/All-Publishresult'].some(route => path === route),
       resultsReport: ['/ConfidentialResultlist', '/itemwisepoint', '/SclWisePoint', '/Sclgradewise'].some(route => path === route),
@@ -37,9 +37,9 @@ const Dash = () => {
     // Determine which menu should be open based on current path
     const newOpenMenus = {
       settings: openMenus.settings || ['/AllKalolsavam', '/schlentry', '/All-schools', '/Spl-entry'].some(route => path === route),
-      stageSettings: openMenus.stageSettings || ['/stage-duration-list', '/StageList', '/Stage-itemwiselist', '/festivalwiselist'].some(route => path === route),
+      stageSettings: openMenus.stageSettings || ['/stage-duration-list', '/StageList', '/Stage-itemwiselist', '/festivalwiselist','/ClashReportList'].some(route => path === route),
       stageReport: openMenus.stageReport || ['/AddCallsheet', '/AddTimesheet', '/AddScoresheet', '/AddTabulationsheet', '/Addreport'].some(route => path === route),
-      preFestReport: openMenus.preFestReport || ['/eligible-schools', '/Partcipatescllist', '/SclContactList', '/festwiseList', '/DateWiseList', '/ParticipantsCardList', '/ClashReportList', '/ClusterReport', '/StageReport'].some(route => path === route),
+      preFestReport: openMenus.preFestReport || ['/eligible-schools', '/Partcipatescllist', '/SclContactList', '/festwiseList', '/DateWiseList', '/ParticipantsCardList','/ClusterReport', '/StageReport'].some(route => path === route),
       results: openMenus.results || ['/All-resultentry', '/item-result', '/Itemresult-list', '/All-Publishresult', '/'].some(route => path === route),
       resultsReport: openMenus.resultsReport || ['/ConfidentialResultlist', '/itemwisepoint', '/SclWisePoint', '/Sclgradewise'].some(route => path === route),
       certificate: openMenus.certificate || ['/certificate-template', '/certificate-item-wise', '/certificate-school-wise','/CertificateRegno'].some(route => path === route),
@@ -216,6 +216,16 @@ const Dash = () => {
                       Define Stage
                     </Link>
                     <Link
+                      to="/festivalwiselist"
+                      className={`block py-2 text-gray-300 ${isActive('/festivalwiselist')
+                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Stage Allotment Festival Wise List
+                    </Link>
+                    <Link
                       to="/Stage-itemwiselist"
                       className={`block py-2 text-gray-300 ${isActive('/Stage-itemwiselist')
                           ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
@@ -226,15 +236,16 @@ const Dash = () => {
                       Stage Allotment Item Wise
                     </Link>
                     <Link
-                      to="/festivalwiselist"
-                      className={`block py-2 text-gray-300 ${isActive('/festivalwiselist')
+                      to="/ClashReportList"
+                      className={`block py-2 text-gray-300 ${isActive('/ClashReportList')
                           ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                           : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
-                      Stage Allotment Festival Wise List
+                      Clash Report
                     </Link>
+                   
                   </div>
                 )}
               </div>
@@ -399,16 +410,7 @@ const Dash = () => {
                     >
                       Participants more than one item
                     </Link>
-                    <Link
-                      to="/ClashReportList"
-                      className={`block py-2 text-gray-300 ${isActive('/ClashReportList')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
-                        }`}
-                      onClick={() => setIsSidebarOpen(false)}
-                    >
-                      Clash Report
-                    </Link>
+                   
                     <Link
                       to="/ClusterReport"
                       className={`block py-2 text-gray-300 ${isActive('/ClusterReport')

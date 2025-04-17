@@ -10,22 +10,56 @@ const AddStgReport = () => {
     const [selectedSheet, setSelectedSheet] = useState('');
     const [selectedItemCode, setSelectedItemCode] = useState('');
 
-    // Item code options
+    // Item code options with mapped dummy data
     const itemOptions = [
-        { value: "201", label: "201 - drama" },
-        { value: "203", label: "203 - essay" },
-        { value: "300", label: "300 - writing" },
-        { value: "301", label: "301 - Story Writing" }
+        { 
+            value: "201", 
+            label: "201 - drama",
+            data: [
+                { slNo: 1, regNo: '101', name: 'John Doe', gender: 'M', class: '10', school: 'St. Mary School' },
+                { slNo: 2, regNo: '102', name: 'Emily Wilson', gender: 'F', class: '10', school: 'St. Mary School' },
+                { slNo: 3, regNo: '103', name: 'Michael Brown', gender: 'M', class: '11', school: 'Greenwood High' }
+            ]
+        },
+        { 
+            value: "203", 
+            label: "203 - essay",
+            data: [
+                { slNo: 1, regNo: '204', name: 'Sarah Johnson', gender: 'F', class: '9', school: 'ABC School' },
+                { slNo: 2, regNo: '205', name: 'Robert Davis', gender: 'M', class: '9', school: 'XYZ Academy' },
+                { slNo: 3, regNo: '206', name: 'Jessica Lee', gender: 'F', class: '10', school: 'PQR School' },
+                { slNo: 4, regNo: '207', name: 'Daniel Clark', gender: 'M', class: '8', school: 'LMN School' }
+            ]
+        },
+        { 
+            value: "300", 
+            label: "300 - writing",
+            data: [
+                { slNo: 1, regNo: '308', name: 'Lisa Martinez', gender: 'F', class: '12', school: 'DEF School' },
+                { slNo: 2, regNo: '309', name: 'Kevin Wilson', gender: 'M', class: '11', school: 'GHI Academy' }
+            ]
+        },
+        { 
+            value: "301", 
+            label: "301 - Story Writing",
+            data: [
+                { slNo: 1, regNo: '310', name: 'Aisha Patel', gender: 'F', class: '10', school: 'International School' },
+                { slNo: 2, regNo: '311', name: 'Thomas Young', gender: 'M', class: '12', school: 'Creative Academy' },
+                { slNo: 3, regNo: '312', name: 'Maria Rodriguez', gender: 'F', class: '11', school: 'Literary Institute' },
+                { slNo: 4, regNo: '313', name: 'James Wong', gender: 'M', class: '10', school: 'City High School' },
+                { slNo: 5, regNo: '314', name: 'Sophia Kim', gender: 'F', class: '9', school: 'Downtown School' }
+            ]
+        }
     ];
 
-    // Sample data for report preview
-    const participantsData = [
+    // Current participants data based on selection
+    const [participantsData, setParticipantsData] = useState([
         { slNo: 1, regNo: '17', name: 'Participant 1', gender: 'M', class: '10', school: 'ABC School' },
         { slNo: 2, regNo: '190', name: 'Participant 2', gender: 'F', class: '11', school: 'XYZ School' },
         { slNo: 3, regNo: '149', name: 'Participant 3', gender: 'M', class: '9', school: 'PQR School' },
         { slNo: 4, regNo: '301', name: 'Participant 4', gender: 'F', class: '12', school: 'LMN School' },
         { slNo: 5, regNo: '340', name: 'Participant 5', gender: 'M', class: '10', school: 'DEF School' },
-    ];
+    ]);
 
     // Filter options based on search term
     const filteredOptions = itemOptions.filter(option => 
@@ -37,6 +71,12 @@ const AddStgReport = () => {
         setSelectedItemCode(option.value);
         setSearchTerm(option.label);
         setShowOptions(false);
+        
+        // Update participants data based on selected option
+        const selectedItemData = itemOptions.find(item => item.value === option.value);
+        if (selectedItemData && selectedItemData.data) {
+            setParticipantsData(selectedItemData.data);
+        }
     };
 
     const handleSubmit = (e) => {
@@ -210,17 +250,35 @@ const AddStgReport = () => {
                                             <div className="flex flex-col md:flex-row mb-8">
                                                 <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Item Code</label>
                                                 <div className="w-full md:w-80 relative">
-                                                    <input
-                                                        type="text"
-                                                        value={searchTerm}
-                                                        onChange={(e) => {
-                                                            setSearchTerm(e.target.value);
-                                                            setShowOptions(true);
-                                                        }}
-                                                        onClick={() => setShowOptions(true)}
-                                                        placeholder="Search item code"
-                                                        className="border border-blue-600 px-2 py-1 rounded-full w-full"
-                                                    />
+                                                    <div className="relative">
+                                                        <input
+                                                            type="text"
+                                                            value={searchTerm}
+                                                            onChange={(e) => {
+                                                                setSearchTerm(e.target.value);
+                                                                setShowOptions(true);
+                                                            }}
+                                                            onClick={() => setShowOptions(true)}
+                                                            placeholder="Search item code"
+                                                            className="border border-blue-600 px-2 py-1 rounded-full w-full pr-8"
+                                                        />
+                                                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                                            <svg 
+                                                                xmlns="http://www.w3.org/2000/svg" 
+                                                                className="h-4 w-4 text-gray-600" 
+                                                                fill="none" 
+                                                                viewBox="0 0 24 24" 
+                                                                stroke="currentColor"
+                                                            >
+                                                                <path 
+                                                                    strokeLinecap="round" 
+                                                                    strokeLinejoin="round" 
+                                                                    strokeWidth={2} 
+                                                                    d="M19 9l-7 7-7-7" 
+                                                                />
+                                                            </svg>
+                                                        </div>
+                                                    </div>
                                                     {showOptions && (
                                                         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
                                                             {filteredOptions.length > 0 ? (
@@ -254,6 +312,9 @@ const AddStgReport = () => {
                                                         <option value="Call Sheet">Call Sheet</option>
                                                         <option value="Score Sheet">Score Sheet</option>
                                                         <option value="Time Sheet">Time Sheet</option>
+                                                        <option value="Tabulation Sheet"> Tabulation Sheet</option>
+                                                        <option value="Participant List"> Participant List</option>
+                                                        <option value="All Sheet">All Sheet</option>
                                                     </select>
                                                 </div>
                                             </div>

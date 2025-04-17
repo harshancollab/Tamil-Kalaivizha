@@ -8,6 +8,13 @@ const CertificateGenerator = () => {
     pageStyle: 'landscape',
     width: 297,  // Default A4 landscape width in mm
     height: 210, // Default A4 landscape height in mm
+    margins: {
+      top: 20,
+      right: 20,
+      bottom: 20,
+      left: 20
+    },
+    certificateType: 'participation', // Default certificate type
     title: {
       text: 'Certificate for participate',
       x: 96,
@@ -51,7 +58,7 @@ const CertificateGenerator = () => {
       font: 'Times',
       size: 12
     },
-    festName: ' Tamil Kalaivizha',
+    festName: 'Tamil Kalaivizha',
     background: null,
     logo: null
   });
@@ -59,11 +66,11 @@ const CertificateGenerator = () => {
   // Certificate data for preview
   const [certificateData, setCertificateData] = useState({
     studentName: 'Max',
-    item: 'Stroy writing',
+    item: 'Story writing',
     category: 'Junior Category',
     grade: 'A',
     class: 'Class 8',
-    school: ' Secondary School'
+    school: 'Secondary School'
   });
 
   const canvasRef = useRef(null);
@@ -84,6 +91,17 @@ const CertificateGenerator = () => {
     setDesign(prev => ({
       ...prev,
       [property]: value
+    }));
+  };
+
+  // Function to update margin properties
+  const updateMargin = (property, value) => {
+    setDesign(prev => ({
+      ...prev,
+      margins: {
+        ...prev.margins,
+        [property]: parseInt(value)
+      }
     }));
   };
 
@@ -128,10 +146,18 @@ const CertificateGenerator = () => {
       };
       img.src = design.background;
     } else {
-      // Draw border
+      // Draw border with margins
+      const scaleX = canvas.width / design.width;
+      const scaleY = canvas.height / design.height;
+      
       ctx.strokeStyle = '#000';
       ctx.lineWidth = 5;
-      ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+      ctx.strokeRect(
+        design.margins.left * scaleX,
+        design.margins.top * scaleY,
+        canvas.width - (design.margins.left + design.margins.right) * scaleX,
+        canvas.height - (design.margins.top + design.margins.bottom) * scaleY
+      );
       
       drawCertificateContent(ctx, canvas);
     }
@@ -142,6 +168,20 @@ const CertificateGenerator = () => {
     const scaleX = canvas.width / design.width;
     const scaleY = canvas.height / design.height;
     
+    // Apply certificate type-specific styling
+    let titleText = design.title.text;
+    if (design.certificateType === 'Allparticipation') {
+      titleText = 'Certificate of Allparticipation';
+    } else if (design.certificateType === 'A Grade') {
+      titleText = 'Certificate of A Grade';
+    } else if (design.certificateType === 'A Grade & B Grade') {
+      titleText = 'Certificate of A Grade & B Grade';
+    } else if (design.certificateType === 'appreciation') {
+      titleText = 'Certificate of Appreciation';
+    } else if (design.certificateType === 'excellence') {
+      titleText = 'Certificate of Excellence';
+    }
+    
     // Draw fest name
     ctx.font = `bold ${design.title.size * 1.2 * scaleY}px ${design.title.font}`;
     ctx.fillStyle = '#000';
@@ -150,7 +190,7 @@ const CertificateGenerator = () => {
     
     // Draw title
     ctx.font = `bold ${design.title.size * scaleY}px ${design.title.font}`;
-    ctx.fillText(design.title.text, canvas.width / 2, design.title.y * scaleY);
+    ctx.fillText(titleText, canvas.width / 2, design.title.y * scaleY);
     
     // Draw student name
     ctx.font = `bold ${design.name.size * scaleY}px ${design.name.font}`;
@@ -189,14 +229,33 @@ const CertificateGenerator = () => {
     if (design.background) {
       doc.addImage(design.background, 'JPEG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
     } else {
-      // Add border
+      // Add border with margins
       doc.setLineWidth(0.5);
-      doc.rect(10, 10, doc.internal.pageSize.getWidth() - 20, doc.internal.pageSize.getHeight() - 20);
+      doc.rect(
+        design.margins.left,
+        design.margins.top,
+        doc.internal.pageSize.getWidth() - (design.margins.left + design.margins.right),
+        doc.internal.pageSize.getHeight() - (design.margins.top + design.margins.bottom)
+      );
     }
     
     // Add logo if exists
     if (design.logo) {
-      doc.addImage(design.logo, 'PNG', 20, 20, 25, 25);
+      doc.addImage(design.logo, 'PNG', design.margins.left + 10, design.margins.top + 10, 25, 25);
+    }
+    
+    // Get certificate title based on type
+    let titleText = design.title.text;
+    if (design.certificateType === 'Allparticipation') {
+      titleText = 'Certificate of Allparticipation';
+    } else if (design.certificateType === 'A Grade') {
+      titleText = 'Certificate of A Grade';
+    } else if (design.certificateType === 'A Grade & B Grade') {
+      titleText = 'Certificate of A Grade & B Grade';
+    } else if (design.certificateType === 'appreciation') {
+      titleText = 'Certificate of Appreciation';
+    } else if (design.certificateType === 'excellence') {
+      titleText = 'Certificate of Excellence';
     }
     
     // Add fest name
@@ -206,7 +265,7 @@ const CertificateGenerator = () => {
     
     // Add title
     doc.setFontSize(design.title.size);
-    doc.text(design.title.text, doc.internal.pageSize.getWidth() / 2, design.title.y, { align: 'center' });
+    doc.text(titleText, doc.internal.pageSize.getWidth() / 2, design.title.y, { align: 'center' });
     
     // Add student name
     doc.setFontSize(design.name.size);
@@ -223,12 +282,12 @@ const CertificateGenerator = () => {
     doc.text(`School: ${certificateData.school}`, doc.internal.pageSize.getWidth() / 2, design.school.y, { align: 'center' });
     
     // Add signature lines
-    const signatureY = doc.internal.pageSize.getHeight() - 40;
-    doc.line(40, signatureY, 90, signatureY);
-    doc.line(doc.internal.pageSize.getWidth() - 90, signatureY, doc.internal.pageSize.getWidth() - 40, signatureY);
+    const signatureY = doc.internal.pageSize.getHeight() - design.margins.bottom - 20;
+    doc.line(design.margins.left + 30, signatureY, design.margins.left + 80, signatureY);
+    doc.line(doc.internal.pageSize.getWidth() - design.margins.right - 80, signatureY, doc.internal.pageSize.getWidth() - design.margins.right - 30, signatureY);
     
-    doc.text('Principal', 65, signatureY + 10, { align: 'center' });
-    doc.text('Director', doc.internal.pageSize.getWidth() - 65, signatureY + 10, { align: 'center' });
+    doc.text('Principal', design.margins.left + 55, signatureY + 10, { align: 'center' });
+    doc.text('Director', doc.internal.pageSize.getWidth() - design.margins.right - 55, signatureY + 10, { align: 'center' });
     
     // Save the PDF
     doc.save(`${certificateData.studentName}-certificate.pdf`);
@@ -270,6 +329,21 @@ const CertificateGenerator = () => {
       format: [design.width, design.height]
     });
     
+    // Get certificate title based on type
+    let titleText = design.title.text;
+    if (design.certificateType === 'Allparticipation') {
+      titleText = 'Certificate of Allparticipation';
+    } else if (design.certificateType === 'A Grade') {
+      titleText = 'Certificate of A Grade';
+    } else if (design.certificateType === 'A Grade & B Grade') {
+      titleText = 'Certificate of A Grade & B Grade';
+    } else if (design.certificateType === 'appreciation') {
+      titleText = 'Certificate of Appreciation';
+    } else if (design.certificateType === 'excellence') {
+      titleText = 'Certificate of Excellence';
+    }
+   
+    
     students.forEach((student, index) => {
       if (index > 0) {
         doc.addPage();
@@ -279,14 +353,19 @@ const CertificateGenerator = () => {
       if (design.background) {
         doc.addImage(design.background, 'JPEG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
       } else {
-        // Add border
+        // Add border with margins
         doc.setLineWidth(0.5);
-        doc.rect(10, 10, doc.internal.pageSize.getWidth() - 20, doc.internal.pageSize.getHeight() - 20);
+        doc.rect(
+          design.margins.left,
+          design.margins.top,
+          doc.internal.pageSize.getWidth() - (design.margins.left + design.margins.right),
+          doc.internal.pageSize.getHeight() - (design.margins.top + design.margins.bottom)
+        );
       }
       
       // Add logo if exists
       if (design.logo) {
-        doc.addImage(design.logo, 'PNG', 20, 20, 25, 25);
+        doc.addImage(design.logo, 'PNG', design.margins.left + 10, design.margins.top + 10, 25, 25);
       }
       
       // Add fest name
@@ -296,7 +375,7 @@ const CertificateGenerator = () => {
       
       // Add title
       doc.setFontSize(design.title.size);
-      doc.text(design.title.text, doc.internal.pageSize.getWidth() / 2, design.title.y, { align: 'center' });
+      doc.text(titleText, doc.internal.pageSize.getWidth() / 2, design.title.y, { align: 'center' });
       
       // Add student name
       doc.setFontSize(design.name.size);
@@ -313,12 +392,12 @@ const CertificateGenerator = () => {
       doc.text(`School: ${student.school}`, doc.internal.pageSize.getWidth() / 2, design.school.y, { align: 'center' });
       
       // Add signature lines
-      const signatureY = doc.internal.pageSize.getHeight() - 40;
-      doc.line(40, signatureY, 90, signatureY);
-      doc.line(doc.internal.pageSize.getWidth() - 90, signatureY, doc.internal.pageSize.getWidth() - 40, signatureY);
+      const signatureY = doc.internal.pageSize.getHeight() - design.margins.bottom - 20;
+      doc.line(design.margins.left + 30, signatureY, design.margins.left + 80, signatureY);
+      doc.line(doc.internal.pageSize.getWidth() - design.margins.right - 80, signatureY, doc.internal.pageSize.getWidth() - design.margins.right - 30, signatureY);
       
-      doc.text('Principal', 65, signatureY + 10, { align: 'center' });
-      doc.text('Director', doc.internal.pageSize.getWidth() - 65, signatureY + 10, { align: 'center' });
+      doc.text('Principal', design.margins.left + 55, signatureY + 10, { align: 'center' });
+      doc.text('Director', doc.internal.pageSize.getWidth() - design.margins.right - 55, signatureY + 10, { align: 'center' });
     });
     
     // Save the PDF
@@ -409,6 +488,22 @@ const CertificateGenerator = () => {
           </div>
           
           <div className="mb-4">
+            <label className="block mb-2">Certificate Type:</label>
+            <select 
+              value={design.certificateType} 
+              onChange={(e) => updateBasicDesign('certificateType', e.target.value)}
+              className="w-full p-2 border rounded"
+            >
+              <option value="Allparticipation">All Participation</option>
+              <option value="A Grade">A Grade </option>
+              <option value="A Grade & B Grade">A Grade & B Grade</option>
+              <option value="appreciation">Appreciation</option>
+              <option value="excellence">Excellence</option>
+              
+            </select>
+          </div>
+          
+          <div className="mb-4">
             <label className="block mb-2">Paper Size:</label>
             <select 
               onChange={handlePaperSizeChange}
@@ -455,13 +550,57 @@ const CertificateGenerator = () => {
           </div>
           
           <div className="mb-4">
+            <label className="block mb-2">Margins (mm):</label>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-sm">Top:</label>
+                <input 
+                  type="number" 
+                  value={design.margins.top} 
+                  onChange={(e) => updateMargin('top', e.target.value)}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm">Right:</label>
+                <input 
+                  type="number" 
+                  value={design.margins.right} 
+                  onChange={(e) => updateMargin('right', e.target.value)}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm">Bottom:</label>
+                <input 
+                  type="number" 
+                  value={design.margins.bottom} 
+                  onChange={(e) => updateMargin('bottom', e.target.value)}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm">Left:</label>
+                <input 
+                  type="number" 
+                  value={design.margins.left} 
+                  onChange={(e) => updateMargin('left', e.target.value)}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+            </div>
+          </div>
+          
+          <div className="mb-4">
             <label className="block mb-2">Title:</label>
-            <input 
-              type="text" 
-              value={design.title.text} 
-              onChange={(e) => updateDesignElement('title', 'text', e.target.value)}
-              className="w-full p-2 border rounded mb-2"
-            />
+            {design.certificateType === 'custom' && (
+              <input 
+                type="text" 
+                value={design.title.text} 
+                onChange={(e) => updateDesignElement('title', 'text', e.target.value)}
+                className="w-full p-2 border rounded mb-2"
+              />
+            )}
             <div className="flex gap-2">
               <div>
                 <label className="block text-sm">X Position:</label>
@@ -547,7 +686,12 @@ const CertificateGenerator = () => {
           </div>
           
           <div className="flex gap-2 mt-4">
-           
+            <button 
+              onClick={saveTemplate}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Save Template
+            </button>
             <button 
               onClick={generatePDF}
               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
