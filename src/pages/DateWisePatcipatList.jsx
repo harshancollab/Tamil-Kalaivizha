@@ -67,7 +67,93 @@ const DateWiseParticipantList = () => {
         hsGirls: "20",
         hssBoys: "15",
         hssGirls: "17"
-      }
+      },
+      {
+        schoolCode: "781",
+        schoolName: "Central Academy",
+        upBoys: "14",
+        upGirls: "16",
+        lpBoys: "10",
+        lpGirls: "12",
+        hsBoys: "18",
+        hsGirls: "20",
+        hssBoys: "15",
+        hssGirls: "17"
+      },
+      {
+        schoolCode: "781",
+        schoolName: "Central Academy",
+        upBoys: "14",
+        upGirls: "16",
+        lpBoys: "10",
+        lpGirls: "12",
+        hsBoys: "18",
+        hsGirls: "20",
+        hssBoys: "15",
+        hssGirls: "17"
+      },
+      {
+        schoolCode: "781",
+        schoolName: "Central Academy",
+        upBoys: "14",
+        upGirls: "16",
+        lpBoys: "10",
+        lpGirls: "12",
+        hsBoys: "18",
+        hsGirls: "20",
+        hssBoys: "15",
+        hssGirls: "17"
+      },
+      {
+        schoolCode: "781",
+        schoolName: "Central Academy",
+        upBoys: "14",
+        upGirls: "16",
+        lpBoys: "10",
+        lpGirls: "12",
+        hsBoys: "18",
+        hsGirls: "20",
+        hssBoys: "15",
+        hssGirls: "17"
+      },
+      {
+        schoolCode: "781",
+        schoolName: "Central Academy",
+        upBoys: "14",
+        upGirls: "16",
+        lpBoys: "10",
+        lpGirls: "12",
+        hsBoys: "18",
+        hsGirls: "20",
+        hssBoys: "15",
+        hssGirls: "17"
+      },
+      {
+        schoolCode: "781",
+        schoolName: "Central Academy",
+        upBoys: "14",
+        upGirls: "16",
+        lpBoys: "10",
+        lpGirls: "12",
+        hsBoys: "18",
+        hsGirls: "20",
+        hssBoys: "15",
+        hssGirls: "17"
+      },
+      {
+        schoolCode: "781",
+        schoolName: "Central Academy",
+        upBoys: "14",
+        upGirls: "16",
+        lpBoys: "10",
+        lpGirls: "12",
+        hsBoys: "18",
+        hsGirls: "20",
+        hssBoys: "15",
+        hssGirls: "17"
+      },
+      
+      
     ],
     "2025-04-01": [
       {
@@ -177,39 +263,148 @@ const DateWiseParticipantList = () => {
 
   const [Alllist, setList] = useState([]);
   const printRef = useRef();
-
+  const [filteredList, setFilteredList] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedDate = searchParams.get('date') || "ALL";
+  const searchQuery = searchParams.get('search') || "";
+   // Pagination states
+   const [currentPage, setCurrentPage] = useState(1);
+   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  useEffect(() => {
+   useEffect(() => {
     getAllitemise();
-  }, [selectedDate]); // Fixed the dependency array
-
+  }, [selectedDate]);
+  
+  // Modify getAllitemise to update both lists:
   const getAllitemise = async () => {
-    // Instead of making an API call, we'll use our dummy data
     try {
-      // Simulate API call delay
       setTimeout(() => {
-        // Get data for selected date
         const dateData = dummyData[selectedDate] || [];
         setList(dateData);
+        setFilteredList(dateData); // Set the filtered list initially to all data
       }, 300);
     } catch (err) {
       console.log(err);
     }
   };
-
-  const handleDateChange = (e) => {
-    const newDate = e.target.value;
-
-    // Update URL when date changes
-    if (newDate === "ALL") {
-      // Remove date parameter if "ALL" is selected
-      setSearchParams({});
-    } else {
-      setSearchParams({ date: newDate });
+  
+  // Fix the filterData function:
+  const filterData = (query) => {
+    if (!query) {
+      setFilteredList(Alllist); // Reset to all data when query is empty
+      return;
+    }
+  
+    const lowercaseQuery = query.toLowerCase();
+    const filtered = Alllist.filter(item => 
+      item.schoolName.toLowerCase().includes(lowercaseQuery)
+    );
+    
+    setFilteredList(filtered);
+    // Reset to first page when filtering results
+    setCurrentPage(1);
+  };
+  
+  // Update the search handlers to call filterData:
+  const handleSearch = (e) => {
+    const newSearchQuery = e.target.value;
+    updateSearchParams(selectedDate, newSearchQuery);
+    filterData(newSearchQuery); // Call filterData with the new query
+  };
+  
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      updateSearchParams(selectedDate, e.target.value);
+      filterData(e.target.value); // Call filterData with the query
     }
   };
+  
+  const handleBlur = (e) => {
+    updateSearchParams(selectedDate, e.target.value);
+    filterData(e.target.value); // Call filterData with the query
+  };
+
+
+
+// Pagination logic
+const indexOfLastItem = currentPage * rowsPerPage;
+const indexOfFirstItem = indexOfLastItem - rowsPerPage;
+const currentItems = filteredList.slice(indexOfFirstItem, indexOfLastItem);
+const totalPages = Math.ceil(filteredList.length / rowsPerPage);
+
+const handlePageChange = (pageNumber) => {
+    if (pageNumber > 0 && pageNumber <= totalPages) {
+        setCurrentPage(pageNumber);
+    }
+};
+
+const renderPageNumbers = () => {
+    const pageNumbers = [];
+    // Dynamically adjust number of page buttons based on screen size
+    const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
+    
+    if (totalPages <= maxPageNumbersToShow) {
+        // Show all page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            pageNumbers.push(i);
+        }
+    } else {
+        // Show limited page numbers with dots
+        if (currentPage <= 2) {
+            // Near the start
+            for (let i = 1; i <= 3; i++) {
+                if (i <= totalPages) pageNumbers.push(i);
+            }
+            if (totalPages > 3) {
+                pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+            }
+        } else if (currentPage >= totalPages - 1) {
+            // Near the end
+            pageNumbers.push(1);
+            pageNumbers.push('...');
+            for (let i = totalPages - 2; i <= totalPages; i++) {
+                if (i > 0) pageNumbers.push(i);
+            }
+        } else {
+            // Middle
+            pageNumbers.push(1);
+            if (currentPage > 3) pageNumbers.push('...');
+            pageNumbers.push(currentPage - 1);
+            pageNumbers.push(currentPage);
+            pageNumbers.push(currentPage + 1);
+            if (currentPage < totalPages - 2) pageNumbers.push('...');
+            pageNumbers.push(totalPages);
+        }
+    }
+    
+    return pageNumbers;
+};
+
+const handleDateChange = (e) => {
+  const newDate = e.target.value;
+  updateSearchParams(newDate, searchQuery);
+};
+
+
+
+// Update search params function
+const updateSearchParams = (date, search) => {
+  const params = new URLSearchParams();
+  
+  // Add date parameter if not "ALL"
+  if (date !== "ALL") {
+    params.append('date', date);
+  }
+  
+  // Add search parameter if not empty
+  if (search && search.trim() !== "") {
+    params.append('search', search.trim());
+  }
+  
+  // Update URL
+  setSearchParams(params);
+};
 
   const getPrintTitle = () => {
     if (selectedDate === "ALL") {
@@ -442,7 +637,7 @@ const DateWiseParticipantList = () => {
           {/* Header section with title and controls */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
             <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
-              Participants List (Date Wise)
+            No of Participation Date Wise List
             </h2>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
               <div className="relative w-full sm:w-40">
@@ -468,6 +663,20 @@ const DateWiseParticipantList = () => {
                 Print
               </button>
             </div>
+          </div>
+          <div className="relative flex mt-2 items-center w-full sm:w-64 h-9 border border-blue-800 rounded-full px-4">
+          <input
+              type="text"
+              placeholder="Search School Name..."
+              className="w-full bg-transparent outline-none text-sm"
+              value={searchQuery}
+              onChange={(e) => handleSearch(e)}
+              onKeyDown={handleKeyDown}
+              onBlur={handleBlur}
+            />
+            <button className="text-gray-500 hover:text-gray-700">
+              <i className="fa-solid fa-magnifying-glass"></i>
+            </button>
           </div>
 
           <div ref={printRef} className="w-full">
@@ -533,8 +742,8 @@ const DateWiseParticipantList = () => {
                     </tr>
                   </thead>
                   <tbody className="text-xs">
-                    {Alllist && Alllist.length > 0 ? (
-                      Alllist.map((item, index) => (
+                    {currentItems && currentItems.length > 0 ? (
+                      currentItems.map((item, index) => (
                         <tr key={index} className="hover:bg-gray-100">
                           <td className="p-2">{index + 1}</td>
                           <td className="p-2">{item.schoolCode || "-"}</td>
@@ -629,8 +838,8 @@ const DateWiseParticipantList = () => {
                   </tr>
                 </thead>
                 <tbody className="text-xs lg:text-sm">
-                  {Alllist && Alllist.length > 0 ? (
-                    Alllist.map((item, index) => (
+                  {currentItems && currentItems.length > 0 ? (
+                    currentItems.map((item, index) => (
                       <tr key={index} className="hover:bg-gray-100">
                         <td className="p-2 lg:p-3">{index + 1}</td>
                         <td className="p-2 lg:p-3">{item.schoolCode || "-"}</td>
@@ -723,8 +932,8 @@ const DateWiseParticipantList = () => {
                   </tr>
                 </thead>
                 <tbody className="text-sm">
-                  {Alllist && Alllist.length > 0 ? (
-                    Alllist.map((item, index) => (
+                  {currentItems && currentItems.length > 0 ? (
+                    currentItems.map((item, index) => (
                       <tr key={index} className="hover:bg-gray-100">
                         <td className="p-3">{index + 1}</td>
                         <td className="p-3">{item.schoolCode || "-"}</td>
@@ -757,6 +966,50 @@ const DateWiseParticipantList = () => {
                 </tbody>
               </table>
             </div>
+            <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
+                  {/* Showing X of Y rows */}
+                  <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
+                    {Alllist.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, Alllist.length)} of ${Alllist.length} rows` : '0 rows'}
+                  </div>
+                  
+                  {/* Pagination Controls */}
+                  <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                    {/* Previous Button with icon */}
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
+                    >
+                      <i className="fa-solid fa-angle-right transform rotate-180"></i>
+                      <span className="hidden sm:inline p-1">Previous</span>
+                    </button>
+                    
+                    {/* Page Numbers */}
+                    <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+                      {renderPageNumbers().map((page, index) => (
+                        <button
+                          key={index}
+                          onClick={() => page !== '...' && handlePageChange(page)}
+                          className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${
+                            currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                          } ${page === '...' ? 'pointer-events-none' : ''}`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                    </div>
+                    
+                    {/* Next Button with icon */}
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages || totalPages === 0}
+                      className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
+                    >
+                      <span className="hidden sm:inline p-1">Next</span>
+                      <i className="fa-solid fa-angle-right"></i>
+                    </button>
+                  </div>
+                </div>
           </div>
         </div>
       </div>

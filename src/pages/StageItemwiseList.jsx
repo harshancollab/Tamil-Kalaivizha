@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Dash from '../components/Dash';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getAllItemStageListAPI } from '../services/allAPI';
 
 const StageItemwiseList = () => {
@@ -15,14 +15,30 @@ const StageItemwiseList = () => {
         location: '',
         capacity: '',
     });
+    // Selected festival/category state
+    const [selectedFestival, setSelectedFestival] = useState('ALL Festival');
 
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(8);
 
+    // For URL query params
+    const navigate = useNavigate();
+    const location = useLocation();
+
     useEffect(() => {
         getAllitemise();
     }, []);
+
+    useEffect(() => {
+        // Parse query parameters when component mounts or URL changes
+        const queryParams = new URLSearchParams(location.search);
+        const category = queryParams.get('category');
+        
+        if (category) {
+            setSelectedFestival(category.toUpperCase());
+        }
+    }, [location.search]);
 
     const getAllitemise = async () => {
         const token = sessionStorage.getItem('token');
@@ -41,8 +57,6 @@ const StageItemwiseList = () => {
         }
     };
 
-    const navigate = useNavigate();
-
     const handleAddClick = () => {
         navigate('/Stage-itemwise');
     };
@@ -54,6 +68,15 @@ const StageItemwiseList = () => {
     const stageOptions = ['Stage 1', 'Stage 2', 'Stage 3', 'Stage 4', 'Stage 5', 'New'];
     const clusterOptions = [1, 2, 3, 4, 5, 6];
     const judgesOptions = [1, 2, 3, 4, 5, 6, 7];
+
+    // Festival/category options with their item code ranges
+    const festivalOptions = [
+        { value: 'ALL Festival', label: 'ALL Festival', minCode: 0, maxCode: 9999 },
+        { value: 'UP', label: 'UP', minCode: 300, maxCode: 399 },
+        { value: 'LP', label: 'LP', minCode: 400, maxCode: 499 },
+        { value: 'HS', label: 'HS', minCode: 500, maxCode: 599 },
+        { value: 'HSS', label: 'HSS', minCode: 600, maxCode: 699 }
+    ];
 
     // Handle field change
     const handleFieldChange = (itemId, field, value) => {
@@ -90,21 +113,53 @@ const StageItemwiseList = () => {
 
     // Default data to use if API doesn't return anything
     const defaultStages = [
-        { id: 1, itemCode: '3001', itemName: 'Item1', noOfParticipants: 50, date: '2025-04-05', hours: 9, minutes: 0, stageName: 'Stage 1', noOfCluster: 5, noOfJudges: 3 },
-        { id: 2, itemCode: '4004', itemName: 'Item 2', noOfParticipants: 25, date: '2025-04-06', hours: 14, minutes: 30, stageName: 'stage 3', noOfCluster: 2, noOfJudges: 5 },
-        { id: 3, itemCode: '4003', itemName: 'item 3', noOfParticipants: 15, date: '2025-04-07', hours: 10, minutes: 15, stageName: 'Stage 4', noOfCluster: 1, noOfJudges: 7 },
-        { id: 4, itemCode: '3454', itemName: 'Item 4', noOfParticipants: 60, date: '2025-04-05', hours: 11, minutes: 45, stageName: 'stage 4', noOfCluster: 6, noOfJudges: 2 },
-        { id: 5, itemCode: '3405', itemName: 'item 5', noOfParticipants: 30, date: '2025-04-06', hours: 16, minutes: 0, stageName: 'Stage 5', noOfCluster: 3, noOfJudges: 4 },
-        { id: 6, itemCode: '3705', itemName: 'item 5', noOfParticipants: 30, date: '2025-04-06', hours: 16, minutes: 0, stageName: 'Stage 5', noOfCluster: 3, noOfJudges: 4 },
-        { id: 7, itemCode: '3805', itemName: 'item 5', noOfParticipants: 30, date: '2025-04-06', hours: 16, minutes: 0, stageName: 'Stage 5', noOfCluster: 3, noOfJudges: 4 },
-        { id: 8, itemCode: '3905', itemName: 'item 5', noOfParticipants: 30, date: '2025-04-06', hours: 16, minutes: 0, stageName: 'Stage 5', noOfCluster: 3, noOfJudges: 4 },
-        { id: 9, itemCode: '1405', itemName: 'item 5', noOfParticipants: 30, date: '2025-04-06', hours: 16, minutes: 0, stageName: 'Stage 5', noOfCluster: 3, noOfJudges: 4 },
-        { id: 10, itemCode: '2405', itemName: 'item 5', noOfParticipants: 30, date: '2025-04-06', hours: 16, minutes: 0, stageName: 'Stage 5', noOfCluster: 3, noOfJudges: 4 },
-        { id: 11, itemCode: '4405', itemName: 'item 5', noOfParticipants: 30, date: '2025-04-06', hours: 16, minutes: 0, stageName: 'Stage 5', noOfCluster: 3, noOfJudges: 4 },
+        { id: 1, itemCode: '301', itemName: 'Item1', noOfParticipants: 50, date: '2025-04-05', hours: 9, minutes: 0, stageName: 'Stage 1', noOfCluster: 5, noOfJudges: 3 },
+        { id: 2, itemCode: '300', itemName: 'Item 2', noOfParticipants: 25, date: '2025-04-06', hours: 14, minutes: 30, stageName: 'stage 3', noOfCluster: 2, noOfJudges: 5 },
+        { id: 3, itemCode: '403', itemName: 'item 3', noOfParticipants: 15, date: '2025-04-07', hours: 10, minutes: 15, stageName: 'Stage 4', noOfCluster: 1, noOfJudges: 7 },
+        { id: 4, itemCode: '454', itemName: 'Item 4', noOfParticipants: 60, date: '2025-04-05', hours: 11, minutes: 45, stageName: 'stage 4', noOfCluster: 6, noOfJudges: 2 },
+        { id: 5, itemCode: '505', itemName: 'item 5', noOfParticipants: 30, date: '2025-04-06', hours: 16, minutes: 0, stageName: 'Stage 5', noOfCluster: 3, noOfJudges: 4 },
+        { id: 6, itemCode: '705', itemName: 'item 5', noOfParticipants: 30, date: '2025-04-06', hours: 16, minutes: 0, stageName: 'Stage 5', noOfCluster: 3, noOfJudges: 4 },
+        { id: 7, itemCode: '509', itemName: 'item 5', noOfParticipants: 30, date: '2025-04-06', hours: 16, minutes: 0, stageName: 'Stage 5', noOfCluster: 3, noOfJudges: 4 },
+        { id: 8, itemCode: '605', itemName: 'item 5', noOfParticipants: 30, date: '2025-04-06', hours: 16, minutes: 0, stageName: 'Stage 5', noOfCluster: 3, noOfJudges: 4 },
+        { id: 9, itemCode: '678', itemName: 'item 5', noOfParticipants: 30, date: '2025-04-06', hours: 16, minutes: 0, stageName: 'Stage 5', noOfCluster: 3, noOfJudges: 4 },
+        { id: 10, itemCode: '705', itemName: 'item 5', noOfParticipants: 30, date: '2025-04-06', hours: 16, minutes: 0, stageName: 'Stage 5', noOfCluster: 3, noOfJudges: 4 },
+        { id: 11, itemCode: '739', itemName: 'item 5', noOfParticipants: 30, date: '2025-04-06', hours: 16, minutes: 0, stageName: 'Stage 5', noOfCluster: 3, noOfJudges: 4 },
     ];
 
-    // Use API data if available, otherwise use default data
-    const stagesToRender = Allitemise.length > 0 ? Allitemise : defaultStages;
+    // Filter items based on selected festival/category
+    const filterItemsByFestival = (items, festival) => {
+        const selectedOption = festivalOptions.find(opt => opt.value === festival);
+        
+        if (!selectedOption || festival === 'ALL Festival') {
+            return items; // Return all items if "ALL Festival" is selected or if option not found
+        }
+        
+        return items.filter(item => {
+            const itemCode = parseInt(item.itemCode, 10);
+            return itemCode >= selectedOption.minCode && itemCode <= selectedOption.maxCode;
+        });
+    };
+
+    // Apply filtering before pagination
+    const stagesToRender = filterItemsByFestival(
+        Allitemise.length > 0 ? Allitemise : defaultStages,
+        selectedFestival
+    );
+
+    // Handle festival selection change
+    const handleFestivalChange = (e) => {
+        const selected = e.target.value;
+        setSelectedFestival(selected);
+        setCurrentPage(1); // Reset to first page when changing filters
+        
+        // Update URL with the selected category
+        if (selected === 'ALL Festival') {
+            // Remove query parameter if "ALL Festival" is selected
+            navigate(location.pathname);
+        } else {
+            navigate(`${location.pathname}?category=${selected.toLowerCase()}`);
+        }
+    };
 
     // Pagination logic
     const indexOfLastItem = currentPage * rowsPerPage;
@@ -164,8 +219,6 @@ const StageItemwiseList = () => {
     const handleEditClick = (itemId) => {
         navigate(`/Edit-itemwiseList/${itemId}`);
     };
-
-    
     
     return (
         <>
@@ -178,7 +231,23 @@ const StageItemwiseList = () => {
                             Stage Allotment Item Wise List
                         </h2>
                         <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-                           
+                            <div className="relative w-full sm:w-40 md:w-48">
+                                <select
+                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                                    value={selectedFestival}
+                                    onChange={handleFestivalChange}
+                                    aria-label="Select Festival"
+                                >
+                                    {festivalOptions.map(option => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                                    <i className="fa-solid fa-chevron-down"></i>
+                                </div>
+                            </div>
                             
                             <button
                                 onClick={handleAddClick}
@@ -209,89 +278,84 @@ const StageItemwiseList = () => {
                             </thead>
                             <tbody>
                                 {currentItems.map((stage, index) => (
-                                  
-                                        <tr className="hover:bg-gray-50 text-gray-700 border-separate border-spacing-y-4">
-                                            <td className="p-2 md:p-3 text-xs md:text-sm bg-white z-10">{indexOfFirstItem + index + 1}</td>
-                                            <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.itemCode}</td>
-                                            <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.itemName}</td>
-                                            <td className="p-2 md:p-3 text-xs md:text-sm">{stage.noOfParticipants}</td>
+                                    <tr key={stage.id} className="hover:bg-gray-50 text-gray-700 border-separate border-spacing-y-4">
+                                        <td className="p-2 md:p-3 text-xs md:text-sm bg-white z-10">{indexOfFirstItem + index + 1}</td>
+                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.itemCode}</td>
+                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap">{stage.itemName}</td>
+                                        <td className="p-2 md:p-3 text-xs md:text-sm">{stage.noOfParticipants}</td>
 
-                                            {/* Date - Selectable */}
-                                            <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap border border-gray-500 rounded">
-                                                <select
-                                                    
-                                                    onChange={(e) => handleFieldChange(stage.id, 'date', e.target.value)}
-                                                    className="bg-transparent text-center w-full focus:outline-none appearance-none"
-                                                >
-                                                    {dateOptions.map(date => (
-                                                        <option key={date} value={date}>{date}</option>
-                                                    ))}
-                                                </select>
-                                            </td>
+                                        {/* Date - Selectable */}
+                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap border border-gray-500 rounded">
+                                            <select
+                                                value={editedFields[stage.id]?.date || stage.date}
+                                                onChange={(e) => handleFieldChange(stage.id, 'date', e.target.value)}
+                                                className="bg-transparent text-center w-full focus:outline-none appearance-none"
+                                            >
+                                                {dateOptions.map(date => (
+                                                    <option key={date} value={date}>{date}</option>
+                                                ))}
+                                            </select>
+                                        </td>
 
-                                            {/* Hours - Now active and functional */}
-                                            <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap border border-gray-500 rounded">
-                                                6
-                                            </td>
+                                        {/* Hours - Now active and functional */}
+                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap border border-gray-500 rounded">
+                                            6
+                                        </td>
 
-                                            {/* Minutes - Now active and functional */}
-                                            <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap border border-gray-500 rounded">
-                                                30
-                                            </td>
+                                        {/* Minutes - Now active and functional */}
+                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap border border-gray-500 rounded">
+                                            30
+                                        </td>
 
-                                            {/* Stage - Selectable with New option */}
-                                            <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap border border-gray-500 rounded">
-                                                <select
-                                                    
-                                                    onChange={(e) => handleFieldChange(stage.id, 'stageName', e.target.value)}
-                                                    className="bg-transparent text-center w-full focus:outline-none appearance-none"
-                                                >
-                                                    {stageOptions.map(stageOpt => (
-                                                        <option key={stageOpt} value={stageOpt}>{stageOpt}</option>
-                                                    ))}
-                                                </select>
-                                            </td>
+                                        {/* Stage - Selectable with New option */}
+                                        <td className="p-2 md:p-3 text-xs md:text-sm whitespace-nowrap border border-gray-500 rounded">
+                                            <select
+                                                value={editedFields[stage.id]?.stageName || stage.stageName}
+                                                onChange={(e) => handleFieldChange(stage.id, 'stageName', e.target.value)}
+                                                className="bg-transparent text-center w-full focus:outline-none appearance-none"
+                                            >
+                                                {stageOptions.map(stageOpt => (
+                                                    <option key={stageOpt} value={stageOpt}>{stageOpt}</option>
+                                                ))}
+                                            </select>
+                                        </td>
 
-                                            {/* Clusters - Selectable */}
-                                            <td className="p-2 md:p-3 text-xs md:text-sm border border-gray-500 rounded">
-                                                <select
-                                                  
-                                                    onChange={(e) => handleFieldChange(stage.id, 'noOfCluster', parseInt(e.target.value))}
-                                                    className="bg-transparent text-center w-full focus:outline-none appearance-none"
-                                                >
-                                                    {clusterOptions.map(cluster => (
-                                                        <option key={cluster} value={cluster}>{cluster}</option>
-                                                    ))}
-                                                </select>
-                                            </td>
+                                        {/* Clusters - Selectable */}
+                                        <td className="p-2 md:p-3 text-xs md:text-sm border border-gray-500 rounded">
+                                            <select
+                                                value={editedFields[stage.id]?.noOfCluster || stage.noOfCluster}
+                                                onChange={(e) => handleFieldChange(stage.id, 'noOfCluster', parseInt(e.target.value))}
+                                                className="bg-transparent text-center w-full focus:outline-none appearance-none"
+                                            >
+                                                {clusterOptions.map(cluster => (
+                                                    <option key={cluster} value={cluster}>{cluster}</option>
+                                                ))}
+                                            </select>
+                                        </td>
 
-                                            {/* Judges - Selectable */}
-                                            <td className="p-2 md:p-3 text-xs md:text-sm border border-gray-500 rounded">
-                                                <select
-                                                   
-                                                    onChange={(e) => handleFieldChange(stage.id, 'noOfJudges', parseInt(e.target.value))}
-                                                    className="bg-transparent text-center w-full focus:outline-none appearance-none"
-                                                >
-                                                    {judgesOptions.map(judge => (
-                                                        <option key={judge} value={judge}>{judge}</option>
-                                                    ))}
-                                                </select>
-                                            </td>
+                                        {/* Judges - Selectable */}
+                                        <td className="p-2 md:p-3 text-xs md:text-sm border border-gray-500 rounded">
+                                            <select
+                                                value={editedFields[stage.id]?.noOfJudges || stage.noOfJudges}
+                                                onChange={(e) => handleFieldChange(stage.id, 'noOfJudges', parseInt(e.target.value))}
+                                                className="bg-transparent text-center w-full focus:outline-none appearance-none"
+                                            >
+                                                {judgesOptions.map(judge => (
+                                                    <option key={judge} value={judge}>{judge}</option>
+                                                ))}
+                                            </select>
+                                        </td>
 
-                                            <td className="p-2 md:p-3 text-xs md:text-sm">
-                                                <button
-                                                    className="text-blue-500 hover:text-blue-700 focus:outline-none"
-                                                    onClick={() => handleEditClick(stage.id)}
-                                                    aria-label={`Edit ${stage.itemName}`}
-                                                >
-                                                    <i className="fa-solid fa-pen-to-square"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        
-                                       
-                                       
-                                   
+                                        <td className="p-2 md:p-3 text-xs md:text-sm">
+                                            <button
+                                                className="text-blue-500 hover:text-blue-700 focus:outline-none"
+                                                onClick={() => handleEditClick(stage.id)}
+                                                aria-label={`Edit ${stage.itemName}`}
+                                            >
+                                                <i className="fa-solid fa-pen-to-square"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
                                 ))}
                             </tbody>
                         </table>
@@ -351,8 +415,6 @@ const StageItemwiseList = () => {
                             </button>
                         </div>
                     </div>
-
-                  
                 </div>
             </div>
         </>

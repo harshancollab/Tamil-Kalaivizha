@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { deleteresultentryAPI, getAllResultentryListAPI } from '../services/allAPI';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import html2pdf from 'html2pdf.js';
 
 const AllResultEntry = () => {
@@ -10,6 +10,12 @@ const AllResultEntry = () => {
     const [Allresultentry, setResultentry] = useState([]);
     const navigate = useNavigate();
     const printRef = useRef();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchCode, setSearchCode] = useState(searchParams.get('code') || '');
+
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const absenteeRegNos = [
         "001", "002", "003", "004",
@@ -18,8 +24,13 @@ const AllResultEntry = () => {
     ];
 
     useEffect(() => {
+        // Initialize search code from URL params when component mounts
+        const codeParam = searchParams.get('code');
+        if (codeParam) {
+            setSearchCode(codeParam);
+        }
         // getAllresultentry();
-    }, []);
+    }, [searchParams]);
 
     const getAllresultentry = async () => {
         const token = sessionStorage.getItem("token");
@@ -39,21 +50,21 @@ const AllResultEntry = () => {
     }
 
     const handleEditRedirect = (resultEntry) => {
-        navigate(`/edit-resultentry/${resultEntry.slNo}`, { 
-            state: { resultEntry } 
+        navigate(`/edit-resultentry/${resultEntry.slNo}`, {
+            state: { resultEntry }
         });
     };
 
-    const handleDeleteClick = async(id) => {
+    const handleDeleteClick = async (id) => {
         const token = sessionStorage.getItem("token")
-        if(token){
+        if (token) {
             const reqHeader = {
                 "Authorization": `Bearer ${token}`
             }
-            try{
+            try {
                 await deleteresultentryAPI(id, reqHeader)
-                getAllresultentry() 
-            } catch(err){
+                getAllresultentry()
+            } catch (err) {
                 console.log(err);
             }
         }
@@ -62,7 +73,7 @@ const AllResultEntry = () => {
     const generatePDF = () => {
         // Create a new div element for PDF content
         const pdfContent = document.createElement('div');
-        
+
         // Add title
         const titleElement = document.createElement('h2');
         titleElement.textContent = "Result Entry";
@@ -76,11 +87,11 @@ const AllResultEntry = () => {
         table.style.width = '100%';
         table.style.borderCollapse = 'collapse';
         table.style.marginBottom = '20px';
-        
+
         // Create table header
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
-        
+
         const headers = ['Sl No', 'Reg No', 'Code', 'Mark 1', 'Mark 2', 'Mark 3', 'Total', 'Mark %', 'Rank', 'Grade', 'Point'];
         headers.forEach(headerText => {
             const th = document.createElement('th');
@@ -91,19 +102,22 @@ const AllResultEntry = () => {
             th.style.fontWeight = 'bold';
             headerRow.appendChild(th);
         });
-        
+
         thead.appendChild(headerRow);
         table.appendChild(thead);
-        
+
         // Create table body
         const tbody = document.createElement('tbody');
+
+        // Use filtered data for PDF
+        const filteredData = filteredResultData();
         
-        resultData.forEach(result => {
+        filteredData.forEach((result, index) => {
             const row = document.createElement('tr');
-            
+
             // Add cells
             const cellData = [
-                result.slNo,
+                index + 1, // Adjust serial number
                 result.regNo,
                 result.code,
                 result.mark1,
@@ -115,7 +129,7 @@ const AllResultEntry = () => {
                 result.grade,
                 result.point
             ];
-            
+
             cellData.forEach(text => {
                 const td = document.createElement('td');
                 td.textContent = text;
@@ -124,38 +138,38 @@ const AllResultEntry = () => {
                 td.style.textAlign = 'center';
                 row.appendChild(td);
             });
-            
+
             tbody.appendChild(row);
         });
-        
+
         table.appendChild(tbody);
         pdfContent.appendChild(table);
-        
+
         // Add absentee information
         const absenteeSection = document.createElement('div');
         absenteeSection.style.marginTop = '20px';
-        
+
         const absenteeInfo = document.createElement('p');
         absenteeInfo.innerHTML = `<strong>Absentee Reg No:</strong> ${absenteeRegNos.join(', ')}`;
         absenteeSection.appendChild(absenteeInfo);
-        
+
         const absenteeCount = document.createElement('p');
         absenteeCount.innerHTML = `<strong>No of Absentees:</strong> ${absenteeRegNos.length}`;
         absenteeSection.appendChild(absenteeCount);
-        
+
         const withheldCount = document.createElement('p');
         withheldCount.innerHTML = '<strong>No of Withheld Participants:</strong> 3';
         absenteeSection.appendChild(withheldCount);
-        
+
         const appealCount = document.createElement('p');
         appealCount.innerHTML = '<strong>No of Appeal Entry:</strong> 8';
         absenteeSection.appendChild(appealCount);
-        
+
         pdfContent.appendChild(absenteeSection);
-        
+
         // PDF filename
         const fileName = 'Result_Entry.pdf';
-        
+
         // PDF options
         const options = {
             margin: 10,
@@ -164,7 +178,7 @@ const AllResultEntry = () => {
             html2canvas: { scale: 2, useCORS: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
-        
+
         // Generate and download PDF
         html2pdf().from(pdfContent).set(options).save();
     };
@@ -178,8 +192,86 @@ const AllResultEntry = () => {
         { slNo: 5, regNo: "67", code: "234", mark1: 92, mark2: 80, mark3: 88, total: 260, markPercentage: 87, rank: 4, grade: "A", point: 9.5 },
         { slNo: 6, regNo: "890", code: "123", mark1: 78, mark2: 75, mark3: 82, total: 235, markPercentage: 78, rank: 5, grade: "B+", point: 8.5 },
         { slNo: 7, regNo: "45", code: "456", mark1: 65, mark2: 70, mark3: 68, total: 203, markPercentage: 68, rank: 8, grade: "B", point: 7.5 },
-        { slNo: 8, regNo: "678", code: "976", mark1: 70, mark2: 76, mark3: 80, total: 226, markPercentage: 75, rank: 6, grade: "B+", point: 8.0 }
+        { slNo: 8, regNo: "678", code: "976", mark1: 70, mark2: 76, mark3: 80, total: 226, markPercentage: 75, rank: 6, grade: "B+", point: 8.0 },
+        { slNo: 9, regNo: "678", code: "976", mark1: 70, mark2: 76, mark3: 80, total: 226, markPercentage: 75, rank: 6, grade: "B+", point: 8.0 },
+        { slNo: 10, regNo: "678", code: "976", mark1: 70, mark2: 76, mark3: 80, total: 226, markPercentage: 75, rank: 6, grade: "B+", point: 8.0 },
+        { slNo: 11, regNo: "678", code: "976", mark1: 70, mark2: 76, mark3: 80, total: 226, markPercentage: 75, rank: 6, grade: "B+", point: 8.0 },
+        { slNo: 12, regNo: "712", code: "432", mark1: 75, mark2: 73, mark3: 84, total: 232, markPercentage: 77, rank: 5, grade: "B+", point: 8.0 },
+        { slNo: 13, regNo: "546", code: "312", mark1: 83, mark2: 81, mark3: 90, total: 254, markPercentage: 85, rank: 2, grade: "A", point: 9.5 },
+        { slNo: 14, regNo: "321", code: "654", mark1: 77, mark2: 75, mark3: 79, total: 231, markPercentage: 77, rank: 5, grade: "B+", point: 8.0 },
+        { slNo: 15, regNo: "987", code: "789", mark1: 65, mark2: 68, mark3: 72, total: 205, markPercentage: 68, rank: 8, grade: "B", point: 7.5 },
     ];
+
+    // Filter results based on search code
+    const filteredResultData = () => {
+        if (!searchCode) {
+            return resultData;
+        }
+        return resultData.filter(result => 
+            result.code.toLowerCase().includes(searchCode.toLowerCase())
+        );
+    };
+
+    // Reset pagination when search changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchCode]);
+
+    // Pagination logic
+    const filteredData = filteredResultData();
+    const indexOfLastItem = currentPage * rowsPerPage;
+    const indexOfFirstItem = indexOfLastItem - rowsPerPage;
+    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
+    const handlePageChange = (pageNumber) => {
+        if (pageNumber > 0 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
+
+    const renderPageNumbers = () => {
+        const pageNumbers = [];
+        // Dynamically adjust number of page buttons based on screen size
+        const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
+
+        if (totalPages <= maxPageNumbersToShow) {
+            // Show all page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            // Show limited page numbers with dots
+            if (currentPage <= 2) {
+                // Near the start
+                for (let i = 1; i <= 3; i++) {
+                    if (i <= totalPages) pageNumbers.push(i);
+                }
+                if (totalPages > 3) {
+                    pageNumbers.push('...');
+                    pageNumbers.push(totalPages);
+                }
+            } else if (currentPage >= totalPages - 1) {
+                // Near the end
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = totalPages - 2; i <= totalPages; i++) {
+                    if (i > 0) pageNumbers.push(i);
+                }
+            } else {
+                // Middle
+                pageNumbers.push(1);
+                if (currentPage > 3) pageNumbers.push('...');
+                pageNumbers.push(currentPage - 1);
+                pageNumbers.push(currentPage);
+                pageNumbers.push(currentPage + 1);
+                if (currentPage < totalPages - 2) pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+            }
+        }
+
+        return pageNumbers;
+    };
 
     const chunkRegNos = (arr, size) => {
         const chunkedArr = [];
@@ -195,6 +287,19 @@ const AllResultEntry = () => {
         navigate('/result-entry');
     };
 
+    // Handle search input changes
+    const handleSearchChange = (e) => {
+        const value = e.target.value;
+        setSearchCode(value);
+        
+        // Update URL parameter
+        if (value) {
+            setSearchParams({ code: value });
+        } else {
+            setSearchParams({});
+        }
+    };
+
     return (
         <>
             <Header />
@@ -206,13 +311,34 @@ const AllResultEntry = () => {
                             Result Entry
                         </h2>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
-                        <button onClick={handleAddClick} className="text-blue-500 border border-blue-500 py-2 px-6 rounded-full flex items-center">
-                            Add Result entry
-                        </button>
-                       
-                            <div className="relative">
+                            <div className="flex items-center gap-2 w-full sm:w-auto">
+                                <label className="text-blue-900 whitespace-nowrap min-w-max">Item Code</label>
+                                <input
+                                    type="text"
+                                    className="rounded-full border border-blue-700 px-2 py-2 flex-grow"
+                                    placeholder="Search by item code..."
+                                    value={searchCode}
+                                    onChange={handleSearchChange}
+                                />
+                            </div>
+
+                            <button onClick={handleAddClick} className="text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4] border border-blue-500 py-2 px-6 rounded-full flex items-center w-full sm:w-auto">
+                                Add Result entry
+                            </button>
+
+                            <button
+                                onClick={generatePDF}
+                                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
+                            >
+                                Print
+                            </button>
+                        </div>
+                    </div>
+                    <div className="flex items-center justify-center">
+                        <div className="">
+                            <div className="relative inline-block">
                                 <p
-                                    className='text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4] cursor-pointer'
+                                    className='text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4] cursor-pointer inline'
                                     onMouseEnter={() => setShowRegNo(true)}
                                     onMouseLeave={() => setShowRegNo(false)}
                                 >
@@ -228,17 +354,10 @@ const AllResultEntry = () => {
                                     </div>
                                 )}
                             </div>
-                            <p className='text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4]'>No of Withheld Participants :<span> 3</span></p>
-                            <p className='text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4]'>No of Absentees :<span> {absenteeRegNos.length}</span></p>
-                            <button 
-                                onClick={generatePDF}
-                                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
-                            >
-                                Print
-                            </button>
+                            <p className='text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4] inline ml-4'>No of Withheld Participants :<span> 3</span></p>
+                            <p className='text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4] inline ml-4'>No of Absentees :<span> {absenteeRegNos.length}</span></p>
                         </div>
                     </div>
-
                     <div className="w-full">
                         <div ref={printRef} className="overflow-x-auto -mx-4 sm:mx-0">
                             <div className="inline-block min-w-full align-middle px-4 sm:px-0">
@@ -262,38 +381,91 @@ const AllResultEntry = () => {
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
-                                            {resultData.map((result) => (
-                                                <tr key={result.slNo} className="hover:bg-gray-100">
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.slNo}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.regNo}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.code}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.mark1}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.mark2}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.mark3}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.total}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.markPercentage}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.rank}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">{result.point}</td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">
-                                                        <button 
-                                                            className="text-blue-500 hover:text-blue-700 focus:outline-none"
-                                                            onClick={() => handleEditRedirect(result)}
-                                                        >
-                                                            <i className="fa-solid fa-pen-to-square cursor-pointer"></i>
-                                                        </button>
-                                                    </td>
-                                                    <td className="p-2 md:p-3 whitespace-nowrap">
-                                                        <button onClick={() => handleDeleteClick(result.slNo)} className="text-red-600 hover:text-red-800 focus:outline-none">
-                                                            <i className="fa-solid fa-trash cursor-pointer"></i>
-                                                        </button>
+                                            {currentItems.length > 0 ? (
+                                                currentItems.map((result, index) => (
+                                                    <tr key={result.slNo} className="hover:bg-gray-100">
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.regNo}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.code}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.mark1}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.mark2}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.mark3}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.total}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.markPercentage}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.rank}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.point}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">
+                                                            <button
+                                                                className="text-blue-500 hover:text-blue-700 focus:outline-none"
+                                                                onClick={() => handleEditRedirect(result)}
+                                                            >
+                                                                <i className="fa-solid fa-pen-to-square cursor-pointer"></i>
+                                                            </button>
+                                                        </td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">
+                                                            <button onClick={() => handleDeleteClick(result.slNo)} className="text-red-600 hover:text-red-800 focus:outline-none">
+                                                                <i className="fa-solid fa-trash cursor-pointer"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan="13" className="p-4 text-center text-gray-500">
+                                                        No results found for "{searchCode}"
                                                     </td>
                                                 </tr>
-                                            ))}
+                                            )}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Pagination Controls */}
+                    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
+                        {/* Showing X of Y rows */}
+                        <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
+                            {filteredData.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} of ${filteredData.length} rows` : '0 rows'}
+                        </div>
+
+                        {/* Pagination Controls */}
+                        <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                            {/* Previous Button with icon */}
+                            <button
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
+                            >
+                                <i className="fa-solid fa-angle-right transform rotate-180"></i>
+                                <span className="hidden sm:inline p-1">Previous</span>
+                            </button>
+
+                            {/* Page Numbers */}
+                            <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+                                {renderPageNumbers().map((page, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => page !== '...' && handlePageChange(page)}
+                                        className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                                            } ${page === '...' ? 'pointer-events-none' : ''}`}
+                                    >
+                                        {page}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Next Button with icon */}
+                            <button
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === totalPages || totalPages === 0}
+                                className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
+                            >
+                                <span className="hidden sm:inline p-1">Next</span>
+                                <i className="fa-solid fa-angle-right"></i>
+                            </button>
                         </div>
                     </div>
                 </div>

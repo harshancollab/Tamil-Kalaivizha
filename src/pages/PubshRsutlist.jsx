@@ -184,7 +184,7 @@ const PublishResultList = () => {
                     return itemCode >= 600 && itemCode < 700;
                 });
                 break;
-            case "Status View":
+            case "All Festival":
             default:
                 filtered = [...dataToFilter];
         }
@@ -234,6 +234,22 @@ const PublishResultList = () => {
         setSearchTerm(initialSearchTerm);
         filterSchools(initialSearchTerm);
     }, [searchParams]);
+
+    // Check if we need to update result type when festival changes
+    useEffect(() => {
+        // If Status View is selected and result type is All Result, keep it
+        // Otherwise if Status View is selected and result type is not All Result or Status of Festival,
+        // set it to Declared Result
+        if (selectedFestival === "Status View") {
+            if (selectedResultType !== "All Result" && selectedResultType !== "Status of Festival") {
+                setSearchParams(prev => {
+                    const newParams = new URLSearchParams(prev);
+                    newParams.set('resultType', "Declared Result");
+                    return newParams;
+                });
+            }
+        }
+    }, [selectedFestival]);
 
     const handleSearchChange = (event) => {
         const newSearchTerm = event.target.value;
@@ -302,9 +318,21 @@ const PublishResultList = () => {
     };
 
     const handleFestivalChange = (e) => {
+        const newFestival = e.target.value;
+        
+        // Update the festival in the search params
         setSearchParams(prev => {
             const newParams = new URLSearchParams(prev);
-            newParams.set('festival', e.target.value);
+            newParams.set('festival', newFestival);
+            
+            // If switching to Status View and the current result type isn't All Result or Status of Festival,
+            // set the result type to Declared Result
+            if (newFestival === "Status View" && 
+                selectedResultType !== "All Result" && 
+                selectedResultType !== "Status of Festival") {
+                newParams.set('resultType', "Declared Result");
+            }
+            
             return newParams;
         });
     };
@@ -452,6 +480,9 @@ const PublishResultList = () => {
     // Determine what data to display
     const displayResultData = filteredResultData.length > 0 ? filteredResultData : resultData;
 
+    // Check if Status View is selected in the festival dropdown
+    const isStatusViewSelected = selectedFestival === "Status View";
+
     return (
         <>
             <Header />
@@ -463,21 +494,39 @@ const PublishResultList = () => {
                             {getPageHeading()}
                         </h2>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
-                            <div className="relative w-full sm:w-40">
-                                <select
-                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
-                                    onChange={handleResultTypeChange}
-                                    value={selectedResultType}
-                                >
-                                    <option value="Declared Result">Declared Result</option>
-                                    <option value="School Points">School Points</option>
-                                    <option value="All Result">All Result</option>
-                                    <option value="Status of Festival">Status of Festival</option>
-                                </select>
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                                    <i className="fa-solid fa-chevron-down"></i>
+                            {/* Only show the All Result & Status of Festival dropdown when Status View is selected */}
+                            {isStatusViewSelected && (
+                                <div className="relative w-full sm:w-40">
+                                    <select
+                                        className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
+                                        onChange={handleResultTypeChange}
+                                        value={selectedResultType}
+                                    >
+                                        <option value="All Result">All Result</option>
+                                        <option value="Status of Festival">Status of Festival</option>
+                                    </select>
+                                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                        <i className="fa-solid fa-chevron-down"></i>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
+                            
+                            {/* Only show the Declared Result & School Points dropdown when Status View is NOT selected */}
+                            {!isStatusViewSelected && (
+                                <div className="relative w-full sm:w-40">
+                                    <select
+                                        className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
+                                        onChange={handleResultTypeChange}
+                                        value={selectedResultType}
+                                    >
+                                        <option value="Declared Result">Declared Result</option>
+                                        <option value="School Points">School Points</option>
+                                    </select>
+                                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                        <i className="fa-solid fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="relative w-full sm:w-40">
                                 <select
@@ -489,6 +538,7 @@ const PublishResultList = () => {
                                     <option value="Lp Kalaivizha">Lp Kalaivizha</option>
                                     <option value="Hs Kalaivizha">Hs Kalaivizha</option>
                                     <option value="Hss Kalaivizha">Hss Kalaivizha</option>
+                                    <option value="All Festival">All Festival</option>
                                     <option value="Status View">Status View</option>
                                 </select>
                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">

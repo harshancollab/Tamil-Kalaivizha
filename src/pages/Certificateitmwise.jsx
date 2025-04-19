@@ -10,15 +10,28 @@ const Certificateitmwise = () => {
     const [filteredItems, setFilteredItems] = useState([]);
     const [searchParams, setSearchParams] = useSearchParams();
     const selectedFestival = searchParams.get('festival') || "UP Kalaivizha";
+    const searchQuery = searchParams.get('search') || '';
+    const [searchText, setSearchText] = useState('');
     const navigate = useNavigate();
+
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     useEffect(() => {
         getAllItemResult();
-    }, []); 
+        
+        // Initialize search text from URL on component mount
+        if (searchQuery) {
+            setSearchText(searchQuery);
+        }
+    }, []);
 
     useEffect(() => {
-        filterItemsByFestival(selectedFestival);
-    }, [selectedFestival, Allitemresult]);
+        if (Allitemresult.length > 0) {
+            filterItems();
+        }
+    }, [selectedFestival, Allitemresult, searchText]);
 
     const getAllItemResult = async () => {
         const token = sessionStorage.getItem("token");
@@ -40,11 +53,12 @@ const Certificateitmwise = () => {
         }
     }
 
-    const filterItemsByFestival = (festival) => {
+    const filterItems = () => {
         if (!Allitemresult.length) return;
         
+        // First filter by festival
         let filtered;
-        switch (festival) {
+        switch (selectedFestival) {
             case "UP Kalaivizha":
                 filtered = Allitemresult.filter(item => {
                     const itemCode = parseInt(item.itemCode);
@@ -76,17 +90,42 @@ const Certificateitmwise = () => {
                 filtered = [...Allitemresult];
         }
         
+        // Then filter by search text
+        if (searchText && searchText.trim() !== '') {
+            const searchLower = searchText.toLowerCase().trim();
+            filtered = filtered.filter(item => 
+                (item.itemCode && item.itemCode.toLowerCase().includes(searchLower)) || 
+                (item.itemName && item.itemName.toLowerCase().includes(searchLower))
+            );
+        }
+        
+        // Add sequential numbering to filtered results
         filtered = filtered.map((item, index) => ({
             ...item,
             slNo: index + 1
         }));
         
         setFilteredItems(filtered);
+        // Reset to first page when filters change
+        setCurrentPage(1);
     }
 
     const handleFestivalChange = (e) => {
         const festival = e.target.value;
         setSearchParams({ festival });
+        
+        // Reset search text when changing festival
+        setSearchText('');
+    };
+
+    const handleSearchInputChange = (e) => {
+        setSearchText(e.target.value);
+        // The useEffect will handle filtering as the user types
+    };
+
+    const clearSearch = () => {
+        setSearchText('');
+        // The useEffect will handle filtering
     };
 
     const handleItemClick = (itemCode, itemName) => {
@@ -150,7 +189,7 @@ const Certificateitmwise = () => {
         // Create table body
         const tbody = document.createElement('tbody');
         
-        displayData.forEach((item) => {
+        currentItems.forEach((item) => {
             const row = document.createElement('tr');
             
             // Add cells
@@ -289,19 +328,122 @@ const Certificateitmwise = () => {
             gradeA: 6, 
             gradeB: 3, 
             gradeC: 1 
+        },
+        { 
+            slNo: 8, 
+            printed: "Yes", 
+            itemCode: "602", 
+            itemName: "Elocution", 
+            itemType: "Single", 
+            totalStudents: 15, 
+            participation: 14, 
+            nonParticipant: 1, 
+            gradeA: 7, 
+            gradeB: 5, 
+            gradeC: 2 
+        },
+        { 
+            slNo: 9, 
+            printed: "No", 
+            itemCode: "304", 
+            itemName: "Quiz Competition", 
+            itemType: "Group", 
+            totalStudents: 30, 
+            participation: 30, 
+            nonParticipant: 0, 
+            gradeA: 12, 
+            gradeB: 10, 
+            gradeC: 8 
+        },
+        { 
+            slNo: 10, 
+            printed: "Yes", 
+            itemCode: "403", 
+            itemName: "Speech", 
+            itemType: "Single", 
+            totalStudents: 20, 
+            participation: 18, 
+            nonParticipant: 2, 
+            gradeA: 10, 
+            gradeB: 6, 
+            gradeC: 2 
+        },
+        { 
+            slNo: 11, 
+            printed: "No", 
+            itemCode: "502", 
+            itemName: "Western Dance", 
+            itemType: "Group", 
+            totalStudents: 25, 
+            participation: 22, 
+            nonParticipant: 3, 
+            gradeA: 15, 
+            gradeB: 5, 
+            gradeC: 2 
         }
     ];
 
     // Initialize filtered data at component mount
     useEffect(() => {
         if (Allitemresult.length === 0 && certificateItemData.length > 0) {
-            filterItemsByFestival(selectedFestival);
+            setItemresult(certificateItemData);
         }
     }, []);
 
-    // Determine what data to display
-    const displayData = filteredItems.length > 0 ? filteredItems : 
-                       (Allitemresult.length > 0 ? Allitemresult : certificateItemData);
+    // Pagination logic
+    const indexOfLastItem = currentPage * rowsPerPage;
+    const indexOfFirstItem = indexOfLastItem - rowsPerPage;
+    const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredItems.length / rowsPerPage);
+
+    const handlePageChange = (pageNumber) => {
+        if (pageNumber > 0 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
+
+    const renderPageNumbers = () => {
+        const pageNumbers = [];
+        // Dynamically adjust number of page buttons based on screen size
+        const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
+        
+        if (totalPages <= maxPageNumbersToShow) {
+            // Show all page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            // Show limited page numbers with dots
+            if (currentPage <= 2) {
+                // Near the start
+                for (let i = 1; i <= 3; i++) {
+                    if (i <= totalPages) pageNumbers.push(i);
+                }
+                if (totalPages > 3) {
+                    pageNumbers.push('...');
+                    pageNumbers.push(totalPages);
+                }
+            } else if (currentPage >= totalPages - 1) {
+                // Near the end
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = totalPages - 2; i <= totalPages; i++) {
+                    if (i > 0) pageNumbers.push(i);
+                }
+            } else {
+                // Middle
+                pageNumbers.push(1);
+                if (currentPage > 3) pageNumbers.push('...');
+                pageNumbers.push(currentPage - 1);
+                pageNumbers.push(currentPage);
+                pageNumbers.push(currentPage + 1);
+                if (currentPage < totalPages - 2) pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+            }
+        }
+        
+        return pageNumbers;
+    };
 
     return (
         <>
@@ -339,7 +481,21 @@ const Certificateitmwise = () => {
                         </div>
                     </div>
 
-                    <div className="w-full">
+                    {/* Search Box */}
+                    <div className="relative flex mt-2 items-center w-full sm:w-64 h-9 border border-blue-800 rounded-full px-4">
+                        <input
+                            type="text"
+                            placeholder="Search Item Code..."
+                            className="w-full bg-transparent outline-none text-sm"
+                            value={searchText}
+                            onChange={handleSearchInputChange}
+                        />
+                        <div className="text-gray-500">
+                            <i className="fa-solid fa-magnifying-glass"></i>
+                        </div>
+                    </div>
+
+                    <div className="w-full mt-4">
                         <div className="overflow-x-auto -mx-4 sm:mx-0">
                             <div className="inline-block min-w-full align-middle px-4 sm:px-0">
                                 <div id="certificate-table-container" className="shadow overflow-hidden border-gray-200 sm:rounded-lg">
@@ -359,8 +515,8 @@ const Certificateitmwise = () => {
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
-                                            {displayData.length > 0 ? (
-                                                displayData.map((item) => (
+                                            {currentItems && currentItems.length > 0 ? (
+                                                currentItems.map((item) => (
                                                     <tr key={item.slNo} className="hover:bg-gray-100">
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{item.slNo}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{item.printed}</td>
@@ -381,8 +537,10 @@ const Certificateitmwise = () => {
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="10" className="p-4 text-center">
-                                                        No items found for {selectedFestival}
+                                                    <td colSpan="10" className="p-3 text-center text-gray-500">
+                                                        {searchText 
+                                                            ? `No items found matching "${searchText}" in ${selectedFestival}` 
+                                                            : `No records found for ${selectedFestival}`}
                                                     </td>
                                                 </tr>
                                             )}
@@ -391,6 +549,54 @@ const Certificateitmwise = () => {
                                 </div>
                             </div>
                         </div>
+                        
+                        {/* Pagination section */}
+                        {filteredItems && filteredItems.length > 0 && (
+                            <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
+                                {/* Showing X of Y rows */}
+                                <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
+                                    {filteredItems.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredItems.length)} of ${filteredItems.length} rows` : '0 rows'}
+                                </div>
+                                
+                                {/* Pagination Controls */}
+                                <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                                    {/* Previous Button with icon */}
+                                    <button
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                        className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
+                                    >
+                                        <i className="fa-solid fa-angle-right transform rotate-180"></i>
+                                        <span className="hidden sm:inline p-1">Previous</span>
+                                    </button>
+                                    
+                                    {/* Page Numbers */}
+                                    <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+                                        {renderPageNumbers().map((page, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => page !== '...' && handlePageChange(page)}
+                                                className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${
+                                                    currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                                                } ${page === '...' ? 'pointer-events-none' : ''}`}
+                                            >
+                                                {page}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    
+                                    {/* Next Button with icon */}
+                                    <button
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === totalPages || totalPages === 0}
+                                        className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
+                                    >
+                                        <span className="hidden sm:inline p-1">Next</span>
+                                        <i className="fa-solid fa-angle-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

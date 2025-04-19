@@ -4,16 +4,13 @@ import Dash from '../components/Dash';
 import { getAllItemwisepointAPI } from '../services/allAPI';
 import html2pdf from 'html2pdf.js';
 
-const ItemWisePoint = () => {
+const ItemCodewise = () => {
   const [schoolCodeSearch, setSchoolCodeSearch] = useState('');
-  const [schoolName, setSchoolName] = useState('');
-  const [showSchoolName, setShowSchoolName] = useState(false);
-  const [showSchoolColumn, setShowSchoolColumn] = useState(true); // New state to control school column visibility
   const [selectedFestival, setSelectedFestival] = useState('All Festival');
   const [Allitemwiswpoint, setItemwiswpoint] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [nameSearch, setNameSearch] = useState('');
+  const [itemNameDisplay, setItemNameDisplay] = useState(''); // New state to store item name
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,17 +21,46 @@ const ItemWisePoint = () => {
   }, []);
 
   useEffect(() => {
-    filterItems(selectedFestival, schoolCodeSearch, nameSearch);
+    filterItemsByFestivalAndSchool(selectedFestival, schoolCodeSearch);
 
     // Update search state based on input value
-    setIsSearching(schoolCodeSearch.trim() !== '' || nameSearch.trim() !== '');
+    setIsSearching(schoolCodeSearch.trim() !== '');
     
     // Reset to first page when filters change
     setCurrentPage(1);
     
-    // Hide school column when filtering by school code
-    setShowSchoolColumn(schoolCodeSearch.trim() === '');
-  }, [selectedFestival, Allitemwiswpoint, schoolCodeSearch, nameSearch]);
+    // Find and set the item name based on search input
+    findItemName(schoolCodeSearch);
+  }, [selectedFestival, Allitemwiswpoint, schoolCodeSearch]);
+
+  // Function to find and display item name based on search input
+  const findItemName = (searchCode) => {
+    if (!searchCode.trim()) {
+      setItemNameDisplay('');
+      return;
+    }
+    
+    const itemsToSearch = Allitemwiswpoint.length > 0 ? Allitemwiswpoint : resultData;
+    
+    // Find items that match the search code
+    const matchingItems = itemsToSearch.filter(item => {
+      const itemCodeStr = item.itemCode.split(' ')[0];
+      return itemCodeStr.includes(searchCode);
+    });
+    
+    // If matching items found, display the item name
+    if (matchingItems.length > 0) {
+      // Extract item name from "301 - Story Writing" format
+      const itemCodeParts = matchingItems[0].itemCode.split(' - ');
+      if (itemCodeParts.length > 1) {
+        setItemNameDisplay(itemCodeParts[1]);
+      } else {
+        setItemNameDisplay('');
+      }
+    } else {
+      setItemNameDisplay('');
+    }
+  };
 
   const getAllItemwiswpoint = async () => {
     const token = sessionStorage.getItem("token");
@@ -56,7 +82,7 @@ const ItemWisePoint = () => {
     }
   }
 
-  const filterItems = (festival, schoolCode, name) => {
+  const filterItemsByFestivalAndSchool = (festival, schoolCode) => {
     if (!Allitemwiswpoint.length) return;
 
     // First filter by festival
@@ -100,28 +126,13 @@ const ItemWisePoint = () => {
 
     // Then filter by school code if provided
     if (schoolCode.trim() !== '') {
-      filtered = filtered.filter(item =>
-        item.SchoolCode && item.SchoolCode.toString().includes(schoolCode)
-      );
-      
-      // Update school name when filtering by school code
-      if (filtered.length > 0) {
-        setSchoolName(filtered[0].school);
-      } else {
-        setSchoolName('School not found');
-      }
-    } else {
-      setSchoolName('');
+      filtered = filtered.filter(item => {
+        const itemCodeStr = item.itemCode.split(' ')[0];
+        return itemCodeStr.includes(schoolCode);
+      });
     }
 
-    // Then filter by student name if provided
-    if (name.trim() !== '') {
-      filtered = filtered.filter(item =>
-        item.studentName && item.studentName.toLowerCase().includes(name.toLowerCase())
-      );
-    }
-
-    // Add sequential numbering to filtered results AFTER all filters have been applied
+    // Add sequential numbering to filtered results AFTER both filters have been applied
     filtered = filtered.map((item, index) => ({
       ...item,
       slNo: index + 1
@@ -148,64 +159,26 @@ const ItemWisePoint = () => {
   const handleSchoolSearchChange = (e) => {
     const searchValue = e.target.value;
     setSchoolCodeSearch(searchValue);
-    
     // Set isSearching based on whether there's text in the search field
-    setIsSearching(searchValue.trim() !== '' || nameSearch.trim() !== '');
-    
+    setIsSearching(searchValue.trim() !== '');
     // Update URL with search parameters
-    updateURLParams(searchValue, selectedFestival, nameSearch);
-    
-    // When school code changes, we want to find the corresponding school name
-    if (searchValue.trim() !== '') {
-      const school = Allitemwiswpoint.find(item => 
-        item.SchoolCode && item.SchoolCode.toString().includes(searchValue)
-      );
-      
-      if (school) {
-        setSchoolName(school.school);
-      } else {
-        setSchoolName('School not found');
-      }
-      
-      // Hide school column when searching by school code
-      setShowSchoolColumn(false);
-    } else {
-      setSchoolName('');
-      setShowSchoolColumn(true);
-    }
-  };
-
-  const handleNameSearchChange = (e) => {
-    const searchValue = e.target.value;
-    setNameSearch(searchValue);
-    
-    // Set isSearching based on whether there's text in the search field
-    setIsSearching(searchValue.trim() !== '' || schoolCodeSearch.trim() !== '');
-    
-    // Update URL with search parameters
-    updateURLParams(schoolCodeSearch, selectedFestival, searchValue);
+    updateURLParams(searchValue, selectedFestival);
   };
 
   const handleFestivalChange = (e) => {
     setSelectedFestival(e.target.value);
     // Update URL with festival parameter
-    updateURLParams(schoolCodeSearch, e.target.value, nameSearch);
+    updateURLParams(schoolCodeSearch, e.target.value);
   };
 
   // Function to update URL parameters
-  const updateURLParams = (schoolCode, festival, name) => {
+  const updateURLParams = (schoolCode, festival) => {
     const url = new URL(window.location);
 
     if (schoolCode.trim() !== '') {
       url.searchParams.set('schoolCode', schoolCode);
     } else {
       url.searchParams.delete('schoolCode');
-    }
-
-    if (name && name.trim() !== '') {
-      url.searchParams.set('name', name);
-    } else {
-      url.searchParams.delete('name');
     }
 
     if (festival !== 'All Festival') {
@@ -222,17 +195,10 @@ const ItemWisePoint = () => {
     const url = new URL(window.location);
     const schoolCodeParam = url.searchParams.get('schoolCode');
     const festivalParam = url.searchParams.get('festival');
-    const nameParam = url.searchParams.get('name');
 
     if (schoolCodeParam) {
       setSchoolCodeSearch(schoolCodeParam);
       setIsSearching(true); // Set isSearching immediately when loading from URL params
-      setShowSchoolColumn(false); // Hide school column when loading with school code param
-    }
-
-    if (nameParam) {
-      setNameSearch(nameParam);
-      setIsSearching(true);
     }
 
     if (festivalParam) {
@@ -313,41 +279,31 @@ const ItemWisePoint = () => {
   const clearSearch = () => {
     // Reset search and filter states
     setSchoolCodeSearch('');
-    setNameSearch('');
-    setSchoolName('');
     setIsSearching(false);
-    setShowSchoolColumn(true); // Show school column when clearing search
+    setItemNameDisplay(''); // Clear the item name display
 
     // Clear URL parameters
-    updateURLParams('', selectedFestival, '');
+    updateURLParams('', selectedFestival);
 
     // Force a re-filter with empty search text
-    filterItems(selectedFestival, '', '');
-  };
-
-  // Toggle function for showing school name
-  const toggleShowSchoolName = () => {
-    setShowSchoolName(!showSchoolName);
+    filterItemsByFestivalAndSchool(selectedFestival, '');
   };
 
   // Complete reset function that clears search and resets festival
   const resetAllFilters = () => {
     setSchoolCodeSearch('');
-    setNameSearch('');
     setSelectedFestival('All Festival');
     setIsSearching(false);
-    setShowSchoolName(true); // Show school name when "All Schools" is clicked
-    setShowSchoolColumn(true); // Show school column when "All Schools" is clicked
+    setItemNameDisplay(''); // Clear the item name display
 
     // Clear all URL parameters
     const url = new URL(window.location);
     url.searchParams.delete('schoolCode');
     url.searchParams.delete('festival');
-    url.searchParams.delete('name');
     window.history.replaceState({}, '', url);
 
     // Force a re-filter with empty search and default festival
-    filterItems('All Festival', '', '');
+    filterItemsByFestivalAndSchool('All Festival', '');
     
     // Reset to first page
     setCurrentPage(1);
@@ -422,7 +378,7 @@ const ItemWisePoint = () => {
   useEffect(() => {
     if (Allitemwiswpoint.length === 0 && resultData.length > 0) {
       setItemwiswpoint(resultData);
-      filterItems(selectedFestival, schoolCodeSearch, nameSearch);
+      filterItemsByFestivalAndSchool(selectedFestival, schoolCodeSearch);
     }
 
     // Read URL parameters on component mount
@@ -437,34 +393,27 @@ const ItemWisePoint = () => {
         <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-hidden">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-4">
             <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
-              Item Wise Point List
+            Item Code Wise Point List
             </h2>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
               <div className="flex flex-col w-full sm:w-auto">
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <label className="text-blue-700 whitespace-nowrap min-w-max">School Code</label>
+                <div className="flex items-center gap-2 w-full">
+                  <label className="text-blue-700 whitespace-nowrap min-w-max">Item Code</label>
                   <input
                     type="text"
                     className="rounded-full border border-blue-700 px-2 py-2 flex-grow"
-                    placeholder="Search by school code..."
+                    placeholder="Search by item code..."
                     value={schoolCodeSearch}
                     onChange={handleSchoolSearchChange}
                   />
                 </div>
-                {/* School name display area */}
-                {schoolCodeSearch && showSchoolName && schoolName && (
-                  <div className="ml-32 mt-1 text-sm text-blue-800 font-medium">
-                    {schoolName}
+                {/* Item Name Display */}
+                {itemNameDisplay && (
+                  <div className="ml-32 mt-1 text-sm font-medium text-blue-700 ">
+                    {itemNameDisplay}
                   </div>
                 )}
               </div>
-              
-              <button
-                className="border-blue-800 border text-blue-900 py-2 px-4 rounded-full min-w-max whitespace-nowrap"
-                onClick={resetAllFilters}
-              >
-                All Schools
-              </button>
 
               <div className="relative w-full sm:w-40">
                 <select
@@ -493,19 +442,7 @@ const ItemWisePoint = () => {
               </button>
             </div>
           </div>
-          <div className="relative flex mt-2 items-center w-full sm:w-64 h-9 border border-blue-800 rounded-full px-4">
-            <input
-              type="text"
-              placeholder="Search Student Name..."
-              className="w-full bg-transparent outline-none text-sm"
-              value={nameSearch}
-              onChange={handleNameSearchChange}
-            />
-            <button className="text-gray-500 hover:text-gray-700">
-              <i className="fa-solid fa-magnifying-glass"></i>
-            </button>
-          </div>
-      
+
           <div className="w-full mt-6">
             <div className="overflow-x-auto">
               <div className="inline-block min-w-full align-middle">
@@ -515,27 +452,23 @@ const ItemWisePoint = () => {
                       <thead className="bg-gray-50">
                         <tr className="text-gray-700">
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
-                          <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Item Code & Item Name</th>
-                          {/* Only show school column when not filtering by school code */}
-                          {showSchoolColumn && (
-                            <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School</th>
-                          )}
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Student Name</th>
+                          <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School</th>
+                          <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Rank</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Point</th>
-                          <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Total Point</th>
+                       
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
                         {(isFiltering && allDisplayData.length === 0) ? (
                           <tr>
-                            <td colSpan={showSchoolColumn ? "7" : "6"} className="p-4 text-center">
+                            <td colSpan="7" className="p-4 text-center">
                               <div className="flex flex-col items-center justify-center p-6">
                                 <p className="text-red-500 font-medium mb-2">No results found</p>
                                 <p>
                                   No items found for {selectedFestival}
-                                  {schoolCodeSearch ? ` with school code containing "${schoolCodeSearch}"` : ''}
-                                  {nameSearch ? ` with student name containing "${nameSearch}"` : ''}
+                                  {isSearching ? ` with item code containing "${schoolCodeSearch}"` : ''}
                                 </p>
                                 {isSearching && (
                                   <button
@@ -552,14 +485,10 @@ const ItemWisePoint = () => {
                           currentItems.map((result, index) => (
                             <tr key={result.slNo} className="hover:bg-gray-100">
                               <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
-                              <td className="p-2 md:p-3 whitespace-nowrap">{result.itemCode}</td>
-                              {/* Only show school column when not filtering by school code */}
-                              {showSchoolColumn && (
-                                <td className="p-2 md:p-3 whitespace-nowrap">{result.school}</td>
-                              )}
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.studentName}</td>
-                              <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
+                              <td className="p-2 md:p-3 whitespace-nowrap">{result.SchoolCode}-{result.school}</td>
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.point}</td>
+                              <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.totalPoint}</td>
                             </tr>
                           ))
@@ -625,4 +554,4 @@ const ItemWisePoint = () => {
   )
 }
 
-export default ItemWisePoint
+export default ItemCodewise

@@ -69,6 +69,8 @@ import CertificateRegno from './pages/CertificateRegno';
 import CertificatePartcipate from './pages/CertificatePartcipate';
 import Higherlvlcomp from './pages/Higherlvlcomp';
 import ExportDatabase from './pages/ExportDatabase';
+import Ai from './pages/Ai';
+import ItemCodewise from './pages/ItemCodewise';
 
 
 
@@ -156,6 +158,8 @@ function App() {
           <Route path="/CertificateParticipate" element={<CertificatePartcipate/>} />
           <Route path="/Higherlvlcomp" element={<Higherlvlcomp/>} />
           <Route path="/ExportDatabase" element={<ExportDatabase/>} />
+          <Route path="/itemcodewise" element={<ItemCodewise/>} />
+          <Route path="/ai" element={<Ai/>} />
          
         </Route>
 

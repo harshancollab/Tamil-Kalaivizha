@@ -19,22 +19,18 @@ const ExportDatabase = () => {
                 <div className="flex justify-center mt-8 md:mt-28">
                   <div className="space-y-4 w-full max-w-lg">
                     <div className="flex flex-col md:flex-row mb-6">
-                      <div className="w-full md:ml-4 md:w-80 relative text-center">
+                      <div className="w-full  md:ml-20 md:w-80 relative text-center">
                       <label className="font-semibold text-blue-900 w-full md:w-40 mb-2 md:mb-0 md:pt-2">Export Result data for district kalolsavam</label>
 
                       </div>
                     </div>
-                    <div className='text-left'>
+                    <div className='text-center'>
                     <button
                         className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-8 md:px-14 py-2 md:py-3 rounded-full mt-10 md:mt-20 mr-10"
                       >
                         Export Data
                       </button>
-                      <button
-                        className="border border-blue-600 text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4] px-8 md:px-14 py-2 md:py-3 rounded-full mt-10 md:mt-20"
-                      >
-                       Export Photo
-                      </button>
+                    
                     </div>
                   </div>
                 </div>

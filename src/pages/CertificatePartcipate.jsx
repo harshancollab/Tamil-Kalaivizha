@@ -12,8 +12,11 @@ const CertificateParticipate = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredParticipants, setFilteredParticipants] = useState([]);
   const dropdownRef = useRef(null);
   const certificateRef = useRef(null);
+  const searchInputRef = useRef(null);
 
   // Dummy data for participants
   const dummyParticipants = [
@@ -71,15 +74,73 @@ const CertificateParticipate = () => {
       item: "Folk Music",
       grade: "B"
     },
+    {
+      id: 7,
+      name: "Rahul",
+      regNo: "7",
+      school: "G. H. S. S. Anakara",
+      class: "12",
+      item: "Instrumental Music",
+      grade: "A"
+    },
+    {
+      id: 8,
+      name: "Divya",
+      regNo: "8",
+      school: "G. H. S. S. Kumily",
+      class: "10",
+      item: "Group Song",
+      grade: "A"
+    },
     { id: "all", name: "All Participants" }
   ];
 
   const [participants, setParticipants] = useState([]);
+  const [showSearchBar, setShowSearchBar] = useState(false);
 
   // Simulate API call to get participants
   useEffect(() => {
     getAllParticipants();
   }, []);
+
+  // Check if search bar should be shown based on participant count
+  useEffect(() => {
+    // Show search bar if there are more than 7 participants
+    setShowSearchBar(participants.length > 7);
+    
+    // Initialize filtered participants with all participants
+    setFilteredParticipants(participants);
+  }, [participants]);
+
+  // Filter participants when search term changes
+  useEffect(() => {
+    if (searchTerm.trim() !== '') {
+      const filtered = participants.filter(participant => {
+        // Always include "All Participants" option at the top
+        if (participant.id === "all") return false; // Remove from filtered results when searching
+        
+        // Search by name, regNo or school - make search case-insensitive
+        const searchLower = searchTerm.toLowerCase();
+        const nameMatch = participant.name?.toLowerCase().includes(searchLower);
+        const regNoMatch = participant.regNo?.toString().includes(searchLower);
+        const schoolMatch = participant.school?.toLowerCase().includes(searchLower);
+        
+        return nameMatch || regNoMatch || schoolMatch;
+      });
+      
+      // Only add "All Participants" option if we're not searching or if there are results
+      setFilteredParticipants(filtered);
+    } else {
+      setFilteredParticipants(participants);
+    }
+  }, [searchTerm, participants]);
+
+  // Focus search input when dropdown opens and search bar is visible
+  useEffect(() => {
+    if (isDropdownOpen && showSearchBar && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isDropdownOpen, showSearchBar]);
 
   // Reset highlighted index when dropdown opens/closes
   useEffect(() => {
@@ -87,6 +148,8 @@ const CertificateParticipate = () => {
       setHighlightedIndex(0);
     } else {
       setHighlightedIndex(-1);
+      // Clear search when closing dropdown
+      setSearchTerm('');
     }
   }, [isDropdownOpen]);
 
@@ -176,7 +239,7 @@ const CertificateParticipate = () => {
       case 'ArrowDown':
         e.preventDefault();
         setHighlightedIndex(prev =>
-          prev < participants.length - 1 ? prev + 1 : prev
+          prev < filteredParticipants.length - 1 ? prev + 1 : prev
         );
         break;
       case 'ArrowUp':
@@ -185,8 +248,8 @@ const CertificateParticipate = () => {
         break;
       case 'Enter':
         e.preventDefault();
-        if (highlightedIndex >= 0) {
-          handleParticipantSelect(participants[highlightedIndex]);
+        if (highlightedIndex >= 0 && filteredParticipants[highlightedIndex]) {
+          handleParticipantSelect(filteredParticipants[highlightedIndex]);
         }
         break;
       case 'Escape':
@@ -195,6 +258,24 @@ const CertificateParticipate = () => {
         break;
       default:
         break;
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    // Reset highlighted index when search changes
+    setHighlightedIndex(0);
+  };
+
+  const handleSearchKeyDown = (e) => {
+    // Prevent closing dropdown when typing in search
+    e.stopPropagation();
+    
+    if (e.key === 'Escape') {
+      setIsDropdownOpen(false);
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightedIndex(0);
     }
   };
 
@@ -421,29 +502,107 @@ const CertificateParticipate = () => {
                             </div>
                             {isDropdownOpen && (
                               <div
-                                ref={dropdownRef}
                                 className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"
                                 role="listbox"
+                                ref={dropdownRef}
                               >
-                                {participants.length > 1 ? (
-                                  participants.map((participant, index) => (
-                                    <div
-                                      key={participant.id}
-                                      className={`px-4 py-2 cursor-pointer ${
-                                        index === highlightedIndex ? 'bg-blue-100' : 'hover:bg-blue-50'
-                                      } ${participant.id === "all" ? "font-semibold border-b border-gray-200" : ""}`}
-                                      onClick={() => handleParticipantSelect(participant)}
-                                      role="option"
-                                      aria-selected={index === highlightedIndex}
-                                    >
-                                      {participant.id === "all" ?
-                                        participant.name :
-                                        `${participant.id} - ${participant.name}`
-                                      }
+                                {/* Search bar when participants > 7 */}
+                                {showSearchBar && (
+                                  <div className="sticky top-0 bg-white p-2 border-b border-gray-200">
+                                    <div className="relative">
+                                      <input
+                                        ref={searchInputRef}
+                                        type="text"
+                                        className="w-full border border-gray-300 rounded-md px-3 py-2 pl-8"
+                                        placeholder="Search participants..."
+                                        value={searchTerm}
+                                        onChange={handleSearchChange}
+                                        onKeyDown={handleSearchKeyDown}
+                                        onClick={e => e.stopPropagation()}
+                                      />
+                                      <div className="absolute left-2 top-1/2 transform -translate-y-1/2">
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          width="16"
+                                          height="16"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          strokeWidth="2"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                        >
+                                          <circle cx="11" cy="11" r="8" />
+                                          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                        </svg>
+                                      </div>
+                                      {searchTerm.trim() !== '' && (
+                                        <div 
+                                          className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                                          onClick={() => setSearchTerm('')}
+                                        >
+                                          <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="16"
+                                            height="16"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          >
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                          </svg>
+                                        </div>
+                                      )}
                                     </div>
-                                  ))
+                                  </div>
+                                )}
+                                
+                                {/* "All Participants" option always at the top when not searching */}
+                                {searchTerm.trim() === '' && participants.find(p => p.id === "all") && (
+                                  <div
+                                    key="all"
+                                    className={`px-4 py-2 cursor-pointer ${
+                                      0 === highlightedIndex ? 'bg-blue-100' : 'hover:bg-blue-50'
+                                    } font-semibold border-b border-gray-200`}
+                                    onClick={() => handleParticipantSelect(participants.find(p => p.id === "all"))}
+                                    role="option"
+                                    aria-selected={0 === highlightedIndex}
+                                  >
+                                    All Participants
+                                  </div>
+                                )}
+                                
+                                {/* Regular participants list */}
+                                {filteredParticipants.length > 0 ? (
+                                  filteredParticipants.map((participant, index) => {
+                                    // Skip "All Participants" since we're handling it separately above
+                                    if (participant.id === "all") return null;
+                                    
+                                    // Calculate the proper index for highlighting (account for "All Participants" at top)
+                                    const highlightIndex = searchTerm.trim() === '' ? index + 1 : index;
+                                    
+                                    return (
+                                      <div
+                                        key={participant.id}
+                                        className={`px-4 py-2 cursor-pointer ${
+                                          highlightIndex === highlightedIndex ? 'bg-blue-100' : 'hover:bg-blue-50'
+                                        }`}
+                                        onClick={() => handleParticipantSelect(participant)}
+                                        role="option"
+                                        aria-selected={highlightIndex === highlightedIndex}
+                                      >
+                                        {`${participant.id} - ${participant.name}`}
+                                      </div>
+                                    );
+                                  })
                                 ) : (
-                                  <div className="px-4 py-2 text-gray-500">No participants found</div>
+                                  <div className="px-4 py-2 text-gray-500">
+                                    {searchTerm.trim() !== '' ? "No matching participants found" : "No participants available"}
+                                  </div>
                                 )}
                               </div>
                             )}
@@ -470,7 +629,7 @@ const CertificateParticipate = () => {
                       <span>Certificate saved successfully!</span>
                       <button 
                         onClick={() => setSaveSuccess(false)}
-                        className="text-green-700"
+                        className="text-gray-700"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <line x1="18" y1="6" x2="6" y2="18"></line>

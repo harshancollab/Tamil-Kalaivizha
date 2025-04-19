@@ -8,9 +8,15 @@ import html2pdf from 'html2pdf.js';
 const Higherlvlcomp = () => {
     const [Allitemresult, setItemresult] = useState([]);
     const [filteredItems, setFilteredItems] = useState([]);
+    const [searchText, setSearchText] = useState('');
     const printRef = useRef();
     const [searchParams, setSearchParams] = useSearchParams();
-    const [festivalOptions, setFestivalOptions] = useState([]);
+    const [festivalOptions, setFestivalOptions] = useState(["All Festival"]);
+    const [dataLoaded, setDataLoaded] = useState(false);
+
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     // Festival mapping with codes and names
     const festivalMapping = {
@@ -20,19 +26,32 @@ const Higherlvlcomp = () => {
         "HSS Kalaivizha": { min: 600, max: 899 },
     };
 
-    const selectedFestival = searchParams.get('festival') || "UP Kalaivizha";
+    const selectedFestival = searchParams.get('festival') || "All Festival";
+    const searchQuery = searchParams.get('search') || '';
 
     useEffect(() => {
         getAllItemResult();
+        
+        // Initialize search text from URL on component mount
+        if (searchQuery) {
+            setSearchText(searchQuery);
+        }
     }, []);
 
     useEffect(() => {
-        if (Allitemresult.length > 0) {
+        if (dataLoaded) {
             // Generate festival options from the actual data
             generateFestivalOptions();
-            filterItemsByFestival(selectedFestival);
+            filterItemsByFestivalAndSearchText();
         }
-    }, [selectedFestival, Allitemresult]);
+    }, [selectedFestival, dataLoaded]);
+
+    // React to searchText changes directly
+    useEffect(() => {
+        if (dataLoaded) {
+            filterItemsByFestivalAndSearchText();
+        }
+    }, [searchText]);
 
     // Generate festival options based on data
     const generateFestivalOptions = () => {
@@ -65,51 +84,40 @@ const Higherlvlcomp = () => {
                 const result = await getAllHigherlvlcompAPI(reqHeader)
                 if (result.status === 200) {
                     setItemresult(result.data);
+                    setDataLoaded(true);
                 }
             } catch (err) {
                 console.log(err);
                 setItemresult(resultData);
-                generateFestivalOptionsFromDummy();
+                setDataLoaded(true);
             }
         } else {
             setItemresult(resultData);
-            generateFestivalOptionsFromDummy();
+            setDataLoaded(true);
         }
     }
 
-    // Generate festival options from dummy data when API fails
-    const generateFestivalOptionsFromDummy = () => {
-        const festivals = new Set();
-
-        // Add "All Festival" option by default
-        festivals.add("All Festival");
-
-        // Add festivals based on item codes in dummy data
-        resultData.forEach(item => {
-            const itemCode = parseInt(item.itemCode);
-
-            Object.entries(festivalMapping).forEach(([festival, range]) => {
-                if (itemCode >= range.min && itemCode <= range.max) {
-                    festivals.add(festival);
-                }
-            });
-        });
-
-        setFestivalOptions(Array.from(festivals));
-    };
-
-    const filterItemsByFestival = (festival) => {
+    const filterItemsByFestivalAndSearchText = () => {
         if (!Allitemresult.length) return;
 
+        // First filter by festival
         let filtered;
-        if (festival === "All Festival") {
+        if (selectedFestival === "All Festival") {
             filtered = [...Allitemresult];
         } else {
-            const range = festivalMapping[festival];
+            const range = festivalMapping[selectedFestival];
             filtered = Allitemresult.filter(item => {
                 const itemCode = parseInt(item.itemCode);
                 return itemCode >= range.min && itemCode <= range.max;
             });
+        }
+
+        // Then filter by search text
+        if (searchText && searchText.trim() !== '') {
+            const searchLower = searchText.toLowerCase().trim();
+            filtered = filtered.filter(item => 
+                (item.participantName && item.participantName.toLowerCase().includes(searchLower))
+            );
         }
 
         // Add sequential numbering to filtered results
@@ -119,6 +127,8 @@ const Higherlvlcomp = () => {
         }));
 
         setFilteredItems(filtered);
+        // Reset to first page when filters change
+        setCurrentPage(1);
     }
 
     const resultData = [
@@ -185,7 +195,36 @@ const Higherlvlcomp = () => {
             participantName: "Cultural Team",
             class: "Various",
             schoolName: "Vidya Mandir"
-        }
+        },
+        {
+            slNo: 9,
+            itemCode: "601",
+            itemName: "HSS Kolam Competition",
+            participantName: "Lakshmi Sundaram",
+            class: "12th A",
+            schoolName: "St. Mary's School"
+        },  {
+            slNo: 10,
+            itemCode: "601",
+            itemName: "HSS Kolam Competition",
+            participantName: "Lakshmi Sundaram",
+            class: "12th A",
+            schoolName: "St. Mary's School"
+        },  {
+            slNo: 11,
+            itemCode: "601",
+            itemName: "HSS Kolam Competition",
+            participantName: "Lakshmi Sundaram",
+            class: "12th A",
+            schoolName: "St. Mary's School"
+        },  {
+            slNo: 12,
+            itemCode: "601",
+            itemName: "HSS Kolam Competition",
+            participantName: "Lakshmi Sundaram",
+            class: "12th A",
+            schoolName: "St. Mary's School"
+        },
     ];
 
     const getPrintTitle = () => {
@@ -208,6 +247,13 @@ const Higherlvlcomp = () => {
     const handleFestivalChange = (e) => {
         const festival = e.target.value;
         setSearchParams({ festival });
+        // Reset search text when changing festival
+        setSearchText('');
+    };
+
+    const handleSearchInputChange = (e) => {
+        setSearchText(e.target.value);
+        // The useEffect will handle filtering as the user types
     };
 
     // Updated handlePrint function using html2pdf.js
@@ -250,32 +296,45 @@ const Higherlvlcomp = () => {
         // Create table body
         const tbody = document.createElement('tbody');
         
-        const displayData = filteredItems.length > 0 ? filteredItems : 
-            (Allitemresult.length > 0 ? Allitemresult : resultData);
+        const displayData = filteredItems.length > 0 ? filteredItems : [];
             
-        displayData.forEach((item) => {
-            const row = document.createElement('tr');
-            
-            // Add cells
-            const cellData = [
-                item.slNo,
-                `${item.itemCode} - ${item.itemName}`,
-                item.participantName,
-                item.class,
-                item.schoolName
-            ];
-            
-            cellData.forEach(text => {
-                const td = document.createElement('td');
-                td.textContent = text;
-                td.style.border = '1px solid #ddd';
-                td.style.padding = '8px';
-                td.style.textAlign = 'center';
-                row.appendChild(td);
+        if (displayData.length > 0) {
+            displayData.forEach((item) => {
+                const row = document.createElement('tr');
+                
+                // Add cells
+                const cellData = [
+                    item.slNo,
+                    `${item.itemCode} - ${item.itemName}`,
+                    item.participantName,
+                    item.class,
+                    item.schoolName
+                ];
+                
+                cellData.forEach(text => {
+                    const td = document.createElement('td');
+                    td.textContent = text;
+                    td.style.border = '1px solid #ddd';
+                    td.style.padding = '8px';
+                    td.style.textAlign = 'center';
+                    row.appendChild(td);
+                });
+                
+                tbody.appendChild(row);
             });
+        } else {
+            // Add a "No results" row for empty data
+            const emptyRow = document.createElement('tr');
+            const emptyCell = document.createElement('td');
+            emptyCell.textContent = 'No participants found for the selected criteria.';
+            emptyCell.style.border = '1px solid #ddd';
+            emptyCell.style.padding = '10px';
+            emptyCell.style.textAlign = 'center';
+            emptyCell.colSpan = 5;
             
-            tbody.appendChild(row);
-        });
+            emptyRow.appendChild(emptyCell);
+            tbody.appendChild(emptyRow);
+        }
         
         table.appendChild(tbody);
         pdfContent.appendChild(table);
@@ -296,16 +355,62 @@ const Higherlvlcomp = () => {
         html2pdf().from(pdfContent).set(options).save();
     };
 
-    const displayData = filteredItems.length > 0 ? filteredItems :
-        (Allitemresult.length > 0 ? Allitemresult : resultData);
+    // Pagination logic
+    const indexOfLastItem = currentPage * rowsPerPage;
+    const indexOfFirstItem = indexOfLastItem - rowsPerPage;
+    
+    const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+    const totalItems = filteredItems.length;
+    const totalPages = Math.ceil(totalItems / rowsPerPage);
 
-    useEffect(() => {
-        if (Allitemresult.length === 0 && resultData.length > 0) {
-            setItemresult(resultData);
-            generateFestivalOptionsFromDummy();
-            filterItemsByFestival(selectedFestival);
+    const handlePageChange = (pageNumber) => {
+        if (pageNumber > 0 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
         }
-    }, []);
+    };
+
+    const renderPageNumbers = () => {
+        const pageNumbers = [];
+        // Dynamically adjust number of page buttons based on screen size
+        const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
+        
+        if (totalPages <= maxPageNumbersToShow) {
+            // Show all page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            // Show limited page numbers with dots
+            if (currentPage <= 2) {
+                // Near the start
+                for (let i = 1; i <= 3; i++) {
+                    if (i <= totalPages) pageNumbers.push(i);
+                }
+                if (totalPages > 3) {
+                    pageNumbers.push('...');
+                    pageNumbers.push(totalPages);
+                }
+            } else if (currentPage >= totalPages - 1) {
+                // Near the end
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = totalPages - 2; i <= totalPages; i++) {
+                    if (i > 0) pageNumbers.push(i);
+                }
+            } else {
+                // Middle
+                pageNumbers.push(1);
+                if (currentPage > 3) pageNumbers.push('...');
+                pageNumbers.push(currentPage - 1);
+                pageNumbers.push(currentPage);
+                pageNumbers.push(currentPage + 1);
+                if (currentPage < totalPages - 2) pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+            }
+        }
+        
+        return pageNumbers;
+    };
 
     return (
         <>
@@ -343,7 +448,22 @@ const Higherlvlcomp = () => {
                         </div>
                     </div>
 
-                    <div className="w-full">
+                    {/* Search Bar */}
+                    <div className="relative flex mt-2 items-center w-full sm:w-64 h-9 border border-blue-800 rounded-full px-4">
+                        <input
+                            type="text"
+                            placeholder="Search Participant Name..."
+                            className="w-full bg-transparent outline-none text-sm"
+                            value={searchText}
+                            onChange={handleSearchInputChange}
+                        />
+                     
+                        <div className="text-gray-500">
+                            <i className="fa-solid fa-magnifying-glass"></i>
+                        </div>
+                    </div>
+
+                    <div className="w-full mt-4">
                         <div className="overflow-x-auto -mx-4 sm:mx-0">
                             <div className="inline-block min-w-full align-middle px-4 sm:px-0">
                                 <div id="higher-level-table-container" className="shadow overflow-hidden border-gray-200 sm:rounded-lg">
@@ -358,8 +478,8 @@ const Higherlvlcomp = () => {
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
-                                            {displayData.length > 0 ? (
-                                                displayData.map((result) => (
+                                            {dataLoaded && currentItems.length > 0 ? (
+                                                currentItems.map((result) => (
                                                     <tr key={result.slNo} className="hover:bg-gray-100">
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.slNo}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.itemCode} - {result.itemName}</td>
@@ -370,8 +490,8 @@ const Higherlvlcomp = () => {
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="5" className="p-4 text-center">
-                                                        No items found for {selectedFestival}
+                                                    <td colSpan="5" className="p-4 text-center text-gray-500">
+                                                        {!dataLoaded ? "Loading..." : "No participants found. Please try a different search."}
                                                     </td>
                                                 </tr>
                                             )}
@@ -381,6 +501,54 @@ const Higherlvlcomp = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Pagination section */}
+                    {dataLoaded && currentItems.length > 0 && (
+                        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
+                            {/* Showing X of Y rows */}
+                            <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
+                                {totalItems > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, totalItems)} of ${totalItems} rows` : '0 rows'}
+                            </div>
+                            
+                            {/* Pagination Controls */}
+                            <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                                {/* Previous Button with icon */}
+                                <button
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
+                                >
+                                    <i className="fa-solid fa-angle-right transform rotate-180"></i>
+                                    <span className="hidden sm:inline p-1">Previous</span>
+                                </button>
+                                
+                                {/* Page Numbers */}
+                                <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+                                    {renderPageNumbers().map((page, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => page !== '...' && handlePageChange(page)}
+                                            className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${
+                                                currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                                            } ${page === '...' ? 'pointer-events-none' : ''}`}
+                                        >
+                                            {page}
+                                        </button>
+                                    ))}
+                                </div>
+                                
+                                {/* Next Button with icon */}
+                                <button
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages || totalPages === 0}
+                                    className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
+                                >
+                                    <span className="hidden sm:inline p-1">Next</span>
+                                    <i className="fa-solid fa-angle-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

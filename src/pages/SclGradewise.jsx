@@ -8,6 +8,7 @@ import html2pdf from 'html2pdf.js';
 const SclGradewise = () => {
     const [allResultData, setAllResultData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
+    const [searchText, setSearchText] = useState('');
     const printRef = useRef();
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -26,6 +27,11 @@ const SclGradewise = () => {
 
     const selectedFestival = getInitialFestival();
     const selectedGrade = getInitialGrade();
+    const searchQuery = searchParams.get('search') || '';
+
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     // Update URL params based on initial values
     useEffect(() => {
@@ -33,6 +39,11 @@ const SclGradewise = () => {
             festival: selectedFestival,
             grade: selectedGrade
         });
+        
+        // Initialize search text from URL on component mount
+        if (searchQuery) {
+            setSearchText(searchQuery);
+        }
     }, []);
 
     // Dummy data with item codes to help with filtering
@@ -44,7 +55,13 @@ const SclGradewise = () => {
         { slNo: 5, participantName: "Michael Brown", schoolName: "Riverdale Academy", item: "Painting", itemCode: "402", category: "Single", points: 9.5, grade: "A" },
         { slNo: 6, participantName: "Emily Davis", schoolName: "Westview High", item: "Classical Dance", itemCode: "501", category: "Single", points: 8.5, grade: "B" },
         { slNo: 7, participantName: "David Wilson", schoolName: "Pinewood Elementary", item: "Recitation", itemCode: "502", category: "Single", points: 7.5, grade: "B" },
-        { slNo: 8, participantName: "Sophie Miller", schoolName: "Greenwood School", item: "Folk Dance", itemCode: "601", category: "Group", points: 8.0, grade: "C" }
+        { slNo: 8, participantName: "Sophie Miller", schoolName: "Greenwood School", item: "Folk Dance", itemCode: "601", category: "Group", points: 8.0, grade: "C" },
+        { slNo: 9, participantName: "Robert Taylor", schoolName: "Greenwood School", item: "Folk Dance", itemCode: "601", category: "Group", points: 8.0, grade: "C" },
+        { slNo: 10, participantName: "Emma Johnson", schoolName: "Central High", item: "Essay Writing", itemCode: "302", category: "Single", points: 9.2, grade: "A" },
+        { slNo: 11, participantName: "Noah Garcia", schoolName: "Riverdale Academy", item: "Poetry", itemCode: "303", category: "Single", points: 8.8, grade: "A" },
+        { slNo: 12, participantName: "Olivia Martinez", schoolName: "Springfield Elementary", item: "Debate", itemCode: "401", category: "Group", points: 7.9, grade: "B" },
+        { slNo: 13, participantName: "Liam Rodriguez", schoolName: "Oak Ridge School", item: "Solo Music", itemCode: "502", category: "Single", points: 8.7, grade: "B" },
+        { slNo: 14, participantName: "Ava Lopez", schoolName: "Westview High", item: "Drama", itemCode: "601", category: "Group", points: 7.5, grade: "C" }
     ];
 
     useEffect(() => {
@@ -52,12 +69,12 @@ const SclGradewise = () => {
     }, []);
 
     useEffect(() => {
-        filterDataByFestivalAndGrade();
+        filterDataByFestivalGradeAndSearch();
 
         // Save selections to session storage whenever they change
         sessionStorage.setItem("selectedFestival", selectedFestival);
         sessionStorage.setItem("selectedGrade", selectedGrade);
-    }, [selectedFestival, selectedGrade, allResultData]);
+    }, [selectedFestival, selectedGrade, searchText, allResultData]);
 
     const getAllResultData = async () => {
         const token = sessionStorage.getItem("token");
@@ -79,7 +96,7 @@ const SclGradewise = () => {
         }
     }
 
-    const filterDataByFestivalAndGrade = () => {
+    const filterDataByFestivalGradeAndSearch = () => {
         if (!allResultData.length) return;
 
         // Step 1: Filter by festival (based on item code ranges)
@@ -129,13 +146,25 @@ const SclGradewise = () => {
             });
         }
 
-        // Step 3: Add sequential numbering
-        const numberedResults = gradeFiltered.map((item, index) => ({
+        // Step 3: Filter by search text
+        let searchFiltered = gradeFiltered;
+        if (searchText && searchText.trim() !== '') {
+            const searchLower = searchText.toLowerCase().trim();
+            searchFiltered = gradeFiltered.filter(item => 
+                (item.participantName && item.participantName.toLowerCase().includes(searchLower)) || 
+                (item.schoolName && item.schoolName.toLowerCase().includes(searchLower))
+            );
+        }
+
+        // Step 4: Add sequential numbering
+        const numberedResults = searchFiltered.map((item, index) => ({
             ...item,
             slNo: index + 1
         }));
 
         setFilteredData(numberedResults);
+        // Reset to first page when filters change
+        setCurrentPage(1);
     }
 
     const getPrintTitle = () => {
@@ -172,6 +201,16 @@ const SclGradewise = () => {
 
         // Update session storage
         sessionStorage.setItem("selectedGrade", newGrade);
+    };
+
+    const handleSearchInputChange = (e) => {
+        setSearchText(e.target.value);
+        // The useEffect will handle filtering as the user types
+    };
+
+    const clearSearch = () => {
+        setSearchText('');
+        // The useEffect will handle filtering
     };
 
     const handlePrint = () => {
@@ -213,8 +252,8 @@ const SclGradewise = () => {
         // Create table body
         const tbody = document.createElement('tbody');
         
-        // Use displayData to populate the PDF
-        displayData.forEach((item, index) => {
+        // Use all filtered data for PDF rather than just current page
+        filteredData.forEach((item, index) => {
           const row = document.createElement('tr');
           
           // Add cells
@@ -264,9 +303,60 @@ const SclGradewise = () => {
         }
     }, []);
 
-    // Determine what data to display
-    const displayData = filteredData.length > 0 ? filteredData :
-        (allResultData.length > 0 ? allResultData : dummyResultData);
+    // Pagination logic
+    const indexOfLastItem = currentPage * rowsPerPage;
+    const indexOfFirstItem = indexOfLastItem - rowsPerPage;
+    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
+    const handlePageChange = (pageNumber) => {
+        if (pageNumber > 0 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
+
+    const renderPageNumbers = () => {
+        const pageNumbers = [];
+        // Dynamically adjust number of page buttons based on screen size
+        const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
+        
+        if (totalPages <= maxPageNumbersToShow) {
+            // Show all page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            // Show limited page numbers with dots
+            if (currentPage <= 2) {
+                // Near the start
+                for (let i = 1; i <= 3; i++) {
+                    if (i <= totalPages) pageNumbers.push(i);
+                }
+                if (totalPages > 3) {
+                    pageNumbers.push('...');
+                    pageNumbers.push(totalPages);
+                }
+            } else if (currentPage >= totalPages - 1) {
+                // Near the end
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = totalPages - 2; i <= totalPages; i++) {
+                    if (i > 0) pageNumbers.push(i);
+                }
+            } else {
+                // Middle
+                pageNumbers.push(1);
+                if (currentPage > 3) pageNumbers.push('...');
+                pageNumbers.push(currentPage - 1);
+                pageNumbers.push(currentPage);
+                pageNumbers.push(currentPage + 1);
+                if (currentPage < totalPages - 2) pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+            }
+        }
+        
+        return pageNumbers;
+    };
 
     return (
         <>
@@ -320,10 +410,25 @@ const SclGradewise = () => {
                         </div>
                     </div>
 
-                    <div className="w-full">
+                    {/* Add search input */}
+                    <div className="relative flex mt-2 items-center w-full sm:w-64 h-9 border border-blue-800 rounded-full px-4">
+                        <input
+                            type="text"
+                            placeholder="Search participant or school..."
+                            className="w-full bg-transparent outline-none text-sm"
+                            value={searchText}
+                            onChange={handleSearchInputChange}
+                        />
+                       
+                        <div className="text-gray-500">
+                            <i className="fa-solid fa-magnifying-glass"></i>
+                        </div>
+                    </div>
+
+                    <div className="w-full mt-4">
                         <div className="overflow-x-auto -mx-4 sm:mx-0">
                             <div className="inline-block min-w-full align-middle px-4 sm:px-0">
-                                <div id="school-grade-table-container" className="shadow overflow-hidden border-gray-200 sm:rounded-lg">
+                                <div id="school-grade-table-container" ref={printRef} className="shadow overflow-hidden border-gray-200 sm:rounded-lg">
                                     <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
                                         <thead className="bg-gray-50">
                                             <tr className="text-gray-700">
@@ -336,8 +441,8 @@ const SclGradewise = () => {
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
-                                            {displayData.length > 0 ? (
-                                                displayData.map((result) => (
+                                            {currentItems && currentItems.length > 0 ? (
+                                                currentItems.map((result) => (
                                                     <tr key={result.slNo} className="hover:bg-gray-100">
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.slNo}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.participantName}</td>
@@ -350,7 +455,9 @@ const SclGradewise = () => {
                                             ) : (
                                                 <tr>
                                                     <td colSpan="6" className="p-3 text-center text-gray-500">
-                                                        No records found for {selectedFestival} with {selectedGrade}
+                                                        {searchText 
+                                                            ? `No records found matching "${searchText}" in ${selectedFestival} with ${selectedGrade}` 
+                                                            : `No records found for ${selectedFestival} with ${selectedGrade}`}
                                                     </td>
                                                 </tr>
                                             )}
@@ -360,6 +467,54 @@ const SclGradewise = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Pagination controls */}
+                    {currentItems && currentItems.length > 0 && (
+                        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
+                            {/* Showing X of Y rows */}
+                            <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
+                                {filteredData.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} of ${filteredData.length} rows` : '0 rows'}
+                            </div>
+                            
+                            {/* Pagination Controls */}
+                            <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                                {/* Previous Button with icon */}
+                                <button
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
+                                >
+                                    <i className="fa-solid fa-angle-right transform rotate-180"></i>
+                                    <span className="hidden sm:inline p-1">Previous</span>
+                                </button>
+                                
+                                {/* Page Numbers */}
+                                <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+                                    {renderPageNumbers().map((page, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => page !== '...' && handlePageChange(page)}
+                                            className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${
+                                                currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                                            } ${page === '...' ? 'pointer-events-none' : ''}`}
+                                        >
+                                            {page}
+                                        </button>
+                                    ))}
+                                </div>
+                                
+                                {/* Next Button with icon */}
+                                <button
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages || totalPages === 0}
+                                    className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
+                                >
+                                    <span className="hidden sm:inline p-1">Next</span>
+                                    <i className="fa-solid fa-angle-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

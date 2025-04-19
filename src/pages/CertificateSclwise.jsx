@@ -11,6 +11,10 @@ const CertificateSclwise = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const selectedFestival = searchParams.get('festival') || "UP Kalaivizha";
     const navigate = useNavigate();
+    
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     useEffect(() => {
         getAllItemResult();
@@ -83,6 +87,8 @@ const CertificateSclwise = () => {
         }));
 
         setFilteredData(filtered);
+        // Reset to first page when filters change
+        setCurrentPage(1);
     }
 
     const handleFestivalChange = (e) => {
@@ -277,7 +283,7 @@ const CertificateSclwise = () => {
             gradeC: 2
         },
         {
-            slNo: 6,
+            slNo: 7,
             printed: "30443 - G. H. S. Chemmannu",
             itemCode: "501",
             itemName: "Drawing",
@@ -288,6 +294,58 @@ const CertificateSclwise = () => {
             gradeA: 9,
             gradeB: 7,
             gradeC: 2
+        },
+        {
+            slNo: 8,
+            printed: "30075 - G. M. R. S. Peermedu",
+            itemCode: "304",
+            itemName: "Story Telling",
+            itemType: "Single",
+            totalStudents: 15,
+            participation: 14,
+            nonParticipant: 1,
+            gradeA: 6,
+            gradeB: 5,
+            gradeC: 3
+        },
+        {
+            slNo: 9,
+            printed: "30077 - G. H. S. Kallar",
+            itemCode: "305",
+            itemName: "Recitation",
+            itemType: "Single",
+            totalStudents: 22,
+            participation: 20,
+            nonParticipant: 2,
+            gradeA: 10,
+            gradeB: 7,
+            gradeC: 3
+        },
+        {
+            slNo: 10,
+            printed: "30079 - St. Mary's H.S. Kumily",
+            itemCode: "306",
+            itemName: "Drawing",
+            itemType: "Single",
+            totalStudents: 18,
+            participation: 17,
+            nonParticipant: 1,
+            gradeA: 8,
+            gradeB: 6,
+            gradeC: 3
+        },
+        {
+            slNo: 11,
+            printed: "30082 - St. Joseph's H.S. Kumily",
+            itemCode: "307",
+            itemName: "Painting",
+            itemType: "Single",
+            totalStudents: 25,
+            participation: 23,
+            nonParticipant: 2,
+            gradeA: 12,
+            gradeB: 8,
+            gradeC: 3
         }
     ];
 
@@ -298,9 +356,63 @@ const CertificateSclwise = () => {
         }
     }, []);
 
+    // Pagination logic
+    const indexOfLastItem = currentPage * rowsPerPage;
+    const indexOfFirstItem = indexOfLastItem - rowsPerPage;
+    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
+    const handlePageChange = (pageNumber) => {
+        if (pageNumber > 0 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
+
+    const renderPageNumbers = () => {
+        const pageNumbers = [];
+        // Dynamically adjust number of page buttons based on screen size
+        const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
+        
+        if (totalPages <= maxPageNumbersToShow) {
+            // Show all page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            // Show limited page numbers with dots
+            if (currentPage <= 2) {
+                // Near the start
+                for (let i = 1; i <= 3; i++) {
+                    if (i <= totalPages) pageNumbers.push(i);
+                }
+                if (totalPages > 3) {
+                    pageNumbers.push('...');
+                    pageNumbers.push(totalPages);
+                }
+            } else if (currentPage >= totalPages - 1) {
+                // Near the end
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = totalPages - 2; i <= totalPages; i++) {
+                    if (i > 0) pageNumbers.push(i);
+                }
+            } else {
+                // Middle
+                pageNumbers.push(1);
+                if (currentPage > 3) pageNumbers.push('...');
+                pageNumbers.push(currentPage - 1);
+                pageNumbers.push(currentPage);
+                pageNumbers.push(currentPage + 1);
+                if (currentPage < totalPages - 2) pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+            }
+        }
+        
+        return pageNumbers;
+    };
+
     // Determine what data to display
-    const displayData = filteredData.length > 0 ? filteredData : 
-        (allItemResult.length > 0 ? allItemResult : certificateItemData);
+    const displayData = currentItems.length > 0 ? currentItems : [];
 
     return (
         <>
@@ -380,6 +492,54 @@ const CertificateSclwise = () => {
                                 </div>
                             </div>
                         </div>
+                        
+                        {/* Pagination section */}
+                        {filteredData.length > 0 && (
+                            <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
+                                {/* Showing X of Y rows */}
+                                <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
+                                    {filteredData.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} of ${filteredData.length} rows` : '0 rows'}
+                                </div>
+                                
+                                {/* Pagination Controls */}
+                                <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                                    {/* Previous Button with icon */}
+                                    <button
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                        className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
+                                    >
+                                        <i className="fa-solid fa-angle-right transform rotate-180"></i>
+                                        <span className="hidden sm:inline p-1">Previous</span>
+                                    </button>
+                                    
+                                    {/* Page Numbers */}
+                                    <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+                                        {renderPageNumbers().map((page, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => page !== '...' && handlePageChange(page)}
+                                                className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${
+                                                    currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                                                } ${page === '...' ? 'pointer-events-none' : ''}`}
+                                            >
+                                                {page}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    
+                                    {/* Next Button with icon */}
+                                    <button
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === totalPages || totalPages === 0}
+                                        className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
+                                    >
+                                        <span className="hidden sm:inline p-1">Next</span>
+                                        <i className="fa-solid fa-angle-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

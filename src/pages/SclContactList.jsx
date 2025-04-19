@@ -395,7 +395,7 @@ const SclContactList = () => {
     return pageNumbers;
   };
 
-  // New PDF generation function using html2pdf
+  // PDF generation function
   const generatePDF = () => {
     // Create a container for PDF content
     const pdfContent = document.createElement('div');
@@ -504,7 +504,7 @@ const SclContactList = () => {
       filename: fileName,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } // Use landscape for better fit
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
     };
     
     // Generate and download PDF
@@ -523,9 +523,8 @@ const SclContactList = () => {
               onClick={generatePDF}
               className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full"
             >
-            Print
+              Print
             </button>
-            
           </div>
           <div className="relative flex mt-2 items-center w-full sm:w-64 h-9 border border-blue-800 rounded-full px-4">
             <input
@@ -541,9 +540,9 @@ const SclContactList = () => {
           </div>
           
           <div ref={printRef} className="w-full">
-            <div className="overflow-x-auto  sm:mx-0">
+            <div className="overflow-x-auto sm:mx-0">
               <div className="inline-block min-w-full align-middle px-4 sm:px-0">
-                <div className=" overflow-hidden border-gray-200 sm:rounded-lg">
+                <div className="overflow-hidden border-gray-200 sm:rounded-lg">
                   <table className="min-w-full text-center print-table">
                     <thead className="min-h-screen">
                       <tr className="text-gray-700">
@@ -554,73 +553,89 @@ const SclContactList = () => {
                       </tr>
                     </thead>
                     <tbody className="text-xs sm:text-sm">
-                    {currentItems.map((school, index) => (
-                        <tr key={index} className="hover:bg-gray-100">
-                          <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
-                          <td className="p-2 md:p-3 whitespace-nowrap">{school.id}</td>
-                          <td className="p-2 md:p-3 whitespace-nowrap">{school.name}</td>
-                          <td className="p-2 md:p-3 whitespace-nowrap">
-                            <button
-                              onClick={() => openModal(school)}
-                              className="text-[#114568] py-1 px-3 rounded-md"
-                            >
-                              View More
-                            </button>
+                      {filteredSchools.length > 0 ? (
+                        currentItems.map((school, index) => (
+                          <tr key={index} className="hover:bg-gray-100">
+                            <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
+                            <td className="p-2 md:p-3 whitespace-nowrap">{school.id}</td>
+                            <td className="p-2 md:p-3 whitespace-nowrap">{school.name}</td>
+                            <td className="p-2 md:p-3 whitespace-nowrap">
+                              <button
+                                onClick={() => openModal(school)}
+                                className="text-[#114568] py-1 px-3 rounded-md"
+                              >
+                                <i className="far fa-window-restore"></i>
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="4" className="p-4 text-center">
+                            <div className="flex flex-col items-center justify-center py-8">
+                              <i className="fas fa-search text-gray-400 text-4xl mb-4"></i>
+                              <p className="text-gray-500 text-lg font-medium">No matching schools found</p>
+                              <p className="text-gray-400 mt-2">Try adjusting your search criteria</p>
+                            </div>
                           </td>
                         </tr>
-                      ))}
+                      )}
                     </tbody>
                   </table>
                 </div>
-                   {/* Enhanced Responsive Pagination with icons */}
-                   <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
-                {/* Showing X of Y rows */}
-                <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
-                  {filteredSchools.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredSchools.length)} of ${filteredSchools.length} rows` : '0 rows'}
-                </div>
                 
-                {/* Pagination Controls */}
-                <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
-                  {/* Previous Button with icon */}
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
-                  >
-                    <i className="fa-solid fa-angle-right transform rotate-180"></i>
-                    <span className="hidden sm:inline p-1">Previous</span>
-                  </button>
-                  
-                  {/* Page Numbers */}
-                  <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
-                    {renderPageNumbers().map((page, index) => (
+                {/* Pagination - only show when we have results */}
+                {filteredSchools.length > 0 && (
+                  <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
+                    {/* Showing X of Y rows */}
+                    <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
+                      {`${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredSchools.length)} of ${filteredSchools.length} rows`}
+                    </div>
+                    
+                    {/* Pagination Controls */}
+                    <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                      {/* Previous Button with icon */}
                       <button
-                        key={index}
-                        onClick={() => page !== '...' && handlePageChange(page)}
-                        className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${
-                          currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
-                        } ${page === '...' ? 'pointer-events-none' : ''}`}
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
                       >
-                        {page}
+                        <i className="fa-solid fa-angle-right transform rotate-180"></i>
+                        <span className="hidden sm:inline p-1">Previous</span>
                       </button>
-                    ))}
+                      
+                      {/* Page Numbers */}
+                      <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+                        {renderPageNumbers().map((page, index) => (
+                          <button
+                            key={index}
+                            onClick={() => page !== '...' && handlePageChange(page)}
+                            className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${
+                              currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                            } ${page === '...' ? 'pointer-events-none' : ''}`}
+                          >
+                            {page}
+                          </button>
+                        ))}
+                      </div>
+                      
+                      {/* Next Button with icon */}
+                      <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
+                      >
+                        <span className="hidden sm:inline p-1">Next</span>
+                        <i className="fa-solid fa-angle-right"></i>
+                      </button>
+                    </div>
                   </div>
-                  
-                  {/* Next Button with icon */}
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages || totalPages === 0}
-                    className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
-                  >
-                    <span className="hidden sm:inline p-1">Next</span>
-                    <i className="fa-solid fa-angle-right"></i>
-                  </button>
-                </div>
-              </div>
+                )}
               </div>
             </div>
           </div>
 
+          {/* School Details Modal */}
           {modalOpen && selectedSchool && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
               <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">

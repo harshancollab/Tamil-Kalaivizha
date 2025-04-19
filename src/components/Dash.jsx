@@ -21,7 +21,7 @@ const Dash = () => {
       preFestReport: ['/eligible-schools', '/Partcipatescllist', '/SclContactList', '/festwiseList', '/DateWiseList', '/ParticipantsCardList', '/ParticipantsMorethan','/ClusterReport', '/StageReport'].some(route => path === route),
       // Result menu should be open if current path matches any of its links
       results: ['/All-resultentry', '/item-result', '/Itemresult-list', '/All-Publishresult'].some(route => path === route),
-      resultsReport: ['/ConfidentialResultlist', '/itemwisepoint', '/SclWisePoint', '/Sclgradewise'].some(route => path === route),
+      resultsReport: ['/ConfidentialResultlist', '/itemwisepoint','/itemcodewise', '/SclWisePoint', '/Sclgradewise'].some(route => path === route),
       certificate: ['/certificate-template', '/certificate-item-wise', '/certificate-school-wise','/CertificateRegno'].some(route => path === route),
       Export: ['/Higherlvlcomp'].some(route => path === route)
     };
@@ -41,7 +41,7 @@ const Dash = () => {
       stageReport: openMenus.stageReport || ['/AddCallsheet', '/AddTimesheet', '/AddScoresheet', '/AddTabulationsheet', '/Addreport'].some(route => path === route),
       preFestReport: openMenus.preFestReport || ['/eligible-schools', '/Partcipatescllist', '/SclContactList', '/festwiseList', '/DateWiseList', '/ParticipantsCardList','/ClusterReport', '/StageReport'].some(route => path === route),
       results: openMenus.results || ['/All-resultentry', '/item-result', '/Itemresult-list', '/All-Publishresult', '/'].some(route => path === route),
-      resultsReport: openMenus.resultsReport || ['/ConfidentialResultlist', '/itemwisepoint', '/SclWisePoint', '/Sclgradewise'].some(route => path === route),
+      resultsReport: openMenus.resultsReport || ['/ConfidentialResultlist', '/itemwisepoint','/itemcodewise', '/SclWisePoint', '/Sclgradewise'].some(route => path === route),
       certificate: openMenus.certificate || ['/certificate-template', '/certificate-item-wise', '/certificate-school-wise','/CertificateRegno'].some(route => path === route),
       Export: openMenus.Export || ['/Higherlvlcomp'].some(route => path === route)
     };
@@ -82,11 +82,11 @@ const Dash = () => {
           } lg:translate-x-0 transition-transform duration-300 ease-in-out w-64 bg-[#003566] text-white flex flex-col`}
       >
         {/* Sidebar header - fixed at top */}
-        <div className="p-4">
+        <div className="p-4  ml-3">
           <div className={`flex justify-between items-center w-full mb-6 ${isActive('/') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
             }`}>
             <Link to="/" className="text-lg font-semibold flex items-center cursor-pointer">
-              <i className="fa-solid fa-table mr-2" aria-hidden="true"></i> Dashboard
+              <i className="fa-solid fa-table mr-3" aria-hidden="true"></i> Dashboard
             </Link>
             <button
               className="lg:hidden text-white"
@@ -123,7 +123,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('settings')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <i className="fa-solid fa-cog mr-2" aria-hidden="true"></i> Settings
+                    <i className="fa-solid fa-cog mr-4" aria-hidden="true"></i> Settings
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.settings ? 'up' : 'down'} text-sm`}
@@ -185,7 +185,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('stageSettings')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <span className='text-white mr-1' role="img" aria-label="Microphone">🎤</span> Stage Settings
+                  <i class="fa-solid fa-microphone mr-5"></i> Stage Settings
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.stageSettings ? 'up' : 'down'} text-sm`}
@@ -258,7 +258,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('stageReport')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <i className="fa-solid fa-laptop mr-1"></i> Stage Report
+                    <i className="fa-solid fa-laptop mr-3"></i> Stage Report
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.stageReport ? 'up' : 'down'} text-sm`}
@@ -330,7 +330,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('preFestReport')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <i className="fa-regular fa-message mr-1"></i> Pre Fest Report
+                    <i className="fa-regular fa-message mr-4"></i> Pre Fest Report
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.preFestReport ? 'up' : 'down'} text-sm`}
@@ -443,7 +443,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('results')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <i className="fa-solid fa-note-sticky fa-rotate-270 mr-1"></i> Result
+                    <i className="fa-solid fa-note-sticky fa-rotate-270 mr-4"></i> Result
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.results ? 'up' : 'down'} text-sm`}
@@ -496,7 +496,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('resultsReport')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <i class="fas fa-paper-plane mr-1  "></i> Result Report
+                    <i class="fas fa-paper-plane mr-4  "></i> Result Report
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.resultsReport ? 'up' : 'down'} text-sm`}
@@ -525,6 +525,16 @@ const Dash = () => {
                       onClick={() => setIsSidebarOpen(false)}
                     >
                       Item Wise Point
+                    </Link>
+                    <Link
+                      to="/itemcodewise"
+                      className={`block py-2 text-gray-300 ${isActive('/itemcodewise')
+                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                     Item Code Wise Point
                     </Link>
                     <Link
                       to="/SclWisePoint"
@@ -558,7 +568,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('certificate')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                  <i class="fa-solid fa-file-circle-plus mr-1"></i>
+                  <i class="fa-solid fa-file-circle-plus mr-4"></i>
        
 
                   Certificate
@@ -624,7 +634,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('Export')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                  <i class="fas fa-arrow-up-right-from-square mr-1"></i>Export 
+                  <i class="fas fa-arrow-up-right-from-square mr-4"></i>Export 
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.Export ? 'up' : 'down'} text-sm`}

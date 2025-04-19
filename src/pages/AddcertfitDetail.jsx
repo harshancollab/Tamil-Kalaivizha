@@ -5,6 +5,268 @@ import { useSearchParams } from 'react-router-dom'
 import html2pdf from 'html2pdf.js'
 // import { getAllCertificateDetailsAPI, generateCertificateDetailsAPI } from '../services/allAPI'
 
+// Reusable SearchableDropdown component
+const SearchableDropdown = ({ 
+  options, 
+  value, 
+  onChange, 
+  placeholder, 
+  label, 
+  showSearch = false 
+}) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredOptions, setFilteredOptions] = useState(options);
+  const dropdownRef = useRef(null);
+  const searchInputRef = useRef(null);
+
+  // Filter options when search term changes
+  useEffect(() => {
+    if (searchTerm.trim() !== '') {
+      const filtered = options.filter(option => {
+        // Search by label - case-insensitive
+        const searchLower = searchTerm.toLowerCase();
+        return option.label.toLowerCase().includes(searchLower);
+      });
+      setFilteredOptions(filtered);
+    } else {
+      setFilteredOptions(options);
+    }
+  }, [searchTerm, options]);
+
+  // Focus search input when dropdown opens
+  useEffect(() => {
+    if (isDropdownOpen && showSearch && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isDropdownOpen, showSearch]);
+
+  // Reset highlighted index when dropdown opens/closes
+  useEffect(() => {
+    if (isDropdownOpen) {
+      setHighlightedIndex(0);
+    } else {
+      setHighlightedIndex(-1);
+      setSearchTerm('');
+    }
+  }, [isDropdownOpen]);
+
+  // Scroll to highlighted item
+  useEffect(() => {
+    if (highlightedIndex >= 0 && dropdownRef.current) {
+      const highlightedElement = dropdownRef.current.children[highlightedIndex + (showSearch ? 1 : 0)];
+      if (highlightedElement) {
+        highlightedElement.scrollIntoView({
+          block: 'nearest',
+          behavior: 'smooth'
+        });
+      }
+    }
+  }, [highlightedIndex, showSearch]);
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleOptionSelect = (option) => {
+    onChange(option.value);
+    setIsDropdownOpen(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (!isDropdownOpen) {
+      if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+        setIsDropdownOpen(true);
+        e.preventDefault();
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setHighlightedIndex(prev =>
+          prev < filteredOptions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setHighlightedIndex(prev => prev > 0 ? prev - 1 : 0);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (highlightedIndex >= 0 && filteredOptions[highlightedIndex]) {
+          handleOptionSelect(filteredOptions[highlightedIndex]);
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setIsDropdownOpen(false);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setHighlightedIndex(0);
+  };
+
+  const handleSearchKeyDown = (e) => {
+    e.stopPropagation();
+    
+    if (e.key === 'Escape') {
+      setIsDropdownOpen(false);
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightedIndex(0);
+    }
+  };
+
+  // Find the label to display for the current value
+  const selectedLabel = options.find(option => option.value === value)?.label || value || '';
+
+  return (
+    <div className="flex flex-col md:flex-row mb-6">
+      <label className="font-semibold text-blue-900 w-full md:w-52 mb-2 md:mb-0 md:pt-2">{label}</label>
+      <div className="w-full md:ml-4 lg:ml-12 md:w-80 relative">
+        <div className="relative">
+          <input
+            placeholder={placeholder || "Select..."}
+            type="text"
+            className="border border-blue-600 px-2 py-1 rounded-full w-full cursor-pointer pr-8"
+            value={selectedLabel}
+            onClick={toggleDropdown}
+            onKeyDown={handleKeyDown}
+            readOnly
+            aria-haspopup="listbox"
+            aria-expanded={isDropdownOpen}
+          />
+          <div
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+            onClick={toggleDropdown}
+          >
+            {isDropdownOpen ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m18 15-6-6-6 6" />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            )}
+          </div>
+        </div>
+        {isDropdownOpen && (
+          <div
+            className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"
+            role="listbox"
+            ref={dropdownRef}
+          >
+            {/* Search bar when showSearch is true */}
+            {showSearch && (
+              <div className="sticky top-0 bg-white p-2 border-b border-gray-200">
+                <div className="relative">
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 pl-8"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    onKeyDown={handleSearchKeyDown}
+                    onClick={e => e.stopPropagation()}
+                  />
+                  <div className="absolute left-2 top-1/2 transform -translate-y-1/2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="11" cy="11" r="8" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                  </div>
+                  {searchTerm.trim() !== '' && (
+                    <div 
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                      onClick={() => setSearchTerm('')}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* Options list */}
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((option, index) => (
+                <div
+                  key={option.value}
+                  className={`px-4 py-2 cursor-pointer ${
+                    index === highlightedIndex ? 'bg-blue-100' : 'hover:bg-blue-50'
+                  }`}
+                  onClick={() => handleOptionSelect(option)}
+                  role="option"
+                  aria-selected={index === highlightedIndex}
+                >
+                  {option.label}
+                </div>
+              ))
+            ) : (
+              <div className="px-4 py-2 text-gray-500">
+                No matching options found
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const AddcertfitDetail = () => {
     const [searchParams] = useSearchParams();
     const schoolName = searchParams.get('school') || "School Name";
@@ -33,6 +295,10 @@ const AddcertfitDetail = () => {
         { value: "", label: "Select Item" },
         { value: "303 - Drama", label: "303 - Drama" },
         { value: "301 - Story Writing", label: "301 - Story Writing" },
+        { value: "304 - Essay Writing", label: "304 - Essay Writing" },
+        { value: "304 - Essay Writing", label: "304 - Essay Writing" },
+        { value: "304 - Essay Writing", label: "304 - Essay Writing" },
+        { value: "304 - Essay Writing", label: "304 - Essay Writing" },
         { value: "304 - Essay Writing", label: "304 - Essay Writing" },
         { value: "All Item", label: "All Item" },
     ];
@@ -299,76 +565,46 @@ const AddcertfitDetail = () => {
                                     <form onSubmit={handleSubmit}>
                                         <div className="flex justify-center mt-8 md:mt-28">
                                             <div className="space-y-4 w-full max-w-xl">
-                                                <div className="flex flex-col md:flex-row mb-6">
-                                                    <label className="font-semibold text-blue-900 w-full md:w-52 mb-2 md:mb-0 md:pt-2">Festival Type</label>
-                                                    <div className="w-full md:ml-4 lg:ml-12 md:w-80 relative">
-                                                        <select
-                                                            name="festivalType"
-                                                            className="border border-blue-600 px-2 py-1 rounded-full w-full"
-                                                            required
-                                                            value={selectedFestival}
-                                                            onChange={(e) => setSelectedFestival(e.target.value)}
-                                                        >
-                                                            {festivalTypes.map((festival) => (
-                                                                <option key={festival.value} value={festival.value}>
-                                                                    {festival.label}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-col md:flex-row mb-6">
-                                                    <label className="font-semibold text-blue-900 w-full md:w-52 mb-2 md:mb-0 md:pt-2">Item Name</label>
-                                                    <div className="w-full md:ml-4 lg:ml-12 md:w-80">
-                                                        <select
-                                                            name="itemName"
-                                                            className="border border-blue-600 px-2 py-1 rounded-full w-full"
-                                                            required
-                                                            value={selectedItem}
-                                                            onChange={(e) => setSelectedItem(e.target.value)}
-                                                        >
-                                                            {itemNames.map((item) => (
-                                                                <option key={item.value} value={item.value}>
-                                                                    {item.label}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-col md:flex-row mb-6">
-                                                    <label className="font-semibold text-blue-900 w-full md:w-52 mb-2 md:mb-0 md:pt-2">Participant / Captain</label>
-                                                    <div className="w-full md:ml-4 lg:ml-12 md:w-80">
-                                                        <select
-                                                            name="participantCaptain"
-                                                            className="border border-blue-600 px-2 py-1 rounded-full w-full"
-                                                            value={selectedParticipant}
-                                                            onChange={(e) => setSelectedParticipant(e.target.value)}
-                                                        >
-                                                            {participantOptions.map((participant) => (
-                                                                <option key={participant.value} value={participant.value}>
-                                                                    {participant.label}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-col md:flex-row mb-6">
-                                                    <label className="font-semibold text-blue-900 w-full md:w-52 mb-2 md:mb-0 md:pt-2">Participant (Group / Pinnany)</label>
-                                                    <div className="w-full md:ml-4 lg:ml-12 md:w-80">
-                                                        <select
-                                                            name="groupParticipant"
-                                                            className="border border-blue-600 px-2 py-1 rounded-full w-full"
-                                                            value={selectedGroupParticipant}
-                                                            onChange={(e) => setSelectedGroupParticipant(e.target.value)}
-                                                        >
-                                                            {groupParticipantOptions.map((groupParticipant) => (
-                                                                <option key={groupParticipant.value} value={groupParticipant.value}>
-                                                                    {groupParticipant.label}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                    </div>
-                                                </div>
+                                                {/* Festival Type with SearchableDropdown */}
+                                                <SearchableDropdown 
+                                                    options={festivalTypes}
+                                                    value={selectedFestival}
+                                                    onChange={setSelectedFestival}
+                                                    placeholder="Select Festival"
+                                                    label="Festival Type"
+                                                    showSearch={festivalTypes.length > 7}
+                                                />
+
+                                                {/* Item Name with SearchableDropdown */}
+                                                <SearchableDropdown 
+                                                    options={itemNames}
+                                                    value={selectedItem}
+                                                    onChange={setSelectedItem}
+                                                    placeholder="Select Item"
+                                                    label="Item Name"
+                                                    showSearch={itemNames.length > 7}
+                                                />
+
+                                                {/* Participant with SearchableDropdown */}
+                                                <SearchableDropdown 
+                                                    options={participantOptions}
+                                                    value={selectedParticipant}
+                                                    onChange={setSelectedParticipant}
+                                                    placeholder="Select Participant"
+                                                    label="Participant / Captain"
+                                                    showSearch={participantOptions.length > 7}
+                                                />
+
+                                                {/* Group Participant with SearchableDropdown */}
+                                                <SearchableDropdown 
+                                                    options={groupParticipantOptions}
+                                                    value={selectedGroupParticipant}
+                                                    onChange={setSelectedGroupParticipant}
+                                                    placeholder="Select Group Participant"
+                                                    label="Participant (Group / Pinnany)"
+                                                    showSearch={groupParticipantOptions.length > 7}
+                                                />
+
                                                 <div className="text-center mt-6 md:mt-10">
                                                     <button
                                                         type="submit"
@@ -495,4 +731,4 @@ const AddcertfitDetail = () => {
     );
 };
 
-export default AddcertfitDetail
+export default AddcertfitDetail;
