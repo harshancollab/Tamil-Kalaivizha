@@ -209,17 +209,17 @@ const ItemCodewise = () => {
   const getPrintTitle = () => {
     switch (selectedFestival) {
       case "UP Kalaivizha":
-        return "UP Tamil Kalaivizha - Item Wise Point List";
+        return "UP Tamil Kalaivizha - Item Code Wise Point Report";
       case "LP Kalaivizha":
-        return "LP Tamil Kalaivizha - Item Wise Point List";
+        return "LP Tamil Kalaivizha - Item Code Wise Point Report";
       case "HS Kalaivizha":
-        return "HS Tamil Kalaivizha - Item Wise Point List";
+        return "HS Tamil Kalaivizha - Item Code Wise Point Report";
       case "HSS Kalaivizha":
-        return "HSS Tamil Kalaivizha - Item Wise Point List";
+        return "HSS Tamil Kalaivizha - Item Code Wise Point Report";
       case "All Festival":
-        return "All Festival Tamil Kalaivizha - Item Wise Point List";
+        return "All Festival Tamil Kalaivizha - Item Code Wise Point Report";
       default:
-        return "Item Wise Point List";
+        return "Item Code Wise Point Report";
     }
   };
 

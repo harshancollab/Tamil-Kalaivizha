@@ -294,7 +294,7 @@ const ClashReportList = () => {
       title += ` - ${formattedDate}`;
     }
     
-    title += " - Clash List";
+    title += " - Clash List Report";
     return title;
   };
 

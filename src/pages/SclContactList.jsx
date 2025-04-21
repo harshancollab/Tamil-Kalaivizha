@@ -395,122 +395,158 @@ const SclContactList = () => {
     return pageNumbers;
   };
 
-  // PDF generation function
-  const generatePDF = () => {
-    // Create a container for PDF content
-    const pdfContent = document.createElement('div');
-    
-    // Add title
-    const titleElement = document.createElement('h2');
-    titleElement.textContent = "School Contacts List";
-    titleElement.style.textAlign = 'center';
-    titleElement.style.margin = '20px 0';
-    titleElement.style.fontWeight = 'bold';
-    titleElement.style.fontSize = '18px';
-    pdfContent.appendChild(titleElement);
+// PDF generation function
+const generatePDF = () => {
+  // Create a container for PDF content
+  const pdfContent = document.createElement('div');
+  pdfContent.style.padding = '20px';
+  
+  // Add title
+  const titleElement = document.createElement('h2');
+  titleElement.textContent = "List of School Contacts";
+  titleElement.style.textAlign = 'center';
+  titleElement.style.margin = '20px 0';
+  titleElement.style.fontWeight = 'bold';
+  titleElement.style.fontSize = '18px';
+  pdfContent.appendChild(titleElement);
 
-    // Create table
-    const table = document.createElement('table');
-    table.style.width = '100%';
-    table.style.borderCollapse = 'collapse';
-    table.style.marginTop = '20px';
+  // Create table
+  const table = document.createElement('table');
+  table.style.width = '100%';
+  table.style.borderCollapse = 'collapse';
+  table.style.marginTop = '20px';
+  table.style.fontSize = '12px'; // Make font size smaller to fit content
+  
+  // Create table header
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+  
+  // Define column widths for better control
+  const columnWidths = ['10%', '15%', '25%', '50%'];
+  const headers = ['Sl. No.', 'School ID', 'School Name', 'Contact Details'];
+  
+  headers.forEach((headerText, index) => {
+    const th = document.createElement('th');
+    th.textContent = headerText;
+    th.style.border = '1px solid #ddd';
+    th.style.padding = '8px';
+    th.style.backgroundColor = '#f2f2f2';
+    th.style.fontWeight = 'bold';
+    th.style.textAlign = 'left';
+    th.style.width = columnWidths[index]; // Set column width
+    headerRow.appendChild(th);
+  });
+  
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+  
+  // Create table body
+  const tbody = document.createElement('tbody');
+  
+  // Use schoolContacts data (in production, you would use Alllist)
+  schoolContacts.forEach((school, index) => {
+    const row = document.createElement('tr');
     
-    // Create table header
-    const thead = document.createElement('thead');
-    const headerRow = document.createElement('tr');
+    // Add cells
+    const indexCell = document.createElement('td');
+    indexCell.textContent = index + 1;
+    indexCell.style.border = '1px solid #ddd';
+    indexCell.style.padding = '8px';
+    indexCell.style.verticalAlign = 'top'; // Align to top for consistent layout
+    row.appendChild(indexCell);
     
-    const headers = ['Sl. No.', 'School ID', 'School Name', 'Contact Details'];
-    headers.forEach(headerText => {
-      const th = document.createElement('th');
-      th.textContent = headerText;
-      th.style.border = '1px solid #ddd';
-      th.style.padding = '8px';
-      th.style.backgroundColor = '#f2f2f2';
-      th.style.fontWeight = 'bold';
-      th.style.textAlign = 'left';
-      headerRow.appendChild(th);
-    });
+    const idCell = document.createElement('td');
+    idCell.textContent = school.id;
+    idCell.style.border = '1px solid #ddd';
+    idCell.style.padding = '8px';
+    idCell.style.verticalAlign = 'top'; // Align to top
+    row.appendChild(idCell);
     
-    thead.appendChild(headerRow);
-    table.appendChild(thead);
+    const nameCell = document.createElement('td');
+    nameCell.textContent = school.name;
+    nameCell.style.border = '1px solid #ddd';
+    nameCell.style.padding = '8px';
+    nameCell.style.verticalAlign = 'top'; // Align to top
+    row.appendChild(nameCell);
     
-    // Create table body
-    const tbody = document.createElement('tbody');
+    const contactsCell = document.createElement('td');
+    contactsCell.style.border = '1px solid #ddd';
+    contactsCell.style.padding = '8px';
+    contactsCell.style.verticalAlign = 'top'; // Align to top
     
-    // Use schoolContacts data (in production, you would use Alllist)
-    schoolContacts.forEach((school, index) => {
-      const row = document.createElement('tr');
-      
-      // Add cells
-      const indexCell = document.createElement('td');
-      indexCell.textContent = index + 1;
-      indexCell.style.border = '1px solid #ddd';
-      indexCell.style.padding = '8px';
-      row.appendChild(indexCell);
-      
-      const idCell = document.createElement('td');
-      idCell.textContent = school.id;
-      idCell.style.border = '1px solid #ddd';
-      idCell.style.padding = '8px';
-      row.appendChild(idCell);
-      
-      const nameCell = document.createElement('td');
-      nameCell.textContent = school.name;
-      nameCell.style.border = '1px solid #ddd';
-      nameCell.style.padding = '8px';
-      row.appendChild(nameCell);
-      
-      const contactsCell = document.createElement('td');
-      contactsCell.style.border = '1px solid #ddd';
-      contactsCell.style.padding = '8px';
-      
-      // Create contact details entries
-      const contactDetails = document.createElement('div');
-      
-      const headmasterDiv = document.createElement('div');
-      headmasterDiv.textContent = `Headmaster: ${school.headmaster.phone}`;
-      headmasterDiv.style.marginBottom = '4px';
-      contactDetails.appendChild(headmasterDiv);
-      
-      const teamManagerDiv = document.createElement('div');
-      teamManagerDiv.textContent = `Team Manager: ${school.teamManager.phone}`;
-      teamManagerDiv.style.marginBottom = '4px';
-      contactDetails.appendChild(teamManagerDiv);
-      
-      const chairmanDiv = document.createElement('div');
-      chairmanDiv.textContent = `Chairman: ${school.chairman.phone}`;
-      chairmanDiv.style.marginBottom = '4px';
-      contactDetails.appendChild(chairmanDiv);
-      
-      const escortingTeachersDiv = document.createElement('div');
-      escortingTeachersDiv.textContent = `Escorting Teachers: ${getAllEscortingTeachers(school).join(', ')}`;
-      contactDetails.appendChild(escortingTeachersDiv);
-      
-      contactsCell.appendChild(contactDetails);
-      row.appendChild(contactsCell);
-      
-      tbody.appendChild(row);
-    });
+    // Create contact details entries with better structure
+    const contactDetails = document.createElement('div');
+    contactDetails.style.display = 'grid';
+    contactDetails.style.gridTemplateColumns = 'auto 1fr';
+    contactDetails.style.gap = '4px 8px';
     
-    table.appendChild(tbody);
-    pdfContent.appendChild(table);
+    // Headmaster
+    const headmasterLabel = document.createElement('div');
+    headmasterLabel.textContent = 'Headmaster:';
+    headmasterLabel.style.fontWeight = 'bold';
+    contactDetails.appendChild(headmasterLabel);
     
-    // PDF filename
-    const fileName = 'School_Contacts_List.pdf';
+    const headmasterValue = document.createElement('div');
+    headmasterValue.textContent = school.headmaster.phone;
+    contactDetails.appendChild(headmasterValue);
     
-    // PDF options
-    const options = {
-      margin: 10,
-      filename: fileName,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-    };
+    // Team Manager
+    const teamManagerLabel = document.createElement('div');
+    teamManagerLabel.textContent = 'Team Manager:';
+    teamManagerLabel.style.fontWeight = 'bold';
+    contactDetails.appendChild(teamManagerLabel);
     
-    // Generate and download PDF
-    html2pdf().from(pdfContent).set(options).save();
+    const teamManagerValue = document.createElement('div');
+    teamManagerValue.textContent = school.teamManager.phone;
+    contactDetails.appendChild(teamManagerValue);
+    
+    // Chairman
+    const chairmanLabel = document.createElement('div');
+    chairmanLabel.textContent = 'Chairman:';
+    chairmanLabel.style.fontWeight = 'bold';
+    contactDetails.appendChild(chairmanLabel);
+    
+    const chairmanValue = document.createElement('div');
+    chairmanValue.textContent = school.chairman.phone;
+    contactDetails.appendChild(chairmanValue);
+    
+    // Escorting Teachers
+    const escortingTeachersLabel = document.createElement('div');
+    escortingTeachersLabel.textContent = 'Escorting Teachers:';
+    escortingTeachersLabel.style.fontWeight = 'bold';
+    contactDetails.appendChild(escortingTeachersLabel);
+    
+    const escortingTeachersValue = document.createElement('div');
+    escortingTeachersValue.textContent = getAllEscortingTeachers(school).join(', ');
+    // Handle long teacher lists by allowing text wrapping
+    escortingTeachersValue.style.wordBreak = 'break-word';
+    contactDetails.appendChild(escortingTeachersValue);
+    
+    contactsCell.appendChild(contactDetails);
+    row.appendChild(contactsCell);
+    
+    tbody.appendChild(row);
+  });
+  
+  table.appendChild(tbody);
+  pdfContent.appendChild(table);
+  
+  // PDF filename
+  const fileName = 'School_Contacts_List.pdf';
+  
+  // PDF options with better settings for page fitting
+  const options = {
+    margin: [15, 15, 15, 15], // [top, right, bottom, left] in mm
+    filename: fileName,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } // Better page breaks
   };
-
+  
+  // Generate and download PDF
+  html2pdf().from(pdfContent).set(options).save();
+};
   return (
     <>
       <Header />
@@ -562,7 +598,7 @@ const SclContactList = () => {
                             <td className="p-2 md:p-3 whitespace-nowrap">
                               <button
                                 onClick={() => openModal(school)}
-                                className="text-[#114568] py-1 px-3 rounded-md"
+                                className="text-blue-500 py-1 px-3 rounded-md"
                               >
                                 <i className="far fa-window-restore"></i>
                               </button>

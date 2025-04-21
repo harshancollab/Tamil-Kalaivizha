@@ -382,12 +382,12 @@ const StageDurationList = () => {
     const festival = festivalOptions.find(option => option.value === selectedFestival);
     if (festival) {
       if (festival.value === "ALL Festival") {
-        return "ALL Festival - Stage Duration List";
+        return "ALL Festival - Stage Duration List Report";
       } else {
-        return `${festival.display.split(" ")[0]} Festival - Stage Duration List`;
+        return `${festival.display.split(" ")[0]} - Stage Duration List Report`;
       }
     }
-    return "Festival - Stage Duration List";
+    return " Stage Duration List Report";
   };
 
   const handlePrint = () => {

@@ -350,7 +350,7 @@ const ParticipantsMorethan = () => {
     
     const schoolCodeText = searchTerm ? ` - School Code: ${searchTerm}` : '';
     
-    return `Participants List ${festivalText}${itemsText}${schoolCodeText} Report`;
+    return `Participants List more than one item ${festivalText}${itemsText}${schoolCodeText} Report`;
   };
 
   // New PDF generation function using html2pdf

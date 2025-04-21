@@ -2,8 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import Header from '../components/Header';
 import Dash from '../components/Dash';
 import html2pdf from 'html2pdf.js';
+import { useSearchParams } from 'react-router-dom';
 
 const CertificateParticipate = () => {
+  // Add useSearchParams to get item information from URL
+  const [searchParams] = useSearchParams();
+  const itemCode = searchParams.get('itemCode');
+  const itemName = searchParams.get('itemName');
+  const festival = searchParams.get('festival') || "All Festival";
+
   const [selectedParticipant, setSelectedParticipant] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -188,6 +195,8 @@ const CertificateParticipate = () => {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       // Use dummy data
+      // If itemCode is provided, filter participants to match that item if needed
+      // This is where you could make an API call to get participants for a specific item
       setParticipants(dummyParticipants);
     } catch (err) {
       console.log(err);
@@ -329,8 +338,8 @@ const CertificateParticipate = () => {
       setLoading(true);
       
       const filename = selectedParticipant === "All Participants" 
-        ? 'all-participants-certificate.pdf'
-        : `${selectedParticipant.split(' - ')[1]}-certificate.pdf`;
+        ? `all-participants-${itemCode ? itemCode + '-' + itemName : ''}-certificate.pdf`
+        : `${selectedParticipant.split(' - ')[1]}-${itemCode ? itemCode + '-' + itemName : ''}-certificate.pdf`;
       
       // Generate PDF first
       const options = {
@@ -437,6 +446,17 @@ const CertificateParticipate = () => {
                 <>
                   <h2 className="text-lg font-semibold mb-4">Certificate Participant Wise</h2>
                   
+                  {/* Display Item Code & Item Name if available */}
+                  {itemCode && itemName && (
+                    <div className="mb-4 p-3 rounded-lg">
+                      <div className="flex flex-col sm:flex-row text-blue-900 sm:items-center">
+                       
+                        <div>{itemCode} - {itemName}</div>
+                      </div>
+                      
+                    </div>
+                  )}
+                  
                   {/* Display error message if exists */}
                   {error && (
                     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -445,7 +465,7 @@ const CertificateParticipate = () => {
                   )}
                   
                   <form onSubmit={handleGenerateCertificate}>
-                    <div className="flex justify-center mt-28">
+                    <div className="flex justify-center mt-20">
                       <div className="space-y-4">
                         <div className="flex flex-col md:flex-row mb-8">
                           <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">
@@ -611,7 +631,7 @@ const CertificateParticipate = () => {
                         <div className='text-center'>
                           <button
                             type="submit"
-                            className={`bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-14 py-3 rounded-full mt-20 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-14 py-3 rounded-full mt-10 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={loading}
                           >
                             {loading ? 'Processing...' : 'Generate'}
@@ -666,6 +686,19 @@ const CertificateParticipate = () => {
                   {/* Certificate content */}
                   <div ref={certificateRef} className="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
                     <h1 className="text-xl font-bold text-center mb-6">Certificate Participant Wise Report</h1>
+                    
+                    {/* Display Item Code & Item Name in the Certificate */}
+                    {itemCode && itemName && (
+                      <div className="mb-6 text-center">
+                        <div className="text-lg font-semibold">
+                          Item: {itemCode} - {itemName}
+                        </div>
+                        <div className="text-md text-gray-700">
+                          Festival: {festival}
+                        </div>
+                      </div>
+                    )}
+                    
                     {certificateData && certificateData.map((participant, index) => (
                       <div key={participant.id} className="mb-8">
                         <div className="mb-6 px-16">

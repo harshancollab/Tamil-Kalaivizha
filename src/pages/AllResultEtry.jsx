@@ -12,6 +12,8 @@ const AllResultEntry = () => {
     const printRef = useRef();
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchCode, setSearchCode] = useState(searchParams.get('code') || '');
+    const [showConfirmButton, setShowConfirmButton] = useState(true);
+    const [resultsConfirmed, setResultsConfirmed] = useState(false);
 
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
@@ -48,6 +50,11 @@ const AllResultEntry = () => {
             }
         }
     }
+
+    const handleConfirmResults = () => {
+        setShowConfirmButton(false);
+        setResultsConfirmed(true);
+    };
 
     const handleEditRedirect = (resultEntry) => {
         navigate(`/edit-resultentry/${resultEntry.slNo}`, {
@@ -334,30 +341,35 @@ const AllResultEntry = () => {
                             </button>
                         </div>
                     </div>
-                    <div className="flex items-center justify-center">
-                        <div className="">
-                            <div className="relative inline-block">
-                                <p
-                                    className='text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4] cursor-pointer inline'
-                                    onMouseEnter={() => setShowRegNo(true)}
-                                    onMouseLeave={() => setShowRegNo(false)}
-                                >
-                                    Absentee Reg No...
-                                </p>
-                                {showRegNo && (
-                                    <div className="absolute top-full left-0 mt-1 p-2 bg-white shadow-lg rounded-md z-10 text-gray-800 min-w-max">
-                                        {chunkedRegNos.map((chunk, i) => (
-                                            <div key={i} className="mb-1 last:mb-0">
-                                                {chunk.join(', ')}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
+                    
+                    {/* Absentee Info Section - Only shown when results are confirmed */}
+                    {resultsConfirmed && (
+                        <div className="flex items-center justify-center mb-4">
+                            <div className="">
+                                <div className="relative inline-block">
+                                    <p
+                                        className='text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4] cursor-pointer inline'
+                                        onMouseEnter={() => setShowRegNo(true)}
+                                        onMouseLeave={() => setShowRegNo(false)}
+                                    >
+                                        Absentee Reg No...
+                                    </p>
+                                    {showRegNo && (
+                                        <div className="absolute top-full left-0 mt-1 p-2 bg-white shadow-lg rounded-md z-10 text-gray-800 min-w-max">
+                                            {chunkedRegNos.map((chunk, i) => (
+                                                <div key={i} className="mb-1 last:mb-0">
+                                                    {chunk.join(', ')}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                                <p className='text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4] inline ml-4'>No of Withheld Participants :<span> 3</span></p>
+                                <p className='text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4] inline ml-4'>No of Absentees :<span> {absenteeRegNos.length}</span></p>
                             </div>
-                            <p className='text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4] inline ml-4'>No of Withheld Participants :<span> 3</span></p>
-                            <p className='text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4] inline ml-4'>No of Absentees :<span> {absenteeRegNos.length}</span></p>
                         </div>
-                    </div>
+                    )}
+                    
                     <div className="w-full">
                         <div ref={printRef} className="overflow-x-auto -mx-4 sm:mx-0">
                             <div className="inline-block min-w-full align-middle px-4 sm:px-0">
@@ -419,6 +431,22 @@ const AllResultEntry = () => {
                                             )}
                                         </tbody>
                                     </table>
+                                    <div className="flex justify-end gap-4">
+                                        {/* Show Confirm Results button only when not confirmed */}
+                                        {showConfirmButton && (
+                                            <button 
+                                                onClick={handleConfirmResults}
+                                                className="text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4] border border-blue-500 py-2 px-6 rounded-full flex items-center w-full sm:w-auto"
+                                            >
+                                                Confirm Results
+                                            </button>
+                                        )}
+                                        <button
+                                            className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
+                                        >
+                                            Print Confidential Report
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

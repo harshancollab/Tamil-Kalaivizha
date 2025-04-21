@@ -416,7 +416,7 @@ const updateSearchParams = (date, search) => {
         month: 'long',
         day: 'numeric'
       });
-      return `${formattedDate} - Participants List`;
+      return `Participants List on ${formattedDate} `;
     }
   };
 
