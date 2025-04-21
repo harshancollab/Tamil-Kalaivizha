@@ -13,10 +13,10 @@
 //   const [rowsPerPage, setRowsPerPage] = useState(10);
 //   // Modal state
 //   const [showOrientationModal, setShowOrientationModal] = useState(false);
-  
+
 //   // Get photoStatus from URL, default to "With Photo" if not present
 //   const photoStatus = searchParams.get('photoStatus') || "With Photo";
-  
+
 //   useEffect(() => {
 //     getAllParticipants();
 //   }, []);
@@ -73,7 +73,7 @@
 //     const pageNumbers = [];
 //     // Dynamically adjust number of page buttons based on screen size
 //     const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
-    
+
 //     if (totalPages <= maxPageNumbersToShow) {
 //       // Show all page numbers
 //       for (let i = 1; i <= totalPages; i++) {
@@ -108,7 +108,7 @@
 //         pageNumbers.push(totalPages);
 //       }
 //     }
-    
+
 //     return pageNumbers;
 //   };
 
@@ -125,13 +125,13 @@
 //   // Generate PDF using html2pdf library with selected orientation
 //   // const generatePDF = (orientation) => {
 //   //   const data = participants.length > 0 ? participants : sampleParticipants;
-    
+
 //   //   // Close modal
 //   //   setShowOrientationModal(false);
-    
+
 //   //   // Create a container for PDF content
 //   //   const pdfContent = document.createElement('div');
-    
+
 //   //   // Add title
 //   //   const titleElement = document.createElement('h2');
 //   //   titleElement.textContent = `Participants Card - ${photoStatus}`;
@@ -139,14 +139,14 @@
 //   //   titleElement.style.margin = '20px 0';
 //   //   titleElement.style.fontWeight = 'bold';
 //   //   pdfContent.appendChild(titleElement);
-    
+
 //   //   // Create card grid container
 //   //   const cardGrid = document.createElement('div');
 //   //   cardGrid.style.display = 'grid';
-    
+
 //   //   // Adjust grid and card dimensions based on orientation
 //   //   let cardWidth, cardHeight, photoSize, fontSize, marginSize;
-    
+
 //   //   if (orientation === 'landscape') {
 //   //     // Landscape layout (A4 landscape: 297mm × 210mm)
 //   //     cardGrid.style.gridTemplateColumns = 'repeat(4, 1fr)'; // 4 columns
@@ -166,13 +166,13 @@
 //   //     fontSize = '0.9em';
 //   //     marginSize = '10px';
 //   //   }
-    
+
 //   //   cardGrid.style.gap = '10px';
-    
+
 //   //   // Generate cards
 //   //   for (let i = 0; i < data.length; i++) {
 //   //     const participant = data[i];
-      
+
 //   //     // Create card
 //   //     const card = document.createElement('div');
 //   //     card.style.border = '1px solid #000';
@@ -182,7 +182,7 @@
 //   //     card.style.width = cardWidth;
 //   //     card.style.height = cardHeight;
 //   //     card.style.boxSizing = 'border-box';
-      
+
 //   //     // Card header
 //   //     const cardHeader = document.createElement('div');
 //   //     cardHeader.textContent = 'Tamil Kalaivizha 2024 - 2025';
@@ -190,14 +190,14 @@
 //   //     cardHeader.style.marginBottom = '5px';
 //   //     cardHeader.style.fontSize = fontSize;
 //   //     card.appendChild(cardHeader);
-      
+
 //   //     // School info
 //   //     const cardSchool = document.createElement('div');
 //   //     cardSchool.textContent = 'Idukki Revenue District SGHSS, KATTAPPANA';
 //   //     cardSchool.style.fontSize = orientation === 'landscape' ? '0.7em' : '0.8em';
 //   //     cardSchool.style.marginBottom = marginSize;
 //   //     card.appendChild(cardSchool);
-      
+
 //   //     // Photo placeholder if needed
 //   //     if (photoStatus === "With Photo") {
 //   //       const photoPlaceholder = document.createElement('div');
@@ -208,7 +208,7 @@
 //   //       photoPlaceholder.style.border = '1px solid #ccc';
 //   //       card.appendChild(photoPlaceholder);
 //   //     }
-      
+
 //   //     // Participant name
 //   //     const nameElement = document.createElement('div');
 //   //     nameElement.textContent = participant.name;
@@ -216,7 +216,7 @@
 //   //     nameElement.style.marginBottom = '5px';
 //   //     nameElement.style.fontSize = fontSize;
 //   //     card.appendChild(nameElement);
-      
+
 //   //     // Participant details
 //   //     const detailsDiv = document.createElement('div');
 //   //     detailsDiv.style.display = 'flex';
@@ -224,50 +224,50 @@
 //   //     detailsDiv.style.gap = '10px';
 //   //     detailsDiv.style.marginBottom = '5px';
 //   //     detailsDiv.style.fontSize = orientation === 'landscape' ? '0.7em' : '0.8em';
-      
+
 //   //     const regNo = document.createElement('div');
 //   //     regNo.textContent = `Reg No : ${participant.regNo}`;
 //   //     detailsDiv.appendChild(regNo);
-      
+
 //   //     const classInfo = document.createElement('div');
 //   //     classInfo.textContent = `Class : ${participant.class}`;
 //   //     classInfo.style.borderLeft = '1px solid #ccc';
 //   //     classInfo.style.paddingLeft = '8px';
 //   //     detailsDiv.appendChild(classInfo);
-      
+
 //   //     card.appendChild(detailsDiv);
-      
+
 //   //     // School details
 //   //     const schoolDetails = document.createElement('div');
 //   //     schoolDetails.textContent = `${participant.schoolCode} ${participant.schoolName}`;
 //   //     schoolDetails.style.fontSize = orientation === 'landscape' ? '0.7em' : '0.8em';
 //   //     schoolDetails.style.marginBottom = '5px';
 //   //     card.appendChild(schoolDetails);
-      
+
 //   //     // Event date
 //   //     const eventDate = document.createElement('div');
 //   //     eventDate.textContent = 'Stage 5 on 7 Dec 2023';
 //   //     eventDate.style.fontSize = orientation === 'landscape' ? '0.7em' : '0.8em';
 //   //     eventDate.style.marginBottom = '5px';
 //   //     card.appendChild(eventDate);
-      
+
 //   //     // Event details
 //   //     const eventDetails = document.createElement('div');
 //   //     eventDetails.innerHTML = '304 - Mono Act, 300 - Versification,<br />301 - Story Writing' + 
 //   //                            (participant.id === 4 ? ', 302 - Drama' : '');
 //   //     eventDetails.style.fontSize = orientation === 'landscape' ? '0.7em' : '0.8em';
 //   //     card.appendChild(eventDetails);
-      
+
 //   //     // Add card to grid
 //   //     cardGrid.appendChild(card);
 //   //   }
-    
+
 //   //   // Add card grid to PDF content
 //   //   pdfContent.appendChild(cardGrid);
-    
+
 //   //   // PDF filename
 //   //   const fileName = `Participant_Cards_${photoStatus.replace(/ /g, '_')}_${orientation}.pdf`;
-    
+
 //   //   // PDF options
 //   //   const options = {
 //   //     margin: [10, 10, 10, 10], // top, right, bottom, left
@@ -276,7 +276,7 @@
 //   //     html2canvas: { scale: 2, useCORS: true },
 //   //     jsPDF: { unit: 'mm', format: 'a4', orientation: orientation }
 //   //   };
-    
+
 //   //   // Generate and download PDF
 //   //   html2pdf().from(pdfContent).set(options).save();
 //   // };
@@ -285,13 +285,13 @@
 //   // Generate PDF using html2pdf library with selected orientation
 // const generatePDF = (orientation) => {
 //   const data = participants.length > 0 ? participants : sampleParticipants;
-  
+
 //   // Close modal
 //   setShowOrientationModal(false);
-  
+
 //   // Create a container for PDF content
 //   const pdfContent = document.createElement('div');
-  
+
 //   // Add title
 //   const titleElement = document.createElement('h2');
 //   titleElement.textContent = `Participants Card - ${photoStatus}`;
@@ -299,10 +299,10 @@
 //   titleElement.style.margin = '20px 0';
 //   titleElement.style.fontWeight = 'bold';
 //   pdfContent.appendChild(titleElement);
-  
+
 //   // Define card dimensions based on orientation
 //   let cardWidth, cardHeight, photoSize, fontSize, marginSize, cardsPerRow;
-  
+
 //   if (orientation === 'landscape') {
 //     // Landscape layout (A4 landscape: 297mm × 210mm)
 //     cardWidth = '65mm';
@@ -320,10 +320,10 @@
 //     marginSize = '10px';
 //     cardsPerRow = 2;
 //   }
-  
+
 //   // Calculate how many cards can fit on a page (based on A4 size)
 //   const cardsPerPage = orientation === 'landscape' ? 8 : 4;
-  
+
 //   // Create rows for the cards
 //   for (let i = 0; i < data.length; i += cardsPerRow) {
 //     const row = document.createElement('div');
@@ -332,16 +332,16 @@
 //     row.style.justifyContent = 'center';
 //     row.style.gap = '10px';
 //     row.style.marginBottom = '10px';
-    
+
 //     // Add page break before row if needed (except for first row)
 //     if (i > 0 && i % cardsPerPage === 0) {
 //       row.style.pageBreakBefore = 'always';
 //     }
-    
+
 //     // Add cards to the row
 //     for (let j = 0; j < cardsPerRow && i + j < data.length; j++) {
 //       const participant = data[i + j];
-      
+
 //       // Create card
 //       const card = document.createElement('div');
 //       card.style.border = '1px solid #000';
@@ -352,7 +352,7 @@
 //       card.style.boxSizing = 'border-box';
 //       // Make sure cards don't break across pages
 //       card.style.pageBreakInside = 'avoid';
-      
+
 //       // Card header
 //       const cardHeader = document.createElement('div');
 //       cardHeader.textContent = 'Tamil Kalaivizha 2024 - 2025';
@@ -360,14 +360,14 @@
 //       cardHeader.style.marginBottom = '5px';
 //       cardHeader.style.fontSize = fontSize;
 //       card.appendChild(cardHeader);
-      
+
 //       // School info
 //       const cardSchool = document.createElement('div');
 //       cardSchool.textContent = 'Idukki Revenue District SGHSS, KATTAPPANA';
 //       cardSchool.style.fontSize = orientation === 'landscape' ? '0.7em' : '0.8em';
 //       cardSchool.style.marginBottom = marginSize;
 //       card.appendChild(cardSchool);
-      
+
 //       // Photo placeholder if needed
 //       if (photoStatus === "With Photo") {
 //         const photoPlaceholder = document.createElement('div');
@@ -378,7 +378,7 @@
 //         photoPlaceholder.style.border = '1px solid #ccc';
 //         card.appendChild(photoPlaceholder);
 //       }
-      
+
 //       // Participant name
 //       const nameElement = document.createElement('div');
 //       nameElement.textContent = participant.name;
@@ -386,7 +386,7 @@
 //       nameElement.style.marginBottom = '5px';
 //       nameElement.style.fontSize = fontSize;
 //       card.appendChild(nameElement);
-      
+
 //       // Participant details
 //       const detailsDiv = document.createElement('div');
 //       detailsDiv.style.display = 'flex';
@@ -394,51 +394,51 @@
 //       detailsDiv.style.gap = '10px';
 //       detailsDiv.style.marginBottom = '5px';
 //       detailsDiv.style.fontSize = orientation === 'landscape' ? '0.7em' : '0.8em';
-      
+
 //       const regNo = document.createElement('div');
 //       regNo.textContent = `Reg No : ${participant.regNo}`;
 //       detailsDiv.appendChild(regNo);
-      
+
 //       const classInfo = document.createElement('div');
 //       classInfo.textContent = `Class : ${participant.class}`;
 //       classInfo.style.borderLeft = '1px solid #ccc';
 //       classInfo.style.paddingLeft = '8px';
 //       detailsDiv.appendChild(classInfo);
-      
+
 //       card.appendChild(detailsDiv);
-      
+
 //       // School details
 //       const schoolDetails = document.createElement('div');
 //       schoolDetails.textContent = `${participant.schoolCode} ${participant.schoolName}`;
 //       schoolDetails.style.fontSize = orientation === 'landscape' ? '0.7em' : '0.8em';
 //       schoolDetails.style.marginBottom = '5px';
 //       card.appendChild(schoolDetails);
-      
+
 //       // Event date
 //       const eventDate = document.createElement('div');
 //       eventDate.textContent = 'Stage 5 on 7 Dec 2023';
 //       eventDate.style.fontSize = orientation === 'landscape' ? '0.7em' : '0.8em';
 //       eventDate.style.marginBottom = '5px';
 //       card.appendChild(eventDate);
-      
+
 //       // Event details
 //       const eventDetails = document.createElement('div');
 //       eventDetails.innerHTML = '304 - Mono Act, 300 - Versification,<br />301 - Story Writing' + 
 //                             (participant.id === 4 ? ', 302 - Drama' : '');
 //       eventDetails.style.fontSize = orientation === 'landscape' ? '0.7em' : '0.8em';
 //       card.appendChild(eventDetails);
-      
+
 //       // Add card to row
 //       row.appendChild(card);
 //     }
-    
+
 //     // Add row to PDF content
 //     pdfContent.appendChild(row);
 //   }
-  
+
 //   // PDF filename
 //   const fileName = `Participant_Cards_${photoStatus.replace(/ /g, '_')}_${orientation}.pdf`;
-  
+
 //   // PDF options
 //   const options = {
 //     margin: [10, 10, 10, 10], // top, right, bottom, left
@@ -447,7 +447,7 @@
 //     html2canvas: { scale: 2, useCORS: true },
 //     jsPDF: { unit: 'mm', format: 'a4', orientation: orientation }
 //   };
-  
+
 //   // Generate and download PDF
 //   html2pdf().from(pdfContent).set(options).save();
 // };
@@ -467,7 +467,7 @@
 //       <div className="flex flex-col md:flex-row min-h-screen">
 //         <Dash />
 //         <div className="flex-1 p-4 md:p-6 lg:p-8">
-         
+
 //           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
 //             <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
 //               Participants Card List
@@ -543,7 +543,7 @@
 //             <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
 //               {data.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, data.length)} of ${data.length} rows` : '0 rows'}
 //             </div>
-            
+
 //             {/* Pagination Controls */}
 //             <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
 //               {/* Previous Button with icon */}
@@ -555,7 +555,7 @@
 //                 <i className="fa-solid fa-angle-right transform rotate-180"></i>
 //                 <span className="hidden sm:inline p-1">Previous</span>
 //               </button>
-              
+
 //               {/* Page Numbers */}
 //               <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
 //                 {renderPageNumbers().map((page, index) => (
@@ -570,7 +570,7 @@
 //                   </button>
 //                 ))}
 //               </div>
-              
+
 //               {/* Next Button with icon */}
 //               <button
 //                 onClick={() => handlePageChange(currentPage + 1)}
@@ -595,28 +595,28 @@
 //                     <div className="card-school">
 //                       Idukki Revenue District SGHSS, KATTAPPANA
 //                     </div>
-                    
+
 //                     {photoStatus === "With Photo" && (
 //                       <div className="card-photo"></div>
 //                     )}
-                    
+
 //                     <div className="card-name">
 //                       {participant.name}
 //                     </div>
-                    
+
 //                     <div className="card-details">
 //                       <div>Reg No : {participant.regNo}</div>
 //                       <div style={{borderLeft: '1px solid #ccc', paddingLeft: '8px'}}>Class : {participant.class}</div>
 //                     </div>
-                    
+
 //                     <div className="card-school-details">
 //                       {participant.schoolCode} {participant.schoolName}
 //                     </div>
-                    
+
 //                     <div className="card-school-details">
 //                       Stage 5 on 7 Dec 2023
 //                     </div>
-                    
+
 //                     <div className="card-event-details">
 //                       304 - Mono Act, 300 - Versification,<br />
 //                       301 - Story Writing{participant.id === 4 ? ', 302 - Drama' : ''}
@@ -626,13 +626,13 @@
 //               ))}
 //             </div>
 //           </div>
-          
+
 //           {/* Orientation Selection Modal */}
 //           {showOrientationModal && (
 //             <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
 //               <div className="bg-white rounded-lg p-6 w-full max-w-md">
 //                 <h3 className="text-lg font-bold mb-4 text-center">Select Print Orientation</h3>
-                
+
 //                 <div className="flex justify-around mb-6">
 //                   {/* Portrait option with card preview */}
 //                   <div 
@@ -646,13 +646,13 @@
 //                           <div className="w-8 h-8 bg-gray-200 my-1 border border-gray-300"></div>
 //                         )}
 //                         <div className="text-[5px]">Participant Name</div>
-                      
+
 //                       </div>
 //                     </div>
 //                     <span className="font-medium">Portrait</span>
-                   
+
 //                   </div>
-                  
+
 //                   {/* Landscape option with card preview */}
 //                   <div 
 //                     className="flex flex-col items-center cursor-pointer hover:opacity-80"
@@ -677,10 +677,10 @@
 //                       </div>
 //                     </div>
 //                     <span className="font-medium">Landscape</span>
-                   
+
 //                   </div>
 //                 </div>
-                
+
 //                 <div className="flex justify-end">
 //                   <button 
 //                     className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
@@ -735,9 +735,9 @@ const ParticipantsCardList = () => {
   // Check URL params on mount to potentially show preview modal directly
   useEffect(() => {
     // If both photoStatus and orientation are in URL, and there's a 'showPreview' param
-    if (searchParams.get('showPreview') === 'true' && 
-        searchParams.get('photoStatus') && 
-        searchParams.get('orientation')) {
+    if (searchParams.get('showPreview') === 'true' &&
+      searchParams.get('photoStatus') &&
+      searchParams.get('orientation')) {
       // Skip orientation modal and go straight to preview
       setShowPreviewModal(true);
     }
@@ -789,7 +789,7 @@ const ParticipantsCardList = () => {
   const handleSearchChange = (event) => {
     const newSearchTerm = event.target.value;
     setSearchTerm(newSearchTerm);
-    
+
     // Update URL params while preserving existing ones
     const newParams = new URLSearchParams(searchParams);
     if (newSearchTerm) {
@@ -798,7 +798,7 @@ const ParticipantsCardList = () => {
       newParams.delete('query');
     }
     setSearchParams(newParams);
-    
+
     filterParticipants(newSearchTerm);
     setCurrentPage(1); // Reset to first page when searching
   };
@@ -812,15 +812,15 @@ const ParticipantsCardList = () => {
 
     const lowercasedTerm = term.toLowerCase();
     const data = participants.length > 0 ? participants : sampleParticipants;
-    
+
     // Search primarily by item code, but also search in other fields
-    const results = data.filter(participant => 
+    const results = data.filter(participant =>
       participant.itemcode.toLowerCase().includes(lowercasedTerm) ||
       participant.name.toLowerCase().includes(lowercasedTerm) ||
       participant.regNo.toLowerCase().includes(lowercasedTerm) ||
       participant.schoolCode.toLowerCase().includes(lowercasedTerm)
     );
-    
+
     setFilteredParticipants(results);
   };
 
@@ -882,7 +882,7 @@ const ParticipantsCardList = () => {
 
   const handlePhotoStatusChange = (e) => {
     const newStatus = e.target.value;
-    
+
     // Update URL params while preserving existing ones
     const newParams = new URLSearchParams(searchParams);
     newParams.set('photoStatus', newStatus);
@@ -897,13 +897,13 @@ const ParticipantsCardList = () => {
   // Handle orientation selection and show preview
   const handleOrientationSelect = (orientation) => {
     setSelectedOrientation(orientation);
-    
+
     // Update URL params
     const newParams = new URLSearchParams(searchParams);
     newParams.set('orientation', orientation);
     newParams.set('showPreview', 'true');
     setSearchParams(newParams);
-    
+
     setShowOrientationModal(false);
     setShowPreviewModal(true);
   };
@@ -914,7 +914,7 @@ const ParticipantsCardList = () => {
     const newParams = new URLSearchParams(searchParams);
     newParams.delete('showPreview');
     setSearchParams(newParams);
-    
+
     setShowPreviewModal(false);
   };
 
@@ -1163,15 +1163,15 @@ const ParticipantsCardList = () => {
     // Create a shareable URL with current settings
     const currentUrl = window.location.origin + window.location.pathname;
     const urlParams = new URLSearchParams(searchParams);
-    
+
     // Ensure all relevant params are set
     urlParams.set('photoStatus', photoStatus);
     urlParams.set('orientation', selectedOrientation);
     urlParams.set('showPreview', 'true');
-    
+
     // Create the full URL to share
     const shareableUrl = `${currentUrl}?${urlParams.toString()}`;
-    
+
     // Copy to clipboard
     navigator.clipboard.writeText(shareableUrl)
       .then(() => {
@@ -1230,69 +1230,69 @@ const ParticipantsCardList = () => {
           </div>
           {/* Table view */}
           <div className="w-full">
-  <div className="overflow-x-auto -mx-4 sm:mx-0">
-    <div className="inline-block min-w-full align-middle px-4 sm:px-0">
-      {filteredParticipants.length > 0 ? (
-        <table className="min-w-full text-center border-separate border-spacing-y-2">
-          <thead className="text-xs sm:text-sm">
-            <tr className="text-gray-700">
-              <th className="p-2 md:p-3">Sl No</th>
-              {photoStatus === "With Photo" && (
-                <th className="p-2 md:p-3">Picture</th>
-              )}
-              <th className="p-2 md:p-3">Reg No</th>
-              <th className="p-2 md:p-3">Name</th>
-              <th className="p-2 md:p-3">Item Name</th>
-              <th className="p-2 md:p-3">Class</th>
-              <th className="p-2 md:p-3">School code</th>
-              <th className="p-2 md:p-3">School Name</th>
-            </tr>
-          </thead>
-          <tbody className="text-xs sm:text-sm">
-            {currentItems.map((participant, index) => (
-              <tr key={participant.id || index} className="hover:bg-gray-100">
-                <td className="p-2 md:p-3">{indexOfFirstItem + index + 1}</td>
-                {photoStatus === "With Photo" && (
-                  <td className="p-2 justify-center items-center md:p-3">
-                    <div className="w-12 h-12 bg-gray-200 mx-auto"></div>
-                  </td>
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <div className="inline-block min-w-full align-middle px-4 sm:px-0">
+                {filteredParticipants.length > 0 ? (
+                  <table className="min-w-full text-center border-separate border-spacing-y-2">
+                    <thead className="text-xs sm:text-sm">
+                      <tr className="text-gray-700">
+                        <th className="p-2 md:p-3">Sl No</th>
+                        {photoStatus === "With Photo" && (
+                          <th className="p-2 md:p-3">Picture</th>
+                        )}
+                        <th className="p-2 md:p-3">Reg No</th>
+                        <th className="p-2 md:p-3">Name</th>
+                        <th className="p-2 md:p-3">Item Name</th>
+                        <th className="p-2 md:p-3">Class</th>
+                        <th className="p-2 md:p-3">School code</th>
+                        <th className="p-2 md:p-3">School Name</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-xs sm:text-sm">
+                      {currentItems.map((participant, index) => (
+                        <tr key={participant.id || index} className="hover:bg-gray-100">
+                          <td className="p-2 md:p-3">{indexOfFirstItem + index + 1}</td>
+                          {photoStatus === "With Photo" && (
+                            <td className="p-2 justify-center items-center md:p-3">
+                              <div className="w-12 h-12 bg-gray-200 mx-auto"></div>
+                            </td>
+                          )}
+                          <td className="p-2 md:p-3">{participant.regNo}</td>
+                          <td className="p-2 md:p-3">{participant.name}</td>
+                          <td className="p-2 md:p-3">{participant.itemcode}-{participant.itemname}</td>
+                          <td className="p-2 md:p-3">{participant.class}</td>
+                          <td className="p-2 md:p-3">{participant.schoolCode}</td>
+                          <td className="p-2 md:p-3">{participant.schoolName}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div className="py-8 text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                      <i className="fa-solid fa-search text-gray-400 text-xl"></i>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-1">No results found</h3>
+                    <p className="text-gray-500">
+                      We couldn't find any participants matching "{searchTerm}".
+                    </p>
+                    <button
+                      onClick={() => {
+                        setSearchTerm('');
+                        const newParams = new URLSearchParams(searchParams);
+                        newParams.delete('query');
+                        setSearchParams(newParams);
+                        setFilteredParticipants(participants.length > 0 ? participants : sampleParticipants);
+                      }}
+                      className="mt-4 px-4 py-2 rounded-full text-sm"
+                    >
+                      Clear search
+                    </button>
+                  </div>
                 )}
-                <td className="p-2 md:p-3">{participant.regNo}</td>
-                <td className="p-2 md:p-3">{participant.name}</td>
-                <td className="p-2 md:p-3">{participant.itemcode}-{participant.itemname}</td>
-                <td className="p-2 md:p-3">{participant.class}</td>
-                <td className="p-2 md:p-3">{participant.schoolCode}</td>
-                <td className="p-2 md:p-3">{participant.schoolName}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <div className="py-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-            <i className="fa-solid fa-search text-gray-400 text-xl"></i>
+              </div>
+            </div>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-1">No results found</h3>
-          <p className="text-gray-500">
-            We couldn't find any participants matching "{searchTerm}".
-          </p>
-          <button 
-            onClick={() => {
-              setSearchTerm('');
-              const newParams = new URLSearchParams(searchParams);
-              newParams.delete('query');
-              setSearchParams(newParams);
-              setFilteredParticipants(participants.length > 0 ? participants : sampleParticipants);
-            }}
-            className="mt-4 px-4 py-2 rounded-full text-sm"
-          >
-            Clear search
-          </button>
-        </div>
-      )}
-    </div>
-  </div>
-</div>
 
           {/* Pagination Controls */}
           <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
@@ -1412,55 +1412,55 @@ const ParticipantsCardList = () => {
             </div>
           )}
 
-          {/* Print Preview Modal */}
-          {showPreviewModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-              <div className="bg-white rounded-lg p-4 w-full max-w-4xl max-h-[90vh] overflow-auto">
-                <div className="flex justify-between items-center mb-4 sticky top-0 bg-white z-10 pb-2 border-b">
-                  <h3 className="text-lg font-bold">
-                    Print Preview - {photoStatus} ({selectedOrientation})
-                  </h3>
-                  <div className="flex gap-2">
-                    <button
-                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                      onClick={generatePDF}
-                    >
-                      <i className="fa-solid fa-print mr-2"></i>
-                      Download PDF
-                    </button>
-                    <button
-                      className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-                      onClick={() => setShowPreviewModal(false)}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-
-                <div className="border border-gray-300 rounded shadow-sm bg-gray-100 p-4">
-                  {/* Preview content that will be converted to PDF */}
-                  <div id="pdf-preview-content" className="bg-white mx-auto" style={{
-                    width: selectedOrientation === 'portrait' ? '595px' : '842px',  // A4 dimensions in pixels at 72dpi
-                    minHeight: selectedOrientation === 'portrait' ? '842px' : '595px',
-                    padding: '20px',
-                    boxSizing: 'border-box',
-                    boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-                    overflow: 'hidden'
-                  }}>
-                    <h2 style={{
-                      textAlign: 'center',
-                      margin: '0 0 15px 0',
-                      fontWeight: 'bold',
-                      fontSize: '18px'
-                    }}>
-                      Participants Card - {photoStatus}
-                    </h2>
-                    {renderPreviewCards()}
-                  </div>
-                </div>
-              </div>
+{showPreviewModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2">
+    <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+      <div className="flex flex-col sm:flex-row justify-between items-center p-3 sticky top-0 bg-white z-10 border-b">
+        <h3 className="text-lg font-bold mb-3 sm:mb-0 text-center sm:text-left w-full sm:w-auto">
+          Print Preview - {photoStatus} ({selectedOrientation})
+        </h3>
+        <div className="flex gap-2 w-full sm:w-auto justify-center sm:justify-end">
+          <button
+            className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            onClick={generatePDF}
+          >
+            <i className="fa-solid fa-print mr-2"></i>
+            Download PDF
+          </button>
+          <button
+            className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300"
+            onClick={() => setShowPreviewModal(false)}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+      
+      <div className="p-3 overflow-x-auto">
+        <div className="border border-gray-300 rounded shadow-sm bg-gray-100 p-2 min-w-fit">
+          <div 
+            id="pdf-preview-content" 
+            className="bg-white mx-auto" 
+            style={{
+              width: selectedOrientation === 'portrait' ? '595px' : '842px',
+              height: 'auto',
+              minHeight: selectedOrientation === 'portrait' ? '842px' : '595px',
+              padding: '20px',
+              boxShadow: '0 0 10px rgba(0,0,0,0.1)'
+            }}
+          >
+            <h2 className="text-center font-bold text-lg mb-4">
+              Participants Card - {photoStatus}
+            </h2>
+            <div className="flex flex-wrap justify-center">
+              {renderPreviewCards()}
             </div>
-          )}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
         </div>
       </div>
     </>

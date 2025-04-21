@@ -5,7 +5,7 @@ import html2pdf from 'html2pdf.js';
 import { useSearchParams } from 'react-router-dom';
 
 const CertificateParticipate = () => {
-  // Add useSearchParams to get item information from URL
+  // Get item information from URL
   const [searchParams] = useSearchParams();
   const itemCode = searchParams.get('itemCode');
   const itemName = searchParams.get('itemName');
@@ -14,7 +14,6 @@ const CertificateParticipate = () => {
   const [selectedParticipant, setSelectedParticipant] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const [showCertificate, setShowCertificate] = useState(false);
   const [certificateData, setCertificateData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -24,6 +23,7 @@ const CertificateParticipate = () => {
   const dropdownRef = useRef(null);
   const certificateRef = useRef(null);
   const searchInputRef = useRef(null);
+  const hiddenCertificateRef = useRef(null);
 
   // Dummy data for participants
   const dummyParticipants = [
@@ -135,7 +135,6 @@ const CertificateParticipate = () => {
         return nameMatch || regNoMatch || schoolMatch;
       });
       
-      // Only add "All Participants" option if we're not searching or if there are results
       setFilteredParticipants(filtered);
     } else {
       setFilteredParticipants(participants);
@@ -173,9 +172,9 @@ const CertificateParticipate = () => {
     }
   }, [highlightedIndex]);
 
-  // Trigger PDF generation when certificate data is ready and shown
+  // Trigger PDF generation when certificate data is ready
   useEffect(() => {
-    if (showCertificate && certificateData) {
+    if (certificateData && certificateData.length > 0 && hiddenCertificateRef.current) {
       // Give time for the certificate to render
       const timer = setTimeout(() => {
         handleSaveAsPDF();
@@ -183,7 +182,7 @@ const CertificateParticipate = () => {
       
       return () => clearTimeout(timer);
     }
-  }, [showCertificate, certificateData]);
+  }, [certificateData]);
 
   // Simulate API call to get all participants
   const getAllParticipants = async () => {
@@ -195,8 +194,6 @@ const CertificateParticipate = () => {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       // Use dummy data
-      // If itemCode is provided, filter participants to match that item if needed
-      // This is where you could make an API call to get participants for a specific item
       setParticipants(dummyParticipants);
     } catch (err) {
       console.log(err);
@@ -316,8 +313,6 @@ const CertificateParticipate = () => {
             return;
           }
         }
-        setShowCertificate(true);
-        // handleSaveAsPDF will be called automatically via useEffect
         
       } catch (err) {
         console.error("Error generating certificate:", err);
@@ -331,83 +326,232 @@ const CertificateParticipate = () => {
   };
 
   // Function to generate PDF and handle save as
-  const handleSaveAsPDF = async () => {
-    if (!certificateRef.current) return;
+ // Update the handleSaveAsPDF function with better PDF options
+const handleSaveAsPDF = async () => {
+  if (!hiddenCertificateRef.current) return;
+  
+  try {
+    // Keep loading state active during PDF generation
+    setLoading(true);
     
-    try {
-      setLoading(true);
-      
-      const filename = selectedParticipant === "All Participants" 
-        ? `all-participants-${itemCode ? itemCode + '-' + itemName : ''}-certificate.pdf`
-        : `${selectedParticipant.split(' - ')[1]}-${itemCode ? itemCode + '-' + itemName : ''}-certificate.pdf`;
-      
-      // Generate PDF first
-      const options = {
-        margin: 10,
-        filename: filename,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    const filename = selectedParticipant === "All Participants" 
+      ? `all-participants-${itemCode ? itemCode + '-' + itemName : ''}-certificate.pdf`
+      : `${selectedParticipant.split(' - ')[1]}-${itemCode ? itemCode + '-' + itemName : ''}-certificate.pdf`;
+    
+    // Enhanced PDF options for better centering and margins
+    const options = {
+      margin: [15, 15, 15, 15], // [top, right, bottom, left] margins in mm
+      filename: filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2, 
+        useCORS: true,
+        letterRendering: true,
+      },
+      jsPDF: { 
+        unit: 'mm', 
+        format: 'a4', 
+        orientation: 'portrait',
+        compress: true,
+      }
+    };
+    
+    // If multiple certificates, ensure they all fit well
+    if (certificateData && certificateData.length > 1) {
+      options.pagebreak = { 
+        mode: ['avoid-all', 'css', 'legacy'],
+        before: '.page-break' 
       };
-      
-      // If multiple certificates, ensure they all fit well
-      if (certificateData && certificateData.length > 1) {
-        options.pagebreak = { mode: ['avoid-all', 'css', 'legacy'] };
-      }
-      
-      // Generate PDF blob
-      const pdfBlob = await html2pdf()
-        .set(options)
-        .from(certificateRef.current)
-        .output('blob');
-      
-      // Check if browser supports the File System Access API
-      if ('showSaveFilePicker' in window) {
-        try {
-          // File picker options
-          const opts = {
-            suggestedName: filename,
-            types: [{
-              description: 'PDF Files',
-              accept: {'application/pdf': ['.pdf']}
-            }],
-          };
-          
-          // Show the file picker
-          const fileHandle = await window.showSaveFilePicker(opts);
-          
-          // Create a FileSystemWritableFileStream
-          const writable = await fileHandle.createWritable();
-          
-          // Write the blob to the file
-          await writable.write(pdfBlob);
-          
-          // Close the file
-          await writable.close();
-          
-          // Show success message
-          setSaveSuccess(true);
-          
-        } catch (err) {
-          if (err.name !== 'AbortError') {
-            console.error("Error saving file:", err);
-            // Fall back to regular download if there's an error other than user cancellation
-            downloadPDF(pdfBlob, filename);
-            setSaveSuccess(true);
-          }
-        }
-      } else {
-        // Fall back to regular download if File System Access API is not supported
-        downloadPDF(pdfBlob, filename);
-        setSaveSuccess(true);
-      }
-    } catch (err) {
-      console.error("Error generating or saving PDF:", err);
-      setError("Failed to save PDF. Please try again.");
-    } finally {
-      setLoading(false);
     }
-  };
+    
+    // Generate PDF blob
+    const pdfBlob = await html2pdf()
+      .set(options)
+      .from(hiddenCertificateRef.current)
+      .output('blob');
+    
+    // Rest of the function remains the same...
+
+    // Check if browser supports the File System Access API
+    if ('showSaveFilePicker' in window) {
+      try {
+        // File picker options
+        const opts = {
+          suggestedName: filename,
+          types: [{
+            description: 'PDF Files',
+            accept: {'application/pdf': ['.pdf']}
+          }],
+        };
+        
+        // Show the file picker
+        const fileHandle = await window.showSaveFilePicker(opts);
+        
+        // Create a FileSystemWritableFileStream
+        const writable = await fileHandle.createWritable();
+        
+        // Write the blob to the file
+        await writable.write(pdfBlob);
+        
+        // Close the file
+        await writable.close();
+        
+        // Show success message
+        setSaveSuccess(true);
+        
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error("Error saving file:", err);
+          // Fall back to regular download if there's an error other than user cancellation
+          downloadPDF(pdfBlob, filename);
+          setSaveSuccess(true);
+        }
+      }
+    } else {
+      // Fall back to regular download if File System Access API is not supported
+      downloadPDF(pdfBlob, filename);
+      setSaveSuccess(true);
+    }
+    
+    // Reset certificate data after successful download
+    setTimeout(() => {
+      setCertificateData(null);
+    }, 1000);
+    
+  } catch (err) {
+    console.error("Error generating or saving PDF:", err);
+    setError("Failed to save PDF. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+// Replace the hidden certificate container with this improved version
+// The JSX part to replace:
+{/* Hidden certificate container for PDF generation */}
+<div style={{ display: 'none' }}>
+  <div ref={hiddenCertificateRef} className="certificate-container">
+    <style>
+      {`
+        .certificate-container {
+          width: 210mm;
+          padding: 15mm;
+          background-color: white;
+          font-family: Arial, sans-serif;
+          box-sizing: border-box;
+        }
+        .certificate-header {
+          text-align: center;
+          margin-bottom: 20px;
+          border-bottom: 2px solid #003566;
+          padding-bottom: 10px;
+        }
+        .certificate-header h1 {
+          font-size: 24px;
+          font-weight: bold;
+          color: #003566;
+          margin-bottom: 10px;
+        }
+        .certificate-header .item-info {
+          font-size: 16px;
+          font-weight: 600;
+        }
+        .certificate-header .festival-info {
+          font-size: 14px;
+          color: #444;
+        }
+        .participant-info {
+          width: 100%;
+          max-width: 500px;
+          margin: 0 auto;
+          text-align: left;
+        }
+        .participant-row {
+          display: flex;
+          margin-bottom: 10px;
+          align-items: center;
+        }
+        .participant-label {
+          font-weight: 600;
+          width: 100px;
+          color: #003566;
+        }
+        .participant-value {
+          flex: 1;
+        }
+        .page-break {
+          page-break-after: always;
+          height: 0;
+          margin: 0;
+          border: 0;
+        }
+        .participant-card {
+          padding: 15px;
+          margin-bottom: 20px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .certificate-footer {
+          text-align: center;
+          margin-top: 30px;
+          font-size: 12px;
+          color: #666;
+        }
+      `}
+    </style>
+    <div className="certificate-header">
+      <h1>Certificate Participant Wise Report</h1>
+      {itemCode && itemName && (
+        <>
+          <div className="item-info">Item: {itemCode} - {itemName}</div>
+          <div className="festival-info">Festival: {festival}</div>
+        </>
+      )}
+    </div>
+
+    {/* Certificate content container */}
+    <div className="certificate-content">
+      {certificateData && certificateData.map((participant, index) => (
+        <div key={participant.id}>
+          <div className="participant-card">
+            <div className="participant-info">
+              <div className="participant-row">
+                <div className="participant-label">Name:</div>
+                <div className="participant-value">{participant.name}</div>
+              </div>
+              <div className="participant-row">
+                <div className="participant-label">Reg No:</div>
+                <div className="participant-value">{participant.regNo}</div>
+              </div>
+              <div className="participant-row">
+                <div className="participant-label">School:</div>
+                <div className="participant-value">{participant.school}</div>
+              </div>
+              <div className="participant-row">
+                <div className="participant-label">Class:</div>
+                <div className="participant-value">{participant.class}</div>
+              </div>
+              <div className="participant-row">
+                <div className="participant-label">Item:</div>
+                <div className="participant-value">{participant.item}</div>
+              </div>
+              <div className="participant-row">
+                <div className="participant-label">Grade:</div>
+                <div className="participant-value">{participant.grade}</div>
+              </div>
+            </div>
+          </div>
+          {index < certificateData.length - 1 && <div className="page-break"></div>}
+        </div>
+      ))}
+    </div>
+    
+    <div className="certificate-footer">
+      Generated on: {new Date().toLocaleDateString()} | Certificate ID: {Math.random().toString(36).substring(2, 10).toUpperCase()}
+    </div>
+  </div>
+</div>
   
   // Fallback download function using URL.createObjectURL
   const downloadPDF = (blob, filename) => {
@@ -427,13 +571,6 @@ const CertificateParticipate = () => {
     URL.revokeObjectURL(link.href);
   };
 
-  const handleBackToSelection = () => {
-    setShowCertificate(false);
-    setCertificateData(null);
-    setError(null);
-    setSaveSuccess(false);
-  };
-
   return (
     <>
       <div>
@@ -442,309 +579,284 @@ const CertificateParticipate = () => {
           <Dash />
           <div className="flex-1 p-4 md:p-2 w-full overflow-x-auto">
             <div className="bg-gray-200 p-4 rounded-lg min-h-screen">
-              {!showCertificate ? (
-                <>
-                  <h2 className="text-lg font-semibold mb-4">Certificate Participant Wise</h2>
-                  
-                  {/* Display Item Code & Item Name if available */}
-                  {itemCode && itemName && (
-                    <div className="mb-4 p-3 rounded-lg">
-                      <div className="flex flex-col sm:flex-row text-blue-900 sm:items-center">
-                       
-                        <div>{itemCode} - {itemName}</div>
-                      </div>
-                      
-                    </div>
-                  )}
-                  
-                  {/* Display error message if exists */}
-                  {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                      {error}
-                    </div>
-                  )}
-                  
-                  <form onSubmit={handleGenerateCertificate}>
-                    <div className="flex justify-center mt-20">
-                      <div className="space-y-4">
-                        <div className="flex flex-col md:flex-row mb-8">
-                          <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">
-                            Participant
-                          </label>
-                          <div className="w-full md:w-80 relative">
-                            <div className="relative">
-                              <input
-                                placeholder={loading ? 'Loading participants...' : 'Select Participant'}
-                                type="text"
-                                className="border border-blue-600 px-2 py-1 rounded-full w-full cursor-pointer pr-8"
-                                value={selectedParticipant}
-                                onClick={toggleDropdown}
-                                onKeyDown={handleKeyDown}
-                                readOnly
-                                disabled={loading}
-                                aria-haspopup="listbox"
-                                aria-expanded={isDropdownOpen}
-                              />
-                              <div
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
-                                onClick={toggleDropdown}
+              <h2 className="text-lg font-semibold mb-4">Certificate Participant Wise</h2>
+              
+              {/* Display Item Code & Item Name if available */}
+              {itemCode && itemName && (
+                <div className="mb-4 p-3 rounded-lg">
+                  <div className="flex flex-col sm:flex-row text-blue-900 sm:items-center">
+                    <div>{itemCode} - {itemName}</div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Display success message when save is successful */}
+              {saveSuccess && (
+                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 flex justify-between items-center">
+                  <span>Certificate saved successfully!</span>
+                  <button
+                    onClick={() => setSaveSuccess(false)}
+                    className="text-gray-700"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+              )}
+              
+              {/* Display error message if exists */}
+              {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                  {error}
+                </div>
+              )}
+              
+              <form onSubmit={handleGenerateCertificate}>
+                <div className="flex justify-center mt-20">
+                  <div className="space-y-4">
+                    <div className="flex flex-col md:flex-row mb-8">
+                      <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">
+                        Participant
+                      </label>
+                      <div className="w-full md:w-80 relative">
+                        <div className="relative">
+                          <input
+                            placeholder={loading ? 'Loading participants...' : 'Select Participant'}
+                            type="text"
+                            className="border border-blue-600 px-2 py-1 rounded-full w-full cursor-pointer pr-8"
+                            value={selectedParticipant}
+                            onClick={toggleDropdown}
+                            onKeyDown={handleKeyDown}
+                            readOnly
+                            disabled={loading}
+                            aria-haspopup="listbox"
+                            aria-expanded={isDropdownOpen}
+                          />
+                          <div
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+                            onClick={toggleDropdown}
+                          >
+                            {isDropdownOpen ? (
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                               >
-                                {isDropdownOpen ? (
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  >
-                                    <path d="m18 15-6-6-6 6" />
-                                  </svg>
-                                ) : (
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  >
-                                    <path d="m6 9 6 6 6-6" />
-                                  </svg>
-                                )}
-                              </div>
-                            </div>
-                            {isDropdownOpen && (
-                              <div
-                                className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"
-                                role="listbox"
-                                ref={dropdownRef}
+                                <path d="m18 15-6-6-6 6" />
+                              </svg>
+                            ) : (
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                               >
-                                {/* Search bar when participants > 7 */}
-                                {showSearchBar && (
-                                  <div className="sticky top-0 bg-white p-2 border-b border-gray-200">
-                                    <div className="relative">
-                                      <input
-                                        ref={searchInputRef}
-                                        type="text"
-                                        className="w-full border border-gray-300 rounded-md px-3 py-2 pl-8"
-                                        placeholder="Search participants..."
-                                        value={searchTerm}
-                                        onChange={handleSearchChange}
-                                        onKeyDown={handleSearchKeyDown}
-                                        onClick={e => e.stopPropagation()}
-                                      />
-                                      <div className="absolute left-2 top-1/2 transform -translate-y-1/2">
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          width="16"
-                                          height="16"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          strokeWidth="2"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                        >
-                                          <circle cx="11" cy="11" r="8" />
-                                          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                                        </svg>
-                                      </div>
-                                      {searchTerm.trim() !== '' && (
-                                        <div 
-                                          className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
-                                          onClick={() => setSearchTerm('')}
-                                        >
-                                          <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="16"
-                                            height="16"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                          >
-                                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                                          </svg>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                )}
-                                
-                                {/* "All Participants" option always at the top when not searching */}
-                                {searchTerm.trim() === '' && participants.find(p => p.id === "all") && (
-                                  <div
-                                    key="all"
-                                    className={`px-4 py-2 cursor-pointer ${
-                                      0 === highlightedIndex ? 'bg-blue-100' : 'hover:bg-blue-50'
-                                    } font-semibold border-b border-gray-200`}
-                                    onClick={() => handleParticipantSelect(participants.find(p => p.id === "all"))}
-                                    role="option"
-                                    aria-selected={0 === highlightedIndex}
-                                  >
-                                    All Participants
-                                  </div>
-                                )}
-                                
-                                {/* Regular participants list */}
-                                {filteredParticipants.length > 0 ? (
-                                  filteredParticipants.map((participant, index) => {
-                                    // Skip "All Participants" since we're handling it separately above
-                                    if (participant.id === "all") return null;
-                                    
-                                    // Calculate the proper index for highlighting (account for "All Participants" at top)
-                                    const highlightIndex = searchTerm.trim() === '' ? index + 1 : index;
-                                    
-                                    return (
-                                      <div
-                                        key={participant.id}
-                                        className={`px-4 py-2 cursor-pointer ${
-                                          highlightIndex === highlightedIndex ? 'bg-blue-100' : 'hover:bg-blue-50'
-                                        }`}
-                                        onClick={() => handleParticipantSelect(participant)}
-                                        role="option"
-                                        aria-selected={highlightIndex === highlightedIndex}
-                                      >
-                                        {`${participant.id} - ${participant.name}`}
-                                      </div>
-                                    );
-                                  })
-                                ) : (
-                                  <div className="px-4 py-2 text-gray-500">
-                                    {searchTerm.trim() !== '' ? "No matching participants found" : "No participants available"}
-                                  </div>
-                                )}
-                              </div>
+                                <path d="m6 9 6 6 6-6" />
+                              </svg>
                             )}
                           </div>
                         </div>
-                        <div className='text-center'>
-                          <button
-                            type="submit"
-                            className={`bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-14 py-3 rounded-full mt-10 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            disabled={loading}
+                        {isDropdownOpen && (
+                          <div
+                            className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"
+                            role="listbox"
+                            ref={dropdownRef}
                           >
-                            {loading ? 'Processing...' : 'Generate'}
-                          </button>
-                        </div>
+                            {/* Search bar when participants > 7 */}
+                            {showSearchBar && (
+                              <div className="sticky top-0 bg-white p-2 border-b border-gray-200">
+                                <div className="relative">
+                                  <input
+                                    ref={searchInputRef}
+                                    type="text"
+                                    className="w-full border border-gray-300 rounded-md px-3 py-2 pl-8"
+                                    placeholder="Search participants..."
+                                    value={searchTerm}
+                                    onChange={handleSearchChange}
+                                    onKeyDown={handleSearchKeyDown}
+                                    onClick={e => e.stopPropagation()}
+                                  />
+                                  <div className="absolute left-2 top-1/2 transform -translate-y-1/2">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="16"
+                                      height="16"
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    >
+                                      <circle cx="11" cy="11" r="8" />
+                                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                    </svg>
+                                  </div>
+                                  {searchTerm.trim() !== '' && (
+                                    <div 
+                                      className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                                      onClick={() => setSearchTerm('')}
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      >
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                      </svg>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* "All Participants" option always at the top when not searching */}
+                            {searchTerm.trim() === '' && participants.find(p => p.id === "all") && (
+                              <div
+                                key="all"
+                                className={`px-4 py-2 cursor-pointer ${
+                                  0 === highlightedIndex ? 'bg-blue-100' : 'hover:bg-blue-50'
+                                } font-semibold border-b border-gray-200`}
+                                onClick={() => handleParticipantSelect(participants.find(p => p.id === "all"))}
+                                role="option"
+                                aria-selected={0 === highlightedIndex}
+                              >
+                                All Participants
+                              </div>
+                            )}
+                            
+                            {/* Regular participants list */}
+                            {filteredParticipants.length > 0 ? (
+                              filteredParticipants.map((participant, index) => {
+                                // Skip "All Participants" since we're handling it separately above
+                                if (participant.id === "all") return null;
+                                
+                                // Calculate the proper index for highlighting (account for "All Participants" at top)
+                                const highlightIndex = searchTerm.trim() === '' ? index + 1 : index;
+                                
+                                return (
+                                  <div
+                                    key={participant.id}
+                                    className={`px-4 py-2 cursor-pointer ${
+                                      highlightIndex === highlightedIndex ? 'bg-blue-100' : 'hover:bg-blue-50'
+                                    }`}
+                                    onClick={() => handleParticipantSelect(participant)}
+                                    role="option"
+                                    aria-selected={highlightIndex === highlightedIndex}
+                                  >
+                                    {`${participant.id} - ${participant.name}`}
+                                  </div>
+                                );
+                              })
+                            ) : (
+                              <div className="px-4 py-2 text-gray-500">
+                                {searchTerm.trim() !== '' ? "No matching participants found" : "No participants available"}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
-                  </form>
-                </>
-              ) : (
-                <div className="flex flex-col">
-                  {/* Display success message when save is successful */}
-                  {saveSuccess && (
-                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 flex justify-between items-center">
-                      <span>Certificate saved successfully!</span>
-                      <button 
-                        onClick={() => setSaveSuccess(false)}
-                        className="text-gray-700"
+                    <div className='text-center'>
+                      <button
+                        type="submit"
+                        className={`bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-14 py-3 rounded-full mt-10 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={loading}
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <line x1="18" y1="6" x2="6" y2="18"></line>
-                          <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
+                        {loading ? 'Generating...' : 'Generate'}
                       </button>
                     </div>
-                  )}
-                  
-                  {/* Back button */}
-                  <div className="mb-4">
-                    <button
-                      onClick={handleBackToSelection}
-                      className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded flex items-center"
-                    >
-                      <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        width="16" 
-                        height="16" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        className="mr-2"
-                      >
-                        <path d="m15 18-6-6 6-6"/>
-                      </svg>
-                      Back
-                    </button>
                   </div>
-                  
-                  {/* Certificate content */}
-                  <div ref={certificateRef} className="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
-                    <h1 className="text-xl font-bold text-center mb-6">Certificate Participant Wise Report</h1>
-                    
-                    {/* Display Item Code & Item Name in the Certificate */}
-                    {itemCode && itemName && (
-                      <div className="mb-6 text-center">
-                        <div className="text-lg font-semibold">
-                          Item: {itemCode} - {itemName}
-                        </div>
-                        <div className="text-md text-gray-700">
-                          Festival: {festival}
-                        </div>
+                </div>
+              </form>
+              
+              {/* Hidden certificate container for PDF generation */}
+              <div style={{ display: 'none' }}>
+                <div ref={hiddenCertificateRef} className="bg-white p-6 w-full max-w-4xl mx-auto">
+                  <h1 className="text-2xl font-bold text-center mb-4">Certificate Participant Wise Report</h1>
+                
+                  {/* Display Item Code & Item Name in the Certificate */}
+                  {itemCode && itemName && (
+                    <div className="mb-4 text-center">
+                      <div className="text-lg font-semibold">
+                        Item: {itemCode} - {itemName}
                       </div>
-                    )}
-                    
-                    {certificateData && certificateData.map((participant, index) => (
-                      <div key={participant.id} className="mb-8">
-                        <div className="mb-6 px-16">
-                          <div className="mb-6 px-4 flex justify-center">
-                            <div className="grid gap-y-2 text-left">
-                              <div className="flex">
-                                <span className="w-32 font-semibold">Name:</span>
-                                <span>{participant.name}</span>
-                              </div>
-                              <div className="flex">
-                                <span className="w-32 font-semibold">Reg No:</span>
-                                <span>{participant.regNo}</span>
-                              </div>
-                              <div className="flex">
-                                <span className="w-32 font-semibold">School:</span>
-                                <span>{participant.school}</span>
-                              </div>
-                              <div className="flex">
-                                <span className="w-32 font-semibold">Class:</span>
-                                <span>{participant.class}</span>
-                              </div>
-                              <div className="flex">
-                                <span className="w-32 font-semibold">Item:</span>
-                                <span>{participant.item}</span>
-                              </div>
-                              <div className="flex">
-                                <span className="w-32 font-semibold">Grade:</span>
-                                <span>{participant.grade}</span>
+                      <div className="text-base text-gray-700">
+                        Festival: {festival}
+                      </div>
+                    </div>
+                  )}
+                
+                  {/* Certificate content container */}
+                  <div className="certificate-content">
+                    <div className="w-full text-center">
+                      {certificateData && certificateData.map((participant, index) => (
+                        <div key={participant.id} className="mb-6 inline-block">
+                          <div className="mb-4">
+                            <div className="participant-info">
+                              <div className="grid gap-y-2">
+                                <div className="flex flex-row items-center">
+                                  <span className="font-semibold w-24">Name:</span>
+                                  <span>{participant.name}</span>
+                                </div>
+                                <div className="flex flex-row items-center">
+                                  <span className="font-semibold w-24">Reg No:</span>
+                                  <span>{participant.regNo}</span>
+                                </div>
+                                <div className="flex flex-row items-center">
+                                  <span className="font-semibold w-24">School:</span>
+                                  <span>{participant.school}</span>
+                                </div>
+                                <div className="flex flex-row items-center">
+                                  <span className="font-semibold w-24">Class:</span>
+                                  <span>{participant.class}</span>
+                                </div>
+                                <div className="flex flex-row items-center">
+                                  <span className="font-semibold w-24">Item:</span>
+                                  <span>{participant.item}</span>
+                                </div>
+                                <div className="flex flex-row items-center">
+                                  <span className="font-semibold w-24">Grade:</span>
+                                  <span>{participant.grade}</span>
+                                </div>
                               </div>
                             </div>
                           </div>
+                          {index < certificateData.length - 1 && <hr className="my-4" />}
                         </div>
-                        {index < certificateData.length - 1 && <hr className="my-6" />}
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {/* Loading overlay */}
-                  {loading && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                      <div className="bg-white p-5 rounded-lg flex flex-col items-center">
-                        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500 mb-3"></div>
-                        <p>Saving certificate...</p>
-                      </div>
+                      ))}
                     </div>
-                  )}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Loading overlay */}
+              {loading && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white p-5 rounded-lg flex flex-col items-center">
+                    <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500 mb-3"></div>
+                    <p>{certificateData ? "Saving certificate..." : "Generating certificate..."}</p>
+                  </div>
                 </div>
               )}
             </div>
