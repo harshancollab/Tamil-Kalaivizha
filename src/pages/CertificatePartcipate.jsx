@@ -20,10 +20,13 @@ const CertificateParticipate = () => {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredParticipants, setFilteredParticipants] = useState([]);
+  const [pdfGenerationReady, setPdfGenerationReady] = useState(false);
+  
   const dropdownRef = useRef(null);
   const certificateRef = useRef(null);
   const searchInputRef = useRef(null);
   const hiddenCertificateRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Dummy data for participants
   const dummyParticipants = [
@@ -172,17 +175,24 @@ const CertificateParticipate = () => {
     }
   }, [highlightedIndex]);
 
-  // Trigger PDF generation when certificate data is ready
+  // Better PDF generation flow
   useEffect(() => {
-    if (certificateData && certificateData.length > 0 && hiddenCertificateRef.current) {
-      // Give time for the certificate to render
-      const timer = setTimeout(() => {
-        handleSaveAsPDF();
-      }, 500);
-      
-      return () => clearTimeout(timer);
+    if (certificateData && certificateData.length > 0) {
+      // Wait for certificate content to be rendered properly
+      setTimeout(() => {
+        setPdfGenerationReady(true);
+      }, 1000);
     }
   }, [certificateData]);
+
+  // Trigger PDF generation when ready
+  useEffect(() => {
+    if (pdfGenerationReady && hiddenCertificateRef.current) {
+      handleSaveAsPDF();
+      // Reset the flag after PDF generation starts
+      setPdfGenerationReady(false);
+    }
+  }, [pdfGenerationReady]);
 
   // Simulate API call to get all participants
   const getAllParticipants = async () => {
@@ -325,250 +335,140 @@ const CertificateParticipate = () => {
     }
   };
 
-  // Function to generate PDF and handle save as
- // Update the handleSaveAsPDF function with better PDF options
-const handleSaveAsPDF = async () => {
-  if (!hiddenCertificateRef.current) return;
-  
-  try {
-    // Keep loading state active during PDF generation
-    setLoading(true);
+  // Improved PDF generation function with Save As dialog
+  const handleSaveAsPDF = async () => {
+    if (!hiddenCertificateRef.current) return;
     
-    const filename = selectedParticipant === "All Participants" 
-      ? `all-participants-${itemCode ? itemCode + '-' + itemName : ''}-certificate.pdf`
-      : `${selectedParticipant.split(' - ')[1]}-${itemCode ? itemCode + '-' + itemName : ''}-certificate.pdf`;
-    
-    // Enhanced PDF options for better centering and margins
-    const options = {
-      margin: [15, 15, 15, 15], // [top, right, bottom, left] margins in mm
-      filename: filename,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { 
-        scale: 2, 
-        useCORS: true,
-        letterRendering: true,
-      },
-      jsPDF: { 
-        unit: 'mm', 
-        format: 'a4', 
-        orientation: 'portrait',
-        compress: true,
-      }
-    };
-    
-    // If multiple certificates, ensure they all fit well
-    if (certificateData && certificateData.length > 1) {
-      options.pagebreak = { 
-        mode: ['avoid-all', 'css', 'legacy'],
-        before: '.page-break' 
+    try {
+      // Keep loading state active during PDF generation
+      setLoading(true);
+      
+      // Generate file name
+      const filename = selectedParticipant === "All Participants" 
+        ? `all-participants-${itemCode ? itemCode + '-' + itemName : ''}-certificate.pdf`
+        : `${selectedParticipant.split(' - ')[1]}-${itemCode ? itemCode + '-' + itemName : ''}-certificate.pdf`;
+      
+      // Enhanced PDF options for better output
+      const options = {
+        margin: 10,
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+          scale: 2,
+          useCORS: true,
+          logging: true, // Enable logging for debugging
+          letterRendering: true,
+          allowTaint: true, // Allow tainted canvas
+          backgroundColor: '#ffffff'
+        },
+        jsPDF: { 
+          unit: 'mm', 
+          format: 'a4', 
+          orientation: 'portrait'
+        }
       };
-    }
-    
-    // Generate PDF blob
-    const pdfBlob = await html2pdf()
-      .set(options)
-      .from(hiddenCertificateRef.current)
-      .output('blob');
-    
-    // Rest of the function remains the same...
-
-    // Check if browser supports the File System Access API
-    if ('showSaveFilePicker' in window) {
-      try {
-        // File picker options
-        const opts = {
-          suggestedName: filename,
-          types: [{
-            description: 'PDF Files',
-            accept: {'application/pdf': ['.pdf']}
-          }],
+      
+      // If multiple certificates, ensure they all fit well
+      if (certificateData && certificateData.length > 1) {
+        options.pagebreak = { 
+          mode: ['avoid-all', 'css', 'legacy'],
+          before: '.page-break' 
         };
-        
-        // Show the file picker
-        const fileHandle = await window.showSaveFilePicker(opts);
-        
-        // Create a FileSystemWritableFileStream
-        const writable = await fileHandle.createWritable();
-        
-        // Write the blob to the file
-        await writable.write(pdfBlob);
-        
-        // Close the file
-        await writable.close();
-        
-        // Show success message
-        setSaveSuccess(true);
-        
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          console.error("Error saving file:", err);
-          // Fall back to regular download if there's an error other than user cancellation
-          downloadPDF(pdfBlob, filename);
-          setSaveSuccess(true);
-        }
       }
-    } else {
-      // Fall back to regular download if File System Access API is not supported
-      downloadPDF(pdfBlob, filename);
-      setSaveSuccess(true);
+      
+      // Generate PDF blob
+      const pdfBlob = await html2pdf()
+        .from(hiddenCertificateRef.current)
+        .set(options)
+        .outputPdf('blob');
+      
+      // Show save as dialog using FileSaver API
+      showSaveAsDialog(pdfBlob, filename);
+      
+      // Reset certificate data after successful generation
+      setTimeout(() => {
+        setCertificateData(null);
+        setSaveSuccess(true);
+      }, 1000);
+      
+    } catch (err) {
+      console.error("Error generating or saving PDF:", err);
+      setError("Failed to save PDF. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    
-    // Reset certificate data after successful download
-    setTimeout(() => {
-      setCertificateData(null);
-    }, 1000);
-    
-  } catch (err) {
-    console.error("Error generating or saving PDF:", err);
-    setError("Failed to save PDF. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
-
-// Replace the hidden certificate container with this improved version
-// The JSX part to replace:
-{/* Hidden certificate container for PDF generation */}
-<div style={{ display: 'none' }}>
-  <div ref={hiddenCertificateRef} className="certificate-container">
-    <style>
-      {`
-        .certificate-container {
-          width: 210mm;
-          padding: 15mm;
-          background-color: white;
-          font-family: Arial, sans-serif;
-          box-sizing: border-box;
-        }
-        .certificate-header {
-          text-align: center;
-          margin-bottom: 20px;
-          border-bottom: 2px solid #003566;
-          padding-bottom: 10px;
-        }
-        .certificate-header h1 {
-          font-size: 24px;
-          font-weight: bold;
-          color: #003566;
-          margin-bottom: 10px;
-        }
-        .certificate-header .item-info {
-          font-size: 16px;
-          font-weight: 600;
-        }
-        .certificate-header .festival-info {
-          font-size: 14px;
-          color: #444;
-        }
-        .participant-info {
-          width: 100%;
-          max-width: 500px;
-          margin: 0 auto;
-          text-align: left;
-        }
-        .participant-row {
-          display: flex;
-          margin-bottom: 10px;
-          align-items: center;
-        }
-        .participant-label {
-          font-weight: 600;
-          width: 100px;
-          color: #003566;
-        }
-        .participant-value {
-          flex: 1;
-        }
-        .page-break {
-          page-break-after: always;
-          height: 0;
-          margin: 0;
-          border: 0;
-        }
-        .participant-card {
-          padding: 15px;
-          margin-bottom: 20px;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .certificate-footer {
-          text-align: center;
-          margin-top: 30px;
-          font-size: 12px;
-          color: #666;
-        }
-      `}
-    </style>
-    <div className="certificate-header">
-      <h1>Certificate Participant Wise Report</h1>
-      {itemCode && itemName && (
-        <>
-          <div className="item-info">Item: {itemCode} - {itemName}</div>
-          <div className="festival-info">Festival: {festival}</div>
-        </>
-      )}
-    </div>
-
-    {/* Certificate content container */}
-    <div className="certificate-content">
-      {certificateData && certificateData.map((participant, index) => (
-        <div key={participant.id}>
-          <div className="participant-card">
-            <div className="participant-info">
-              <div className="participant-row">
-                <div className="participant-label">Name:</div>
-                <div className="participant-value">{participant.name}</div>
-              </div>
-              <div className="participant-row">
-                <div className="participant-label">Reg No:</div>
-                <div className="participant-value">{participant.regNo}</div>
-              </div>
-              <div className="participant-row">
-                <div className="participant-label">School:</div>
-                <div className="participant-value">{participant.school}</div>
-              </div>
-              <div className="participant-row">
-                <div className="participant-label">Class:</div>
-                <div className="participant-value">{participant.class}</div>
-              </div>
-              <div className="participant-row">
-                <div className="participant-label">Item:</div>
-                <div className="participant-value">{participant.item}</div>
-              </div>
-              <div className="participant-row">
-                <div className="participant-label">Grade:</div>
-                <div className="participant-value">{participant.grade}</div>
-              </div>
-            </div>
-          </div>
-          {index < certificateData.length - 1 && <div className="page-break"></div>}
-        </div>
-      ))}
-    </div>
-    
-    <div className="certificate-footer">
-      Generated on: {new Date().toLocaleDateString()} | Certificate ID: {Math.random().toString(36).substring(2, 10).toUpperCase()}
-    </div>
-  </div>
-</div>
+  };
   
-  // Fallback download function using URL.createObjectURL
-  const downloadPDF = (blob, filename) => {
+  // Show save as dialog using modern browser APIs
+  const showSaveAsDialog = (blob, defaultFilename) => {
+    // Check if the newer File System Access API is supported
+    if ('showSaveFilePicker' in window) {
+      handleSaveWithFileSystemAPI(blob, defaultFilename);
+    } else {
+      // Fallback to the older method which still lets the browser handle the save dialog
+      handleSaveWithFileSaver(blob, defaultFilename);
+    }
+  };
+
+  // Use modern File System Access API (Chrome 86+, Edge 86+)
+  const handleSaveWithFileSystemAPI = async (blob, defaultFilename) => {
+    try {
+      // Define save file options
+      const options = {
+        suggestedName: defaultFilename,
+        types: [{
+          description: 'PDF Files',
+          accept: { 'application/pdf': ['.pdf'] }
+        }]
+      };
+      
+      // Open the file picker in "save" mode
+      const fileHandle = await window.showSaveFilePicker(options);
+      
+      // Get a writable stream
+      const writable = await fileHandle.createWritable();
+      
+      // Write the blob to the file
+      await writable.write(blob);
+      
+      // Close the file
+      await writable.close();
+      
+      // Show success message
+      setSaveSuccess(true);
+    } catch (err) {
+      // User canceled or other error
+      console.error("Save file operation failed:", err);
+      
+      // If user canceled, don't show error
+      if (err.name !== 'AbortError') {
+        setError("Failed to save the file. Please try again.");
+      }
+    }
+  };
+
+  // Fallback method for browsers that don't support File System Access API
+  const handleSaveWithFileSaver = (blob, filename) => {
+    // Create a URL for the blob
+    const blobUrl = URL.createObjectURL(blob);
+    
     // Create a link element
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
+    link.href = blobUrl;
     link.download = filename;
     
     // Append to the document
     document.body.appendChild(link);
     
-    // Trigger click
+    // Trigger click to open browser's save dialog
     link.click();
     
     // Clean up
     document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
+    URL.revokeObjectURL(blobUrl);
+    
+    // Show success message
+    setSaveSuccess(true);
   };
 
   return (
@@ -608,8 +508,17 @@ const handleSaveAsPDF = async () => {
               
               {/* Display error message if exists */}
               {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                  {error}
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 flex justify-between items-center">
+                  <span>{error}</span>
+                  <button
+                    onClick={() => setError(null)}
+                    className="text-gray-700"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
                 </div>
               )}
               
@@ -790,63 +699,65 @@ const handleSaveAsPDF = async () => {
                 </div>
               </form>
               
-              {/* Hidden certificate container for PDF generation */}
-              <div style={{ display: 'none' }}>
-                <div ref={hiddenCertificateRef} className="bg-white p-6 w-full max-w-4xl mx-auto">
-                  <h1 className="text-2xl font-bold text-center mb-4">Certificate Participant Wise Report</h1>
-                
-                  {/* Display Item Code & Item Name in the Certificate */}
-                  {itemCode && itemName && (
-                    <div className="mb-4 text-center">
-                      <div className="text-lg font-semibold">
-                        Item: {itemCode} - {itemName}
+              {/* Improved hidden certificate container for PDF generation */}
+              <div style={{ position: 'absolute', left: '-9999px', top: 0, width: '210mm', backgroundColor: '#fff' }}>
+                <div ref={hiddenCertificateRef} style={{ width: '210mm', padding: '20mm', backgroundColor: '#fff' }}>
+                  <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                    <h1 style={{ fontSize: '24px', fontWeight: 'bold', margin: '0 0 10px 0' }}>Certificate Participant Wise Report</h1>
+                    
+                    {/* Display Item Code & Item Name in the Certificate */}
+                    {itemCode && itemName && (
+                      <div style={{ marginBottom: '15px' }}>
+                        <div style={{ fontSize: '18px', fontWeight: 'bold' }}>
+                          Item: {itemCode} - {itemName}
+                        </div>
+                        <div style={{ fontSize: '14px', color: '#333' }}>
+                          Festival: {festival}
+                        </div>
                       </div>
-                      <div className="text-base text-gray-700">
-                        Festival: {festival}
-                      </div>
-                    </div>
-                  )}
-                
+                    )}
+                  </div>
+                  
                   {/* Certificate content container */}
-                  <div className="certificate-content">
-                    <div className="w-full text-center">
-                      {certificateData && certificateData.map((participant, index) => (
-                        <div key={participant.id} className="mb-6 inline-block">
-                          <div className="mb-4">
-                            <div className="participant-info">
-                              <div className="grid gap-y-2">
-                                <div className="flex flex-row items-center">
-                                  <span className="font-semibold w-24">Name:</span>
-                                  <span>{participant.name}</span>
-                                </div>
-                                <div className="flex flex-row items-center">
-                                  <span className="font-semibold w-24">Reg No:</span>
-                                  <span>{participant.regNo}</span>
-                                </div>
-                                <div className="flex flex-row items-center">
-                                  <span className="font-semibold w-24">School:</span>
-                                  <span>{participant.school}</span>
-                                </div>
-                                <div className="flex flex-row items-center">
-                                  <span className="font-semibold w-24">Class:</span>
-                                  <span>{participant.class}</span>
-                                </div>
-                                <div className="flex flex-row items-center">
-                                  <span className="font-semibold w-24">Item:</span>
-                                  <span>{participant.item}</span>
-                                </div>
-                                <div className="flex flex-row items-center">
-                                  <span className="font-semibold w-24">Grade:</span>
-                                  <span>{participant.grade}</span>
-                                </div>
-                              </div>
+                  <div>
+                    {certificateData && certificateData.map((participant, index) => (
+                      <div key={participant.id} style={{ marginBottom: '20px', pageBreakAfter: index < certificateData.length - 1 ? 'always' : 'auto' }}>
+                        <div style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '15px', marginBottom: '20px' }}>
+                          <div style={{ width: '100%', maxWidth: '500px' }}>
+                            <div style={{ display: 'flex', marginBottom: '10px' }}>
+                              <div style={{ fontWeight: 'bold', width: '100px', color: '#003566' }}>Name:</div>
+                              <div>{participant.name}</div>
+                            </div>
+                            <div style={{ display: 'flex', marginBottom: '10px' }}>
+                              <div style={{ fontWeight: 'bold', width: '100px', color: '#003566' }}>Reg No:</div>
+                              <div>{participant.regNo}</div>
+                            </div>
+                            <div style={{ display: 'flex', marginBottom: '10px' }}>
+                              <div style={{ fontWeight: 'bold', width: '100px', color: '#003566' }}>School:</div>
+                              <div>{participant.school}</div>
+                            </div>
+                            <div style={{ display: 'flex', marginBottom: '10px' }}>
+                              <div style={{ fontWeight: 'bold', width: '100px', color: '#003566' }}>Class:</div>
+                              <div>{participant.class}</div>
+                            </div>
+                            <div style={{ display: 'flex', marginBottom: '10px' }}>
+                              <div style={{ fontWeight: 'bold', width: '100px', color: '#003566' }}>Item:</div>
+                              <div>{participant.item}</div>
+                            </div>
+                            <div style={{ display: 'flex', marginBottom: '10px' }}>
+                              <div style={{ fontWeight: 'bold', width: '100px', color: '#003566' }}>Grade:</div>
+                              <div>{participant.grade}</div>
                             </div>
                           </div>
-                          {index < certificateData.length - 1 && <hr className="my-4" />}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
                   </div>
+                  
+                  {/* Footer */}
+                  {/* <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '12px', color: '#666' }}>
+                    Generated on: {new Date().toLocaleDateString()} | Certificate ID: {Math.random().toString(36).substring(2, 10).toUpperCase()}
+                  </div> */}
                 </div>
               </div>
               

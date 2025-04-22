@@ -69,8 +69,11 @@ import CertificateRegno from './pages/CertificateRegno';
 import CertificatePartcipate from './pages/CertificatePartcipate';
 import Higherlvlcomp from './pages/Higherlvlcomp';
 import ExportDatabase from './pages/ExportDatabase';
-
+import Publish from './pages/Publish';
 import ItemCodewise from './pages/ItemCodewise';
+import AdminUser from './pages/AdminUser';
+import AddUser from './pages/AddUser';
+import EditUser from './pages/EditUser';
 
 
 
@@ -160,13 +163,16 @@ function App() {
           <Route path="/Higherlvlcomp" element={<Higherlvlcomp/>} />
           <Route path="/ExportDatabase" element={<ExportDatabase/>} />
           <Route path="/itemcodewise" element={<ItemCodewise/>} />
+          <Route path="/ai" element={<Publish/>} />
        
          
         </Route>
 
         {/* Routes ONLY for "admin" */}
-        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-          <Route path="/admin-panel" element={<h1>Admin Panel</h1>} />
+        <Route element={<ProtectedRoute allowedRoles={['It Admin']} />}>
+          <Route path="/admin-panel" element={<AdminUser/>} />
+          <Route path="/AddUser" element={<AddUser/>} />
+          <Route path="/EditUser/:id" element={<EditUser/>} />
         </Route>
 
 

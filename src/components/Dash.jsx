@@ -18,11 +18,11 @@ const Dash = () => {
       // Stage Report menu should be open if current path matches any of its links
       stageReport: ['/AddCallsheet', '/AddTimesheet', '/AddScoresheet', '/AddTabulationsheet', '/Addreport'].some(route => path === route),
       // Pre Fest Report menu should be open if current path matches any of its links
-      preFestReport: ['/eligible-schools', '/Partcipatescllist', '/SclContactList', '/festwiseList', '/DateWiseList', '/ParticipantsCardList', '/ParticipantsMorethan','/ClusterReport', '/StageReport'].some(route => path === route),
+      preFestReport: ['/eligible-schools', '/Partcipatescllist', '/SclContactList', '/festwiseList', '/DateWiseList', '/ParticipantsCardList', '/ParticipantsMorethan', '/ClusterReport', '/StageReport'].some(route => path === route),
       // Result menu should be open if current path matches any of its links
       results: ['/All-resultentry', '/item-result', '/Itemresult-list', '/All-Publishresult'].some(route => path === route),
-      resultsReport: ['/ConfidentialResultlist', '/itemwisepoint','/itemcodewise', '/SclWisePoint', '/Sclgradewise'].some(route => path === route),
-      certificate: ['/certificate-template', '/certificate-item-wise', '/certificate-school-wise','/CertificateRegno','/ExportDatabase'].some(route => path === route),
+      resultsReport: ['/ConfidentialResultlist', '/itemwisepoint', '/itemcodewise', '/SclWisePoint', '/Sclgradewise'].some(route => path === route),
+      certificate: ['/certificate-template', '/certificate-item-wise', '/certificate-school-wise', '/CertificateRegno', '/ExportDatabase'].some(route => path === route),
       Export: ['/Higherlvlcomp'].some(route => path === route)
     };
   });
@@ -37,12 +37,12 @@ const Dash = () => {
     // Determine which menu should be open based on current path
     const newOpenMenus = {
       settings: openMenus.settings || ['/AllKalolsavam', '/schlentry', '/All-schools', '/Spl-entry'].some(route => path === route),
-      stageSettings: openMenus.stageSettings || ['/stage-duration-list','/AddStage','/EditStage','/stage-duration','/Addfestivalwise', '/StageList', '/Stage-itemwiselist', '/festivalwiselist','/ClashReportList'].some(route => path === route),
+      stageSettings: openMenus.stageSettings || ['/stage-duration-list', '/AddStage', '/EditStage', '/stage-duration', '/Addfestivalwise', '/StageList', '/Stage-itemwiselist', '/festivalwiselist', '/ClashReportList'].some(route => path === route),
       stageReport: openMenus.stageReport || ['/AddCallsheet', '/AddTimesheet', '/AddScoresheet', '/AddTabulationsheet', '/Addreport'].some(route => path === route),
-      preFestReport: openMenus.preFestReport || ['/eligible-schools', '/Partcipatescllist', '/SclContactList', '/festwiseList', '/DateWiseList', '/ParticipantsCardList','/ClusterReport', '/StageReport'].some(route => path === route),
+      preFestReport: openMenus.preFestReport || ['/eligible-schools', '/Partcipatescllist', '/SclContactList', '/festwiseList', '/DateWiseList', '/ParticipantsCardList', '/ClusterReport', '/StageReport'].some(route => path === route),
       results: openMenus.results || ['/All-resultentry', '/item-result', '/Itemresult-list', '/All-Publishresult', '/'].some(route => path === route),
-      resultsReport: openMenus.resultsReport || ['/ConfidentialResultlist', '/itemwisepoint','/itemcodewise', '/SclWisePoint', '/Sclgradewise'].some(route => path === route),
-      certificate: openMenus.certificate || ['/certificate-template', '/certificate-item-wise', '/certificate-school-wise','/CertificateRegno','/ExportDatabase'].some(route => path === route),
+      resultsReport: openMenus.resultsReport || ['/ConfidentialResultlist', '/itemwisepoint', '/itemcodewise', '/SclWisePoint', '/Sclgradewise'].some(route => path === route),
+      certificate: openMenus.certificate || ['/certificate-template', '/certificate-item-wise', '/certificate-school-wise', '/CertificateRegno', '/ExportDatabase'].some(route => path === route),
       Export: openMenus.Export || ['/Higherlvlcomp'].some(route => path === route)
     };
 
@@ -136,8 +136,8 @@ const Dash = () => {
                     <Link
                       to="/AllKalolsavam"
                       className={`block py-2 text-gray-300 ${isActive('/AllKalolsavam')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -146,8 +146,8 @@ const Dash = () => {
                     <Link
                       to="/schlentry"
                       className={`block py-2 text-gray-300 ${isActive('/schlentry')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -156,8 +156,8 @@ const Dash = () => {
                     <Link
                       to="/All-schools"
                       className={`block py-2 text-gray-300 ${isActive('/All-schools')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -166,8 +166,8 @@ const Dash = () => {
                     <Link
                       to="/Spl-entry"
                       className={`block py-2 text-gray-300 ${isActive('/Spl-entry')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -185,7 +185,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('stageSettings')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                  <i class="fa-solid fa-microphone mr-5"></i> Stage Settings
+                    <i class="fa-solid fa-microphone mr-5"></i> Stage Settings
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.stageSettings ? 'up' : 'down'} text-sm`}
@@ -198,8 +198,8 @@ const Dash = () => {
                     <Link
                       to="/stage-duration-list"
                       className={`block py-2 text-gray-300 ${isActive('/stage-duration-list')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -208,8 +208,8 @@ const Dash = () => {
                     <Link
                       to="/StageList"
                       className={`block py-2 text-gray-300 ${isActive('/StageList')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -218,8 +218,8 @@ const Dash = () => {
                     <Link
                       to="/festivalwiselist"
                       className={`block py-2 text-gray-300 ${isActive('/festivalwiselist')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -228,8 +228,8 @@ const Dash = () => {
                     <Link
                       to="/Stage-itemwiselist"
                       className={`block py-2 text-gray-300 ${isActive('/Stage-itemwiselist')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -238,14 +238,14 @@ const Dash = () => {
                     <Link
                       to="/ClashReportList"
                       className={`block py-2 text-gray-300 ${isActive('/ClashReportList')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
                       Clash Report
                     </Link>
-                   
+
                   </div>
                 )}
               </div>
@@ -271,8 +271,8 @@ const Dash = () => {
                     <Link
                       to="/AddCallsheet"
                       className={`block py-2 text-gray-300 ${isActive('/AddCallsheet')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -281,8 +281,8 @@ const Dash = () => {
                     <Link
                       to="/AddTimesheet"
                       className={`block py-2 text-gray-300 ${isActive('/AddTimesheet')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -291,8 +291,8 @@ const Dash = () => {
                     <Link
                       to="/AddScoresheet"
                       className={`block py-2 text-gray-300 ${isActive('/AddScoresheet')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -301,8 +301,8 @@ const Dash = () => {
                     <Link
                       to="/AddTabulationsheet"
                       className={`block py-2 text-gray-300 ${isActive('/AddTabulationsheet')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -311,8 +311,8 @@ const Dash = () => {
                     <Link
                       to="/Addreport"
                       className={`block py-2 text-gray-300 ${isActive('/Addreport')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -343,8 +343,8 @@ const Dash = () => {
                     <Link
                       to="/eligible-schools"
                       className={`block py-2 text-gray-300 ${isActive('/eligible-schools')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -353,8 +353,8 @@ const Dash = () => {
                     <Link
                       to="/Partcipatescllist"
                       className={`block py-2 text-gray-300 ${isActive('/Partcipatescllist')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -363,8 +363,8 @@ const Dash = () => {
                     <Link
                       to="/SclContactList"
                       className={`block py-2 text-gray-300 ${isActive('/SclContactList')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -373,8 +373,8 @@ const Dash = () => {
                     <Link
                       to="/festwiseList"
                       className={`block py-2 text-gray-300 ${isActive('/festwiseList')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -383,8 +383,8 @@ const Dash = () => {
                     <Link
                       to="/DateWiseList"
                       className={`block py-2 text-gray-300 ${isActive('/DateWiseList')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -393,8 +393,8 @@ const Dash = () => {
                     <Link
                       to="/ParticipantsCardList"
                       className={`block py-2 text-gray-300 ${isActive('/ParticipantsCardList')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -403,19 +403,19 @@ const Dash = () => {
                     <Link
                       to="/ParticipantsMorethan"
                       className={`block py-2 text-gray-300 ${isActive('/ParticipantsMorethan')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
                       Participants more than one item
                     </Link>
-                   
+
                     <Link
                       to="/ClusterReport"
                       className={`block py-2 text-gray-300 ${isActive('/ClusterReport')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -424,8 +424,8 @@ const Dash = () => {
                     <Link
                       to="/StageReport"
                       className={`block py-2 text-gray-300 ${isActive('/StageReport')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -456,8 +456,8 @@ const Dash = () => {
                     <Link
                       to="/All-resultentry"
                       className={`block py-2 text-gray-300 ${isActive('/All-resultentry')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -466,8 +466,8 @@ const Dash = () => {
                     <Link
                       to="/Itemresult-list"
                       className={`block py-2 text-gray-300 ${isActive('/Itemresult-list')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -476,8 +476,8 @@ const Dash = () => {
                     <Link
                       to="/All-Publishresult"
                       className={`block py-2 text-gray-300 ${isActive('/All-Publishresult')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -509,8 +509,8 @@ const Dash = () => {
                     <Link
                       to="/ConfidentialResultlist"
                       className={`block py-2 text-gray-300 ${isActive('/ConfidentialResultlist')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -519,8 +519,8 @@ const Dash = () => {
                     <Link
                       to="/itemwisepoint"
                       className={`block py-2 text-gray-300 ${isActive('/itemwisepoint')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -529,18 +529,18 @@ const Dash = () => {
                     <Link
                       to="/itemcodewise"
                       className={`block py-2 text-gray-300 ${isActive('/itemcodewise')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
-                     Item Code Wise Point
+                      Item Code Wise Point
                     </Link>
                     <Link
                       to="/SclWisePoint"
                       className={`block py-2 text-gray-300 ${isActive('/SclWisePoint')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -549,8 +549,8 @@ const Dash = () => {
                     <Link
                       to="/Sclgradewise"
                       className={`block py-2 text-gray-300 ${isActive('/Sclgradewise')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -568,10 +568,10 @@ const Dash = () => {
                   onClick={() => toggleMenu('certificate')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                  <i class="fa-solid fa-file-circle-plus mr-4"></i>
-       
+                    <i class="fa-solid fa-file-circle-plus mr-4"></i>
 
-                  Certificate
+
+                    Certificate
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.certificate ? 'up' : 'down'} text-sm`}
@@ -584,8 +584,8 @@ const Dash = () => {
                     <Link
                       to="/certificate-template"
                       className={`block py-2 text-gray-300 ${isActive('/certificate-template')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -594,8 +594,8 @@ const Dash = () => {
                     <Link
                       to="/certificate-item-wise"
                       className={`block py-2 text-gray-300 ${isActive('/certificate-item-wise')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -604,8 +604,8 @@ const Dash = () => {
                     <Link
                       to="/certificate-school-wise"
                       className={`block py-2 text-gray-300 ${isActive('/certificate-school-wise')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
@@ -614,14 +614,14 @@ const Dash = () => {
                     <Link
                       to="/CertificateRegno"
                       className={`block py-2 text-gray-300 ${isActive('/CertificateRegno')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
                       Certificate Reg No Wise
                     </Link>
-                   
+
 
                   </div>
                 )}
@@ -634,7 +634,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('Export')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                  <i class="fas fa-arrow-up-right-from-square mr-4"></i>Export 
+                    <i class="fas fa-arrow-up-right-from-square mr-4"></i>Export
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.Export ? 'up' : 'down'} text-sm`}
@@ -647,28 +647,46 @@ const Dash = () => {
                     <Link
                       to="/Higherlvlcomp"
                       className={`block py-2 text-gray-300 ${isActive('/Higherlvlcomp')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
-                     Higher Level Competition
+                      Higher Level Competition
                     </Link>
                     <Link
                       to="/ExportDatabase"
                       className={`block py-2 text-gray-300 ${isActive('/ExportDatabase')
-                          ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
-                          : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
                       onClick={() => setIsSidebarOpen(false)}
                     >
-                    Export Database
+                      Export Database
                     </Link>
-              
-                    
+
+
 
                   </div>
                 )}
+              </div>
+            </>
+          )}
+          {user?.role === 'It Admin' && (
+            <>
+              <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('settings')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                  <i class="fa-regular fa-user mr-4"></i> Admin User
+                  </h2>
+                
+                </div>
+
+            
               </div>
             </>
           )}

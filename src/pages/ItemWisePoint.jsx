@@ -8,33 +8,90 @@ const ItemWisePoint = () => {
   const [schoolCodeSearch, setSchoolCodeSearch] = useState('');
   const [schoolName, setSchoolName] = useState('');
   const [showSchoolName, setShowSchoolName] = useState(false);
-  const [showSchoolColumn, setShowSchoolColumn] = useState(true); // New state to control school column visibility
+  const [showSchoolColumn, setShowSchoolColumn] = useState(true);
   const [selectedFestival, setSelectedFestival] = useState('All Festival');
   const [Allitemwiswpoint, setItemwiswpoint] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [nameSearch, setNameSearch] = useState('');
+  const [isInitialized, setIsInitialized] = useState(false);
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  // Initialize URL parameters on mount
+  useEffect(() => {
+    // Read URL parameters on component mount
+    const url = new URL(window.location);
+    const schoolCodeParam = url.searchParams.get('schoolCode');
+    const festivalParam = url.searchParams.get('festival');
+    const nameParam = url.searchParams.get('name');
+
+    // Initialize state variables with URL params
+    let initialSchoolCode = '';
+    let initialNameSearch = '';
+    let initialFestival = 'All Festival';
+    let shouldSearch = false;
+
+    if (schoolCodeParam) {
+      initialSchoolCode = schoolCodeParam;
+      shouldSearch = true;
+    }
+
+    if (nameParam) {
+      initialNameSearch = nameParam;
+      shouldSearch = true;
+    }
+
+    if (festivalParam) {
+      initialFestival = festivalParam;
+    }
+
+    // Set state variables
+    setSchoolCodeSearch(initialSchoolCode);
+    setNameSearch(initialNameSearch);
+    setSelectedFestival(initialFestival);
+    setIsSearching(shouldSearch);
+    setShowSchoolColumn(initialSchoolCode === '');
+
+    // Mark initialization as complete
+    setIsInitialized(true);
+  }, []);
+
+  // Fetch data on component mount
   useEffect(() => {
     getAllItemwiswpoint();
   }, []);
 
+  // Handle data and filtering when component is fully initialized
   useEffect(() => {
-    filterItems(selectedFestival, schoolCodeSearch, nameSearch);
-
-    // Update search state based on input value
-    setIsSearching(schoolCodeSearch.trim() !== '' || nameSearch.trim() !== '');
-    
-    // Reset to first page when filters change
-    setCurrentPage(1);
-    
-    // Hide school column when filtering by school code
-    setShowSchoolColumn(schoolCodeSearch.trim() === '');
-  }, [selectedFestival, Allitemwiswpoint, schoolCodeSearch, nameSearch]);
+    // Only run filtering after component is fully initialized
+    if (isInitialized && Allitemwiswpoint.length > 0) {
+      filterItems(selectedFestival, schoolCodeSearch, nameSearch);
+      
+      // Update search state based on input values
+      const isActiveSearch = schoolCodeSearch.trim() !== '' || nameSearch.trim() !== '';
+      setIsSearching(isActiveSearch);
+      
+      // Hide school column when filtering by school code
+      setShowSchoolColumn(schoolCodeSearch.trim() === '');
+      
+      // Update school name when searching by school code
+      if (schoolCodeSearch.trim() !== '') {
+        const school = Allitemwiswpoint.find(item => 
+          item.SchoolCode && item.SchoolCode.toString().includes(schoolCodeSearch)
+        );
+        
+        if (school) {
+          setSchoolName(school.school);
+          setShowSchoolName(true);
+        } else {
+          setSchoolName('School not found');
+        }
+      }
+    }
+  }, [selectedFestival, Allitemwiswpoint, schoolCodeSearch, nameSearch, isInitialized]);
 
   const getAllItemwiswpoint = async () => {
     const token = sessionStorage.getItem("token");
@@ -128,6 +185,9 @@ const ItemWisePoint = () => {
     }));
 
     setFilteredItems(filtered);
+    
+    // Reset to first page when filters change
+    setCurrentPage(1);
   }
 
   const resultData = [
@@ -163,6 +223,7 @@ const ItemWisePoint = () => {
       
       if (school) {
         setSchoolName(school.school);
+        setShowSchoolName(true);
       } else {
         setSchoolName('School not found');
       }
@@ -215,29 +276,6 @@ const ItemWisePoint = () => {
     }
 
     window.history.replaceState({}, '', url);
-  };
-
-  // Function to read URL parameters on component mount
-  const readURLParams = () => {
-    const url = new URL(window.location);
-    const schoolCodeParam = url.searchParams.get('schoolCode');
-    const festivalParam = url.searchParams.get('festival');
-    const nameParam = url.searchParams.get('name');
-
-    if (schoolCodeParam) {
-      setSchoolCodeSearch(schoolCodeParam);
-      setIsSearching(true); // Set isSearching immediately when loading from URL params
-      setShowSchoolColumn(false); // Hide school column when loading with school code param
-    }
-
-    if (nameParam) {
-      setNameSearch(nameParam);
-      setIsSearching(true);
-    }
-
-    if (festivalParam) {
-      setSelectedFestival(festivalParam);
-    }
   };
 
   const getPrintTitle = () => {
@@ -419,15 +457,12 @@ const ItemWisePoint = () => {
     return pageNumbers;
   };
 
+  // Ensure we set default data if API call hasn't returned
   useEffect(() => {
     if (Allitemwiswpoint.length === 0 && resultData.length > 0) {
       setItemwiswpoint(resultData);
-      filterItems(selectedFestival, schoolCodeSearch, nameSearch);
     }
-
-    // Read URL parameters on component mount
-    readURLParams();
-  }, []);
+  }, [Allitemwiswpoint]);
 
   return (
     <>
@@ -435,64 +470,67 @@ const ItemWisePoint = () => {
       <div className="flex flex-col md:flex-row min-h-screen">
         <Dash />
         <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-4">
-            <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
-              Item Wise Point List
-            </h2>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
-              <div className="flex flex-col w-full sm:w-auto">
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <label className="text-blue-700 whitespace-nowrap min-w-max">School Code</label>
-                  <input
-                    type="text"
-                    className="rounded-full border border-blue-700 px-2 py-2 flex-grow"
-                    placeholder="Search by school code..."
-                    value={schoolCodeSearch}
-                    onChange={handleSchoolSearchChange}
-                  />
-                </div>
-                {/* School name display area */}
-                {schoolCodeSearch && showSchoolName && schoolName && (
-                  <div className="ml-32 mt-1 text-sm text-blue-800 font-medium">
-                    {schoolName}
-                  </div>
-                )}
-              </div>
-              
-              <button
-                className="border-blue-800 border text-blue-900 py-2 px-4 rounded-full min-w-max whitespace-nowrap"
-                onClick={resetAllFilters}
-              >
-                All Schools
-              </button>
-
-              <div className="relative w-full sm:w-40">
-                <select
-                  className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
-                  onChange={handleFestivalChange}
-                  value={selectedFestival}
-                  aria-label="Select Festival"
-                >
-                  <option value="All Festival">All Festival</option>
-                  <option value="UP Kalaivizha">UP Kalaivizha</option>
-                  <option value="LP Kalaivizha">LP Kalaivizha</option>
-                  <option value="HS Kalaivizha">HS Kalaivizha</option>
-                  <option value="HSS Kalaivizha">HSS Kalaivizha</option>
-                </select>
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                  <i className="fa-solid fa-chevron-down"></i>
-                </div>
-              </div>
-
-              <button
-                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
-                onClick={handlePrint}
-                aria-label="Print report"
-              >
-                Print
-              </button>
-            </div>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
+  <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%] mb-4">
+    Item Wise Point List
+  </h2>
+  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+    <div className="flex flex-col w-full sm:w-auto relative ml-2">
+      <div className="flex items-center gap-2 w-full sm:w-auto ">
+        <label className="text-blue-700 whitespace-nowrap min-w-max">School Code</label>
+        <input
+          type="text"
+          className="rounded-full border border-blue-700 px-2 py-2 flex-grow"
+          placeholder="Search by school code..."
+          value={schoolCodeSearch}
+          onChange={handleSchoolSearchChange}
+        />
+      </div>
+      {/* School name display area - fixed height placeholder */}
+      <div className="h-6"> {/* This empty div maintains consistent height */}
+        {schoolCodeSearch && showSchoolName && schoolName && (
+          <div className="absolute ml-32 mt-1 text-sm text-blue-800 font-medium">
+            {schoolName}
           </div>
+        )}
+      </div>
+    </div>
+    
+    <button
+      className="border-blue-800 border text-blue-900 py-2 px-4 rounded-full min-w-max whitespace-nowrap mb-5"
+      onClick={resetAllFilters}
+    >
+      All Schools
+    </button>
+
+    <div className="relative w-full sm:w-40 mb-5">
+      <select
+        className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
+        onChange={handleFestivalChange}
+        value={selectedFestival}
+        aria-label="Select Festival"
+      >
+        <option value="All Festival">All Festival</option>
+        <option value="UP Kalaivizha">UP Kalaivizha</option>
+        <option value="LP Kalaivizha">LP Kalaivizha</option>
+        <option value="HS Kalaivizha">HS Kalaivizha</option>
+        <option value="HSS Kalaivizha">HSS Kalaivizha</option>
+      </select>
+      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+        <i className="fa-solid fa-chevron-down"></i>
+      </div>
+    </div>
+
+    <button
+      className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto mb-5"
+      onClick={handlePrint}
+      aria-label="Print report"
+    >
+      Print
+    </button>
+  </div>
+</div>
+          
           <div className="relative flex mt-2 items-center w-full sm:w-64 h-9 border border-blue-800 rounded-full px-4">
             <input
               type="text"

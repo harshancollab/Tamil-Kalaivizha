@@ -22,7 +22,7 @@ const SclGradewise = () => {
     const getInitialGrade = () => {
         const sessionGrade = sessionStorage.getItem("selectedGrade");
         const urlGrade = searchParams.get('grade');
-        return sessionGrade || urlGrade || "Grade A";
+        return sessionGrade || urlGrade || "All Grade";
     };
 
     const selectedFestival = getInitialFestival();
@@ -48,17 +48,17 @@ const SclGradewise = () => {
 
     // Dummy data with item codes to help with filtering
     const dummyResultData = [
-        { slNo: 1, participantName: "John Doe", schoolName: "Central High", item: "Story Writing", itemCode: "301", category: "Single", points: 9.5, grade: "A" },
+        { slNo: 1, participantName: "John Doe", schoolName: "Central High", item: "Story Writing", itemCode: "301", category: "Single", points: 9.5, grade: "B" },
         { slNo: 2, participantName: "Jane Smith", schoolName: "Springfield Elementary", item: "Story Writing", itemCode: "302", category: "Single", points: 10.0, grade: "A" },
         { slNo: 3, participantName: "Alex Johnson", schoolName: "Oak Ridge School", item: "Story Writing", itemCode: "303", category: "Single", points: 9.0, grade: "A" },
         { slNo: 4, participantName: "Sara Williams", schoolName: "Liberty Middle School", item: "Group Song", itemCode: "401", category: "Group", points: 8.0, grade: "B" },
-        { slNo: 5, participantName: "Michael Brown", schoolName: "Riverdale Academy", item: "Painting", itemCode: "402", category: "Single", points: 9.5, grade: "A" },
+        { slNo: 5, participantName: "Michael Brown", schoolName: "Riverdale Academy", item: "Painting", itemCode: "402", category: "Single", points: 5, grade: "C" },
         { slNo: 6, participantName: "Emily Davis", schoolName: "Westview High", item: "Classical Dance", itemCode: "501", category: "Single", points: 8.5, grade: "B" },
         { slNo: 7, participantName: "David Wilson", schoolName: "Pinewood Elementary", item: "Recitation", itemCode: "502", category: "Single", points: 7.5, grade: "B" },
         { slNo: 8, participantName: "Sophie Miller", schoolName: "Greenwood School", item: "Folk Dance", itemCode: "601", category: "Group", points: 8.0, grade: "C" },
         { slNo: 9, participantName: "Robert Taylor", schoolName: "Greenwood School", item: "Folk Dance", itemCode: "601", category: "Group", points: 8.0, grade: "C" },
-        { slNo: 10, participantName: "Emma Johnson", schoolName: "Central High", item: "Essay Writing", itemCode: "302", category: "Single", points: 9.2, grade: "A" },
-        { slNo: 11, participantName: "Noah Garcia", schoolName: "Riverdale Academy", item: "Poetry", itemCode: "303", category: "Single", points: 8.8, grade: "A" },
+        { slNo: 10, participantName: "Emma Johnson", schoolName: "Central High", item: "Essay Writing", itemCode: "302", category: "Single", points: 7.2, grade: "B" },
+        { slNo: 11, participantName: "Noah Garcia", schoolName: "Riverdale Academy", item: "Poetry", itemCode: "303", category: "Single", points: 8.8, grade: "C" },
         { slNo: 12, participantName: "Olivia Martinez", schoolName: "Springfield Elementary", item: "Debate", itemCode: "401", category: "Group", points: 7.9, grade: "B" },
         { slNo: 13, participantName: "Liam Rodriguez", schoolName: "Oak Ridge School", item: "Solo Music", itemCode: "502", category: "Single", points: 8.7, grade: "B" },
         { slNo: 14, participantName: "Ava Lopez", schoolName: "Westview High", item: "Drama", itemCode: "601", category: "Group", points: 7.5, grade: "C" }
@@ -133,19 +133,24 @@ const SclGradewise = () => {
                 festivalFiltered = [...allResultData];
         }
 
-        // Step 2: Filter by grade
-        let gradeFiltered;
-        if (selectedGrade === "All Grade") {
-            gradeFiltered = festivalFiltered;
-        } else {
-            gradeFiltered = festivalFiltered.filter(item => {
-                if (selectedGrade === "Grade A") return ["A", "A+", "A-"].includes(item.grade);
-                if (selectedGrade === "Grade B") return ["B", "B+", "B-"].includes(item.grade);
-                if (selectedGrade === "Grade C") return ["C", "C+", "C-"].includes(item.grade);
-                return true;
-            });
+    // Step 2: Filter by grade
+let gradeFiltered;
+if (selectedGrade === "All Grade") {
+    gradeFiltered = festivalFiltered;
+} else {
+    gradeFiltered = festivalFiltered.filter(item => {
+        const grade = item.grade ? item.grade.toUpperCase() : "";
+        
+        if (selectedGrade === "Grade A") {
+            return ["A", "A+", "A-"].includes(grade);
+        } else if (selectedGrade === "Grade B") {
+            return ["B", "B+", "B-"].includes(grade);
+        } else if (selectedGrade === "Grade C") {
+            return ["C", "C+", "C-"].includes(grade);
         }
-
+        return false; // Default case if none match
+    });
+}
         // Step 3: Filter by search text
         let searchFiltered = gradeFiltered;
         if (searchText && searchText.trim() !== '') {
@@ -437,7 +442,7 @@ const SclGradewise = () => {
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Item</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Points</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade</th>
+                                               
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
@@ -449,7 +454,7 @@ const SclGradewise = () => {
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.schoolName}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.item}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.points}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
+                                                        
                                                     </tr>
                                                 ))
                                             ) : (
