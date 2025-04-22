@@ -19,7 +19,22 @@ const FestivalWisepat = () => {
     { regNo: "401", name: "Sajeev Thomas", gender: "Boy", class: "2", schoolCode: "006", schoolName: "Little Flower LP School Alappuzha", itemCode: "402" },
     { regNo: "601", name: "Lakshmi Pillai", gender: "girl", class: "11", schoolCode: "010", schoolName: "Don Bosco HSS Idukki", itemCode: "602" },
     { regNo: "305", name: "Vijay Menon", gender: "Boy", class: "6", schoolCode: "001", schoolName: "Government UP School Thiruvananthapuram", itemCode: "305" },
-    { regNo: "306", name: "Shreya Nair", gender: "girl", class: "4", schoolCode: "001", schoolName: "Government UP School Thiruvananthapuram", itemCode: "306" }
+    { regNo: "306", name: "Shreya Nair", gender: "girl", class: "4", schoolCode: "001", schoolName: "Government UP School Thiruvananthapuram", itemCode: "306" },
+    { regNo: "0101", name: "Meera Suresh", gender: "girl", class: "11", schoolCode: "004", schoolName: "Sacred Heart HSS Thrissur", itemCode: "601" },
+    { regNo: "601", name: "Nithin Rajan", gender: "Boy", class: "12", schoolCode: "004", schoolName: "Sacred Heart HSS Thrissur", itemCode: "302" },
+    { regNo: "3001", name: "Kavya Mohan", gender: "girl", class: "5", schoolCode: "005", schoolName: "Govt. UP School Kollam", itemCode: "602" },
+    { regNo: "401", name: "Sajeev Thomas", gender: "Boy", class: "2", schoolCode: "006", schoolName: "Little Flower LP School Alappuzha", itemCode: "402" },
+    { regNo: "601", name: "Lakshmi Pillai", gender: "girl", class: "11", schoolCode: "010", schoolName: "Don Bosco HSS Idukki", itemCode: "602" },
+    { regNo: "305", name: "Vijay Menon", gender: "Boy", class: "6", schoolCode: "001", schoolName: "Government UP School Thiruvananthapuram", itemCode: "305" },
+    { regNo: "306", name: "Shreya Nair", gender: "girl", class: "4", schoolCode: "001", schoolName: "Government UP School Thiruvananthapuram", itemCode: "302" },
+    { regNo: "671", name: "Meera Suresh", gender: "girl", class: "11", schoolCode: "004", schoolName: "Sacred Heart HSS Thrissur", itemCode: "302" },
+    { regNo: "771", name: "Nithin Rajan", gender: "Boy", class: "12", schoolCode: "004", schoolName: "Sacred Heart HSS Thrissur", itemCode: "302" },
+    { regNo: "661", name: "Kavya Mohan", gender: "girl", class: "5", schoolCode: "005", schoolName: "Govt. UP School Kollam", itemCode: "302" },
+    { regNo: "678", name: "Sajeev Thomas", gender: "Boy", class: "2", schoolCode: "006", schoolName: "Little Flower LP School Alappuzha", itemCode: "302" },
+    { regNo: "444", name: "Lakshmi Pillai", gender: "girl", class: "11", schoolCode: "010", schoolName: "Don Bosco HSS Idukki", itemCode: "302" },
+    { regNo: "333", name: "Vijay Menon", gender: "Boy", class: "6", schoolCode: "001", schoolName: "Government UP School Thiruvananthapuram", itemCode: "302" },
+    { regNo: "326", name: "Shreya Nair", gender: "girl", class: "4", schoolCode: "001", schoolName: "Government UP School Thiruvananthapuram", itemCode: "302" },
+    { regNo: "326", name: "Shreya Nair", gender: "girl", class: "4", schoolCode: "001", schoolName: "Government UP School Thiruvananthapuram", itemCode: "302" }
 
   ];
 
@@ -227,10 +242,10 @@ const FestivalWisepat = () => {
   const generatePDF = () => {
     // Create the PDF content container
     const pdfContent = document.createElement('div');
-
+  
     // Determine if a specific item is selected
     const isSpecificItemSelected = selectedItemCode && selectedItemCode !== 'select Item';
-
+  
     // PDF main title
     const mainTitleElement = document.createElement('h1');
     mainTitleElement.textContent = isSpecificItemSelected
@@ -240,27 +255,26 @@ const FestivalWisepat = () => {
     mainTitleElement.style.margin = '20px 0';
     mainTitleElement.style.fontWeight = 'bold';
     pdfContent.appendChild(mainTitleElement);
-
+  
     // If a specific item is selected, we'll organize by festival
     if (isSpecificItemSelected) {
       // Get participants for the selected item
       const itemParticipants = filteredList.filter(p => p.itemCode === selectedItemCode);
-
+  
       // Group by festival
       const participantsByFestival = {
-        'All Festival': [],
         'UP Kalaivizha': [],
         'LP Kalaivizha': [],
         'HS Kalaivizha': [],
         'HSS Kalaivizha': []
       };
-
+  
       // Categorize participants into festival groups
       itemParticipants.forEach(participant => {
         if (!participant.itemCode) return;
-
+  
         const code = parseInt(participant.itemCode.trim());
-
+  
         if (code >= 300 && code < 400) {
           participantsByFestival['UP Kalaivizha'].push(participant);
         } else if (code >= 400 && code < 500) {
@@ -271,12 +285,12 @@ const FestivalWisepat = () => {
           participantsByFestival['HSS Kalaivizha'].push(participant);
         }
       });
-
+  
       // Determine which festivals to show
       const festivalsToShow = selectedFestival !== "All Festival"
         ? [selectedFestival]
         : Object.keys(participantsByFestival);
-
+  
       // Create tables for each festival
       festivalsToShow.forEach(festival => {
         const festivalParticipants = participantsByFestival[festival];
@@ -287,108 +301,146 @@ const FestivalWisepat = () => {
     }
     // No specific item selected - organize by item code
     else {
-      // Group by item code first
-      const groupedByItem = {};
-
-      filteredList.forEach(participant => {
-        if (!participant.itemCode) return;
-
-        const itemCode = participant.itemCode.trim();
-        if (!groupedByItem[itemCode]) {
-          groupedByItem[itemCode] = [];
-        }
-        groupedByItem[itemCode].push(participant);
-      });
-
-      // Sort the item codes
-      const sortedItemCodes = Object.keys(groupedByItem).sort((a, b) => parseInt(a) - parseInt(b));
-
-      // Process each item group
-      sortedItemCodes.forEach((itemCode, itemIndex) => {
-        const participants = groupedByItem[itemCode];
-
-        // Add page break between items
-        if (itemIndex > 0) {
-          const pageBreak = document.createElement('div');
-          pageBreak.className = 'html2pdf__page-break';
-          pdfContent.appendChild(pageBreak);
-        }
-
-        // Find the item name
-        let itemName = "Unknown Item";
-        const itemObj = itemsList.find(item => item.itemCode === itemCode);
-        if (itemObj) {
-          itemName = itemObj.itemName;
-        }
-
-        // Item heading
-        const itemHeading = document.createElement('h2');
-        itemHeading.textContent = `Item Code: ${itemCode} - ${itemName}`;
-        itemHeading.style.textAlign = 'center';
-        itemHeading.style.margin = '20px 0';
-        itemHeading.style.fontWeight = 'bold';
-        pdfContent.appendChild(itemHeading);
-
-        // If a specific festival is selected, only show those participants
-        if (selectedFestival !== "All Festival") {
-          // Filter participants by the selected festival
-          const festivalParticipants = participants.filter(p => {
-            if (!p.itemCode) return false;
-            const code = parseInt(p.itemCode.trim());
-
-            if (selectedFestival === "UP Kalaivizha") {
-              return code >= 300 && code < 400;
-            } else if (selectedFestival === "LP Kalaivizha") {
-              return code >= 400 && code < 500;
-            } else if (selectedFestival === "HS Kalaivizha") {
-              return code >= 500 && code < 600;
-            } else if (selectedFestival === "HSS Kalaivizha") {
-              return code >= 600 && code < 700;
-            }
-            return false;
-          });
-
-          if (festivalParticipants.length > 0) {
-            createParticipantsTable(pdfContent, festivalParticipants);
+      // Case 1: Specific festival selected
+      if (selectedFestival !== "All Festival") {
+        // Group by item code
+        const groupedByItem = {};
+        
+        filteredList.forEach(participant => {
+          if (!participant.itemCode) return;
+          
+          const itemCode = participant.itemCode.trim();
+          if (!groupedByItem[itemCode]) {
+            groupedByItem[itemCode] = [];
           }
-        }
-        // Show all festivals, grouped
-        else {
-          // Group by festival
-          const participantsByFestival = {
-            'UP Kalaivizha': [],
-            'LP Kalaivizha': [],
-            'HS Kalaivizha': [],
-            'HSS Kalaivizha': []
-          };
-
-          // Categorize participants into festival groups
-          participants.forEach(participant => {
-            if (!participant.itemCode) return;
-
-            const code = parseInt(participant.itemCode.trim());
-
-            if (code >= 300 && code < 400) {
-              participantsByFestival['UP Kalaivizha'].push(participant);
-            } else if (code >= 400 && code < 500) {
-              participantsByFestival['LP Kalaivizha'].push(participant);
-            } else if (code >= 500 && code < 600) {
-              participantsByFestival['HS Kalaivizha'].push(participant);
-            } else if (code >= 600 && code < 700) {
-              participantsByFestival['HSS Kalaivizha'].push(participant);
+          groupedByItem[itemCode].push(participant);
+        });
+        
+        // Sort item codes
+        const sortedItemCodes = Object.keys(groupedByItem).sort((a, b) => parseInt(a) - parseInt(b));
+        
+        // Process each item group
+        sortedItemCodes.forEach((itemCode, itemIndex) => {
+          const participants = groupedByItem[itemCode];
+          
+          // Add page break between items (except for the first one)
+          if (itemIndex > 0) {
+            const pageBreak = document.createElement('div');
+            pageBreak.className = 'html2pdf__page-break';
+            pdfContent.appendChild(pageBreak);
+          }
+          
+          // Find item name
+          let itemName = "Unknown Item";
+          const itemObj = itemsList.find(item => item.itemCode === itemCode);
+          if (itemObj) {
+            itemName = itemObj.itemName;
+          }
+          
+          // Item heading
+          const itemHeading = document.createElement('h2');
+          itemHeading.textContent = `Item Code: ${itemCode} - ${itemName}`;
+          itemHeading.style.textAlign = 'center';
+          itemHeading.style.margin = '20px 0';
+          itemHeading.style.fontWeight = 'bold';
+          pdfContent.appendChild(itemHeading);
+          
+          // Create participants table
+          createParticipantsTable(pdfContent, participants);
+        });
+      }
+      // Case 2: All festivals selected
+      else {
+        // First, create a festival map to organize participants
+        const festivalMap = {
+          'UP Kalaivizha': { range: [300, 399], participants: [] },
+          'LP Kalaivizha': { range: [400, 499], participants: [] },
+          'HS Kalaivizha': { range: [500, 599], participants: [] },
+          'HSS Kalaivizha': { range: [600, 699], participants: [] }
+        };
+        
+        // Sort all participants into their respective festivals
+        filteredList.forEach(participant => {
+          if (!participant.itemCode) return;
+          
+          const itemCode = parseInt(participant.itemCode.trim());
+          if (isNaN(itemCode)) return;
+          
+          Object.entries(festivalMap).forEach(([festival, data]) => {
+            if (itemCode >= data.range[0] && itemCode <= data.range[1]) {
+              data.participants.push(participant);
             }
           });
-
-          // Create sections for each festival
-          Object.entries(participantsByFestival).forEach(([festival, festivalParticipants]) => {
-            if (festivalParticipants && festivalParticipants.length > 0) {
-              createFestivalSection(pdfContent, festival, festivalParticipants);
+        });
+        
+        // Now process each festival one by one
+        let firstFestival = true;
+        Object.entries(festivalMap).forEach(([festival, data]) => {
+          if (data.participants.length === 0) return;
+          
+          // Add page break between festivals (except for the first one)
+          if (!firstFestival) {
+            const pageBreak = document.createElement('div');
+            pageBreak.className = 'html2pdf__page-break';
+            pdfContent.appendChild(pageBreak);
+          } else {
+            firstFestival = false;
+          }
+          
+          // Festival heading
+          const festivalHeading = document.createElement('h2');
+          festivalHeading.textContent = festival;
+          festivalHeading.style.textAlign = 'center';
+          festivalHeading.style.margin = '20px 0';
+          festivalHeading.style.fontWeight = 'bold';
+          pdfContent.appendChild(festivalHeading);
+          
+          // Group participants by item code
+          const groupedByItem = {};
+          data.participants.forEach(participant => {
+            const itemCode = participant.itemCode.trim();
+            if (!groupedByItem[itemCode]) {
+              groupedByItem[itemCode] = [];
             }
+            groupedByItem[itemCode].push(participant);
           });
-        }
-      });
+          
+          // Sort item codes
+          const sortedItemCodes = Object.keys(groupedByItem).sort((a, b) => parseInt(a) - parseInt(b));
+          
+          // Process each item group within this festival
+          sortedItemCodes.forEach((itemCode, itemIndex) => {
+            const participants = groupedByItem[itemCode];
+            
+            // Add spacing between items (not page breaks within a festival)
+            if (itemIndex > 0) {
+              const spacing = document.createElement('div');
+              spacing.style.height = '30px';
+              pdfContent.appendChild(spacing);
+            }
+            
+            // Find item name
+            let itemName = "Unknown Item";
+            const itemObj = itemsList.find(item => item.itemCode === itemCode);
+            if (itemObj) {
+              itemName = itemObj.itemName;
+            }
+            
+            // Item heading (smaller than festival heading)
+            const itemHeading = document.createElement('h3');
+            itemHeading.textContent = `Item Code: ${itemCode} - ${itemName}`;
+            itemHeading.style.textAlign = 'center';
+            itemHeading.style.margin = '10px 0';
+            itemHeading.style.fontWeight = 'bold';
+            pdfContent.appendChild(itemHeading);
+            
+            // Create participants table
+            createParticipantsTable(pdfContent, participants);
+          });
+        });
+      }
     }
-
+  
     // Generate filename
     let fileName = "";
     if (isSpecificItemSelected) {
@@ -404,7 +456,7 @@ const FestivalWisepat = () => {
       fileName = 'All_Festivals_All_Items';
     }
     fileName += `_Participants_List.pdf`;
-
+  
     // PDF options
     const options = {
       margin: 10,
@@ -413,7 +465,7 @@ const FestivalWisepat = () => {
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
-
+  
     // Generate and download PDF
     html2pdf().from(pdfContent).set(options).save();
   };
