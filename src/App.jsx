@@ -74,7 +74,21 @@ import ItemCodewise from './pages/ItemCodewise';
 import AdminUser from './pages/AdminUser';
 import AddUser from './pages/AddUser';
 import EditUser from './pages/EditUser';
-
+import CreateKalolsavam from './pages/CreateKalolsavam';
+import AddKalolsavam from './pages/AddKalolsavam';
+import EditKalosmAdm from './pages/EditKalosmAdm';
+import SchoolRegList from './pages/SchoolRegList';
+import AddScl from './pages/AddScl';
+import EditScl from './pages/EditScl';
+import FestivalRegiList from './pages/FestivalRegiList';
+import AddFestival from './pages/AddFestival';
+import EditFestival from './pages/EditFestival';
+import DistrictList from './pages/DistrictList';
+import SubDistrictlist from './pages/SubDistrictlist';
+import AddDistrict from './pages/AddDistrict';
+import AddSubDistrict from './pages/AddSubDistrict';
+import ItemRegistrationList from './pages/ItemRegistrationList';
+import AddItem from './pages/AddItem';
 
 
 
@@ -149,30 +163,47 @@ function App() {
           <Route path="/All-resultentry" element={<AllResultEtry />} />
           <Route path="/Edit-resultentry/:id" element={<EditResultentry />} />
           <Route path="/Itemresult-list" element={<ItemResultList />} />
-          <Route path="/All-Publishresult" element={<PubshRsutlist/>} />
-          <Route path="/ConfidentialResultlist" element={<ConfidentialResult/>} />
-          <Route path="/itemwisepoint" element={<ItemWisePoint/>} />
-          <Route path="/SclWisePoint" element={<SclWisePoint/>} />
-          <Route path="/Sclgradewise" element={<SclGradewise/>} />
-          <Route path="/certificate-template" element={<CertificateTempt/>} />
-          <Route path="/certificate-item-wise" element={<Certificateitmwise/>} />
-          <Route path="/certificate-school-wise" element={<CertificateSclwise/>} />
-          <Route path="/Add-certificate" element={<AddcertfitDetail/>} />
-          <Route path="/CertificateRegno" element={<CertificateRegno/>} />
-          <Route path="/CertificateParticipate" element={<CertificatePartcipate/>} />
-          <Route path="/Higherlvlcomp" element={<Higherlvlcomp/>} />
-          <Route path="/ExportDatabase" element={<ExportDatabase/>} />
-          <Route path="/itemcodewise" element={<ItemCodewise/>} />
-          <Route path="/ai" element={<Publish/>} />
-       
-         
+          <Route path="/All-Publishresult" element={<PubshRsutlist />} />
+          <Route path="/ConfidentialResultlist" element={<ConfidentialResult />} />
+          <Route path="/itemwisepoint" element={<ItemWisePoint />} />
+          <Route path="/SclWisePoint" element={<SclWisePoint />} />
+          <Route path="/Sclgradewise" element={<SclGradewise />} />
+          <Route path="/certificate-template" element={<CertificateTempt />} />
+          <Route path="/certificate-item-wise" element={<Certificateitmwise />} />
+          <Route path="/certificate-school-wise" element={<CertificateSclwise />} />
+          <Route path="/Add-certificate" element={<AddcertfitDetail />} />
+          <Route path="/CertificateRegno" element={<CertificateRegno />} />
+          <Route path="/CertificateParticipate" element={<CertificatePartcipate />} />
+          <Route path="/Higherlvlcomp" element={<Higherlvlcomp />} />
+          <Route path="/ExportDatabase" element={<ExportDatabase />} />
+          <Route path="/itemcodewise" element={<ItemCodewise />} />
+          <Route path="/ai" element={<Publish />} />
+
+
         </Route>
 
         {/* Routes ONLY for "admin" */}
         <Route element={<ProtectedRoute allowedRoles={['It Admin']} />}>
-          <Route path="/admin-panel" element={<AdminUser/>} />
-          <Route path="/AddUser" element={<AddUser/>} />
-          <Route path="/EditUser/:id" element={<EditUser/>} />
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/admin-panel" element={<AdminUser />} />
+          <Route path="/AddUser" element={<AddUser />} />
+          <Route path="/EditUser/:id" element={<EditUser />} />
+          <Route path="/CreateKalolsavam" element={<CreateKalolsavam />} />
+          <Route path="/AddKalosavam" element={<AddKalolsavam />} />
+          <Route path="/EditKalosmAdm/:id" element={<EditKalosmAdm />} />
+          <Route path="/SchoolRegList" element={<SchoolRegList />} />
+          <Route path="/AddScl" element={<AddScl />} />
+          <Route path="/EditScl/:id" element={<EditScl />} />
+          <Route path="/FestivalRegiList" element={<FestivalRegiList />} />
+          <Route path="/AddFestival" element={<AddFestival />} />
+          <Route path="/EditFestival/:id" element={<EditFestival />} />
+          <Route path="/AddDistrict" element={<AddDistrict />} />
+          <Route path="/AddSubDistrict" element={<AddSubDistrict />} />
+          
+          <Route path="/DistrictList" element={<DistrictList />} />
+          <Route path="/SubDistrictlist/:id" element={<SubDistrictlist />} />
+          <Route path="/ItemRegistrationList" element={<ItemRegistrationList />} />
+          <Route path="/AddItem" element={<AddItem />} />
         </Route>
 
 

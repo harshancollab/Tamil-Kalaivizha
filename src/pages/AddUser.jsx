@@ -16,8 +16,8 @@ const AddUser = () => {
         'Select User Type',
         'State Admin',
         'District Admin',
-        'Sub-district Admin',
-        'All Admin'
+        'Sub-district Admin'
+       
     ];
     
     const allDistricts = [

@@ -303,37 +303,55 @@ const EditUser = () => {
         navigate(redirectUrl);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("Form submitted with data:", formData);
         
-        if (validateForm()) {
-            console.log("Form is valid, proceeding with submission");
-            
-            // Create request body, omitting password if it wasn't changed
-            const reqBody = {
-                username: formData.username,
-                userType: formData.userType,
-                district: formData.district,
-                subDistrict: formData.subDistrict
+        if (!validateForm()) {
+            return;
+        }
+        
+        // Create request body, omitting password if it wasn't changed
+        const reqBody = new FormData();
+        reqBody.append('username', formData.username);
+        reqBody.append('userType', formData.userType);
+        
+        if (formData.userType === "District Admin" || formData.userType === "Sub-district Admin") {
+            reqBody.append('district', formData.district);
+        }
+        
+        if (formData.userType === "Sub-district Admin") {
+            reqBody.append('subDistrict', formData.subDistrict);
+        }
+        
+        // Only include password if it was changed
+        if (formData.password) {
+            reqBody.append('password', formData.password);
+        }
+    
+        // Get token from session storage
+        const token = sessionStorage.getItem("token");
+        
+        if (token) {
+            const reqHeader = {
+                "Content-Type": "multipart/form-data",
+                "Authorization": `Bearer ${token}`
             };
             
-            // Only include password if it was changed
-            if (formData.password) {
-                reqBody.password = formData.password;
+            try {
+                // Replace with your actual API call function
+                const result = await updateUserAPI(userId, reqBody, reqHeader);
+                
+                if (result.status === 200) {
+                    alert("User updated successfully!");
+                    navigate(redirectUrl);
+                }
+            } catch (err) {
+                console.log(err);
+                alert("Failed to update user. Please try again.");
             }
-
-            // Show success message temporarily 
-            alert(" update successful! .");
-            console.log("User data that would be sent to API:", reqBody);
-            
-            // Uncomment when ready to use with react-router:
-            // const successParam = new URLSearchParams();
-            // successParam.append('updated', 'true');
-            // successParam.append('username', reqBody.username);
-            // navigate(`${redirectUrl}?${successParam.toString()}`);
         } else {
-            console.log("Form has errors");
+            alert("You're not authorized. Please login again.");
         }
     };
 

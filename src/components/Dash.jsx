@@ -675,7 +675,67 @@ const Dash = () => {
           {user?.role === 'It Admin' && (
             <>
               <div className="mb-4">
-                <div
+                <Link to="/DistrictList"
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('settings')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                  <i class="fa-regular fa-user mr-4"></i>District Registration
+                  </h2>
+                
+                </Link>
+                <Link to="/stage-duration-list"
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('settings')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                  <i class="fa-regular fa-user mr-4"></i>Sub District Registration
+                  </h2>
+                
+                </Link>
+                <Link to="/SchoolRegList"
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('settings')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                  <i class="fa-regular fa-user mr-4"></i>School Registration
+                  </h2>
+                
+                </Link>
+                <Link to="/FestivalRegiList"
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('settings')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                  <i class="fa-regular fa-user mr-4"></i> Festival Registration
+                  </h2>
+                
+                </Link>
+                <Link to="/ItemRegistrationList"
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('settings')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                  <i class="fa-regular fa-user mr-4"></i>Item Registration
+                  </h2>
+                
+                </Link>
+                <Link to="/CreateKalolsavam"
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('settings')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                  <i class="fa-regular fa-user mr-4"></i>Create Kalolsavam
+                  </h2>
+                
+                </Link>
+                <Link to="/admin-panel"
                   className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
                     } p-2 rounded`}
                   onClick={() => toggleMenu('settings')}
@@ -684,7 +744,18 @@ const Dash = () => {
                   <i class="fa-regular fa-user mr-4"></i> Admin User
                   </h2>
                 
-                </div>
+                </Link>
+                <Link to="/stage-duration-list"
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('settings')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                  <i class="fa-regular fa-user mr-4"></i>Result
+                  </h2>
+                
+                </Link>
+              
 
             
               </div>

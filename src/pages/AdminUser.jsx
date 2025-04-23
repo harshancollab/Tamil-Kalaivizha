@@ -9,17 +9,17 @@ const AdminUser = () => {
     const navigate = useNavigate();
     const printRef = useRef();
     const [searchParams, setSearchParams] = useSearchParams();
-    
+
     // Add missing state variables
     const [searchCode, setSearchCode] = useState('');
     const [filterParam, setFilterParam] = useState('');
-    
+
     const [loading, setLoading] = useState(false);
 
     // Select dropdown state variables
-    const [selectedSubDistrict, setSelectedSubDistrict] = useState('Select Sub District');
-    const [selectedDistrict, setSelectedDistrict] = useState('Select District');
-    const [selectedUserType, setSelectedUserType] = useState('Select User Type');
+    const [selectedSubDistrict, setSelectedSubDistrict] = useState('Select');
+    const [selectedDistrict, setSelectedDistrict] = useState('Select');
+    const [selectedUserType, setSelectedUserType] = useState('Select');
 
     // Available options for each dropdown
     const [availableSubDistricts, setAvailableSubDistricts] = useState([]);
@@ -32,7 +32,7 @@ const AdminUser = () => {
 
     // Data for dropdowns - full lists
     const allSubDistricts = [
-        'Select Sub District',
+        'Select',
         'Munnar',
         'Adimali',
         'Kattappana',
@@ -43,22 +43,23 @@ const AdminUser = () => {
         'Kuzhalmannam',
         'Nemmara',
         'Mannarkkad',
-        'vatakara'
+        'vatakara',
+        'Ottapalam'
     ];
 
     const allDistricts = [
-        'Select District',
+        'Select',
         'Idukki',
         'Ernakulam',
         'Palakkad',
         'Kozhikode',
         'Wayanad',
         'Thrissur',
-        'Ottapalam'
+        
     ];
 
     const allUserTypes = [
-        'Select User Type',
+        'Select',
         'State Admin',
         'District Admin',
         'Sub-district Admin',
@@ -75,10 +76,10 @@ const AdminUser = () => {
     };
 
     const userTypeToDistrictAccess = {
-        'State Admin': allDistricts.filter(d => d !== 'Select District'),
-        'District Admin': allDistricts.filter(d => d !== 'Select District'),
-        'Sub-district Admin': allDistricts.filter(d => d !== 'Select District'),
-        'All Admin': allDistricts.filter(d => d !== 'Select District')
+        'State Admin': allDistricts.filter(d => d !== 'Select'),
+        'District Admin': allDistricts.filter(d => d !== 'Select'),
+        'Sub-district Admin': allDistricts.filter(d => d !== 'Select'),
+        'All Admin': allDistricts.filter(d => d !== 'Select')
     };
 
     // Initialize available options
@@ -86,7 +87,7 @@ const AdminUser = () => {
         setAvailableSubDistricts(allSubDistricts);
         setAvailableDistricts(allDistricts);
         setAvailableUserTypes(allUserTypes);
-        
+
         // Load admin users when component mounts
         getAllAdminuser();
     }, []);
@@ -120,8 +121,8 @@ const AdminUser = () => {
             } else if (allUserTypes.includes(pParam)) {
                 setSelectedUserType(pParam);
                 // Update available districts based on user type
-                if (pParam !== 'Select User Type') {
-                    const availableDists = ['Select District', ...userTypeToDistrictAccess[pParam]];
+                if (pParam !== 'Select') {
+                    const availableDists = ['Select', ...userTypeToDistrictAccess[pParam]];
                     setAvailableDistricts(availableDists);
                 }
             }
@@ -130,11 +131,11 @@ const AdminUser = () => {
 
     // Function to update available sub-districts based on selected district
     const updateAvailableSubDistricts = (district) => {
-        if (district && district !== 'Select District') {
+        if (district && district !== 'Select') {
             const subDistricts = districtToSubDistrict[district] || [];
-            setAvailableSubDistricts(['Select Sub District', ...subDistricts]);
+            setAvailableSubDistricts(['Select', ...subDistricts]);
             if (subDistricts.length === 0 || !subDistricts.includes(selectedSubDistrict)) {
-                setSelectedSubDistrict('Select Sub District');
+                setSelectedSubDistrict('Select');
             }
         } else {
             setAvailableSubDistricts(allSubDistricts);
@@ -143,12 +144,12 @@ const AdminUser = () => {
 
     // Function to update available districts based on selected user type
     const updateAvailableDistricts = (userType) => {
-        if (userType && userType !== 'Select User Type') {
+        if (userType && userType !== 'Select') {
             const districts = userTypeToDistrictAccess[userType] || [];
-            setAvailableDistricts(['Select District', ...districts]);
-            if (!districts.includes(selectedDistrict) && selectedDistrict !== 'Select District') {
-                setSelectedDistrict('Select District');
-                updateAvailableSubDistricts('Select District');
+            setAvailableDistricts(['Select', ...districts]);
+            if (!districts.includes(selectedDistrict) && selectedDistrict !== 'Select') {
+                setSelectedDistrict('Select');
+                updateAvailableSubDistricts('Select');
             }
         } else {
             setAvailableDistricts(allDistricts);
@@ -173,8 +174,6 @@ const AdminUser = () => {
         }
     };
 
-    
-
     const getAllAdminuser = async () => {
         const token = sessionStorage.getItem("token");
         if (token) {
@@ -189,7 +188,7 @@ const AdminUser = () => {
                 }
             } catch (err) {
                 console.log(err);
-                
+
             } finally {
                 setLoading(false);
             }
@@ -212,7 +211,8 @@ const AdminUser = () => {
             }
             try {
                 setLoading(true);
-                await deleteAdminuserAPI(id, reqHeader);
+                // Implement deleteAdminuserAPI when available
+                // await deleteAdminuserAPI(id, reqHeader);
                 getAllAdminuser();
                 console.log("Delete clicked for ID:", id);
             } catch (err) {
@@ -224,7 +224,6 @@ const AdminUser = () => {
         }
     }
 
-   
     const generatePDF = () => {
         // Create a new div element for PDF content
         const pdfContent = document.createElement('div');
@@ -238,17 +237,17 @@ const AdminUser = () => {
         pdfContent.appendChild(titleElement);
 
         // Add filter information if any filter is applied
-        if (selectedDistrict !== 'Select District' || selectedSubDistrict !== 'Select Sub District' || selectedUserType !== 'Select User Type') {
+        if (selectedDistrict !== 'Select' || selectedSubDistrict !== 'Select' || selectedUserType !== 'Select') {
             const filterInfo = document.createElement('div');
             filterInfo.style.marginBottom = '15px';
             filterInfo.style.fontSize = '12px';
             filterInfo.style.textAlign = 'center';
-            
+
             const filterDetails = [];
-            if (selectedDistrict !== 'Select District') filterDetails.push(`District: ${selectedDistrict}`);
-            if (selectedSubDistrict !== 'Select Sub District') filterDetails.push(`Sub District: ${selectedSubDistrict}`);
-            if (selectedUserType !== 'Select User Type') filterDetails.push(`User Type: ${selectedUserType}`);
-            
+            if (selectedDistrict !== 'Select') filterDetails.push(`District: ${selectedDistrict}`);
+            if (selectedSubDistrict !== 'Select') filterDetails.push(`Sub District: ${selectedSubDistrict}`);
+            if (selectedUserType !== 'Select') filterDetails.push(`User Type: ${selectedUserType}`);
+
             filterInfo.textContent = `Filters Applied: ${filterDetails.join(' | ')}`;
             pdfContent.appendChild(filterInfo);
         }
@@ -292,7 +291,7 @@ const AdminUser = () => {
                 index + 1, // Adjust serial number
                 result.regNo || '-',
                 result.code || '-'
-             
+
             ];
 
             cellData.forEach(text => {
@@ -316,11 +315,11 @@ const AdminUser = () => {
         footer.style.fontSize = '10px';
         footer.style.textAlign = 'right';
         footer.style.color = '#666';
-        
+
         const currentDate = new Date();
         const dateTimeStr = currentDate.toLocaleString();
         footer.textContent = `Generated on: ${dateTimeStr}`;
-        
+
         pdfContent.appendChild(footer);
 
         // PDF filename
@@ -342,7 +341,7 @@ const AdminUser = () => {
     // Function to print directly to printer
     const handlePrintTable = () => {
         const printWindow = window.open('', '_blank');
-        
+
         // Create print content
         printWindow.document.write(`
             <html>
@@ -395,12 +394,12 @@ const AdminUser = () => {
         `);
 
         // Add filter information if any filter is applied
-        if (selectedDistrict !== 'Select District' || selectedSubDistrict !== 'Select Sub District' || selectedUserType !== 'Select User Type') {
+        if (selectedDistrict !== 'Select' || selectedSubDistrict !== 'Select' || selectedUserType !== 'Select') {
             const filterDetails = [];
-            if (selectedDistrict !== 'Select District') filterDetails.push(`District: ${selectedDistrict}`);
-            if (selectedSubDistrict !== 'Select Sub District') filterDetails.push(`Sub District: ${selectedSubDistrict}`);
-            if (selectedUserType !== 'Select User Type') filterDetails.push(`User Type: ${selectedUserType}`);
-            
+            if (selectedDistrict !== 'Select') filterDetails.push(`District: ${selectedDistrict}`);
+            if (selectedSubDistrict !== 'Select') filterDetails.push(`Sub District: ${selectedSubDistrict}`);
+            if (selectedUserType !== 'Select') filterDetails.push(`User Type: ${selectedUserType}`);
+
             printWindow.document.write(`
                 <div class="filter-info">
                     Filters Applied: ${filterDetails.join(' | ')}
@@ -423,9 +422,9 @@ const AdminUser = () => {
 
         // Add table body with data
         printWindow.document.write('<tbody>');
-        
+
         const filteredData = filteredResultData();
-        
+
         if (filteredData.length === 0) {
             printWindow.document.write(`
                 <tr>
@@ -446,7 +445,7 @@ const AdminUser = () => {
                 `);
             });
         }
-        
+
         printWindow.document.write('</tbody>');
         printWindow.document.write('</table>');
 
@@ -476,7 +475,6 @@ const AdminUser = () => {
         printWindow.focus();
     };
 
-
     // Dummy data
     const resultData = [
         { slNo: 1, regNo: "Idukii", code: "District Admin", district: "Idukki", subDistrict: "Munnar", mark2: 78, mark3: 92, total: 255, markPercentage: 85, rank: 2, grade: "A", point: 9.5 },
@@ -498,27 +496,27 @@ const AdminUser = () => {
 
         // First filter by code if present
         if (searchCode) {
-            filtered = filtered.filter(result => 
+            filtered = filtered.filter(result =>
                 result.code && result.code.toLowerCase().includes(searchCode.toLowerCase())
             );
         }
 
         // Filter by selected District
-        if (selectedDistrict !== 'Select District') {
+        if (selectedDistrict !== 'Select') {
             filtered = filtered.filter(result =>
                 result.district === selectedDistrict
             );
         }
 
         // Filter by selected Sub District
-        if (selectedSubDistrict !== 'Select Sub District') {
+        if (selectedSubDistrict !== 'Select') {
             filtered = filtered.filter(result =>
                 result.subDistrict === selectedSubDistrict
             );
         }
 
         // Filter by selected User Type
-        if (selectedUserType !== 'Select User Type') {
+        if (selectedUserType !== 'Select') {
             filtered = filtered.filter(result =>
                 result.code === selectedUserType
             );
@@ -598,7 +596,7 @@ const AdminUser = () => {
         setSelectedSubDistrict(value);
 
         // If a specific sub-district is selected, find and set its district
-        if (value !== 'Select Sub District') {
+        if (value !== 'Select') {
             // Find which district this sub-district belongs to
             for (const [district, subDistricts] of Object.entries(districtToSubDistrict)) {
                 if (subDistricts.includes(value)) {
@@ -625,9 +623,9 @@ const AdminUser = () => {
 
         // Reset sub-district when district changes and update available sub-districts
         updateAvailableSubDistricts(value);
-        setSelectedSubDistrict('Select Sub District');
+        setSelectedSubDistrict('Select');
 
-        if (value !== 'Select District') {
+        if (value !== 'Select') {
             // Update URL parameter
             const updatedParams = new URLSearchParams(searchParams);
             updatedParams.set('p', value);
@@ -643,10 +641,14 @@ const AdminUser = () => {
         const value = e.target.value;
         setSelectedUserType(value);
 
+        // Reset district and sub-district when user type changes
+        setSelectedDistrict('Select');
+        setSelectedSubDistrict('Select');
+
         // Update available districts based on user type
         updateAvailableDistricts(value);
 
-        if (value !== 'Select User Type') {
+        if (value !== 'Select') {
             // Update URL parameter
             const updatedParams = new URLSearchParams(searchParams);
             updatedParams.set('p', value);
@@ -656,6 +658,16 @@ const AdminUser = () => {
             updatedParams.delete('p');
             setSearchParams(updatedParams);
         }
+    };
+
+    // Function to determine if District Select should be displayed
+    const shouldShowDistrictSelect = () => {
+        return selectedUserType === 'District Admin' || selectedUserType === 'Sub-district Admin';
+    };
+
+    // Function to determine if Sub District Select should be displayed
+    const shouldShowSubDistrictSelect = () => {
+        return selectedUserType === 'Sub-district Admin' && selectedDistrict !== 'Select';
     };
 
     return (
@@ -670,47 +682,11 @@ const AdminUser = () => {
                             Admin User
                         </h2>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
-                            {/* Sub District Select */}
+                            {/* User Type Select - Always shown */}
                             <div className="relative w-full sm:w-auto">
                                 <select
-                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
-                                    aria-label="Select Sub District"
-                                    value={selectedSubDistrict}
-                                    onChange={handleSubDistrictChange}
-                                >
-                                    {availableSubDistricts.map((option, index) => (
-                                        <option key={`sub-district-${index}`} value={option}>
-                                            {option}
-                                        </option>
-                                    ))}
-                                </select>
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                                    <i className="fa-solid fa-chevron-down"></i>
-                                </div>
-                            </div>
-                            {/* District Select */}
-                            <div className="relative w-full sm:w-auto">
-                                <select
-                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
-                                    aria-label="Select District"
-                                    value={selectedDistrict}
-                                    onChange={handleDistrictChange}
-                                >
-                                    {availableDistricts.map((option, index) => (
-                                        <option key={`district-${index}`} value={option}>
-                                            {option}
-                                        </option>
-                                    ))}
-                                </select>
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                                    <i className="fa-solid fa-chevron-down"></i>
-                                </div>
-                            </div>
-                            {/* User Type Select */}
-                            <div className="relative w-full sm:w-auto">
-                                <select
-                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
-                                    aria-label="Select User Type"
+                                    className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                                    id="user-type"
                                     value={selectedUserType}
                                     onChange={handleUserTypeChange}
                                 >
@@ -720,10 +696,71 @@ const AdminUser = () => {
                                         </option>
                                     ))}
                                 </select>
+                                <label
+                                    htmlFor="user-type"
+                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                                >
+                                    User Type
+                                </label>
                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
                                     <i className="fa-solid fa-chevron-down"></i>
                                 </div>
                             </div>
+
+                            {/* District Select - Shown conditionally */}
+                            {shouldShowDistrictSelect() && (
+                                <div className="relative w-full sm:w-auto">
+                                    <select
+                                        className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                                        value={selectedDistrict}
+                                        onChange={handleDistrictChange}
+                                        id="district-select"
+                                    >
+                                        {availableDistricts.map((option, index) => (
+                                            <option key={`district-${index}`} value={option}>
+                                                {option}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <label
+                                        htmlFor="district-select"
+                                        className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                                    >
+                                        District
+                                    </label>
+                                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                                        <i className="fa-solid fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Sub District Select - Shown conditionally */}
+                            {shouldShowSubDistrictSelect() && (
+                                <div className="relative w-full sm:w-auto">
+                                    <select
+                                        className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                                        id="sub-district-select"
+                                        value={selectedSubDistrict}
+                                        onChange={handleSubDistrictChange}
+                                        aria-label="Select Sub District"
+                                    >
+                                        {availableSubDistricts.map((option, index) => (
+                                            <option key={`sub-district-${index}`} value={option}>
+                                                {option}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <label
+                                        htmlFor="sub-district-select"
+                                        className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                                    >
+                                        Sub District
+                                    </label>
+                                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                                        <i className="fa-solid fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Add User button */}
                             <button
