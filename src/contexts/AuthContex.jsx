@@ -65,7 +65,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   // Simulating a logged-in sub district admin user (for testing)
-  const [user, setUser] = useState({ role: 'sub district admin', isAuthenticated: true });
+  const [user, setUser] = useState({ role: 'It Admin', isAuthenticated: true });
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>
