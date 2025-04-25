@@ -1,14 +1,14 @@
-// IT admin  ADD item In item List
+// IT admin EDIT item In item List
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import Dash from '../components/Dash';
 import Header from '../components/Header';
-// import { AddItemAPI } from '../services/allAPI'; 
+// import { GetItemByIdAPI, UpdateItemAPI } from '../services/allAPI'; 
 
-const AddItem = () => {
+const EditItem = () => {
     const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
-
+    const [searchParams] = useSearchParams();
+    const { itemId } = useParams(); // Get item ID from URL params
     const festivalDropdownRef = useRef(null);
 
     const festivalOptions = [
@@ -45,18 +45,72 @@ const AddItem = () => {
         festival: ''
     });
 
+    const [isLoading, setIsLoading] = useState(true);
+    const [formSubmitted, setFormSubmitted] = useState(false);
+
+    // Fetch item data when component mounts
+    useEffect(() => {
+        const fetchItemData = async () => {
+            if (!itemId) {
+                setIsLoading(false);
+                return;
+            }
+
+            const token = sessionStorage.getItem("token");
+            if (!token) {
+                alert("Authentication token missing. Please log in again.");
+                navigate('/login');
+                return;
+            }
+
+            try {
+                const reqHeader = {
+                    "Authorization": `Bearer ${token}`
+                };
+
+                // In a real implementation, uncomment this:
+                // const response = await GetItemByIdAPI(itemId, reqHeader);
+                // if (response.status === 200) {
+                //     setFormData(response.data);
+                // }
+                
+              
+                // Simulated API response
+                setTimeout(() => {
+                    const mockData = {
+                        festivalName: 'ITEM001',
+                        fromClass: 'Group Song',
+                        festival: 'UP Tamilkalaivizha',
+                        itemType: 'Group',
+                        maxStudents: '10',
+                        pinnany: '2',
+                        duration: '5 minutes'
+                    };
+                    setFormData(mockData);
+                    setIsLoading(false);
+                }, 500);
+                
+            } catch (err) {
+                console.error("Error fetching item:", err);
+                alert("Error fetching item data. Please try again.");
+                setIsLoading(false);
+            }
+        };
+
+        fetchItemData();
+    }, [itemId, navigate]);
+
+    // Set festival from URL param if available
     useEffect(() => {
         const festivalParam = searchParams.get('festival');
         
-        if (festivalParam) {
+        if (festivalParam && !formData.festival) {
             setFormData(prev => ({
                 ...prev,
                 festival: festivalParam
             }));
         }
-    }, [searchParams]);
-
-    const [formSubmitted, setFormSubmitted] = useState(false);
+    }, [searchParams, formData.festival]);
 
     const filteredFestivals = searchText.festival
         ? festivalOptions.filter(festival =>
@@ -127,7 +181,6 @@ const AddItem = () => {
     const validateForm = () => {
         const newErrors = {};
         let isValid = true;
-
         
         const fieldsToValidate = ['festivalName', 'fromClass', 'festival', 'itemType', 'maxStudents', 'duration'];
         
@@ -162,8 +215,6 @@ const AddItem = () => {
         });
 
         if (name === 'festival') {
-            setSearchParams({ festival: value });
-            
             setDropdownOpen(prev => ({ ...prev, festival: false }));
             setSearchText(prev => ({ ...prev, festival: '' }));
         }
@@ -184,7 +235,7 @@ const AddItem = () => {
         const isValid = validateForm();
 
         if (isValid) {
-            console.log("Form submitted:", formData);
+            console.log("Form submitted for update:", formData);
 
             const token = sessionStorage.getItem("token");
 
@@ -194,32 +245,21 @@ const AddItem = () => {
                 };
                 
                 try {
-                   
                     const dataToSubmit = {
                         ...formData,
                         pinnany: formData.pinnany.trim() === '' ? '0' : formData.pinnany
                     };
                     
-                    console.log("Submitting data:", dataToSubmit);
+                    console.log("Submitting update data:", dataToSubmit);
                     
-                    // const result = await AddItemAPI(dataToSubmit, reqHeader);
+                   
+                    // const result = await UpdateItemAPI(itemId, dataToSubmit, reqHeader);
                     
                   
                     const result = { status: 200 };
                     
                     if (result.status === 200) {
-                        alert('Item added successfully!');
-
-                        setFormData({
-                            festivalName: '',
-                            fromClass: '',
-                            festival: '',
-                            itemType: '',
-                            maxStudents: '',
-                            pinnany: '0',
-                            duration: ''
-                        });
-                        setFormSubmitted(false);
+                        alert('Item updated successfully!');
 
                         if (formData.festival) {
                             navigate(`/ItemRegistrationList?festival=${encodeURIComponent(formData.festival)}`);
@@ -227,11 +267,11 @@ const AddItem = () => {
                             navigate('/ItemRegistrationList');
                         }
                     } else {
-                        alert("Failed to add item");
+                        alert("Failed to update item");
                     }
                 } catch (err) {
-                    console.error("Error adding item:", err);
-                    alert("Error adding item. Please try again.");
+                    console.error("Error updating item:", err);
+                    alert("Error updating item. Please try again.");
                 }
             } else {
                 alert("Authentication token missing. Please log in again.");
@@ -241,6 +281,24 @@ const AddItem = () => {
         }
     };
 
+    if (isLoading) {
+        return (
+            <>
+                <div className="bg-white min-h-screen">
+                    <Header />
+                    <div className="flex flex-col sm:flex-row">
+                        <Dash />
+                        <div className="flex-1 p-2 sm:p-4 bg-gray-300">
+                            <div className="bg-gray-50 p-3 sm:p-6 pt-4 min-h-screen mx-auto flex justify-center items-center">
+                                <p className="text-gray-600">Loading item data...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    }
+
     return (
         <>
             <div className="bg-white min-h-screen">
@@ -249,7 +307,7 @@ const AddItem = () => {
                     <Dash />
                     <div className="flex-1 p-2 sm:p-4 bg-gray-300">
                         <div className="bg-gray-50 p-3 sm:p-6 pt-4 min-h-screen mx-auto">
-                            <h2 className="text-lg font-bold mb-5 sm:mb-10 text-gray-800">Add Item</h2>
+                            <h2 className="text-lg font-bold mb-5 sm:mb-10 text-gray-800">Edit Item</h2>
 
                             <form className="space-y-3 sm:space-y-4 max-w-2xl mx-auto">
                                 <div className="flex flex-col sm:flex-row sm:items-center">
@@ -292,7 +350,7 @@ const AddItem = () => {
                                             </div>
                                             {dropdownOpen.festival && (
                                                 <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
-                                                    {/* Search input */}
+                                            
                                                     <div className="p-2 border-b">
                                                         <input
                                                             type="text"
@@ -394,7 +452,7 @@ const AddItem = () => {
                                     type="submit"
                                     className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:opacity-90 transition-opacity duration-300"
                                 >
-                                    Add
+                                    Update
                                 </button>
                             </div>
                         </div>
@@ -405,4 +463,4 @@ const AddItem = () => {
     );
 };
 
-export default AddItem
+export default EditItem;

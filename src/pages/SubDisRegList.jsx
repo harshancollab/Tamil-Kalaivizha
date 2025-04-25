@@ -1,26 +1,25 @@
-// It admin when user click district name  - subdistr 
-
+// It admin SUb distric reg
 import React, { useState, useRef, useEffect } from 'react';
 import Header from '../components/Header';
 import Dash from '../components/Dash';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { getAllResultentryListAPI } from '../services/allAPI';
-import html2pdf from 'html2pdf.js'; 
+import { getAllResultentryListAPI } from '../services/allAPI'; 
+import html2pdf from 'html2pdf.js'; // Add this import for html2pdf
 
-const SubDistrictList = () => {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [districts, setDistricts] = useState([]);
+const SubDisRegList = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchCode, setSearchCode] = useState(searchParams.get('code') || '');
     const [selectedDistrict, setSelectedDistrict] = useState(searchParams.get('district') || 'Select');
+ 
+    const [resultentry, setResultentry] = useState([]);
     const navigate = useNavigate();
     const printRef = useRef();
     
+   
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
-    // Initialize search parameters from URL
+   
     useEffect(() => {
         const codeParam = searchParams.get('code');
         const districtParam = searchParams.get('district');
@@ -28,6 +27,7 @@ const SubDistrictList = () => {
         if (districtParam) setSelectedDistrict(districtParam);
     }, [searchParams]);
 
+    
     useEffect(() => {
         setCurrentPage(1);
     }, [searchCode, selectedDistrict]);
@@ -51,6 +51,7 @@ const SubDistrictList = () => {
         'Thrissur',
     ];
 
+    
     const subDistrictData = [
         { slNo: 1, name: "Munnar", district: "Idukki", totalSchools: 42, dataEntered: 30, dataNotEntered: 12, confirmed: 25, notConfirmed: 17 },
         { slNo: 2, name: "Adimali", district: "Idukki", totalSchools: 38, dataEntered: 28, dataNotEntered: 10, confirmed: 22, notConfirmed: 16 },
@@ -67,19 +68,42 @@ const SubDistrictList = () => {
         { slNo: 13, name: "Kalpetta", district: "Wayanad", totalSchools: 32, dataEntered: 26, dataNotEntered: 6, confirmed: 22, notConfirmed: 10 },
     ];
 
-    // Filter 
+  
     const filteredData = subDistrictData.filter(item => {
         const matchesSearch = !searchCode || item.name.toLowerCase().includes(searchCode.toLowerCase());
         const matchesDistrict = selectedDistrict === 'Select' || item.district === selectedDistrict;
         return matchesSearch && matchesDistrict;
     });
+    
+  
+    useEffect(() => {
+        getAllresultentry();
+    }, []);
 
-    // Pagination 
+    const getAllresultentry = async () => {
+        const token = sessionStorage.getItem("token");
+        if (token) {
+            const reqHeader = {
+                "Authorization": `Bearer ${token}`
+            };
+            try {
+                const result = await getAllResultentryListAPI(reqHeader);
+                if (result.status === 200) {
+                    setResultentry(result.data);
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        }
+    };
+
+   
     const indexOfLastItem = currentPage * rowsPerPage;
     const indexOfFirstItem = indexOfLastItem - rowsPerPage;
     const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
+   
     const handleSubDistrictClick = (subDistrict, district) => {
         navigate(`/school-list?subDistrict=${encodeURIComponent(subDistrict)}&district=${encodeURIComponent(district)}`);
     };
@@ -90,6 +114,7 @@ const SubDistrictList = () => {
         }
     };
 
+    
     const updateURLParams = (params) => {
         const newParams = new URLSearchParams(searchParams);
         
@@ -104,35 +129,44 @@ const SubDistrictList = () => {
         setSearchParams(newParams);
     };
 
+   
     const handleSearchChange = (e) => {
         const value = e.target.value;
         setSearchCode(value);
         
+      
         updateURLParams({ code: value });
     };
 
+   
     const handleDistrictChange = (e) => {
         const value = e.target.value;
         setSelectedDistrict(value);
         
+      
         updateURLParams({ district: value });
     };
 
     const handleAddSubDistrict = () => {
-        if (selectedDistrict !== 'Select') {
-            navigate(`/AddSubDistrict?district=${encodeURIComponent(selectedDistrict)}`);
-        } else {
-            navigate('/AddSubDistrict');
-        }
+        
+        navigate('/AddSubdis', {
+            state: { 
+                districtName: selectedDistrict !== 'Select' ? selectedDistrict : '' 
+            }
+        });
     };
 
+   
     const generatePDF = () => {
+       
         const pdfContent = document.createElement('div');
         
+       
         const titleElement = document.createElement('h2');
-        titleElement.textContent = selectedDistrict !== 'Select' ? 
-            `${selectedDistrict} - Sub District List Report` : 
-            "Sub District List Report";
+        titleElement.textContent = "Sub District List Report";
+        if (selectedDistrict !== 'Select') {
+            titleElement.textContent += ` - ${selectedDistrict}`;
+        }
         titleElement.style.textAlign = 'center';
         titleElement.style.margin = '20px 0';
         titleElement.style.fontWeight = 'bold';
@@ -144,7 +178,7 @@ const SubDistrictList = () => {
         table.style.borderCollapse = 'collapse';
         table.style.marginTop = '20px';
         
-       
+        
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
         
@@ -162,15 +196,15 @@ const SubDistrictList = () => {
         thead.appendChild(headerRow);
         table.appendChild(thead);
         
-      
+       
         const tbody = document.createElement('tbody');
         
         filteredData.forEach((item, index) => {
             const row = document.createElement('tr');
             
-            
+        
             const cellData = [
-                indexOfFirstItem + index + 1,
+                index + 1,
                 item.name || "-",
                 item.totalSchools || "-",
                 item.dataEntered || "-",
@@ -195,9 +229,9 @@ const SubDistrictList = () => {
         pdfContent.appendChild(table);
         
         
-        const fileName = selectedDistrict !== 'Select' ? 
-            `${selectedDistrict}_Sub_District_List_Report.pdf` : 
-            `Sub_District_List_Report.pdf`;
+        const fileName = selectedDistrict !== 'Select' 
+            ? `SubDistrict_List_${selectedDistrict}.pdf` 
+            : `SubDistrict_List_Report.pdf`;
         
         
         const options = {
@@ -208,54 +242,24 @@ const SubDistrictList = () => {
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
         
+        
         html2pdf().from(pdfContent).set(options).save();
-    };
-
-    
-    useEffect(() => {
-        getAllDistricts();
-    }, []);
-
-    const getAllDistricts = async () => {
-        setLoading(true);
-        setError(null);
-        
-        const token = sessionStorage.getItem("token");
-        if (!token) {
-            setError("Authentication token not found. Please login again.");
-            setLoading(false);
-            return;
-        }
-        
-        const reqHeader = {
-            "Authorization": `Bearer ${token}`
-        };
-        
-        try {
-            const result = await getAllResultentryListAPI(reqHeader);
-            if (result.status === 200) {
-                setDistricts(result.data);
-            } else {
-                setError(`Failed to fetch data: ${result.status}`);
-            }
-        } catch (err) {
-            console.error("API Error:", err);
-            setError("Failed to fetch district data. Please try again later.");
-        } finally {
-            setLoading(false);
-        }
     };
 
     const renderPageNumbers = () => {
         const pageNumbers = [];
+     
         const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
 
         if (totalPages <= maxPageNumbersToShow) {
+           
             for (let i = 1; i <= totalPages; i++) {
                 pageNumbers.push(i);
             }
         } else {
+         
             if (currentPage <= 2) {
+             
                 for (let i = 1; i <= 3; i++) {
                     if (i <= totalPages) pageNumbers.push(i);
                 }
@@ -264,12 +268,14 @@ const SubDistrictList = () => {
                     pageNumbers.push(totalPages);
                 }
             } else if (currentPage >= totalPages - 1) {
+              
                 pageNumbers.push(1);
                 pageNumbers.push('...');
                 for (let i = totalPages - 2; i <= totalPages; i++) {
                     if (i > 0) pageNumbers.push(i);
                 }
             } else {
+             
                 pageNumbers.push(1);
                 if (currentPage > 3) pageNumbers.push('...');
                 pageNumbers.push(currentPage - 1);
@@ -291,9 +297,32 @@ const SubDistrictList = () => {
                 <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-hidden">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
                         <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
-                            {selectedDistrict !== 'Select' ? `${selectedDistrict} - ` : ""} Sub District List
+                            Sub District List
                         </h2>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
+                            <div className="relative w-full sm:w-auto">
+                                <select
+                                    className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                                    value={selectedDistrict}
+                                    onChange={handleDistrictChange}
+                                    id="district-select"
+                                >
+                                    {availableDistricts.map((option, index) => (
+                                        <option key={`district-${index}`} value={option}>
+                                            {option}
+                                        </option>
+                                    ))}
+                                </select>
+                                <label
+                                    htmlFor="district-select"
+                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                                >
+                                    District
+                                </label>
+                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                                    <i className="fa-solid fa-chevron-down"></i>
+                                </div>
+                            </div>
                             <div className="flex gap-2 w-full sm:w-auto">
                                 <button
                                     onClick={handleAddSubDistrict}
@@ -379,12 +408,16 @@ const SubDistrictList = () => {
                         </div>
                     </div>
 
+                 
                     <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
+                      
                         <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
                             {filteredData.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} of ${filteredData.length} rows` : '0 rows'}
                         </div>
 
+                    
                         <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                          
                             <button
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 1}
@@ -394,6 +427,7 @@ const SubDistrictList = () => {
                                 <span className="hidden sm:inline p-1">Previous</span>
                             </button>
 
+                           
                             <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
                                 {renderPageNumbers().map((page, index) => (
                                     <button
@@ -408,6 +442,7 @@ const SubDistrictList = () => {
                                 ))}
                             </div>
 
+                         
                             <button
                                 onClick={() => handlePageChange(currentPage + 1)}
                                 disabled={currentPage === totalPages || totalPages === 0}
@@ -424,4 +459,4 @@ const SubDistrictList = () => {
     );
 };
 
-export default SubDistrictList
+export default SubDisRegList

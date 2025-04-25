@@ -1,8 +1,11 @@
+// It Admin user
+
 import React, { useEffect, useState, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import html2pdf from 'html2pdf.js';
+// import { getAllAdminuserAPI, deleteAdminuserAPI } from '../services/allAPI';
 
 const AdminUser = () => {
     const [Allresultentry, setResultentry] = useState([]);
@@ -37,9 +40,9 @@ const AdminUser = () => {
         'Adimali',
         'Kattappana',
         'Nedumkandam',
+        'Devikulam',
         'Chittur',
         'Pattambi',
-        'Devikulam',
         'Kuzhalmannam',
         'Nemmara',
         'Mannarkkad',
@@ -55,7 +58,6 @@ const AdminUser = () => {
         'Kozhikode',
         'Wayanad',
         'Thrissur',
-        
     ];
 
     const allUserTypes = [
@@ -92,40 +94,63 @@ const AdminUser = () => {
         getAllAdminuser();
     }, []);
 
-    // Initialize from URL params
+    // Initialize from URL params - FIXED
     useEffect(() => {
+        // Get all params
         const codeParam = searchParams.get('code');
+        const districtParam = searchParams.get('district');
+        const subDistrictParam = searchParams.get('subdistrict');
+        const userTypeParam = searchParams.get('usertype');
         const pParam = searchParams.get('p');
 
+        // First handle primary filter parameters
         if (codeParam) {
             setSearchCode(codeParam);
         }
 
+        // Initialize user type from usertype parameter or p parameter
+        let userType = 'Select';
+        if (userTypeParam && allUserTypes.includes(userTypeParam)) {
+            userType = userTypeParam;
+        } else if (pParam && allUserTypes.includes(pParam)) {
+            userType = pParam;
+        }
+        setSelectedUserType(userType);
+
+        // Initialize district
+        let district = 'Select';
+        if (districtParam && allDistricts.includes(districtParam)) {
+            district = districtParam;
+        } else if (pParam && allDistricts.includes(pParam)) {
+            district = pParam;
+        }
+        setSelectedDistrict(district);
+
+        // Update available sub-districts based on selected district
+        if (district !== 'Select') {
+            const subDistricts = districtToSubDistrict[district] || [];
+            setAvailableSubDistricts(['Select', ...subDistricts]);
+        }
+
+        // Initialize sub-district
+        let subDistrict = 'Select';
+        if (subDistrictParam && allSubDistricts.includes(subDistrictParam)) {
+            subDistrict = subDistrictParam;
+        } else if (pParam && allSubDistricts.includes(pParam)) {
+            subDistrict = pParam;
+        }
+
+        // Only set sub-district if it belongs to selected district
+        if (subDistrict !== 'Select' && district !== 'Select') {
+            const validSubDistricts = districtToSubDistrict[district] || [];
+            if (validSubDistricts.includes(subDistrict)) {
+                setSelectedSubDistrict(subDistrict);
+            }
+        }
+
+        // Set general filter param
         if (pParam) {
             setFilterParam(pParam);
-
-            // Set dropdown values based on the p parameter
-            if (allSubDistricts.includes(pParam)) {
-                setSelectedSubDistrict(pParam);
-                // Find matching district for this sub-district
-                for (const [district, subDistricts] of Object.entries(districtToSubDistrict)) {
-                    if (subDistricts.includes(pParam)) {
-                        setSelectedDistrict(district);
-                        break;
-                    }
-                }
-            } else if (allDistricts.includes(pParam)) {
-                setSelectedDistrict(pParam);
-                // Update available sub-districts based on selected district
-                updateAvailableSubDistricts(pParam);
-            } else if (allUserTypes.includes(pParam)) {
-                setSelectedUserType(pParam);
-                // Update available districts based on user type
-                if (pParam !== 'Select') {
-                    const availableDists = ['Select', ...userTypeToDistrictAccess[pParam]];
-                    setAvailableDistricts(availableDists);
-                }
-            }
         }
     }, [searchParams]);
 
@@ -134,9 +159,6 @@ const AdminUser = () => {
         if (district && district !== 'Select') {
             const subDistricts = districtToSubDistrict[district] || [];
             setAvailableSubDistricts(['Select', ...subDistricts]);
-            if (subDistricts.length === 0 || !subDistricts.includes(selectedSubDistrict)) {
-                setSelectedSubDistrict('Select');
-            }
         } else {
             setAvailableSubDistricts(allSubDistricts);
         }
@@ -173,7 +195,6 @@ const AdminUser = () => {
             throw error;
         }
     };
-
     const getAllAdminuser = async () => {
         const token = sessionStorage.getItem("token");
         if (token) {
@@ -188,41 +209,186 @@ const AdminUser = () => {
                 }
             } catch (err) {
                 console.log(err);
-
             } finally {
                 setLoading(false);
             }
         }
     }
 
-    // Handle edit user
+    // Handle edit user - MODIFIED TO PRESERVE FILTERS
     const handleEditRedirect = (resultEntry) => {
+        // Create a query string with the current filter parameters
+        const params = new URLSearchParams();
+
+        // Add the current filter states to params
+        if (selectedUserType !== 'Select') {
+            params.append('usertype', selectedUserType);
+        }
+
+        if (selectedDistrict !== 'Select') {
+            params.append('district', selectedDistrict);
+        }
+
+        if (selectedSubDistrict !== 'Select') {
+            params.append('subdistrict', selectedSubDistrict);
+        }
+
+        // Also add the current search code if any
+        if (searchCode) {
+            params.append('code', searchCode);
+        }
+
+        // Add return URL with all current params
+        params.append('returnUrl', `/AdminUser?${searchParams.toString()}`);
+
         navigate(`/EditUser/${resultEntry.slNo}`, {
-            state: { resultEntry }
+            state: {
+                resultEntry,
+                filterParams: params.toString() // Pass filter params in state as well as backup
+            }
         });
     };
 
     // Handle delete user
     const handleDeleteClick = async (id) => {
-        const token = sessionStorage.getItem("token")
-        if (token) {
-            const reqHeader = {
-                "Authorization": `Bearer ${token}`
-            }
-            try {
-                setLoading(true);
-                // Implement deleteAdminuserAPI when available
-                // await deleteAdminuserAPI(id, reqHeader);
-                getAllAdminuser();
-                console.log("Delete clicked for ID:", id);
-            } catch (err) {
-                console.log(err);
-                // Add appropriate error handling here
-            } finally {
-                setLoading(false);
-            }
+        const token = sessionStorage.getItem("token");
+        if (!token) {
+            // Handle case when token is not available
+            console.error("Authentication token not found");
+            // You could use a toast notification or alert here
+            alert("You need to be logged in to perform this action");
+            return;
         }
-    }
+
+        const reqHeader = {
+            "Authorization": `Bearer ${token}`
+        };
+
+        try {
+            setLoading(true);
+
+            // First, you might want to show a confirmation dialog
+            const confirmDelete = window.confirm("Are you sure you want to delete this user?");
+            if (!confirmDelete) {
+                setLoading(false);
+                return;
+            }
+
+            // Uncomment when API is available
+            // const result = await deleteAdminuserAPI(id, reqHeader);
+
+            // Check response status when API is implemented
+            // if (result.status === 200) {
+            //     // Success message
+            //     alert("User deleted successfully");
+            //     getAllAdminuser(); // Refresh the list
+            // } else {
+            //     throw new Error("Failed to delete user");
+            // }
+
+            console.log("Delete clicked for ID:", id);
+
+            // For now, simulate success since API call is commented out
+            alert("User would be deleted if API was connected");
+            getAllAdminuser();
+
+        } catch (err) {
+            console.error("Error deleting user:", err);
+
+            // Provide specific error messages based on error type
+            if (err.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                if (err.response.status === 401) {
+                    alert("Session expired. Please login again.");
+                    // Optionally redirect to login page
+                    // navigate('/login');
+                } else if (err.response.status === 403) {
+                    alert("You don't have permission to delete this user");
+                } else if (err.response.status === 404) {
+                    alert("User not found. It may have been already deleted.");
+                    getAllAdminuser(); // Refresh to show current state
+                } else {
+                    alert(`Error: ${err.response.data.message || "Failed to delete user"}`);
+                }
+            } else if (err.request) {
+                // The request was made but no response was received
+                alert("Server is not responding. Please try again later.");
+            } else {
+                // Something happened in setting up the request
+                alert("An error occurred while trying to delete the user");
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+    // Dummy data
+    const resultData = [
+        { slNo: 1, regNo: "Idukii", code: "District Admin", district: "Idukki", subDistrict: "Munnar", mark2: 78, mark3: 92, total: 255, markPercentage: 85, rank: 2, grade: "A", point: 9.5 },
+        { slNo: 2, regNo: "Palakkad", code: "District Admin", district: "Palakkad", subDistrict: "Chittur", mark2: 88, mark3: 95, total: 273, markPercentage: 91, rank: 1, grade: "A+", point: 10.0 },
+        { slNo: 3, regNo: "Kozhikode", code: "District Admin", mark1: 75, district: "Kozhikode", subDistrict: "vatakara", mark3: 88, total: 245, markPercentage: 82, rank: 3, grade: "A-", point: 9.0 },
+        { slNo: 4, regNo: "Munnar", code: "Sub-district Admin", district: "Idukki", subDistrict: "Munnar", mark2: 72, mark3: 76, total: 216, markPercentage: 72, rank: 7, grade: "B+", point: 8.0 },
+        { slNo: 5, regNo: "Kattapana", code: "Sub-district Admin", district: "Idukki", subDistrict: "Kattappana", mark2: 80, mark3: 88, total: 260, markPercentage: 87, rank: 4, grade: "A", point: 9.5 },
+        { slNo: 6, regNo: "Chittur", code: "Sub-district Admin", mark1: 78, mark2: 75, district: "Palakkad", subDistrict: "Chittur", total: 235, markPercentage: 78, rank: 5, grade: "B+", point: 8.5 },
+        { slNo: 7, regNo: "Kochi", code: "District Admin", district: "Ernakulam", subDistrict: "Edapally" },
+        { slNo: 8, regNo: "Pattambi", code: "Sub-district Admin", mark1: 78, mark2: 75, district: "Palakkad", subDistrict: "Pattambi", total: 235, markPercentage: 78, rank: 5, grade: "B+", point: 8.5 },
+        { slNo: 9, regNo: "Kuzhalmannam", code: "Sub-district Admin", district: "Palakkad", subDistrict: "Kuzhalmannam" },
+        { slNo: 10, regNo: "Nemmara", code: "Sub-district Admin", district: "Palakkad", subDistrict: "Nemmara" },
+        { slNo: 11, regNo: "Mannarkkad", code: "Sub-district Admin", district: "Palakkad", subDistrict: "Mannarkkad" },
+    ];
+
+    // Filter results based on search code and dropdown selections
+    const filteredResultData = () => {
+        let filtered = [...resultData];
+
+        // First filter by code if present
+        if (searchCode) {
+            filtered = filtered.filter(result =>
+                result.code && result.code.toLowerCase().includes(searchCode.toLowerCase())
+            );
+        }
+
+        // Filter by selected District
+        if (selectedDistrict !== 'Select') {
+            filtered = filtered.filter(result =>
+                result.district === selectedDistrict
+            );
+        }
+
+        // Filter by selected Sub District
+        if (selectedSubDistrict !== 'Select') {
+            filtered = filtered.filter(result =>
+                result.subDistrict === selectedSubDistrict
+            );
+        }
+
+        // Filter by selected User Type
+        if (selectedUserType !== 'Select') {
+            filtered = filtered.filter(result =>
+                result.code === selectedUserType
+            );
+        }
+
+        return filtered;
+    };
+
+    // Reset pagination when search or filter changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchCode, selectedDistrict, selectedSubDistrict, selectedUserType]);
+
+    // Pagination logic
+    const filteredData = filteredResultData();
+    const indexOfLastItem = currentPage * rowsPerPage;
+    const indexOfFirstItem = indexOfLastItem - rowsPerPage;
+    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
+    const handlePageChange = (pageNumber) => {
+        if (pageNumber > 0 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
 
     const generatePDF = () => {
         // Create a new div element for PDF content
@@ -475,73 +641,6 @@ const AdminUser = () => {
         printWindow.focus();
     };
 
-    // Dummy data
-    const resultData = [
-        { slNo: 1, regNo: "Idukii", code: "District Admin", district: "Idukki", subDistrict: "Munnar", mark2: 78, mark3: 92, total: 255, markPercentage: 85, rank: 2, grade: "A", point: 9.5 },
-        { slNo: 2, regNo: "Palakkad", code: "District Admin", district: "Palakkad", subDistrict: "Chittur", mark2: 88, mark3: 95, total: 273, markPercentage: 91, rank: 1, grade: "A+", point: 10.0 },
-        { slNo: 3, regNo: "Kozhikode", code: "District Admin", mark1: 75, district: "Kozhikode", subDistrict: "vatakara", mark3: 88, total: 245, markPercentage: 82, rank: 3, grade: "A-", point: 9.0 },
-        { slNo: 4, regNo: "Munnar", code: "Sub-district Admin", district: "Idukki", subDistrict: "Munnar", mark2: 72, mark3: 76, total: 216, markPercentage: 72, rank: 7, grade: "B+", point: 8.0 },
-        { slNo: 5, regNo: "Kattapana", code: "Sub-district Admin", district: "Idukki", subDistrict: "Kattappana", mark2: 80, mark3: 88, total: 260, markPercentage: 87, rank: 4, grade: "A", point: 9.5 },
-        { slNo: 6, regNo: "Chittur", code: "Sub-district Admin", mark1: 78, mark2: 75, district: "Palakkad", subDistrict: "Chittur", total: 235, markPercentage: 78, rank: 5, grade: "B+", point: 8.5 },
-        { slNo: 7, regNo: "Kochi", code: "District Admin", district: "Ernakulam", subDistrict: "Edapally" },
-        { slNo: 8, regNo: "Pattambi", code: "Sub-district Admin", mark1: 78, mark2: 75, district: "Palakkad", subDistrict: "Pattambi", total: 235, markPercentage: 78, rank: 5, grade: "B+", point: 8.5 },
-        { slNo: 9, regNo: "Kuzhalmannam", code: "Sub-district Admin", district: "Palakkad", subDistrict: "Kuzhalmannam" },
-        { slNo: 10, regNo: "Nemmara", code: "Sub-district Admin", district: "Palakkad", subDistrict: "Nemmara" },
-        { slNo: 11, regNo: "Mannarkkad", code: "Sub-district Admin", district: "Palakkad", subDistrict: "Mannarkkad" },
-    ];
-
-    // Filter results based on search code and dropdown selections
-    const filteredResultData = () => {
-        let filtered = [...resultData];
-
-        // First filter by code if present
-        if (searchCode) {
-            filtered = filtered.filter(result =>
-                result.code && result.code.toLowerCase().includes(searchCode.toLowerCase())
-            );
-        }
-
-        // Filter by selected District
-        if (selectedDistrict !== 'Select') {
-            filtered = filtered.filter(result =>
-                result.district === selectedDistrict
-            );
-        }
-
-        // Filter by selected Sub District
-        if (selectedSubDistrict !== 'Select') {
-            filtered = filtered.filter(result =>
-                result.subDistrict === selectedSubDistrict
-            );
-        }
-
-        // Filter by selected User Type
-        if (selectedUserType !== 'Select') {
-            filtered = filtered.filter(result =>
-                result.code === selectedUserType
-            );
-        }
-
-        return filtered;
-    };
-
-    // Reset pagination when search or filter changes
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchCode, selectedDistrict, selectedSubDistrict, selectedUserType]);
-
-    // Pagination logic
-    const filteredData = filteredResultData();
-    const indexOfLastItem = currentPage * rowsPerPage;
-    const indexOfFirstItem = indexOfLastItem - rowsPerPage;
-    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-
-    const handlePageChange = (pageNumber) => {
-        if (pageNumber > 0 && pageNumber <= totalPages) {
-            setCurrentPage(pageNumber);
-        }
-    };
 
     const renderPageNumbers = () => {
         const pageNumbers = [];
@@ -586,89 +685,140 @@ const AdminUser = () => {
         return pageNumbers;
     };
 
+
+    // Modified to pass filter data to AddUser page and preserve current filters for return
     const handleAddClick = () => {
-        navigate('/AddUser');
-    };
+        const params = new URLSearchParams();
 
-    // Handle select changes with connected dropdown logic
-    const handleSubDistrictChange = (e) => {
-        const value = e.target.value;
-        setSelectedSubDistrict(value);
+        // If there's a redirect URL you want to return to, add it
+        // Include the current filters in the return URL
+        params.append('redirect', `/AdminUser?${searchParams.toString()}`);
 
-        // If a specific sub-district is selected, find and set its district
-        if (value !== 'Select') {
-            // Find which district this sub-district belongs to
-            for (const [district, subDistricts] of Object.entries(districtToSubDistrict)) {
-                if (subDistricts.includes(value)) {
-                    setSelectedDistrict(district);
-                    break;
-                }
-            }
-
-            // Update URL parameter
-            const updatedParams = new URLSearchParams(searchParams);
-            updatedParams.set('p', value);
-            setSearchParams(updatedParams);
-        } else {
-            // Don't reset district when sub-district is cleared
-            const updatedParams = new URLSearchParams(searchParams);
-            updatedParams.delete('p');
-            setSearchParams(updatedParams);
+        // Pass selected filters to the Add User page
+        if (selectedUserType !== 'Select') {
+            params.append('userType', selectedUserType);
         }
-    };
 
-    const handleDistrictChange = (e) => {
-        const value = e.target.value;
-        setSelectedDistrict(value);
-
-        // Reset sub-district when district changes and update available sub-districts
-        updateAvailableSubDistricts(value);
-        setSelectedSubDistrict('Select');
-
-        if (value !== 'Select') {
-            // Update URL parameter
-            const updatedParams = new URLSearchParams(searchParams);
-            updatedParams.set('p', value);
-            setSearchParams(updatedParams);
-        } else {
-            const updatedParams = new URLSearchParams(searchParams);
-            updatedParams.delete('p');
-            setSearchParams(updatedParams);
+        if (selectedDistrict !== 'Select') {
+            params.append('district', selectedDistrict);
         }
-    };
 
-    const handleUserTypeChange = (e) => {
-        const value = e.target.value;
-        setSelectedUserType(value);
-
-        // Reset district and sub-district when user type changes
-        setSelectedDistrict('Select');
-        setSelectedSubDistrict('Select');
-
-        // Update available districts based on user type
-        updateAvailableDistricts(value);
-
-        if (value !== 'Select') {
-            // Update URL parameter
-            const updatedParams = new URLSearchParams(searchParams);
-            updatedParams.set('p', value);
-            setSearchParams(updatedParams);
-        } else {
-            const updatedParams = new URLSearchParams(searchParams);
-            updatedParams.delete('p');
-            setSearchParams(updatedParams);
+        if (selectedSubDistrict !== 'Select') {
+            params.append('subDistrict', selectedSubDistrict);
         }
+
+        const queryString = params.toString();
+        navigate(`/AddUser?${queryString}`);
     };
 
     // Function to determine if District Select should be displayed
+    // Show District select for District Admin and Sub-district Admin types only
     const shouldShowDistrictSelect = () => {
         return selectedUserType === 'District Admin' || selectedUserType === 'Sub-district Admin';
     };
 
     // Function to determine if Sub District Select should be displayed
+    // Only show Sub-district select when user type is Sub-district Admin AND a district is selected
     const shouldShowSubDistrictSelect = () => {
         return selectedUserType === 'Sub-district Admin' && selectedDistrict !== 'Select';
     };
+
+    // FIXED: Handle select changes with connected dropdown logic
+    const handleSubDistrictChange = (e) => {
+        const value = e.target.value;
+        setSelectedSubDistrict(value);
+
+        // Update URL parameters consistently
+        const updatedParams = new URLSearchParams(searchParams);
+
+        if (value !== 'Select') {
+            // Set both specific and general parameters
+            updatedParams.set('subdistrict', value);
+            updatedParams.set('p', value);
+
+            // Make sure district is set correctly for this sub-district
+            for (const [district, subDistricts] of Object.entries(districtToSubDistrict)) {
+                if (subDistricts.includes(value)) {
+                    setSelectedDistrict(district);
+                    updatedParams.set('district', district);
+                    break;
+                }
+            }
+        } else {
+            // Clear only the sub-district parameter, keep district
+            updatedParams.delete('subdistrict');
+            // Don't clear p parameter if it matches another filter
+            if (searchParams.get('p') === searchParams.get('subdistrict')) {
+                updatedParams.delete('p');
+            }
+        }
+
+        setSearchParams(updatedParams);
+    };
+
+    // FIXED: Handle district change
+    const handleDistrictChange = (e) => {
+        const value = e.target.value;
+        setSelectedDistrict(value);
+
+        // Always reset sub-district when district changes
+        setSelectedSubDistrict('Select');
+        updateAvailableSubDistricts(value);
+
+        // Update URL parameters
+        const updatedParams = new URLSearchParams(searchParams);
+
+        if (value !== 'Select') {
+            // Set both specific parameter and general p parameter
+            updatedParams.set('district', value);
+            updatedParams.set('p', value);
+            // Clear sub-district when district changes
+            updatedParams.delete('subdistrict');
+        } else {
+            // Clear district and sub-district parameters
+            updatedParams.delete('district');
+            updatedParams.delete('subdistrict');
+
+            // Only clear p if it was set to the same value as district
+            if (searchParams.get('p') === searchParams.get('district')) {
+                updatedParams.delete('p');
+            }
+        }
+
+        setSearchParams(updatedParams);
+    };
+
+    // FIXED: Handle user type change
+    const handleUserTypeChange = (e) => {
+        const value = e.target.value;
+        setSelectedUserType(value);
+
+        // Reset dependent fields
+        setSelectedDistrict('Select');
+        setSelectedSubDistrict('Select');
+        updateAvailableDistricts(value);
+
+        // Update URL parameters
+        const updatedParams = new URLSearchParams(searchParams);
+
+        if (value !== 'Select') {
+            // Set both usertype and p parameters
+            updatedParams.set('usertype', value);
+            updatedParams.set('p', value);
+            // Clear district and subdistrict filters
+            updatedParams.delete('district');
+            updatedParams.delete('subdistrict');
+        } else {
+            // Clear all filter parameters
+            updatedParams.delete('usertype');
+            updatedParams.delete('district');
+            updatedParams.delete('subdistrict');
+            updatedParams.delete('p');
+        }
+
+        setSearchParams(updatedParams);
+    };
+
 
     return (
         <>
@@ -677,64 +827,31 @@ const AdminUser = () => {
                 <Dash />
                 <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-hidden">
 
-                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
-                        <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
-                            Admin User
-                        </h2>
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
-                            {/* User Type Select - Always shown */}
-                            <div className="relative w-full sm:w-auto">
-                                <select
-                                    className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                                    id="user-type"
-                                    value={selectedUserType}
-                                    onChange={handleUserTypeChange}
+                    <div className="flex flex-col mb-4">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4">
+                            <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
+                                Admin User
+                            </h2>
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-4 mt-4 sm:mt-0">
+                                {/* Add User and Print buttons in the top row */}
+                                <button
+                                    onClick={handleAddClick}
+                                    className="text-transparent bg-clip-text bg-gradient-to-r from-blue-900 to-blue-400 border border-blue-500 py-2 px-6 rounded-full flex items-center justify-center shrink-0 w-full sm:w-auto hover:shadow-md transition-all duration-300"
                                 >
-                                    {availableUserTypes.map((option, index) => (
-                                        <option key={`user-type-${index}`} value={option}>
-                                            {option}
-                                        </option>
-                                    ))}
-                                </select>
-                                <label
-                                    htmlFor="user-type"
-                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                                    Add User
+                                </button>
+                                <button
+                                    onClick={generatePDF}
+                                    className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-10 rounded-full w-full sm:w-auto"
                                 >
-                                    User Type
-                                </label>
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                                    <i className="fa-solid fa-chevron-down"></i>
-                                </div>
+                                    Print
+                                </button>
                             </div>
+                        </div>
 
-                            {/* District Select - Shown conditionally */}
-                            {shouldShowDistrictSelect() && (
-                                <div className="relative w-full sm:w-auto">
-                                    <select
-                                        className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                                        value={selectedDistrict}
-                                        onChange={handleDistrictChange}
-                                        id="district-select"
-                                    >
-                                        {availableDistricts.map((option, index) => (
-                                            <option key={`district-${index}`} value={option}>
-                                                {option}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <label
-                                        htmlFor="district-select"
-                                        className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
-                                    >
-                                        District
-                                    </label>
-                                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                                        <i className="fa-solid fa-chevron-down"></i>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Sub District Select - Shown conditionally */}
+                        {/* Dropdown selects in a separate row, aligned to the right */}
+                        <div className="flex flex-col sm:flex-row gap-4 sm:gap-4 sm:justify-end">
+                            {/* Sub District Select - Only shown for Sub-district Admin when a district is selected */}
                             {shouldShowSubDistrictSelect() && (
                                 <div className="relative w-full sm:w-auto">
                                     <select
@@ -761,24 +878,64 @@ const AdminUser = () => {
                                     </div>
                                 </div>
                             )}
+                            {/* District Select - Only shown for District Admin and Sub-district Admin */}
+                            {shouldShowDistrictSelect() && (
+                                <div className="relative w-full sm:w-auto">
+                                    <select
+                                        className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                                        value={selectedDistrict}
+                                        onChange={handleDistrictChange}
+                                        id="district-select"
+                                    >
+                                        {availableDistricts.map((option, index) => (
+                                            <option key={`district-${index}`} value={option}>
+                                                {option}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <label
+                                        htmlFor="district-select"
+                                        className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                                    >
+                                        District
+                                    </label>
+                                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                                        <i className="fa-solid fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            )}
+                            {/* User Type Select - Always shown */}
+                            <div className="relative w-full sm:w-auto">
+                                <select
+                                    className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                                    id="user-type"
+                                    value={selectedUserType}
+                                    onChange={handleUserTypeChange}
+                                >
+                                    {availableUserTypes.map((option, index) => (
+                                        <option key={`user-type-${index}`} value={option}>
+                                            {option}
+                                        </option>
+                                    ))}
+                                </select>
+                                <label
+                                    htmlFor="user-type"
+                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                                >
+                                    User Type
+                                </label>
+                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                                    <i className="fa-solid fa-chevron-down"></i>
+                                </div>
+                            </div>
 
-                            {/* Add User button */}
-                            <button
-                                onClick={handleAddClick}
-                                className="text-transparent bg-clip-text bg-gradient-to-r from-blue-900 to-blue-400 border border-blue-500 py-2 px-6 rounded-full flex items-center justify-center shrink-0 w-full sm:w-auto hover:shadow-md transition-all duration-300"
-                            >
-                                Add User
-                            </button>
 
-                            {/* Print button */}
-                            <button
-                                onClick={generatePDF}
-                                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-10 rounded-full w-full sm:w-auto "
-                            >
-                                Print
-                            </button>
+
+
                         </div>
                     </div>
+
+
                     <div className="w-full">
                         <div ref={printRef} className="overflow-x-auto -mx-4 sm:mx-0">
                             <div className="inline-block min-w-full align-middle px-4 sm:px-0">
@@ -832,55 +989,57 @@ const AdminUser = () => {
                                             )}
                                         </tbody>
                                     </table>
+                                    {/* Pagination Controls */}
+                                    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
+                                        {/* Showing X of Y rows */}
+                                        <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
+                                            {filteredData.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} of ${filteredData.length} rows` : '0 rows'}
+                                        </div>
+
+                                        {/* Pagination Controls */}
+                                        <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                                            {/* Previous Button with icon */}
+                                            <button
+                                                onClick={() => handlePageChange(currentPage - 1)}
+                                                disabled={currentPage === 1}
+                                                className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
+                                            >
+                                                <i className="fa-solid fa-angle-right transform rotate-180"></i>
+                                                <span className="hidden sm:inline p-1">Previous</span>
+                                            </button>
+
+                                            {/* Page Numbers */}
+                                            <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+                                                {renderPageNumbers().map((page, index) => (
+                                                    <button
+                                                        key={index}
+                                                        onClick={() => page !== '...' && handlePageChange(page)}
+                                                        className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                                                            } ${page === '...' ? 'pointer-events-none' : ''}`}
+                                                    >
+                                                        {page}
+                                                    </button>
+                                                ))}
+                                            </div>
+
+                                            {/* Next Button with icon */}
+                                            <button
+                                                onClick={() => handlePageChange(currentPage + 1)}
+                                                disabled={currentPage === totalPages || totalPages === 0}
+                                                className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
+                                            >
+                                                <span className="hidden sm:inline p-1">Next</span>
+                                                <i className="fa-solid fa-angle-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
 
-                    {/* Pagination Controls */}
-                    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
-                        {/* Showing X of Y rows */}
-                        <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
-                            {filteredData.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} of ${filteredData.length} rows` : '0 rows'}
-                        </div>
 
-                        {/* Pagination Controls */}
-                        <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
-                            {/* Previous Button with icon */}
-                            <button
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1}
-                                className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
-                            >
-                                <i className="fa-solid fa-angle-right transform rotate-180"></i>
-                                <span className="hidden sm:inline p-1">Previous</span>
-                            </button>
-
-                            {/* Page Numbers */}
-                            <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
-                                {renderPageNumbers().map((page, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => page !== '...' && handlePageChange(page)}
-                                        className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
-                                            } ${page === '...' ? 'pointer-events-none' : ''}`}
-                                    >
-                                        {page}
-                                    </button>
-                                ))}
-                            </div>
-
-                            {/* Next Button with icon */}
-                            <button
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage === totalPages || totalPages === 0}
-                                className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
-                            >
-                                <span className="hidden sm:inline p-1">Next</span>
-                                <i className="fa-solid fa-angle-right"></i>
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </>
@@ -888,3 +1047,6 @@ const AdminUser = () => {
 }
 
 export default AdminUser
+
+
+

@@ -396,6 +396,24 @@ const EditUser = () => {
                                         )}
                                     </div>
                                 </div>
+                                <div className="flex flex-col md:flex-row w-full max-w-md mb-6">
+                                    <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">User Name</label>
+                                    <div className="w-full md:w-80">
+                                        <input 
+                                            type="text" 
+                                            name="Password"
+                                           
+                                            onChange={handleInputChange}
+                                            onBlur={() => handleBlur("username")}
+                                            placeholder='Enter Password' 
+                                            className='border px-2 py-1 rounded-full w-full border-blue-700' 
+                                        />
+                                    
+                                        {touched.username && errors.username && (
+                                            <p className="text-sm text-red-500 mt-1">{errors.username}</p>
+                                        )}
+                                    </div>
+                                </div>
                               
                                 <div className="flex flex-col md:flex-row w-full max-w-md mb-6">
                                     <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">User Type</label>

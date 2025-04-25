@@ -1,44 +1,26 @@
-// It Admin school reg List
 import React, { useEffect, useState, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
-import { deleteresultentryAPI, getAllResultentryListAPI } from '../services/allAPI';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import html2pdf from 'html2pdf.js';
 
-const SchoolRegList = () => {
+const SclDisSub = () => {
     const [showRegNo, setShowRegNo] = useState(false);
-    const [Allresultentry, setResultentry] = useState([]);
     const navigate = useNavigate();
     const printRef = useRef();
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchCode, setSearchCode] = useState(searchParams.get('code') || '');
-    const [showConfirmButton, setShowConfirmButton] = useState(true);
-    const [resultsConfirmed, setResultsConfirmed] = useState(false);
+    // Add this near the top of the component with other state variables
+    const [subDistrictName, setSubDistrictName] = useState('');
 
-   
+    // District and SubDistrict states
     const [selectedDistrict, setSelectedDistrict] = useState(searchParams.get('district') || '');
     const [selectedSubDistrict, setSelectedSubDistrict] = useState(searchParams.get('subDistrict') || '');
     const [availableSubDistricts, setAvailableSubDistricts] = useState([]);
 
-    
+    // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const allSubDistricts = [
-        'Select',
-        'Munnar',
-        'Adimali',
-        'Kattappana',
-        'Nedumkandam',
-        'Chittur',
-        'Pattambi',
-        'Devikulam',
-        'Kuzhalmannam',
-        'Nemmara',
-        'Mannarkkad',
-        'vatakara',
-        'Ottapalam'
-    ];
 
     const allDistricts = [
         'Select',
@@ -59,10 +41,26 @@ const SchoolRegList = () => {
         'Thrissur': []
     };
 
+
+    // Add this to your existing useEffect that reads URL parameters
+    useEffect(() => {
+        const codeParam = searchParams.get('code');
+        const districtParam = searchParams.get('district');
+        const subDistrictParam = searchParams.get('subDistrict');
+        const subDistrictNameParam = searchParams.get('subDistrictName');
+
+        if (codeParam) setSearchCode(codeParam);
+        if (districtParam) setSelectedDistrict(districtParam);
+        if (subDistrictParam) setSelectedSubDistrict(subDistrictParam);
+        if (subDistrictNameParam) setSubDistrictName(subDistrictNameParam);
+    }, [searchParams]);
+
+    // Update available subdistricts when district changes
     useEffect(() => {
         if (selectedDistrict && selectedDistrict !== 'Select') {
             setAvailableSubDistricts(districtToSubDistrict[selectedDistrict] || []);
 
+            // Only reset subdistrict if it's not already set from URL
             if (!searchParams.get('subDistrict')) {
                 setSelectedSubDistrict('');
             }
@@ -72,6 +70,7 @@ const SchoolRegList = () => {
         }
     }, [selectedDistrict, searchParams]);
 
+    // Initialize search parameters from URL
     useEffect(() => {
         const codeParam = searchParams.get('code');
         const districtParam = searchParams.get('district');
@@ -80,10 +79,9 @@ const SchoolRegList = () => {
         if (codeParam) setSearchCode(codeParam);
         if (districtParam) setSelectedDistrict(districtParam);
         if (subDistrictParam) setSelectedSubDistrict(subDistrictParam);
-
-        // getAllresultentry();
     }, [searchParams]);
 
+    // Add print styles
     useEffect(() => {
         const style = document.createElement('style');
         style.innerHTML = `
@@ -140,57 +138,12 @@ const SchoolRegList = () => {
         };
     }, []);
 
-    const getAllresultentry = async () => {
-        const token = sessionStorage.getItem("token");
-        if (token) {
-            const reqHeader = {
-                "Authorization": `Bearer ${token}`
-            }
-            try {
-                const result = await getAllResultentryListAPI(reqHeader)
-                if (result.status === 200) {
-                    setResultentry(result.data)
-                }
-            } catch (err) {
-                console.log(err);
-            }
-        }
-    }
-
-    const handleEditRedirect = (resultEntry) => {
-        navigate(`/EditScl/${resultEntry.slNo}`, {
-            state: { resultEntry }
-        });
-    };
-
-    const handleDeleteClick = async (id) => {
-        const token = sessionStorage.getItem("token")
-        if (token) {
-            const reqHeader = {
-                "Authorization": `Bearer ${token}`
-            }
-            try {
-                await deleteresultentryAPI(id, reqHeader)
-                getAllresultentry()
-            } catch (err) {
-                console.log(err);
-            }
-        }
-    }
-
-    const handleAddClick = () => {
-        if (selectedDistrict && selectedSubDistrict) {
-            navigate(`/AddScl?district=${encodeURIComponent(selectedDistrict)}&subDistrict=${encodeURIComponent(selectedSubDistrict)}`);
-        } else {
-            // If no subDistrict is selected, just navigate without parameters
-            // Or you could show an alert asking the user to select both
-            navigate('/AddScl');
-        }
-    };
-
+    // Improved generatePDF function
     const generatePDF = () => {
+        // Create a clone of the table for PDF generation
         const pdfContent = document.createElement('div');
 
+        // Add title
         const titleElement = document.createElement('h2');
         titleElement.textContent = "School Registration List";
         titleElement.style.textAlign = 'center';
@@ -198,6 +151,7 @@ const SchoolRegList = () => {
         titleElement.style.fontWeight = 'bold';
         pdfContent.appendChild(titleElement);
 
+        // Add filter information if any
         if (searchCode || selectedDistrict !== '' || selectedSubDistrict !== '') {
             const filterInfo = document.createElement('div');
             filterInfo.style.margin = '10px 0';
@@ -213,11 +167,13 @@ const SchoolRegList = () => {
             pdfContent.appendChild(filterInfo);
         }
 
+        // Create table
         const table = document.createElement('table');
         table.style.width = '100%';
         table.style.borderCollapse = 'collapse';
         table.style.marginTop = '20px';
 
+        // Create header
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
 
@@ -238,10 +194,12 @@ const SchoolRegList = () => {
         thead.appendChild(headerRow);
         table.appendChild(thead);
 
+        // Create table body with filtered data
         const tbody = document.createElement('tbody');
         filteredData.forEach((school, index) => {
             const row = document.createElement('tr');
 
+            // Create cells
             const cellData = [
                 indexOfFirstItem + index + 1,
                 school.code,
@@ -266,6 +224,7 @@ const SchoolRegList = () => {
         table.appendChild(tbody);
         pdfContent.appendChild(table);
 
+        // Add summary information
         const summaryDiv = document.createElement('div');
         summaryDiv.style.marginTop = '15px';
         summaryDiv.style.padding = '10px';
@@ -277,6 +236,7 @@ const SchoolRegList = () => {
 
         pdfContent.appendChild(summaryDiv);
 
+        // PDF options
         const options = {
             margin: 10,
             filename: 'School_Registration_List.pdf',
@@ -285,9 +245,11 @@ const SchoolRegList = () => {
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
         };
 
+        // Generate and download PDF
         html2pdf().from(pdfContent).set(options).save();
     };
 
+    // Dummy data
     const resultData = [
         { slNo: 1, regNo: "1233", code: "301", district: "Idukki", subDistrict: "Munnar" },
         { slNo: 2, regNo: "4563", code: "203", district: "Palakkad", subDistrict: "Chittur" },
@@ -297,15 +259,44 @@ const SchoolRegList = () => {
         { slNo: 6, regNo: "8903", code: "123", district: "Idukki", subDistrict: "Kattappana" },
         { slNo: 7, regNo: "453", code: "456", district: "Palakkad", subDistrict: "Chittur", },
         { slNo: 8, regNo: "6783", code: "976", district: "Ernakulam", subDistrict: "Edapally" },
-        { slNo: 9, regNo: "6783", code: "976", mark1: 70, mark2: 76, mark3: 80, total: 226, markPercentage: 75, rank: 6, grade: "B+", point: 8.0, district: "Thrissur", subDistrict: "" },
-        { slNo: 10, regNo: "6783", code: "976", mark1: 70, mark2: 76, mark3: 80, total: 226, markPercentage: 75, rank: 6, grade: "B+", point: 8.0, district: "Wayanad", subDistrict: "" },
-        { slNo: 11, regNo: "6783", code: "976", mark1: 70, mark2: 76, mark3: 80, total: 226, markPercentage: 75, rank: 6, grade: "B+", point: 8.0, district: "Idukki", subDistrict: "Adimali" },
-        { slNo: 12, regNo: "7123", code: "432", mark1: 75, mark2: 73, mark3: 84, total: 232, markPercentage: 77, rank: 5, grade: "B+", point: 8.0, district: "Palakkad", subDistrict: "Ottapalam" },
-        { slNo: 13, regNo: "5463", code: "312", mark1: 83, mark2: 81, mark3: 90, total: 254, markPercentage: 85, rank: 2, grade: "A", point: 9.5, district: "Kozhikode", subDistrict: "vatakara" },
-        { slNo: 14, regNo: "3213", code: "654", mark1: 77, mark2: 75, mark3: 79, total: 231, markPercentage: 77, rank: 5, grade: "B+", point: 8.0, district: "Idukki", subDistrict: "Kattappana" },
-        { slNo: 15, regNo: "9873", code: "789", mark1: 65, mark2: 68, mark3: 72, total: 205, markPercentage: 68, rank: 8, grade: "B", point: 7.5, district: "Palakkad", subDistrict: "Chittur" },
+        { slNo: 9, regNo: "6783", code: "976", district: "Thrissur", subDistrict: "" },
+        { slNo: 10, regNo: "6783", code: "976", district: "Wayanad", subDistrict: "" },
+        { slNo: 11, regNo: "6783", code: "976", district: "Idukki", subDistrict: "Adimali" },
+        { slNo: 12, regNo: "7123", code: "432", district: "Palakkad", subDistrict: "Ottapalam" },
+        { slNo: 13, regNo: "5463", code: "312", district: "Kozhikode", subDistrict: "vatakara" },
+        { slNo: 14, regNo: "3213", code: "654", district: "Idukki", subDistrict: "Kattappana" },
+        { slNo: 15, regNo: "9873", code: "789", district: "Palakkad", subDistrict: "Chittur" },
     ];
+    // Add this function to your SclDisSub component
+   // In SclDisSub.js
+const handleAddSchool = () => {
+    // Create URLSearchParams to pass district and subDistrict to the next page
+    const params = new URLSearchParams();
 
+    // Add district parameter if it exists
+    if (selectedDistrict && selectedDistrict !== 'Select') {
+        params.set('district', selectedDistrict);
+    }
+
+    // Add subDistrict parameter if it exists
+    if (selectedSubDistrict) {
+        params.set('subDistrict', selectedSubDistrict);
+        
+        // Get the name of the selected subDistrict if needed for display
+        const subDistrictName = selectedSubDistrict;
+        if (subDistrictName) {
+            params.set('subDistrictName', subDistrictName);
+        }
+    }
+
+    // Navigate to AddScl with the parameters
+    navigate({
+        pathname: '/AddSclsub',
+        search: params.toString()
+    });
+};
+
+    // Filter results based on search code
     const filteredResultData = () => {
         if (!searchCode) {
             return resultData;
@@ -315,6 +306,7 @@ const SchoolRegList = () => {
         );
     };
 
+    // Filter by district and subdistrict
     const filteredByLocation = () => {
         let filtered = filteredResultData();
 
@@ -329,6 +321,7 @@ const SchoolRegList = () => {
         return filtered;
     };
 
+    // Reset pagination when search changes
     useEffect(() => {
         setCurrentPage(1);
     }, [searchCode, selectedDistrict, selectedSubDistrict]);
@@ -348,14 +341,18 @@ const SchoolRegList = () => {
 
     const renderPageNumbers = () => {
         const pageNumbers = [];
+        // Dynamically adjust number of page buttons based on screen size
         const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
 
         if (totalPages <= maxPageNumbersToShow) {
+            // Show all page numbers
             for (let i = 1; i <= totalPages; i++) {
                 pageNumbers.push(i);
             }
         } else {
+            // Show limited page numbers with dots
             if (currentPage <= 2) {
+                // Near the start
                 for (let i = 1; i <= 3; i++) {
                     if (i <= totalPages) pageNumbers.push(i);
                 }
@@ -364,12 +361,14 @@ const SchoolRegList = () => {
                     pageNumbers.push(totalPages);
                 }
             } else if (currentPage >= totalPages - 1) {
+                // Near the end
                 pageNumbers.push(1);
                 pageNumbers.push('...');
                 for (let i = totalPages - 2; i <= totalPages; i++) {
                     if (i > 0) pageNumbers.push(i);
                 }
             } else {
+                // Middle
                 pageNumbers.push(1);
                 if (currentPage > 3) pageNumbers.push('...');
                 pageNumbers.push(currentPage - 1);
@@ -383,9 +382,11 @@ const SchoolRegList = () => {
         return pageNumbers;
     };
 
+    // Function to update URL params
     const updateURLParams = (params) => {
         const newParams = new URLSearchParams(searchParams);
 
+        // Update or remove each parameter
         Object.entries(params).forEach(([key, value]) => {
             if (value && value !== 'Select') {
                 newParams.set(key, value);
@@ -397,28 +398,13 @@ const SchoolRegList = () => {
         setSearchParams(newParams);
     };
 
+    // Handle search input changes
     const handleSearchChange = (e) => {
         const value = e.target.value;
         setSearchCode(value);
 
+        // Update URL parameter
         updateURLParams({ code: value });
-    };
-
-    const handleDistrictChange = (e) => {
-        const district = e.target.value;
-        setSelectedDistrict(district);
-
-        updateURLParams({
-            district: district,
-            subDistrict: '' 
-        });
-    };
-
-    const handleSubDistrictChange = (e) => {
-        const subDistrict = e.target.value;
-        setSelectedSubDistrict(subDistrict);
-
-        updateURLParams({ subDistrict: subDistrict });
     };
 
     return (
@@ -429,67 +415,12 @@ const SchoolRegList = () => {
                 <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-hidden">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
                         <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
-                            School List
+                            <span>{subDistrictName}</span> - Schools List 34
                         </h2>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
-                            <div className="flex items-center gap-2 w-full sm:w-auto">
-
-                            </div>
-                            {selectedDistrict && selectedDistrict !== 'Select' && (
-                                <div className="relative w-full sm:w-32">
-                                    <select
-                                        id="floating_subdistrict"
-                                        className="block px-2 pb-2.5 pt-3 w-full text-sm text-gray-900 bg-transparent rounded-full border border-blue-800 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                                        onChange={handleSubDistrictChange}
-                                        value={selectedSubDistrict}
-                                    >
-                                        <option value="">Select</option>
-                                        {availableSubDistricts.map((subDistrict, index) => (
-                                            <option key={index} value={subDistrict}>
-                                                {subDistrict}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <label
-                                        htmlFor="floating_subdistrict"
-                                        className={`absolute text-sm text-blue-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 start-1 ${selectedSubDistrict ? 'scale-75 -translate-y-4 top-2' : ''}`}
-                                    >
-                                        Sub District
-                                    </label>
-                                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                                        <i className="fa-solid fa-chevron-down"></i>
-                                    </div>
-                                </div>
-                            )}
-                            <div className="relative w-full sm:w-32">
-                                <select
-                                    id="floating_district"
-                                    className="block px-2 pb-2.5 pt-3 w-full text-sm text-gray-900 bg-transparent rounded-full border border-blue-700 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                                    onChange={handleDistrictChange}
-                                    value={selectedDistrict}
-                                >
-                                    <option value="">Select</option>
-                                    {allDistricts.filter(district => district !== 'Select').map((district, index) => (
-                                        <option key={index} value={district}>
-                                            {district}
-                                        </option>
-                                    ))}
-                                </select>
-                                <label
-                                    htmlFor="floating_district"
-                                    className={`absolute left-5 text-sm text-blue-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 start-1 ${selectedDistrict ? 'scale-75 -translate-y-4 top-2' : ''}`}
-                                >
-                                    District
-                                </label>
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                                    <i className="fa-solid fa-chevron-down"></i>
-                                </div>
-                            </div>
-
                             <button
-                                onClick={handleAddClick}
-                                disabled={!selectedSubDistrict}
-                                className={`text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4] border border-blue-500 py-2 px-6 rounded-full flex items-center w-full sm:w-auto ${!selectedSubDistrict ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                onClick={handleAddSchool}
+                                className={`text-transparent bg-clip-text bg-gradient-to-r from-[#003566] to-[#05B9F4] border border-blue-500 py-2 px-6 rounded-full flex items-center w-full sm:w-auto `}
                             >
                                 Add School
                             </button>
@@ -532,11 +463,9 @@ const SchoolRegList = () => {
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Type</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">District</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm no-print">Edit</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm no-print">Delete</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Data Entered</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Confirmed</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Reset</th>
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
@@ -546,22 +475,9 @@ const SchoolRegList = () => {
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.code}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">School {result.code}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">High School</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.district}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.subDistrict}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">
-                                                            <button
-                                                                className="text-blue-500 hover:text-blue-700 focus:outline-none"
-                                                                onClick={() => handleEditRedirect(result)}
-                                                            >
-                                                                <i className="fa-solid fa-pen-to-square cursor-pointer"></i>
-                                                            </button>
-                                                        </td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">
-                                                            <button onClick={() => handleDeleteClick(result.slNo)} className="text-red-600 hover:text-red-800 focus:outline-none">
-                                                                <i className="fa-solid fa-trash cursor-pointer"></i>
-                                                            </button>
-                                                        </td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap"> no</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">Yes</td>
+                                                        <td className="p-2 md:p-3 text-blue-500 whitespace-nowrap"><i class="fa-solid fa-rotate-right"></i></td>
                                                     </tr>
                                                 ))
                                             ) : (
@@ -580,10 +496,14 @@ const SchoolRegList = () => {
 
                     {/* Pagination Controls */}
                     <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
+                        {/* Showing X of Y rows */}
                         <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
                             {filteredData.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} of ${filteredData.length} rows` : '0 rows'}
                         </div>
+
+                        {/* Pagination Controls */}
                         <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                            {/* Previous Button with icon */}
                             <button
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 1}
@@ -592,6 +512,8 @@ const SchoolRegList = () => {
                                 <i className="fa-solid fa-angle-right transform rotate-180"></i>
                                 <span className="hidden sm:inline p-1">Previous</span>
                             </button>
+
+                            {/* Page Numbers */}
                             <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
                                 {renderPageNumbers().map((page, index) => (
                                     <button
@@ -604,6 +526,8 @@ const SchoolRegList = () => {
                                     </button>
                                 ))}
                             </div>
+
+                            {/* Next Button with icon */}
                             <button
                                 onClick={() => handlePageChange(currentPage + 1)}
                                 disabled={currentPage === totalPages || totalPages === 0}
@@ -620,4 +544,4 @@ const SchoolRegList = () => {
     )
 }
 
-export default SchoolRegList
+export default SclDisSub

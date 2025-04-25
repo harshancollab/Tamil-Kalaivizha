@@ -1,3 +1,4 @@
+// It ADmin  Create Kalosvm EDit 
 import React, { useState, useRef, useEffect } from 'react'
 import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import Dash from '../components/Dash'
@@ -9,19 +10,78 @@ const EditKalosmAdm = () => {
   const location = useLocation();
   const { id } = useParams();
 
+  const districtDropdownRef = useRef(null);
+  const subDistrictDropdownRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  // District and Sub-district data
+  const districtToSubDistrict = {
+    'Idukki': ['Munnar', 'Adimali', 'Kattappana', 'Nedumkandam', 'Devikulam'],
+    'Palakkad': ['Chittur', 'Pattambi', 'Kuzhalmannam', 'Nemmara', 'Mannarkkad', 'Ottapalam'],
+    'Ernakulam': [],
+    'Kozhikode': ['Vatakara'],
+    'Wayanad': [],
+    'Thrissur': []
+  };
+  
+  const allDistricts = [
+    'Select',
+    'Idukki',
+    'Ernakulam',
+    'Palakkad',
+    'Kozhikode',
+    'Wayanad',
+    'Thrissur',
+  ];
+
+  const allSubDistricts = [
+    'Select',
+    'Munnar',
+    'Adimali',
+    'Kattappana',
+    'Nedumkandam',
+    'Devikulam',
+    'Chittur',
+    'Pattambi',
+    'Kuzhalmannam',
+    'Nemmara',
+    'Mannarkkad',
+    'Vatakara',
+    'Ottapalam'
+  ];
+
+  // State for dropdown functionality
+  const [districtDropdownOpen, setDistrictDropdownOpen] = useState(false);
+  const [subDistrictDropdownOpen, setSubDistrictDropdownOpen] = useState(false);
+  const [districtSearchTerm, setDistrictSearchTerm] = useState('');
+  const [subDistrictSearchTerm, setSubDistrictSearchTerm] = useState('');
+  const [touched, setTouched] = useState({});
+
   const [formData, setFormData] = useState({
     logo: '',
     kalolsavamYear: '',
     kalolsavamName: 'Idukki District Kalolsavam',
     venue: 'SGHSS KATTAPPANA',
     startDate: '',
-    endDate: ''
+    endDate: '',
+    district: 'Select',
+    subDistrict: 'Select'
   });
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const fileInputRef = useRef(null);
+
+  // Filtered lists for search functionality
+  const filteredDistricts = allDistricts.filter(district =>
+    district.toLowerCase().includes(districtSearchTerm.toLowerCase())
+  );
+
+  const filteredSubDistricts = formData.district !== 'Select'
+    ? ['Select', ...(districtToSubDistrict[formData.district] || [])].filter(subDistrict =>
+        subDistrict.toLowerCase().includes(subDistrictSearchTerm.toLowerCase())
+      )
+    : [];
 
   useEffect(() => {
     if (location.state && location.state.kalolsavam) {
@@ -32,10 +92,45 @@ const EditKalosmAdm = () => {
         kalolsavamName: kalolsavam.kalolsavamName || 'Idukki District Kalolsavam',
         venue: kalolsavam.venue || 'SGHSS KATTAPPANA',
         startDate: kalolsavam.startDate || '',
-        endDate: kalolsavam.endDate || ''
+        endDate: kalolsavam.endDate || '',
+        district: kalolsavam.district || 'Select',
+        subDistrict: kalolsavam.subDistrict || 'Select'
       });
     }
   }, [location.state]);
+
+  // Handle clicking outside dropdowns to close them
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (districtDropdownRef.current && !districtDropdownRef.current.contains(event.target)) {
+        setDistrictDropdownOpen(false);
+      }
+      if (subDistrictDropdownRef.current && !subDistrictDropdownRef.current.contains(event.target)) {
+        setSubDistrictDropdownOpen(false);
+      }
+    }
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Reset sub-district when district changes
+  useEffect(() => {
+    if (formData.district !== 'Select') {
+      // Only reset if the current subDistrict is not valid for the selected district
+      const validSubDistricts = districtToSubDistrict[formData.district] || [];
+      if (formData.subDistrict !== 'Select' && !validSubDistricts.includes(formData.subDistrict)) {
+        setFormData(prev => ({
+          ...prev,
+          subDistrict: 'Select'
+        }));
+      }
+    }
+    // Always close the sub-district dropdown when district changes
+    setSubDistrictDropdownOpen(false);
+  }, [formData.district]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -74,6 +169,11 @@ const EditKalosmAdm = () => {
       newErrors.logo = 'Logo is required';
     }
 
+    // Validate District
+    if (formData.district === 'Select') {
+      newErrors.district = 'District is required';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -92,6 +192,36 @@ const EditKalosmAdm = () => {
         [name]: undefined
       }));
     }
+  };
+
+  const handleDistrictSelect = (district) => {
+    setFormData(prev => ({
+      ...prev,
+      district,
+      // Reset sub-district when district changes
+      subDistrict: 'Select'
+    }));
+    setDistrictDropdownOpen(false);
+    setTouched(prev => ({
+      ...prev,
+      district: true
+    }));
+    
+    // Clear error if present
+    if (errors.district) {
+      setErrors(prev => ({
+        ...prev,
+        district: undefined
+      }));
+    }
+  };
+
+  const handleSubDistrictSelect = (subDistrict) => {
+    setFormData(prev => ({
+      ...prev,
+      subDistrict
+    }));
+    setSubDistrictDropdownOpen(false);
   };
 
   const handleLogoUpload = () => {
@@ -137,6 +267,17 @@ const EditKalosmAdm = () => {
   };
 
   const handleUpdate = async () => {
+    // Set all fields as touched for validation
+    setTouched({
+      district: true,
+      logo: true,
+      kalolsavamName: true,
+      kalolsavamYear: true,
+      venue: true,
+      startDate: true,
+      endDate: true
+    });
+    
     // Validate form before submission
     if (!validateForm()) {
       return;
@@ -164,6 +305,8 @@ const EditKalosmAdm = () => {
       formDataToSubmit.append('venue', formData.venue);
       formDataToSubmit.append('startDate', formData.startDate);
       formDataToSubmit.append('endDate', formData.endDate);
+      formDataToSubmit.append('district', formData.district);
+      formDataToSubmit.append('subDistrict', formData.subDistrict);
 
       const logoInput = fileInputRef.current;
       if (logoInput.files.length > 0) {
@@ -297,6 +440,7 @@ const EditKalosmAdm = () => {
                   </div>
                 </div>
                 
+                
                 <div className="flex flex-col sm:flex-row items-start sm:items-center">
                   <h4 className="w-full sm:w-40 font-semibold mb-3 sm:mb-0">Venue</h4>
                   <div className="w-full sm:max-w-md">
@@ -349,6 +493,101 @@ const EditKalosmAdm = () => {
                     />
                     {errors.endDate && (
                       <div className="text-red-500 text-sm mt-1 ml-0 sm:ml-10">{errors.endDate}</div>
+                    )}
+                  </div>
+                </div>
+                
+                {/* District Selection */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center">
+                  <h4 className="w-full sm:w-40 font-semibold mb-3 sm:mb-0">District</h4>
+                  <div className="w-full sm:max-w-md relative" ref={districtDropdownRef}>
+                    <div 
+                      className={`w-full border ${touched.district && errors.district ? 'border-red-500' : 'border-blue-600'} rounded-full px-4 py-2 sm:ml-10 bg-gray-100 flex justify-between items-center cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-300`}
+                      onClick={() => setDistrictDropdownOpen(!districtDropdownOpen)}
+                    >
+                      <span className={formData.district === 'Select' ? 'text-gray-400' : ''}>{formData.district}</span>
+                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </div>
+                    {districtDropdownOpen && (
+                      <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg sm:ml-10">
+                        {allDistricts.length > 7 && (
+                          <div className="p-2 border-b">
+                            <input
+                              type="text"
+                              className="w-full border border-gray-300 px-3 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+                              placeholder="Search districts..."
+                              value={districtSearchTerm}
+                              onChange={(e) => setDistrictSearchTerm(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </div>
+                        )}
+                        <div className="max-h-60 overflow-y-auto">
+                          {filteredDistricts.map((district, index) => (
+                            <div
+                              key={index}
+                              className={`px-4 py-2 hover:bg-blue-50 cursor-pointer ${formData.district === district ? 'bg-blue-100' : ''}`}
+                              onClick={() => handleDistrictSelect(district)}
+                            >
+                              {district}
+                            </div>
+                          ))}
+                          {filteredDistricts.length === 0 && (
+                            <div className="px-4 py-2 text-gray-500">No matches found</div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    {touched.district && errors.district && (
+                      <div className="text-red-500 text-sm mt-1 ml-0 sm:ml-10">{errors.district}</div>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Sub-District Selection */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center">
+                  <h4 className="w-full sm:w-40 font-semibold mb-3 sm:mb-0">Sub District</h4>
+                  <div className="w-full sm:max-w-md relative" ref={subDistrictDropdownRef}>
+                    <div 
+                      className={`w-full border border-blue-600 rounded-full px-4 py-2 sm:ml-10 bg-gray-100 flex justify-between items-center cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all duration-300 ${formData.district === 'Select' ? 'opacity-70' : ''}`}
+                      onClick={() => formData.district !== 'Select' && setSubDistrictDropdownOpen(!subDistrictDropdownOpen)}
+                    >
+                      <span className={formData.subDistrict === 'Select' ? 'text-gray-400' : ''}>{formData.subDistrict}</span>
+                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </div>
+                    {subDistrictDropdownOpen && formData.district !== 'Select' && (
+                      <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg sm:ml-10">
+                        {filteredSubDistricts.length > 7 && (
+                          <div className="p-2 border-b">
+                            <input
+                              type="text"
+                              className="w-full border border-gray-300 px-3 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+                              placeholder="Search sub-districts..."
+                              value={subDistrictSearchTerm}
+                              onChange={(e) => setSubDistrictSearchTerm(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </div>
+                        )}
+                        <div className="max-h-60 overflow-y-auto">
+                          {filteredSubDistricts.map((subDistrict, index) => (
+                            <div
+                              key={index}
+                              className={`px-4 py-2 hover:bg-blue-50 cursor-pointer ${formData.subDistrict === subDistrict ? 'bg-blue-100' : ''}`}
+                              onClick={() => handleSubDistrictSelect(subDistrict)}
+                            >
+                              {subDistrict}
+                            </div>
+                          ))}
+                          {filteredSubDistricts.length === 0 && (
+                            <div className="px-4 py-2 text-gray-500">No matches found</div>
+                          )}
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>

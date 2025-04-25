@@ -1,3 +1,5 @@
+// It admin add District Regtration
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
@@ -87,7 +89,6 @@ const AddDistrict = () => {
               <h2 className="text-lg font-bold mb-5 sm:mb-10 text-gray-800">Add District</h2>
               
               <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 max-w-2xl mx-auto">
-                {/* District Name Field */}
                 <div className="flex flex-col sm:flex-row sm:items-center">
                   <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">District</label>
                   <div className="w-full sm:w-2/3">

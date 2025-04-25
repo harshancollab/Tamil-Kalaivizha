@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Dash from '../components/Dash';
 import Header from '../components/Header';
 // These will be uncommented when backend is ready
@@ -7,12 +7,15 @@ import Header from '../components/Header';
 
 const EditScl = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const schoolDataFromState = location.state?.resultEntry;
     const { id } = useParams(); // Get school ID from URL
     const [searchTerm, setSearchTerm] = useState('');
     const [dropdownOpen, setDropdownOpen] = useState({
         schoolType: false,
         district: false,
-        subDistrict: false
+        subDistrict: false,
+        educationDistrict: false // Added education district to dropdown state
     });
 
     const [formData, setFormData] = useState({
@@ -61,6 +64,24 @@ const EditScl = () => {
         'Kannur',
         'Kasaragod'
     ];
+
+    // Education districts mapping
+    const districtToEducationDistrict = {
+        'Idukki': ['Idukki North', 'Idukki South', 'Thodupuzha'],
+        'Ernakulam': ['Ernakulam North', 'Ernakulam South', 'Aluva', 'Muvattupuzha'],
+        'Palakkad': ['Palakkad North', 'Palakkad South', 'Ottapalam', 'Mannarkkad'],
+        'Kozhikode': ['Kozhikode North', 'Kozhikode South', 'Vatakara'],
+        'Wayanad': ['Wayanad', 'Kalpetta', 'Sulthan Bathery'],
+        'Thrissur': ['Thrissur North', 'Thrissur South', 'Irinjalakuda', 'Chavakkad'],
+        'Thiruvananthapuram': ['Thiruvananthapuram North', 'Thiruvananthapuram South', 'Neyyattinkara', 'Attingal'],
+        'Kollam': ['Kollam East', 'Kollam West', 'Kottarakkara', 'Punalur'],
+        'Pathanamthitta': ['Pathanamthitta', 'Adoor', 'Thiruvalla'],
+        'Alappuzha': ['Alappuzha North', 'Alappuzha South', 'Chengannur', 'Kayamkulam'],
+        'Kottayam': ['Kottayam North', 'Kottayam South', 'Pala', 'Changanassery'],
+        'Malappuram': ['Malappuram North', 'Malappuram South', 'Tirur', 'Manjeri'],
+        'Kannur': ['Kannur North', 'Kannur South', 'Thalassery', 'Iritty'],
+        'Kasaragod': ['Kasaragod', 'Kanhangad']
+    };
 
     const districtToSubDistrict = {
         'Idukki': ['Munnar', 'Adimali', 'Kattappana', 'Nedumkandam', 'Devikulam', 'Thodupuzha', 'Idukki'],
@@ -193,12 +214,6 @@ const EditScl = () => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
 
-        // If district changes, reset subDistrict
-        if (name === 'district') {
-            setFormData(prev => ({ ...prev, subDistrict: '' }));
-            setErrors(prev => ({ ...prev, subDistrict: '' })); // Reset sub-district error
-        }
-
         // Validate field if form was already submitted
         if (formSubmitted) {
             setErrors(prev => ({
@@ -220,11 +235,19 @@ const EditScl = () => {
             }));
         }
 
-        // If district is selected, automatically open the sub-district dropdown
+        // If district is selected, reset education district and sub-district
         if (field === 'district') {
-            setFormData(prev => ({ ...prev, subDistrict: '' }));
-            setErrors(prev => ({ ...prev, subDistrict: '' }));
+            setFormData(prev => ({ ...prev, educationDistrict: '', subDistrict: '' }));
+            setErrors(prev => ({ ...prev, educationDistrict: '', subDistrict: '' }));
 
+            // Automatically open the education district dropdown
+            setTimeout(() => {
+                setDropdownOpen(prev => ({ ...prev, educationDistrict: true }));
+            }, 100);
+        }
+
+        // If education district is selected, automatically open the sub-district dropdown
+        if (field === 'educationDistrict') {
             setTimeout(() => {
                 setDropdownOpen(prev => ({ ...prev, subDistrict: true }));
             }, 100);
@@ -266,6 +289,7 @@ const EditScl = () => {
                 setDropdownOpen({
                     schoolType: false,
                     district: false,
+                    educationDistrict: false,
                     subDistrict: false
                 });
             }
@@ -446,18 +470,49 @@ const EditScl = () => {
                                         </div>
                                     </div>
 
+                                    {/* Education District as dropdown instead of text input */}
                                     <div className="flex flex-col sm:flex-row sm:items-center">
                                         <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Education District </label>
-                                        <div className="w-full sm:w-2/3">
-                                            <input
-                                                type="text"
-                                                name="educationDistrict"
-                                                placeholder="Enter Education District"
-                                                value={formData.educationDistrict}
-                                                onChange={handleChange}
-                                                className={`w-full px-3 sm:px-4 py-2 border ${errors.educationDistrict ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
-                                            />
+                                        <div className="w-full sm:w-2/3 relative" data-dropdown="educationDistrict">
+                                            <div
+                                                className={`w-full px-3 sm:px-4 py-2 border ${errors.educationDistrict ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-blue-900 flex justify-between items-center cursor-pointer ${!formData.district ? 'opacity-75' : ''}`}
+                                                onClick={() => formData.district ? toggleDropdown('educationDistrict') : null}
+                                            >
+                                                <span className={formData.educationDistrict ? "text-blue-900" : "text-gray-400"}>
+                                                    {formData.educationDistrict || (formData.district ? "Select Education District" : "Please select a district first")}
+                                                </span>
+                                                <svg className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </div>
                                             {errors.educationDistrict && <p className="text-red-500 text-xs mt-1 ml-2">{errors.educationDistrict}</p>}
+
+                                            {dropdownOpen.educationDistrict && formData.district && (
+                                                <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                                                    {districtToEducationDistrict[formData.district] && districtToEducationDistrict[formData.district].length > 7 && (
+                                                        <div className="sticky top-0 bg-white p-2 border-b">
+                                                            <input
+                                                                type="text"
+                                                                className="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                                placeholder="Search..."
+                                                                value={searchTerm}
+                                                                onChange={(e) => setSearchTerm(e.target.value)}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                    {formData.district && districtToEducationDistrict[formData.district] &&
+                                                        filterOptions(districtToEducationDistrict[formData.district]).map((educationDistrict, index) => (
+                                                            <div
+                                                                key={index}
+                                                                className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
+                                                                onClick={() => handleSelectOption('educationDistrict', educationDistrict)}
+                                                            >
+                                                                {educationDistrict}
+                                                            </div>
+                                                        ))
+                                                    }
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 

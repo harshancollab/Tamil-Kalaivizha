@@ -22,7 +22,94 @@ const CreateKalolsavam = () => {
             startDate: "2024-12-01",
             endDate: "2024-12-05",
         },
-
+        {
+            id: 2,
+            kalolsavamName: " Idukki District Kalolsavam",
+            year: 2024,
+            venue: "Palakkad",
+            startDate: "2024-12-01",
+            endDate: "2024-12-05",
+        },
+        {
+            id: 1,
+            kalolsavamName: " School Kalolsavam",
+            year: 2024,
+            venue: "Kochi",
+            startDate: "2024-12-01",
+            endDate: "2024-12-05",
+        },
+        {
+            id: 2,
+            kalolsavamName: " Idukki District Kalolsavam",
+            year: 2024,
+            venue: "Palakkad",
+            startDate: "2024-12-01",
+            endDate: "2024-12-05",
+        },
+        {
+            id: 1,
+            kalolsavamName: " School Kalolsavam",
+            year: 2024,
+            venue: "Kochi",
+            startDate: "2024-12-01",
+            endDate: "2024-12-05",
+        },
+        {
+            id: 2,
+            kalolsavamName: " Idukki District Kalolsavam",
+            year: 2024,
+            venue: "Palakkad",
+            startDate: "2024-12-01",
+            endDate: "2024-12-05",
+        },
+        {
+            id: 1,
+            kalolsavamName: " School Kalolsavam",
+            year: 2024,
+            venue: "Kochi",
+            startDate: "2024-12-01",
+            endDate: "2024-12-05",
+        },
+        {
+            id: 2,
+            kalolsavamName: " Idukki District Kalolsavam",
+            year: 2024,
+            venue: "Palakkad",
+            startDate: "2024-12-01",
+            endDate: "2024-12-05",
+        },
+        {
+            id: 1,
+            kalolsavamName: " School Kalolsavam",
+            year: 2024,
+            venue: "Kochi",
+            startDate: "2024-12-01",
+            endDate: "2024-12-05",
+        },
+        {
+            id: 2,
+            kalolsavamName: " Idukki District Kalolsavam",
+            year: 2024,
+            venue: "Palakkad",
+            startDate: "2024-12-01",
+            endDate: "2024-12-05",
+        },
+        {
+            id: 1,
+            kalolsavamName: " School Kalolsavam",
+            year: 2024,
+            venue: "Kochi",
+            startDate: "2024-12-01",
+            endDate: "2024-12-05",
+        },
+        {
+            id: 2,
+            kalolsavamName: " Idukki District Kalolsavam",
+            year: 2024,
+            venue: "Palakkad",
+            startDate: "2024-12-01",
+            endDate: "2024-12-05",
+        },
     ];
 
     // Pagination logic
@@ -163,20 +250,19 @@ const CreateKalolsavam = () => {
             <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
                 <Dash />
                 <div className="flex-1 p-4 md:p-6 lg:p-8">
-          {/* Header section with title and controls */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
-            <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
-            Create Kalolsavam
-            </h2>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
-              <button onClick={handleAddClick}
-              
-                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-8 rounded-full w-full sm:w-auto"
-              >
-              Add
-              </button>
-            </div>
-          </div>
+                    {/* Header section with title and controls */}
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
+                        <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
+                            Create Kalolsavam
+                        </h2>
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
+                            <button onClick={handleAddClick}
+                                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-8 rounded-full w-full sm:w-auto"
+                            >
+                                Add
+                            </button>
+                        </div>
+                    </div>
                     <div className="overflow-x-auto">
                         <table className="w-full min-w-[600px]">
                             <thead>
@@ -216,13 +302,55 @@ const CreateKalolsavam = () => {
                         </table>
                     </div>
 
+                    {/* Pagination Controls - Added from FestivalRegiList */}
+                    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
+                        {/* Showing X of Y rows */}
+                        <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
+                            {kalolsavams.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, kalolsavams.length)} of ${kalolsavams.length} rows` : '0 rows'}
+                        </div>
 
+                        {/* Pagination Controls */}
+                        <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                            {/* Previous Button with icon */}
+                            <button
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
+                            >
+                                <i className="fa-solid fa-angle-right transform rotate-180"></i>
+                                <span className="hidden sm:inline p-1">Previous</span>
+                            </button>
+
+                            {/* Page Numbers */}
+                            <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+                                {renderPageNumbers().map((page, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => page !== '...' && handlePageChange(page)}
+                                        className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${
+                                            currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                                        } ${page === '...' ? 'pointer-events-none' : ''}`}
+                                    >
+                                        {page}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Next Button with icon */}
+                            <button
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === totalPages || totalPages === 0}
+                                className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
+                            >
+                                <span className="hidden sm:inline p-1">Next</span>
+                                <i className="fa-solid fa-angle-right"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
-
-
 
 export default CreateKalolsavam

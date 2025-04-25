@@ -2,22 +2,21 @@ import React, { useState, useEffect, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { addStageAPI } from '../services/allAPI'
-import { useNavigate, useLocation } from 'react-router-dom' // Import for navigation
+import { useNavigate, useLocation } from 'react-router-dom'
 
 const AddUser = () => {
-    const navigate = useNavigate(); // Initialize navigate hook
-    const location = useLocation(); // Get location to read URL parameters
+    const navigate = useNavigate();
+    const location = useLocation();
     
-    // Parse redirect URL from query parameters if available
-    const queryParams = new URLSearchParams(location.search);
-    const redirectUrl = queryParams.get('redirect') || '/admin-panel'; // Default to '/admin' if no redirect param
+    // Get the redirect URL from query parameters if available
+    const params = new URLSearchParams(location.search);
+    const redirectUrl = params.get('redirect') || '/admin-panel';
 
     const allUserTypes = [
         'Select User Type',
         'State Admin',
         'District Admin',
         'Sub-district Admin'
-       
     ];
     
     const allDistricts = [
@@ -81,11 +80,116 @@ const AddUser = () => {
     const districtDropdownRef = useRef(null);
     const subDistrictDropdownRef = useRef(null);
 
+    // Function to update form data from URL parameters
+    const updateFormFromUrl = () => {
+        const params = new URLSearchParams(location.search);
+        const userType = params.get('userType');
+        const district = params.get('district');
+        const subDistrict = params.get('subDistrict');
+        
+        // Create a new form data object to track changes
+        const newFormData = { ...formData };
+        let changed = false;
+        
+        if (userType && userType !== newFormData.userType) {
+            newFormData.userType = userType;
+            changed = true;
+        }
+        
+        if (district && district !== newFormData.district) {
+            newFormData.district = district;
+            changed = true;
+        }
+        
+        if (subDistrict && subDistrict !== newFormData.subDistrict) {
+            newFormData.subDistrict = subDistrict;
+            changed = true;
+        }
+        
+        // Only update state if there were actual changes to avoid infinite loops
+        if (changed) {
+            console.log("Updating form from URL with:", newFormData);
+            setFormData(newFormData);
+            
+            // Make sure available sub-districts are updated based on the district
+            if (district && district !== 'Select District' && districtToSubDistrict[district]) {
+                const subDistricts = districtToSubDistrict[district] || [];
+                setFilteredSubDistricts(['Select Sub District', ...subDistricts]);
+            }
+        }
+    };
+
+    // Function to update URL parameters when form values change
+    const updateUrlParams = (newFormData) => {
+        const params = new URLSearchParams();
+        
+        // Update URL parameters based on form data
+        if (newFormData.userType && newFormData.userType !== 'Select User Type') {
+            params.set('userType', newFormData.userType);
+        }
+        
+        if (newFormData.district && newFormData.district !== 'Select District') {
+            params.set('district', newFormData.district);
+        }
+        
+        if (newFormData.subDistrict && newFormData.subDistrict !== 'Select Sub District') {
+            params.set('subDistrict', newFormData.subDistrict);
+        }
+        
+        // Preserve the redirect parameter if it exists
+        if (redirectUrl && redirectUrl !== '/admin-panel') {
+            params.set('redirect', redirectUrl);
+        }
+        
+        // Update the URL without reloading the page
+        const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+        window.history.pushState({path: newUrl}, '', newUrl);
+    };
+
+    // Initialize form from URL on first load
+    useEffect(() => {
+        updateFormFromUrl();
+    }, []);
+
+    // Add effect for handling changes to location.search
+    useEffect(() => {
+        updateFormFromUrl();
+    }, [location.search]);
+
+    // Add event listener for popstate (back/forward button)
+   
+    useEffect(() => {
+        const handlePopState = (event) => {
+            // When back/forward button is clicked, we need to synchronize the form
+            console.log("Browser navigation occurred", event.state);
+            
+            // Don't call updateUrlParams here, as that would create a new history entry
+            // Just update the form from the current URL
+            updateFormFromUrl();
+        };
+
+        window.addEventListener('popstate', handlePopState);
+        
+        return () => {
+            window.removeEventListener('popstate', handlePopState);
+        };
+    }, []);
+    
     // Update available sub-districts when district changes
     useEffect(() => {
         if (formData.district && formData.district !== 'Select District') {
             const subDistricts = districtToSubDistrict[formData.district] || [];
             setFilteredSubDistricts(['Select Sub District', ...subDistricts]);
+            
+            // If current subDistrict isn't valid for the new district, reset it
+            if (formData.subDistrict && 
+                formData.subDistrict !== 'Select Sub District' && 
+                !subDistricts.includes(formData.subDistrict)) {
+                setFormData(prev => ({
+                    ...prev,
+                    subDistrict: ''
+                }));
+            }
         } else {
             setFilteredSubDistricts(['Select Sub District']);
         }
@@ -138,41 +242,50 @@ const AddUser = () => {
         const { name, value } = e.target;
         console.log(`Input changed: ${name} = ${value}`);
         
+        let newFormData;
+        
         if (name === "userType" && value !== "District Admin" && value !== "Sub-district Admin") {
-            setFormData(prevState => ({
-                ...prevState,
+            newFormData = {
+                ...formData,
                 [name]: value,
                 district: "",
                 subDistrict: ""
-            }));
+            };
         } else if (name === "userType" && value === "District Admin") {
-            setFormData(prevState => ({
-                ...prevState,
+            newFormData = {
+                ...formData,
                 [name]: value,
                 subDistrict: ""
-            }));
+            };
         } else if (name === "district") {
-            setFormData(prevState => ({
-                ...prevState,
+            newFormData = {
+                ...formData,
                 [name]: value,
                 subDistrict: ""  // Reset sub-district when district changes
-            }));
+            };
             // Close district dropdown after selection
             setDropdownOpen(prev => ({...prev, district: false}));
             setSearchText(prev => ({...prev, district: ""}));
         } else if (name === "subDistrict") {
-            setFormData(prevState => ({
-                ...prevState,
+            newFormData = {
+                ...formData,
                 [name]: value,
-            }));
+            };
             // Close sub-district dropdown after selection
             setDropdownOpen(prev => ({...prev, subDistrict: false}));
             setSearchText(prev => ({...prev, subDistrict: ""}));
         } else {
-            setFormData(prevState => ({
-                ...prevState,
+            newFormData = {
+                ...formData,
                 [name]: value,
-            }));
+            };
+        }
+        
+        setFormData(newFormData);
+        
+        // Update URL parameters
+        if (name === "userType" || name === "district" || name === "subDistrict") {
+            updateUrlParams(newFormData);
         }
         
         validateField(name, value);
@@ -266,9 +379,26 @@ const AddUser = () => {
         return Object.values(fieldValidations).every(Boolean);
     };
 
+    // Added handleCancel function that was missing in the original code
     const handleCancel = () => {
-        // Redirect to admin page or specified redirect URL on cancel
-        navigate(redirectUrl);
+        // Preserve filter parameters when redirecting back
+        const filterParams = new URLSearchParams();
+        
+        // Add the filter parameters that were passed to this page
+        if (formData.userType && formData.userType !== "Select User Type") {
+            filterParams.append('p', formData.userType);
+        } else if (formData.district && formData.district !== "Select District") {
+            filterParams.append('p', formData.district);
+        } else if (formData.subDistrict && formData.subDistrict !== "Select Sub District") {
+            filterParams.append('p', formData.subDistrict);
+        }
+        
+        // Build the URL with filters
+        const redirectWithFilters = filterParams.toString() 
+            ? `${redirectUrl}?${filterParams.toString()}` 
+            : redirectUrl;
+        
+        navigate(redirectWithFilters);
     };
 
     const handleSubmit = async (e) => {
@@ -313,6 +443,9 @@ const AddUser = () => {
                             district: false,
                             subDistrict: false
                         });
+                        
+                        // Clear URL parameters as well
+                        window.history.pushState({}, '', window.location.pathname);
                         
                         // After successful submission, redirect to the admin page
                         // You can pass additional parameters if needed
@@ -550,5 +683,4 @@ const AddUser = () => {
     )
 }
 
-export default AddUser
-
+export default AddUser 

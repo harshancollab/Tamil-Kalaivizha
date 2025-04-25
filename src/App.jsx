@@ -89,6 +89,17 @@ import AddDistrict from './pages/AddDistrict';
 import AddSubDistrict from './pages/AddSubDistrict';
 import ItemRegistrationList from './pages/ItemRegistrationList';
 import AddItem from './pages/AddItem';
+import SclDisSub from './pages/SclDisSub';
+import AddSclsub from './pages/AddSclsub';
+import AdResult from './pages/AdResult';
+import SubDistrictList from './pages/SubDistrictlist';
+import SubDisRegList from './pages/SubDisRegList';
+import SchoolList from './pages/SchoolList';
+import AddSubdis from './pages/AddSubdis';
+import ExportIT from './pages/ExportIT';
+import { LogOut } from 'lucide-react';
+import LogoOut from './pages/LogoOut';
+import EditItem from './pages/EditItem';
 
 
 
@@ -184,26 +195,55 @@ function App() {
 
         {/* Routes ONLY for "admin" */}
         <Route element={<ProtectedRoute allowedRoles={['It Admin']} />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/admin-panel" element={<AdminUser />} />
-          <Route path="/AddUser" element={<AddUser />} />
-          <Route path="/EditUser/:id" element={<EditUser />} />
-          <Route path="/CreateKalolsavam" element={<CreateKalolsavam />} />
-          <Route path="/AddKalosavam" element={<AddKalolsavam />} />
-          <Route path="/EditKalosmAdm/:id" element={<EditKalosmAdm />} />
+          <Route path="/DistrictList" element={<DistrictList />} />
+          <Route path="/AddDistrict" element={<AddDistrict />} />
+          <Route path="/SubDistrictlist" element={<SubDistrictlist />} />
+          <Route path="/AddSubDistrict" element={<AddSubDistrict />} />
+          <Route path="/school-list" element={<SchoolList />} />
+          <Route path="/AddSclsub" element={<AddSclsub />} />
+
+
+          <Route path="/SubDisRegList" element={<SubDisRegList />} />
+          <Route path="/AddSubdis" element={<AddSubdis />} />
+
           <Route path="/SchoolRegList" element={<SchoolRegList />} />
           <Route path="/AddScl" element={<AddScl />} />
-          <Route path="/EditScl/:id" element={<EditScl />} />
+
           <Route path="/FestivalRegiList" element={<FestivalRegiList />} />
           <Route path="/AddFestival" element={<AddFestival />} />
           <Route path="/EditFestival/:id" element={<EditFestival />} />
-          <Route path="/AddDistrict" element={<AddDistrict />} />
-          <Route path="/AddSubDistrict" element={<AddSubDistrict />} />
-          
-          <Route path="/DistrictList" element={<DistrictList />} />
-          <Route path="/SubDistrictlist/:id" element={<SubDistrictlist />} />
+
           <Route path="/ItemRegistrationList" element={<ItemRegistrationList />} />
           <Route path="/AddItem" element={<AddItem />} />
+          <Route path="/EditItem/:id" element={<EditItem />} />
+
+          <Route path="/admin-panel" element={<AdminUser />} />
+          <Route path="/AddUser" element={<AddUser />} />
+          <Route path="/EditUser/:id" element={<EditUser />} />
+
+
+
+          <Route path="/CreateKalolsavam" element={<CreateKalolsavam />} />
+          <Route path="/AddKalosavam" element={<AddKalolsavam />} />
+          <Route path="/EditKalosmAdm/:id" element={<EditKalosmAdm />} />
+
+          {/* dis */}
+
+          <Route path="/EditScl/:id" element={<EditScl />} />
+
+          <Route path="/AddFestival" element={<AddFestival />} />
+          <Route path="/EditFestival/:id" element={<EditFestival />} />
+
+          {/* sub reg */}
+
+         
+          
+          <Route path="/AdResult" element={<AdResult />} />
+
+          <Route path="/SchoolList/:subDistrictId" element={<SclDisSub />} />
+
+          <Route path="/ExportIT" element={<ExportIT />} />
+          <Route path="/LogOut" element={<LogoOut />} />
         </Route>
 
 

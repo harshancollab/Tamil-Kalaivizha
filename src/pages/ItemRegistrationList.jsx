@@ -1,24 +1,20 @@
-import React, { useEffect, useState, useRef } from 'react'
+// It Admin  Item req list
+
+import React, { useState, useRef, useEffect } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
-import { getAllResultentryListAPI } from '../services/allAPI';
+// import { deleteItemAPI, getAllItemsListAPI } from '../services/allAPI';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import html2pdf from 'html2pdf.js';
 
 const ItemRegistrationList = () => {
-    const [showRegNo, setShowRegNo] = useState(false);
-    const [Allresultentry, setResultentry] = useState([]);
-    const navigate = useNavigate();
-    const printRef = useRef();
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
-    const [showConfirmButton, setShowConfirmButton] = useState(true);
-    const [resultsConfirmed, setResultsConfirmed] = useState(false);
+    const [items, setItems] = useState([]);
+    const navigate = useNavigate();
+    const printRef = useRef();
 
-    // Festival state
     const [selectedFestival, setSelectedFestival] = useState(searchParams.get('festival') || '');
-
-    // Festival options
     const festivalOptions = [
         'UP Tamilkalaivizha',
         'LP Tamilkalaivizha',
@@ -27,7 +23,6 @@ const ItemRegistrationList = () => {
         'All Festival'
     ];
 
-    // Define code ranges for each festival (but don't display in UI)
     const festivalCodeRanges = {
         'UP Tamilkalaivizha': { min: 300, max: 399 },
         'LP Tamilkalaivizha': { min: 400, max: 499 },
@@ -35,93 +30,35 @@ const ItemRegistrationList = () => {
         'HSS Tamilkalaivizha': { min: 700, max: 999 }
     };
 
-    // District and SubDistrict states - keeping for backward compatibility
-    const [selectedDistrict, setSelectedDistrict] = useState(searchParams.get('district') || '');
-    const [selectedSubDistrict, setSelectedSubDistrict] = useState(searchParams.get('subDistrict') || '');
-    const [availableSubDistricts, setAvailableSubDistricts] = useState([]);
-
-    // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    
-    // Initialize search parameters from URL
+
     useEffect(() => {
         const searchParam = searchParams.get('search');
         const festivalParam = searchParams.get('festival');
 
         if (searchParam) setSearchTerm(searchParam);
         if (festivalParam) setSelectedFestival(festivalParam);
-
-        // getAllresultentry();
     }, [searchParams]);
 
-    // Add print styles
     useEffect(() => {
-        const style = document.createElement('style');
-        style.innerHTML = `
-            @media print {
-                body * {
-                    visibility: hidden;
-                }
-                #print-container, #print-container * {
-                    visibility: visible;
-                }
-                #print-container {
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    width: 100%;
-                }
-                .no-print {
-                    display: none !important;
-                }
-                table.print-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                }
-                table.print-table th, table.print-table td {
-                    border: 1px solid #ddd;
-                    padding: 8px;
-                }
-                table.print-table th {
-                    background-color: #f2f2f2 !important;
-                    color: black !important;
-                    font-weight: bold;
-                }
-                .print-header {
-                    text-align: center;
-                    margin: 20px 0;
-                    font-size: 24px;
-                    font-weight: bold;
-                }
-                .print-summary {
-                    margin: 15px 0;
-                    padding: 10px;
-                }
-                .print-filters {
-                    text-align: center;
-                    margin: 10px 0;
-                    font-style: italic;
-                }
-            }
-        `;
-        document.head.appendChild(style);
+        setCurrentPage(1);
+    }, [searchTerm, selectedFestival]);
 
-        return () => {
-            document.head.removeChild(style);
-        };
+    useEffect(() => {
+        getAllItems();
     }, []);
 
-    const getAllresultentry = async () => {
+    const getAllItems = async () => {
         const token = sessionStorage.getItem("token");
         if (token) {
             const reqHeader = {
                 "Authorization": `Bearer ${token}`
             }
             try {
-                const result = await getAllResultentryListAPI(reqHeader)
+                const result = await getAllItemsListAPI(reqHeader)
                 if (result.status === 200) {
-                    setResultentry(result.data)
+                    setItems(result.data)
                 }
             } catch (err) {
                 console.log(err);
@@ -129,50 +66,75 @@ const ItemRegistrationList = () => {
         }
     }
 
-    // Improved generatePDF function
-    const generatePDF = () => {
-        // Create a clone of the table for PDF generation
-        const pdfContent = document.createElement('div');
+    const handleEditRedirect = (item) => {
+        navigate(`/EditItem/${item.slNo}`, {
+            state: { item }
+        });
+    };
 
-        // Add title
+    const handleDeleteClick = async (id) => {
+        const token = sessionStorage.getItem("token")
+        if (token) {
+            const reqHeader = {
+                "Authorization": `Bearer ${token}`
+            }
+            try {
+                const result = await deleteItemAPI(id, reqHeader)
+                if (result.status === 200) {
+                    getAllItems();
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        }
+    }
+
+    const generatePDF = () => {
+        const pdfContent = document.createElement('div');
+    
+        // Create dynamic title that includes the selected festival
         const titleElement = document.createElement('h2');
-        titleElement.textContent = "Items Registration List";
+        
+        // Set the title based on selected festival
+        if (selectedFestival && selectedFestival !== 'Select' && selectedFestival !== 'All Festival') {
+            titleElement.textContent = `${selectedFestival} Item Registration List`;
+        } else {
+            titleElement.textContent = "Items Registration List";
+        }
+        
         titleElement.style.textAlign = 'center';
         titleElement.style.margin = '20px 0';
         titleElement.style.fontWeight = 'bold';
         pdfContent.appendChild(titleElement);
-
-        // Add filter information if any
+    
         if (searchTerm || selectedFestival !== '') {
             const filterInfo = document.createElement('div');
             filterInfo.style.margin = '10px 0';
             filterInfo.style.textAlign = 'center';
             filterInfo.style.fontStyle = 'italic';
-
+    
             let filterText = 'Filtered by: ';
             if (searchTerm) filterText += `Search: ${searchTerm} `;
             if (selectedFestival && selectedFestival !== 'Select') {
-                filterText += `Festival: ${selectedFestival} `;
+               
             }
-
+    
             filterInfo.textContent = filterText;
             pdfContent.appendChild(filterInfo);
         }
-
-        // Create table
+    
         const table = document.createElement('table');
         table.style.width = '100%';
         table.style.borderCollapse = 'collapse';
         table.style.marginTop = '20px';
-
-        // Create header
+    
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
-
+    
         const headers = [
-            'Sl No', 'Item Code & Name', 'Item Type', 'No of Students', 'Result Entered', 'Result Not Entered'
+            'Sl No', 'Item Code & Name', 'Item Type', 'Maximum Students', 'Pinnany', 'Duration'
         ];
-
+    
         headers.forEach(header => {
             const th = document.createElement('th');
             th.textContent = header;
@@ -182,25 +144,27 @@ const ItemRegistrationList = () => {
             th.style.fontWeight = 'bold';
             headerRow.appendChild(th);
         });
-
+    
         thead.appendChild(headerRow);
         table.appendChild(thead);
-
-        // Create table body with filtered data
+    
         const tbody = document.createElement('tbody');
-        filteredData.forEach((item, index) => {
+        
+        // Get the filtered items for the PDF
+        const itemsForPDF = filteredItems;
+        
+        itemsForPDF.forEach((item, index) => {
             const row = document.createElement('tr');
-
-            // Create cells
+    
             const cellData = [
-                indexOfFirstItem + index + 1,
+                index + 1,
                 `${item.code} - ${item.item}`,
                 item.itemType || 'N/A',
                 item.noOfStudents || 'N/A',
                 item.resultEntered || 'N/A',
                 item.resultNotEntered || 'N/A'
             ];
-
+    
             cellData.forEach(text => {
                 const td = document.createElement('td');
                 td.textContent = text;
@@ -209,103 +173,95 @@ const ItemRegistrationList = () => {
                 td.style.textAlign = 'center';
                 row.appendChild(td);
             });
-
+    
             tbody.appendChild(row);
         });
-
+    
         table.appendChild(tbody);
         pdfContent.appendChild(table);
-
-        // Add summary information
+    
         const summaryDiv = document.createElement('div');
         summaryDiv.style.marginTop = '15px';
         summaryDiv.style.padding = '10px';
-
+    
         summaryDiv.innerHTML = `
-            <p><strong>Total Items:</strong> ${filteredData.length}</p>
+            <p><strong>Total Items:</strong> ${itemsForPDF.length}</p>
             <p><strong>Date Generated:</strong> ${new Date().toLocaleDateString()}</p>
         `;
-
+    
+        // Add festival info to summary if selected
+        if (selectedFestival && selectedFestival !== 'Select' && selectedFestival !== 'All Festival') {
+            summaryDiv.innerHTML += `<p><strong>Festival:</strong> ${selectedFestival}</p>`;
+        }
+    
         pdfContent.appendChild(summaryDiv);
-
-        // PDF options
+    
+        // Set filename based on selected festival
+        let filename = 'Items_Registration_List.pdf';
+        if (selectedFestival && selectedFestival !== 'Select' && selectedFestival !== 'All Festival') {
+            // Replace spaces with underscores for filename
+            const festivalForFilename = selectedFestival.replace(/\s+/g, '_');
+            filename = `${festivalForFilename}_Items_Registration_List.pdf`;
+        }
+    
         const options = {
             margin: 10,
-            filename: 'Items_Registration_List.pdf',
+            filename: filename,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2, useCORS: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
         };
-
-        // Generate and download PDF
+    
         html2pdf().from(pdfContent).set(options).save();
     };
 
-    // Enhanced dummy data with item types and name
-    const resultData = [
-        { slNo: 1, regNo: "1233", code: "301", item: "Story writing", itemType: "Group", noOfStudents: 45, resultEntered: 40, resultNotEntered: 5, festival: "UP Tamilkalaivizha" },
-        { slNo: 2, regNo: "4563", code: "203", item: "Story telling", itemType: "Single", noOfStudents: 30, resultEntered: 28, resultNotEntered: 2, festival: "LP Tamilkalaivizha" },
-        { slNo: 3, regNo: "8933", code: "345", item: "Elocution", itemType: "Single", noOfStudents: 25, resultEntered: 22, resultNotEntered: 3, festival: "HS Tamilkalaivizha" },
-        { slNo: 4, regNo: "3433", code: "567", item: "Essay writing", itemType: "Single", noOfStudents: 50, resultEntered: 45, resultNotEntered: 5, festival: "HSS Tamilkalaivizha" },
-        { slNo: 5, regNo: "6733", code: "234", item: "Group dance", itemType: "Single", noOfStudents: 40, resultEntered: 40, resultNotEntered: 0, festival: "UP Tamilkalaivizha" },
-        { slNo: 6, regNo: "8903", code: "423", item: "Solo dance", itemType: "Single", noOfStudents: 35, resultEntered: 30, resultNotEntered: 5, festival: "LP Tamilkalaivizha" },
-        { slNo: 7, regNo: "453", code: "526", item: "Group song", itemType: "Group", noOfStudents: 60, resultEntered: 60, resultNotEntered: 0, festival: "HS Tamilkalaivizha" },
-        { slNo: 8, regNo: "6783", code: "776", item: "Solo song", itemType: "Group", noOfStudents: 55, resultEntered: 50, resultNotEntered: 5, festival: "HSS Tamilkalaivizha" },
-        { slNo: 9, regNo: "6783", code: "312", item: "Painting", itemType: "Group", noOfStudents: 45, resultEntered: 40, resultNotEntered: 5, festival: "UP Tamilkalaivizha" },
-        { slNo: 10, regNo: "6783", code: "414", item: "Drama", itemType: "Group", noOfStudents: 30, resultEntered: 30, resultNotEntered: 0, festival: "LP Tamilkalaivizha" },
-        { slNo: 11, regNo: "6783", code: "515", item: "Mono act", itemType: "Single", noOfStudents: 25, resultEntered: 20, resultNotEntered: 5, festival: "HS Tamilkalaivizha" },
-        { slNo: 12, regNo: "7123", code: "732", item: "Recitation", itemType: "Single", noOfStudents: 40, resultEntered: 35, resultNotEntered: 5, festival: "HSS Tamilkalaivizha" },
-        { slNo: 13, regNo: "5463", code: "362", item: "Quiz", itemType: "Group", noOfStudents: 60, resultEntered: 60, resultNotEntered: 0, festival: "UP Tamilkalaivizha" },
-        { slNo: 14, regNo: "3213", code: "454", item: "Debate", itemType: "Single", noOfStudents: 30, resultEntered: 28, resultNotEntered: 2, festival: "LP Tamilkalaivizha" },
-        { slNo: 15, regNo: "9873", code: "589", item: "Instrumental music", itemType: "Single", noOfStudents: 25, resultEntered: 20, resultNotEntered: 5, festival: "HS Tamilkalaivizha" },
+    const itemData = items.length > 0 ? items : [
+        { slNo: 1, regNo: "1233", code: "301", item: "Story writing", itemType: "Group", noOfStudents: 1, resultEntered: 0, resultNotEntered: " 1 Hour 30 Min", festival: "UP Tamilkalaivizha" },
+        { slNo: 2, regNo: "4563", code: "203", item: "Story telling", itemType: "Single", noOfStudents: 1, resultEntered: 0, resultNotEntered: "1 Hour 30 Min", festival: "LP Tamilkalaivizha" },
+        { slNo: 3, regNo: "8933", code: "345", item: "Elocution", itemType: "Single", noOfStudents: 1, resultEntered: 0, resultNotEntered: "45 Min", festival: "HS Tamilkalaivizha" },
+        { slNo: 4, regNo: "3433", code: "567", item: "Essay writing", itemType: "Single", noOfStudents: 1, resultEntered: 0, resultNotEntered: "2 Hours", festival: "HSS Tamilkalaivizha" },
+        { slNo: 5, regNo: "6733", code: "234", item: "Group dance", itemType: "Group", noOfStudents: 5, resultEntered: 0, resultNotEntered: "15 Min", festival: "UP Tamilkalaivizha" },
+        { slNo: 6, regNo: "8903", code: "423", item: "Solo dance", itemType: "Single", noOfStudents: 1, resultEntered: 0, resultNotEntered: "10 Min", festival: "LP Tamilkalaivizha" },
+        { slNo: 7, regNo: "453", code: "526", item: "Group song", itemType: "Group", noOfStudents: 4, resultEntered: 0, resultNotEntered: "15 Min", festival: "HS Tamilkalaivizha" }
     ];
 
-    // Function to check if a code falls within a festival's range
     const codeInFestivalRange = (code, festival) => {
         if (!festival || festival === 'All Festival' || festival === 'Select') return true;
-        
+
         const codeNum = parseInt(code);
         const range = festivalCodeRanges[festival];
-        
-        if (!range) return true; // No range defined for this festival
-        
+
+        if (!range) return true;
+
         return codeNum >= range.min && codeNum <= range.max;
     };
 
-    // Filter results based on search term (both code and item name)
-    const filteredResultData = () => {
+    const filteredBySearch = () => {
         if (!searchTerm) {
-            return resultData;
+            return itemData;
         }
         const searchTermLower = searchTerm.toLowerCase();
-        return resultData.filter(result =>
-            result.code.toLowerCase().includes(searchTermLower) ||
-            result.item.toLowerCase().includes(searchTermLower)
+        return itemData.filter(item =>
+            item.code.toLowerCase().includes(searchTermLower) ||
+            item.item.toLowerCase().includes(searchTermLower)
         );
     };
 
-    // Filter by festival (now using code ranges instead of festival property)
-    const filteredByFestival = () => {
-        let filtered = filteredResultData();
+    const filteredData = () => {
+        let filtered = filteredBySearch();
 
         if (selectedFestival && selectedFestival !== 'Select') {
-            filtered = filtered.filter(result => codeInFestivalRange(result.code, selectedFestival));
+            filtered = filtered.filter(item => codeInFestivalRange(item.code, selectedFestival));
         }
 
         return filtered;
     };
 
-    // Reset pagination when search changes
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm, selectedFestival]);
-
-    // Pagination logic
-    const filteredData = filteredByFestival();
+    const filteredItems = filteredData();
     const indexOfLastItem = currentPage * rowsPerPage;
     const indexOfFirstItem = indexOfLastItem - rowsPerPage;
-    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+    const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredItems.length / rowsPerPage);
 
     const handlePageChange = (pageNumber) => {
         if (pageNumber > 0 && pageNumber <= totalPages) {
@@ -313,58 +269,9 @@ const ItemRegistrationList = () => {
         }
     };
 
-    const renderPageNumbers = () => {
-        const pageNumbers = [];
-        // Dynamically adjust number of page buttons based on screen size
-        const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
-
-        if (totalPages <= maxPageNumbersToShow) {
-            // Show all page numbers
-            for (let i = 1; i <= totalPages; i++) {
-                pageNumbers.push(i);
-            }
-        } else {
-            // Show limited page numbers with dots
-            if (currentPage <= 2) {
-                // Near the start
-                for (let i = 1; i <= 3; i++) {
-                    if (i <= totalPages) pageNumbers.push(i);
-                }
-                if (totalPages > 3) {
-                    pageNumbers.push('...');
-                    pageNumbers.push(totalPages);
-                }
-            } else if (currentPage >= totalPages - 1) {
-                // Near the end
-                pageNumbers.push(1);
-                pageNumbers.push('...');
-                for (let i = totalPages - 2; i <= totalPages; i++) {
-                    if (i > 0) pageNumbers.push(i);
-                }
-            } else {
-                // Middle
-                pageNumbers.push(1);
-                if (currentPage > 3) pageNumbers.push('...');
-                pageNumbers.push(currentPage - 1);
-                pageNumbers.push(currentPage);
-                pageNumbers.push(currentPage + 1);
-                if (currentPage < totalPages - 2) pageNumbers.push('...');
-                pageNumbers.push(totalPages);
-            }
-        }
-
-        return pageNumbers;
-    };
-
-    const handleAddClick = () => {
-        navigate('/AddItem');
-    };
-
-    // Function to update URL params
     const updateURLParams = (params) => {
         const newParams = new URLSearchParams(searchParams);
 
-        // Update or remove each parameter
         Object.entries(params).forEach(([key, value]) => {
             if (value && value !== 'Select') {
                 newParams.set(key, value);
@@ -376,22 +283,63 @@ const ItemRegistrationList = () => {
         setSearchParams(newParams);
     };
 
-    // Handle search input changes
     const handleSearchChange = (e) => {
         const value = e.target.value;
         setSearchTerm(value);
 
-        // Update URL parameter
         updateURLParams({ search: value });
     };
 
-    // Handle festival change
     const handleFestivalChange = (e) => {
         const festival = e.target.value;
         setSelectedFestival(festival);
 
-        // Update URL parameter
         updateURLParams({ festival: festival });
+    };
+
+    const handleAddClick = () => {
+        const params = new URLSearchParams();
+        if (selectedFestival && selectedFestival !== 'Select') {
+            params.append('festival', selectedFestival);
+        }
+        navigate(`/AddItem?${params.toString()}`);
+    };
+
+    const renderPageNumbers = () => {
+        const pageNumbers = [];
+        const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
+
+        if (totalPages <= maxPageNumbersToShow) {
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            if (currentPage <= 2) {
+                for (let i = 1; i <= 3; i++) {
+                    if (i <= totalPages) pageNumbers.push(i);
+                }
+                if (totalPages > 3) {
+                    pageNumbers.push('...');
+                    pageNumbers.push(totalPages);
+                }
+            } else if (currentPage >= totalPages - 1) {
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = totalPages - 2; i <= totalPages; i++) {
+                    if (i > 0) pageNumbers.push(i);
+                }
+            } else {
+                pageNumbers.push(1);
+                if (currentPage > 3) pageNumbers.push('...');
+                pageNumbers.push(currentPage - 1);
+                pageNumbers.push(currentPage);
+                pageNumbers.push(currentPage + 1);
+                if (currentPage < totalPages - 2) pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+            }
+        }
+
+        return pageNumbers;
     };
 
     return (
@@ -408,8 +356,7 @@ const ItemRegistrationList = () => {
                             <div className="flex items-center gap-2 w-full sm:w-auto">
 
                             </div>
-                           
-                            {/* Festival Dropdown with Floating Label - Without showing code ranges */}
+
                             <div className="relative w-full sm:w-48">
                                 <select
                                     id="floating_festival"
@@ -428,7 +375,7 @@ const ItemRegistrationList = () => {
                                     htmlFor="floating_festival"
                                     className={`absolute left-5 text-sm text-blue-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 start-1 ${selectedFestival ? 'scale-75 -translate-y-4 top-2' : ''}`}
                                 >
-                                   Select Festival
+                                    Select Festival
                                 </label>
                                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
                                     <i className="fa-solid fa-chevron-down"></i>
@@ -467,8 +414,10 @@ const ItemRegistrationList = () => {
                         </div>
                     </div>
 
+
+
+
                     <div className="w-full">
-                        {/* Add id="print-container" for CSS print handling */}
                         <div id="print-container" className="overflow-x-auto -mx-4 sm:mx-0">
                             <div className="inline-block min-w-full align-middle px-4 sm:px-0">
                                 <div ref={printRef} className="shadow overflow-hidden sm:rounded-lg">
@@ -478,31 +427,37 @@ const ItemRegistrationList = () => {
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Item Code & Name</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Item Type</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">No of Students</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Result Entered</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Result Not Entered</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm no-print">Confirmed</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm no-print">Reset</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Maximum Students</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Pinnany</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Duration</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm no-print">Edit</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm no-print">Delete</th>
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
                                             {currentItems.length > 0 ? (
-                                                currentItems.map((result, index) => (
-                                                    <tr key={result.slNo} className="hover:bg-gray-100">
+                                                currentItems.map((item, index) => (
+                                                    <tr key={item.slNo} className="hover:bg-gray-100">
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
-                                                        <td className="p-2 md:p-3 text-blue-600 cursor-pointer whitespace-nowrap">{result.code}-{result.item}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.itemType}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.noOfStudents}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.resultEntered}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.resultNotEntered}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{item.code}-{item.item}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{item.itemType}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{item.noOfStudents}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{item.resultEntered}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{item.resultNotEntered}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">
-                                                            <span className="px-2 py-1 text-xs ">
-                                                                {result.resultEntered === result.noOfStudents ? "Yes" : "No"}
-                                                            </span>
+                                                            <button
+                                                                className="text-blue-500 hover:text-blue-700 focus:outline-none"
+                                                                onClick={() => handleEditRedirect(item)}
+                                                            >
+                                                                <i className="fa-solid fa-pen-to-square cursor-pointer"></i>
+                                                            </button>
                                                         </td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">
-                                                            <button className="text-blue-600 focus:outline-none">
-                                                                <i className="fa-solid fa-rotate-right"></i>
+                                                            <button
+                                                                onClick={() => handleDeleteClick(item.slNo)}
+                                                                className="text-red-600 hover:text-red-800 focus:outline-none"
+                                                            >
+                                                                <i className="fa-solid fa-trash cursor-pointer"></i>
                                                             </button>
                                                         </td>
                                                     </tr>
@@ -510,9 +465,9 @@ const ItemRegistrationList = () => {
                                             ) : (
                                                 <tr>
                                                     <td colSpan="8" className="p-4 text-center text-gray-500">
-                                                        No results found {searchTerm ? `for "${searchTerm}"` : ''}
-                                                        {selectedFestival && selectedFestival !== 'Select' && selectedFestival !== 'All Festival' ? 
-                                                        ` in ${selectedFestival}` : ''}
+                                                        No items found {searchTerm ? `for "${searchTerm}"` : ''}
+                                                        {selectedFestival && selectedFestival !== 'Select' && selectedFestival !== 'All Festival' ?
+                                                            ` in ${selectedFestival}` : ''}
                                                     </td>
                                                 </tr>
                                             )}
@@ -527,7 +482,7 @@ const ItemRegistrationList = () => {
                     <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
                         {/* Showing X of Y rows */}
                         <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
-                            {filteredData.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} of ${filteredData.length} rows` : '0 rows'}
+                            {filteredItems.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredItems.length)} of ${filteredItems.length} rows` : '0 rows'}
                         </div>
 
                         {/* Pagination Controls */}

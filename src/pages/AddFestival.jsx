@@ -1,3 +1,5 @@
+// IT Admin  Festival REG List - Add Festivel
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Dash from '../components/Dash';
@@ -7,24 +9,24 @@ import Header from '../components/Header';
 const AddFestival = () => {
     const navigate = useNavigate();
 
-    // State for form data
+    
     const [formData, setFormData] = useState({
         festivalName: '',
         fromClass: '',
         toClass: ''
     });
 
-    // State for validation errors
+
     const [errors, setErrors] = useState({
         festivalName: '',
         fromClass: '',
         toClass: ''
     });
 
-    // Track if form was submitted to show all errors
+
     const [formSubmitted, setFormSubmitted] = useState(false);
 
-    // Validate a single field
+    
     const validateField = (name, value, allValues = formData) => {
         switch (name) {
             case 'festivalName':
@@ -41,7 +43,6 @@ const AddFestival = () => {
                 if (!value.trim()) return 'To class is required';
                 if (isNaN(value)) return 'Class must be a number';
                 
-                // Check if toClass is greater than fromClass
                 const fromClassNum = parseInt(allValues.fromClass);
                 const toClassNum = parseInt(value);
                 
@@ -55,12 +56,10 @@ const AddFestival = () => {
         }
     };
 
-    // Validate all fields and return if form is valid
     const validateForm = () => {
         const newErrors = {};
         let isValid = true;
 
-        // Validate each field
         Object.keys(formData).forEach(key => {
             const error = validateField(key, formData[key], formData);
             newErrors[key] = error;
@@ -74,18 +73,15 @@ const AddFestival = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         
-        // Update form data
         const updatedFormData = { ...formData, [name]: value };
         setFormData(updatedFormData);
 
-        // Validate field if form was already submitted
         if (formSubmitted) {
             setErrors(prev => ({
                 ...prev,
                 [name]: validateField(name, value, updatedFormData)
             }));
             
-            // If changing fromClass, also revalidate toClass
             if (name === 'fromClass' && updatedFormData.toClass) {
                 setErrors(prev => ({
                     ...prev,
@@ -99,37 +95,30 @@ const AddFestival = () => {
         navigate('/FestivalRegiList');
     };
 
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setFormSubmitted(true);
         
-        // Validate all fields
         const isValid = validateForm();
         
         if (isValid) {
             console.log("Form submitted:", formData);
             
-            // Get token from session storage
             const token = sessionStorage.getItem("token");
             
             if (token) {
-                // Set up request header with token
                 const reqHeader = {
                     "Authorization": `Bearer ${token}`
                 };
                 
                 try {
-                    // Uncomment this when API is ready
                     // const result = await AddFestivalAPI(formData, reqHeader);
                     
-                    // For now, simulating successful API call
                     const result = { status: 200 };
                     
                     if (result.status === 200) {
                         alert('Festival added successfully!');
                         
-                        // Reset form after successful submission
                         setFormData({
                             festivalName: '',
                             fromClass: '',
@@ -137,7 +126,6 @@ const AddFestival = () => {
                         });
                         setFormSubmitted(false);
                         
-                        // Navigate back to the list page
                         navigate('/FestivalList');
                     } else {
                         alert("Failed to add festival");
@@ -165,7 +153,6 @@ const AddFestival = () => {
                             <h2 className="text-lg font-bold mb-5 sm:mb-10 text-gray-800">Add Festival</h2>
 
                             <form  className="space-y-3 sm:space-y-4 max-w-2xl mx-auto">
-                                {/* Festival Name Field */}
                                 <div className="flex flex-col sm:flex-row sm:items-center">
                                     <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Festival</label>
                                     <div className="w-full sm:w-2/3">
@@ -181,7 +168,6 @@ const AddFestival = () => {
                                     </div>
                                 </div>
 
-                                {/* From Class Field */}
                                 <div className="flex flex-col sm:flex-row sm:items-center">
                                     <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">From Class</label>
                                     <div className="w-full sm:w-2/3">
@@ -197,7 +183,6 @@ const AddFestival = () => {
                                     </div>
                                 </div>
 
-                                {/* To Class Field */}
                                 <div className="flex flex-col sm:flex-row sm:items-center">
                                     <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">To Class</label>
                                     <div className="w-full sm:w-2/3">
@@ -238,4 +223,4 @@ const AddFestival = () => {
     );
 };
 
-export default AddFestival;
+export default AddFestival

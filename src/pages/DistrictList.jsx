@@ -1,3 +1,5 @@
+// IT admin District Registration List
+
 import React, { useState, useRef, useEffect } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
@@ -51,34 +53,47 @@ const DistrictList = () => {
         { id: 14, name: "Kasaragod", totalSchools: 70, dataEntered: 58, dataNotEntered: 12, confirmed: 50, notConfirmed: 20 }
     ];
 
-    // Fetch data on component mount and when dependencies change
+   
+    // Fetch data on component mount
     useEffect(() => {
-        getAllresultentry();
+        getAllDistricts();
     }, []);
 
-    const getAllresultentry = async () => {
+    const getAllDistricts = async () => {
+        setLoading(true);
+        setError(null);
+        
         const token = sessionStorage.getItem("token");
-        if (token) {
-            const reqHeader = {
-                "Authorization": `Bearer ${token}`
-            }
-            try {
-                const result = await getAllResultentryListAPI(reqHeader)
-                if (result.status === 200) {
-                    setDistricts(result.data)
-                }
-            } catch (err) {
-                console.log(err);
-            }
+        if (!token) {
+            setError("Authentication token not found. Please login again.");
+            setLoading(false);
+            return;
         }
-    }
+        
+        const reqHeader = {
+            "Authorization": `Bearer ${token}`
+        };
+        
+        try {
+            const result = await getAllResultentryListAPI(reqHeader);
+            if (result.status === 200) {
+                setDistricts(result.data);
+            } else {
+                setError(`Failed to fetch data: ${result.status}`);
+            }
+        } catch (err) {
+            console.error("API Error:", err);
+            setError("Failed to fetch district data. Please try again later.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    // Replace the handlePrint function with generatePDF
+  
     const generatePDF = () => {
-        // Create a clone of the table for PDF generation
+        
         const pdfContent = document.createElement('div');
         
-        // Add title
         const titleElement = document.createElement('h2');
         titleElement.textContent = "District List Report";
         titleElement.style.textAlign = 'center';
@@ -154,25 +169,21 @@ const DistrictList = () => {
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
         
-        // Generate and download PDF
+        
         html2pdf().from(pdfContent).set(options).save();
     };
 
+    //  Modified to redirect to SubDisRegList with district name in URL
     const handleDistrictClick = (district) => {
-        // Updated to navigate to the SubDistrictList page instead
-        navigate(`/SubDistrictlist/${district.id}`, {
-            state: { 
-                districtName: district.name, 
-                districtData: district 
-            }
-        });
+        // Navigate to SubDisRegList page with district as URL parameter
+        navigate(`/SubDistrictlist?district=${encodeURIComponent(district.name)}`);
     };
 
     const handleAddClick = () => {
         navigate('/AddDistrict');
     };
 
-    // Filter results based on search code
+    // Filter 
     const filteredData = searchCode 
         ? districts.filter(district => 
             district.name.toLowerCase().includes(searchCode.toLowerCase())
@@ -217,18 +228,14 @@ const DistrictList = () => {
 
     const renderPageNumbers = () => {
         const pageNumbers = [];
-        // Dynamically adjust number of page buttons based on screen size
         const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
 
         if (totalPages <= maxPageNumbersToShow) {
-            // Show all page numbers
             for (let i = 1; i <= totalPages; i++) {
                 pageNumbers.push(i);
             }
         } else {
-            // Show limited page numbers with dots
             if (currentPage <= 2) {
-                // Near the start
                 for (let i = 1; i <= 3; i++) {
                     if (i <= totalPages) pageNumbers.push(i);
                 }
@@ -237,14 +244,12 @@ const DistrictList = () => {
                     pageNumbers.push(totalPages);
                 }
             } else if (currentPage >= totalPages - 1) {
-                // Near the end
                 pageNumbers.push(1);
                 pageNumbers.push('...');
                 for (let i = totalPages - 2; i <= totalPages; i++) {
                     if (i > 0) pageNumbers.push(i);
                 }
             } else {
-                // Middle
                 pageNumbers.push(1);
                 if (currentPage > 3) pageNumbers.push('...');
                 pageNumbers.push(currentPage - 1);
@@ -315,7 +320,7 @@ const DistrictList = () => {
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Data Entered</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Data Not Entered</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Confirmed</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Not Confirm</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Not Confirmed</th>
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
@@ -352,14 +357,11 @@ const DistrictList = () => {
 
                     {/* Pagination Controls */}
                     <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
-                        {/* Showing X of Y rows */}
                         <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
                             {filteredData.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} of ${filteredData.length} rows` : '0 rows'}
                         </div>
 
-                        {/* Pagination Controls */}
                         <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
-                            {/* Previous Button with icon */}
                             <button
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 1}
@@ -368,8 +370,6 @@ const DistrictList = () => {
                                 <i className="fa-solid fa-angle-right transform rotate-180"></i>
                                 <span className="hidden sm:inline p-1">Previous</span>
                             </button>
-
-                            {/* Page Numbers */}
                             <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
                                 {renderPageNumbers().map((page, index) => (
                                     <button
@@ -383,8 +383,6 @@ const DistrictList = () => {
                                     </button>
                                 ))}
                             </div>
-
-                            {/* Next Button with icon */}
                             <button
                                 onClick={() => handlePageChange(currentPage + 1)}
                                 disabled={currentPage === totalPages || totalPages === 0}

@@ -1,96 +1,127 @@
+// IT Admin  Festival REG List - Edit Festivel
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Dash from '../components/Dash';
 import Header from '../components/Header';
-// import { GetFestivalByIdAPI, UpdateFestivalAPI } from '../services/allAPI';
+// import { getFestivalByIdAPI, updateFestivalAPI } from '../services/allAPI';
 
 const EditFestival = () => {
     const navigate = useNavigate();
-    const { id } = useParams(); // Get festival ID from URL parameters
-    
-    // State for form data with only festivalName
+    const { id } = useParams();
+
     const [formData, setFormData] = useState({
-        festivalName: ''
+        festivalName: '',
+        fromClass: '',
+        toClass: ''
     });
 
-    // State for validation errors
     const [errors, setErrors] = useState({
-        festivalName: ''
+        festivalName: '',
+        fromClass: '',
+        toClass: ''
     });
 
-    // Track if form was submitted to show all errors
     const [formSubmitted, setFormSubmitted] = useState(false);
-    
-    // Loading state
     const [isLoading, setIsLoading] = useState(true);
 
-    // Fetch festival details on component mount
+    const mockFestivalData = {
+        "1": { festivalName: "UP Tamil ", fromClass: "1", toClass: "12" },
+        "2": { festivalName: "Sports Day", fromClass: "3", toClass: "10" },
+        "3": { festivalName: "Science Exhibition", fromClass: "5", toClass: "12" },
+        "4": { festivalName: "Cultural Fest", fromClass: "1", toClass: "8" }
+    };
+
     useEffect(() => {
-        const fetchFestivalDetails = async () => {
-            // Get token from session storage
+        const fetchFestivalData = async () => {
+            if (!id) {
+                alert("Festival ID not found");
+                navigate('/FestivalRegiList');
+                return;
+            }
+
             const token = sessionStorage.getItem("token");
-            
-            // if (!token) {
-            //     alert("Authentication token missing. Please log in again.");
+            if (!token) {
                
-            //     return;
-            // }
+                
+                // alert("Authentication token not found. Please login again.");
+                // navigate('/login');
+                // return;
             
+                setTimeout(() => {
+                    if (mockFestivalData[id]) {
+                        setFormData(mockFestivalData[id]);
+                        setIsLoading(false);
+                    } else {
+                        alert("Festival not found");
+                        navigate('/FestivalRegiList');
+                    }
+                }, 800);
+                return;
+            }
+
             try {
-                setIsLoading(true);
-                
-                // Uncomment when API is ready
-                // const reqHeader = { "Authorization": `Bearer ${token}` };
-                // const result = await GetFestivalByIdAPI(id, reqHeader);
-                
-                // For now, simulate API response with mock data
-                const result = { 
-                    status: 200, 
-                    data: { 
-                        festivalName: 'up Festival'
-                    } 
+                const reqHeader = {
+                    "Authorization": `Bearer ${token}`
                 };
                 
+               
+                const result = await getFestivalByIdAPI(id, reqHeader);
                 if (result.status === 200) {
-                    setFormData({
-                        festivalName: result.data.festivalName
-                    });
+                    setFormData(result.data);
                 } else {
-                    alert("Failed to fetch festival details");
-                    navigate('/FestivalList');
+                    throw new Error("Failed to fetch festival data");
                 }
             } catch (err) {
-                console.error("Error fetching festival details:", err);
-                alert("Error fetching festival details. Please try again.");
-                navigate('/FestivalList');
+                console.error("Error fetching festival:", err);
+                alert("Error loading festival data. Please try again.");
+                
+           
+                if (mockFestivalData[id]) {
+                    setFormData(mockFestivalData[id]);
+                }
             } finally {
                 setIsLoading(false);
             }
         };
-        
-        fetchFestivalDetails();
+
+        fetchFestivalData();
     }, [id, navigate]);
 
-    // Validate a single field
-    const validateField = (name, value) => {
+    const validateField = (name, value, allValues = formData) => {
         switch (name) {
             case 'festivalName':
                 if (!value.trim()) return 'Festival name is required';
                 if (value.trim().length < 3) return 'Festival name must be at least 3 characters long';
                 return '';
+                
+            case 'fromClass':
+                if (!value.trim()) return 'From class is required';
+                if (isNaN(value)) return 'Class must be a number';
+                return '';
+                
+            case 'toClass':
+                if (!value.trim()) return 'To class is required';
+                if (isNaN(value)) return 'Class must be a number';
+                
+                const fromClassNum = parseInt(allValues.fromClass);
+                const toClassNum = parseInt(value);
+                
+                if (!isNaN(fromClassNum) && !isNaN(toClassNum) && toClassNum <= fromClassNum) {
+                    return 'To Class must be greater than From Class';
+                }
+                return '';
+                
             default:
                 return '';
         }
     };
 
-    // Validate all fields and return if form is valid
     const validateForm = () => {
         const newErrors = {};
         let isValid = true;
 
-        // Validate each field
         Object.keys(formData).forEach(key => {
-            const error = validateField(key, formData[key]);
+            const error = validateField(key, formData[key], formData);
             newErrors[key] = error;
             if (error) isValid = false;
         });
@@ -102,15 +133,21 @@ const EditFestival = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         
-        // Update form data
-        setFormData({ ...formData, [name]: value });
+        const updatedFormData = { ...formData, [name]: value };
+        setFormData(updatedFormData);
 
-        // Validate field if form was already submitted
         if (formSubmitted) {
             setErrors(prev => ({
                 ...prev,
-                [name]: validateField(name, value)
+                [name]: validateField(name, value, updatedFormData)
             }));
+            
+            if (name === 'fromClass' && updatedFormData.toClass) {
+                setErrors(prev => ({
+                    ...prev,
+                    toClass: validateField('toClass', updatedFormData.toClass, updatedFormData)
+                }));
+            }
         }
     };
 
@@ -118,48 +155,56 @@ const EditFestival = () => {
         navigate('/FestivalRegiList');
     };
 
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setFormSubmitted(true);
         
-        // Validate all fields
         const isValid = validateForm();
         
-        if (isValid) {
-            console.log("Form submitted for update:", formData);
-            
-            // Get token from session storage
+        if (!isValid) {
+            console.log("Form has errors:", errors);
+            return;
+        }
+
+        const { festivalName, fromClass, toClass } = formData;
+        
+        if (festivalName && fromClass && toClass) {
             const token = sessionStorage.getItem("token");
-            
-            if (token) {
-                // Set up request header with token
+            if (!token) {
+                // For development without authentication
+                console.log("Form submitted for update:", formData);
+                setTimeout(() => {
+                    mockFestivalData[id] = formData;
+                    alert('Festival updated successfully!');
+                    navigate('/FestivalList');
+                }, 1000);
+                return;
+            }
+
+            try {
+               
+                const reqBody = new FormData();
+                reqBody.append("festivalName", festivalName);
+                reqBody.append("fromClass", fromClass);
+                reqBody.append("toClass", toClass);
+
                 const reqHeader = {
                     "Authorization": `Bearer ${token}`
                 };
-                
-                try {
-                    // Uncomment this when API is ready
-                    // const result = await UpdateFestivalAPI(id, formData, reqHeader);
-                    
-                    // For now, simulating successful API call
-                    const result = { status: 200 };
-                    
-                    if (result.status === 200) {
-                        alert('Festival updated successfully!');
-                        navigate('/FestivalList');
-                    } else {
-                        alert("Failed to update festival");
-                    }
-                } catch (err) {
-                    console.error("Error updating festival:", err);
-                    alert("Error updating festival. Please try again.");
+
+                const result = await updateFestivalAPI(id, reqBody, reqHeader);
+                if (result.status === 200) {
+                    alert('Festival updated successfully!');
+                    navigate('/FestivalList');
+                } else {
+                    throw new Error("Failed to update festival");
                 }
-            } else {
-                alert("Authentication token missing. Please log in again.");
+            } catch (err) {
+                console.error("Error updating festival:", err);
+                alert("Error updating festival. Please try again.");
             }
         } else {
-            console.log("Form has errors:", errors);
+            alert("Please fill the form completely!");
         }
     };
 
@@ -171,7 +216,7 @@ const EditFestival = () => {
                     <Dash />
                     <div className="flex-1 p-2 sm:p-4 bg-gray-300">
                         <div className="bg-gray-50 p-3 sm:p-6 pt-4 min-h-screen mx-auto flex items-center justify-center">
-                            <p className="text-lg font-medium text-gray-700">Loading festival details...</p>
+                            <p className="text-lg text-gray-600">Loading festival data...</p>
                         </div>
                     </div>
                 </div>
@@ -189,15 +234,14 @@ const EditFestival = () => {
                         <div className="bg-gray-50 p-3 sm:p-6 pt-4 min-h-screen mx-auto">
                             <h2 className="text-lg font-bold mb-5 sm:mb-10 text-gray-800">Edit Festival</h2>
 
-                            <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 max-w-2xl mx-auto">
-                                {/* Festival Name Field */}
+                            <form className="space-y-3 sm:space-y-4 max-w-2xl mx-auto">
                                 <div className="flex flex-col sm:flex-row sm:items-center">
                                     <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Festival</label>
                                     <div className="w-full sm:w-2/3">
                                         <input
                                             type="text"
                                             name="festivalName"
-                                            placeholder="Enter Festival Name "
+                                            placeholder="Enter Festival "
                                             value={formData.festivalName}
                                             onChange={handleChange}
                                             className={`w-full px-3 sm:px-4 py-2 border ${errors.festivalName ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
@@ -205,25 +249,51 @@ const EditFestival = () => {
                                         {errors.festivalName && <p className="text-red-500 text-xs mt-1 ml-2">{errors.festivalName}</p>}
                                     </div>
                                 </div>
-                                
-                                {/* Buttons */}
-                               
-                            </form>
-                            <div className="flex flex-col sm:flex-row justify-center sm:justify-end mt-32 sm:mt-40 sm:mr-10 md:mr-18 lg:mr-40 space-y-4 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">
-                                    <button
-                                        type="button"
-                                        onClick={handleCancel}
-                                        className="bg-white border border-blue-500 text-blue-500 font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:bg-blue-50 transition-colors duration-300"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={handleSubmit}
-                                        className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:opacity-90 transition-opacity duration-300"
-                                    >
-                                        Update
-                                    </button>
+                                <div className="flex flex-col sm:flex-row sm:items-center">
+                                    <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">From Class</label>
+                                    <div className="w-full sm:w-2/3">
+                                        <input
+                                            type="number"
+                                            name="fromClass"
+                                            placeholder="Enter Class"
+                                            value={formData.fromClass}
+                                            onChange={handleChange}
+                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.fromClass ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
+                                        />
+                                        {errors.fromClass && <p className="text-red-500 text-xs mt-1 ml-2">{errors.fromClass}</p>}
+                                    </div>
                                 </div>
+                                <div className="flex flex-col sm:flex-row sm:items-center">
+                                    <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">To Class</label>
+                                    <div className="w-full sm:w-2/3">
+                                        <input
+                                            type="number"
+                                            name="toClass"
+                                            placeholder="Enter Class "
+                                            value={formData.toClass}
+                                            onChange={handleChange}
+                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.toClass ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
+                                        />
+                                        {errors.toClass && <p className="text-red-500 text-xs mt-1 ml-2">{errors.toClass}</p>}
+                                    </div>
+                                </div>
+                            </form>
+                            <div className="flex flex-col sm:flex-row justify-center sm:justify-end mt-16 sm:mt-32 sm:mr-10 md:mr-18 lg:mr-40 space-y-4 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">
+                                <button
+                                    type="button"
+                                    onClick={handleCancel}
+                                    className="bg-white border border-blue-500 text-blue-500 font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:bg-blue-50 transition-colors duration-300"
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    onClick={handleSubmit}
+                                    type="submit"
+                                    className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:opacity-90 transition-opacity duration-300"
+                                >
+                                    Update
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -232,4 +302,4 @@ const EditFestival = () => {
     );
 };
 
-export default EditFestival;
+export default EditFestival

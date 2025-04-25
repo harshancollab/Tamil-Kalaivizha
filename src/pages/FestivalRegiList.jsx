@@ -1,3 +1,4 @@
+// IT Admin  Festival REG List
 import React, { useState, useRef, useEffect } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
@@ -11,22 +12,20 @@ const FestivalRegiList = () => {
     const navigate = useNavigate();
     const printRef = useRef();
     
-    // Pagination states
+    
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
-    // Initialize search parameters from URL
     useEffect(() => {
         const codeParam = searchParams.get('code');
         if (codeParam) setSearchCode(codeParam);
     }, [searchParams]);
 
-    // Reset pagination when search changes
     useEffect(() => {
         setCurrentPage(1);
     }, [searchCode]);
 
-    // Fetch data on component mount and when dependencies change
+    
     useEffect(() => {
         getAllresultentry();
     }, []);
@@ -63,7 +62,7 @@ const FestivalRegiList = () => {
             try {
                 const result = await deleteresultentryAPI(id, reqHeader)
                 if (result.status === 200) {
-                    // Refresh data after deletion
+                   
                     getAllresultentry();
                 }
             } catch (err) {
@@ -72,7 +71,7 @@ const FestivalRegiList = () => {
         }
     }
 
-    // Use actual data from API if available, otherwise use dummy data
+    
     const festivalData = resultentry.length > 0 ? resultentry : [
         { slNo: 1, code: "UP Tamilkalaivizha" },
         { slNo: 2, code: "HS Tamilkalaivizha" },
@@ -83,14 +82,14 @@ const FestivalRegiList = () => {
         { slNo: 7, code: "UP Tamilkalaivizha" },
     ];
 
-    // Filter results based on search code
+    
     const filteredData = searchCode 
         ? festivalData.filter(festival => 
             festival.code.toLowerCase().includes(searchCode.toLowerCase())
           )
         : festivalData;
 
-    // Pagination logic
+   
     const indexOfLastItem = currentPage * rowsPerPage;
     const indexOfFirstItem = indexOfLastItem - rowsPerPage;
     const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
@@ -102,7 +101,7 @@ const FestivalRegiList = () => {
         }
     };
 
-    // Function to update URL params
+  
     const updateURLParams = (params) => {
         const newParams = new URLSearchParams(searchParams);
         
@@ -117,12 +116,12 @@ const FestivalRegiList = () => {
         setSearchParams(newParams);
     };
 
-    // Handle search input changes
+    
     const handleSearchChange = (e) => {
         const value = e.target.value;
         setSearchCode(value);
         
-        // Update URL parameter
+        
         updateURLParams({ code: value });
     };
 
@@ -132,18 +131,18 @@ const FestivalRegiList = () => {
 
     const renderPageNumbers = () => {
         const pageNumbers = [];
-        // Dynamically adjust number of page buttons based on screen size
+      
         const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
 
         if (totalPages <= maxPageNumbersToShow) {
-            // Show all page numbers
+          
             for (let i = 1; i <= totalPages; i++) {
                 pageNumbers.push(i);
             }
         } else {
-            // Show limited page numbers with dots
+           
             if (currentPage <= 2) {
-                // Near the start
+                
                 for (let i = 1; i <= 3; i++) {
                     if (i <= totalPages) pageNumbers.push(i);
                 }
@@ -152,14 +151,14 @@ const FestivalRegiList = () => {
                     pageNumbers.push(totalPages);
                 }
             } else if (currentPage >= totalPages - 1) {
-                // Near the end
+                
                 pageNumbers.push(1);
                 pageNumbers.push('...');
                 for (let i = totalPages - 2; i <= totalPages; i++) {
                     if (i > 0) pageNumbers.push(i);
                 }
             } else {
-                // Middle
+               
                 pageNumbers.push(1);
                 if (currentPage > 3) pageNumbers.push('...');
                 pageNumbers.push(currentPage - 1);
@@ -263,14 +262,10 @@ const FestivalRegiList = () => {
 
                     {/* Pagination Controls */}
                     <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
-                        {/* Showing X of Y rows */}
                         <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
                             {filteredData.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} of ${filteredData.length} rows` : '0 rows'}
                         </div>
-
-                        {/* Pagination Controls */}
                         <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
-                            {/* Previous Button with icon */}
                             <button
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 1}
@@ -279,8 +274,6 @@ const FestivalRegiList = () => {
                                 <i className="fa-solid fa-angle-right transform rotate-180"></i>
                                 <span className="hidden sm:inline p-1">Previous</span>
                             </button>
-
-                            {/* Page Numbers */}
                             <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
                                 {renderPageNumbers().map((page, index) => (
                                     <button
@@ -294,8 +287,6 @@ const FestivalRegiList = () => {
                                     </button>
                                 ))}
                             </div>
-
-                            {/* Next Button with icon */}
                             <button
                                 onClick={() => handlePageChange(currentPage + 1)}
                                 disabled={currentPage === totalPages || totalPages === 0}

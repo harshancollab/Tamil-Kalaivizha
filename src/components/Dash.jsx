@@ -674,91 +674,157 @@ const Dash = () => {
           )}
           {user?.role === 'It Admin' && (
             <>
-              <div className="mb-4">
-                <Link to="/DistrictList"
-                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
-                    } p-2 rounded`}
-                  onClick={() => toggleMenu('settings')}
-                >
-                  <h2 className="text-lg font-semibold flex items-center">
-                  <i class="fa-regular fa-user mr-4"></i>District Registration
-                  </h2>
-                
-                </Link>
-                <Link to="/stage-duration-list"
-                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
-                    } p-2 rounded`}
-                  onClick={() => toggleMenu('settings')}
-                >
-                  <h2 className="text-lg font-semibold flex items-center">
-                  <i class="fa-regular fa-user mr-4"></i>Sub District Registration
-                  </h2>
-                
-                </Link>
-                <Link to="/SchoolRegList"
-                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
-                    } p-2 rounded`}
-                  onClick={() => toggleMenu('settings')}
-                >
-                  <h2 className="text-lg font-semibold flex items-center">
-                  <i class="fa-regular fa-user mr-4"></i>School Registration
-                  </h2>
-                
-                </Link>
-                <Link to="/FestivalRegiList"
-                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
-                    } p-2 rounded`}
-                  onClick={() => toggleMenu('settings')}
-                >
-                  <h2 className="text-lg font-semibold flex items-center">
-                  <i class="fa-regular fa-user mr-4"></i> Festival Registration
-                  </h2>
-                
-                </Link>
-                <Link to="/ItemRegistrationList"
-                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
-                    } p-2 rounded`}
-                  onClick={() => toggleMenu('settings')}
-                >
-                  <h2 className="text-lg font-semibold flex items-center">
-                  <i class="fa-regular fa-user mr-4"></i>Item Registration
-                  </h2>
-                
-                </Link>
-                <Link to="/CreateKalolsavam"
-                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
-                    } p-2 rounded`}
-                  onClick={() => toggleMenu('settings')}
-                >
-                  <h2 className="text-lg font-semibold flex items-center">
-                  <i class="fa-regular fa-user mr-4"></i>Create Kalolsavam
-                  </h2>
-                
-                </Link>
-                <Link to="/admin-panel"
-                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
-                    } p-2 rounded`}
-                  onClick={() => toggleMenu('settings')}
-                >
-                  <h2 className="text-lg font-semibold flex items-center">
-                  <i class="fa-regular fa-user mr-4"></i> Admin User
-                  </h2>
-                
-                </Link>
-                <Link to="/stage-duration-list"
-                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
-                    } p-2 rounded`}
-                  onClick={() => toggleMenu('settings')}
-                >
-                  <h2 className="text-lg font-semibold flex items-center">
-                  <i class="fa-regular fa-user mr-4"></i>Result
-                  </h2>
-                
-                </Link>
-              
 
-            
+              <div className="p-2  ">
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/DistrictList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                  }`}>
+                  <Link to="/DistrictList" className="text-lg font-semibold flex items-center cursor-pointer">
+                  <i class="fa-solid fa-map mr-3"></i>  District Registration
+                  </Link>
+                 
+
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/SubDisRegList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                  }`}>
+                  <Link to="/SubDisRegList" className="text-lg font-semibold flex items-center cursor-pointer">
+                  <i class="fa-solid fa-vector-square mr-3"></i> Sub District Registration 
+                  </Link>
+                 
+
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/SchoolRegList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                  }`}>
+                  <Link to="/SchoolRegList" className="text-lg font-semibold flex items-center cursor-pointer">
+                  <i class="fa-solid fa-building mr-3"></i> School Registration 
+                  </Link>
+                 
+
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/FestivalRegiList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                  }`}>
+                  <Link to="/FestivalRegiList" className="text-lg font-semibold flex items-center cursor-pointer">
+                  <i class="fa-solid fa-chart-diagram mr-3"></i>  Festival Registration
+                  </Link>
+                 
+
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/ItemRegistrationList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                  }`}>
+                  <Link to="/ItemRegistrationList" className="text-lg font-semibold flex items-center cursor-pointer">
+                  <i class="fa-solid fa-diagram-project mr-3"></i>Item Registration
+                  </Link>
+                 
+
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
+               
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/CreateKalolsavam') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                  }`}>
+                  <Link to="/CreateKalolsavam" className="text-lg font-semibold flex items-center cursor-pointer">
+                  <i class="fa-solid fa-pen-to-square mr-3"></i> Create Kalolsavam
+                  </Link>
+                 
+
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/admin-panel') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                  }`}>
+                  <Link to="/admin-panel" className="text-lg font-semibold flex items-center cursor-pointer">
+                  <i class="fa-solid fa-user mr-3"></i> Admin User
+                  </Link>
+                 
+
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/AdResult') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                  }`}>
+                  <Link to="/AdResult" className="text-lg font-semibold flex items-center cursor-pointer">
+                  <i class="fa-solid fa-note-sticky mr-3"></i>Result
+                  </Link>
+                 
+
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
+                {/* <div className={`flex justify-between items-center w-full mb-6 ${isActive('/admin-panel') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                  }`}>
+                  <Link to="/admin-panel" className="text-lg font-semibold flex items-center cursor-pointer">
+                    <i className="fa-solid fa-table mr-3" aria-hidden="true"></i>  Export
+                  </Link>
+                 
+
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div> */}
+               
+
               </div>
+              
+            
+            
+             
+             
+            
+
+
+
+
             </>
           )}
         </div>
