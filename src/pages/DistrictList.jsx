@@ -1,16 +1,16 @@
-// IT admin District Registration List
-
 import React, { useState, useRef, useEffect } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getAllResultentryListAPI } from '../services/allAPI';
-import html2pdf from 'html2pdf.js'; // Add this import for html2pdf
+import html2pdf from 'html2pdf.js'; 
 
 const DistrictList = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchCode, setSearchCode] = useState(searchParams.get('code') || '');
     const [districts, setDistricts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
     const printRef = useRef();
     
@@ -28,12 +28,6 @@ const DistrictList = () => {
     useEffect(() => {
         setCurrentPage(1);
     }, [searchCode]);
-
-    // Load dummy data on component mount
-    useEffect(() => {
-        // This would be replaced with your API call
-        setDistricts(dummyDistrictData);
-    }, []);
 
     // Dummy district data with relevant statistics
     const dummyDistrictData = [
@@ -53,28 +47,35 @@ const DistrictList = () => {
         { id: 14, name: "Kasaragod", totalSchools: 70, dataEntered: 58, dataNotEntered: 12, confirmed: 50, notConfirmed: 20 }
     ];
 
-   
-    // Fetch data on component mount
+    // Fetch data on component mount - temporarily just loading dummy data
     useEffect(() => {
-        getAllDistricts();
+        // Temporarily use dummy data instead of API call
+        setLoading(true);
+        setTimeout(() => {
+            setDistricts(dummyDistrictData);
+            setLoading(false);
+        }, 500); // simulate short loading time
+        
+        // Comment out the actual API call for now
+        // getAllDistricts();
     }, []);
 
+    // Keep the real API function for when you need to switch back
     const getAllDistricts = async () => {
         setLoading(true);
         setError(null);
         
-        const token = sessionStorage.getItem("token");
-        if (!token) {
-            setError("Authentication token not found. Please login again.");
-            setLoading(false);
-            return;
-        }
-        
-        const reqHeader = {
-            "Authorization": `Bearer ${token}`
-        };
-        
         try {
+            const token = sessionStorage.getItem("token");
+            if (!token) {
+                setError("Authentication token not found. Please login again.");
+                return;
+            }
+            
+            const reqHeader = {
+                "Authorization": `Bearer ${token}`
+            };
+            
             const result = await getAllResultentryListAPI(reqHeader);
             if (result.status === 200) {
                 setDistricts(result.data);
@@ -89,9 +90,7 @@ const DistrictList = () => {
         }
     };
 
-  
     const generatePDF = () => {
-        
         const pdfContent = document.createElement('div');
         
         const titleElement = document.createElement('h2');
@@ -128,6 +127,7 @@ const DistrictList = () => {
         // Create table body
         const tbody = document.createElement('tbody');
         
+        // Use the filtered and paginated data for PDF generation
         filteredData.forEach((district, index) => {
             const row = document.createElement('tr');
             
@@ -169,11 +169,10 @@ const DistrictList = () => {
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
         
-        
         html2pdf().from(pdfContent).set(options).save();
     };
 
-    //  Modified to redirect to SubDisRegList with district name in URL
+    // Modified to redirect to SubDisRegList with district name in URL
     const handleDistrictClick = (district) => {
         // Navigate to SubDisRegList page with district as URL parameter
         navigate(`/SubDistrictlist?district=${encodeURIComponent(district.name)}`);
@@ -307,92 +306,104 @@ const DistrictList = () => {
                         </div>
                     </div>
                     
-                    <div className="w-full">
-                        <div id="print-container" className="overflow-x-auto -mx-4 sm:mx-0">
-                            <div className="inline-block min-w-full align-middle px-4 sm:px-0">
-                                <div ref={printRef} className="shadow overflow-hidden sm:rounded-lg">
-                                    <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
-                                        <thead className="bg-gray-50">
-                                            <tr className="text-gray-700">
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">District Name</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Total Schools</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Data Entered</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Data Not Entered</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Confirmed</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Not Confirmed</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
-                                            {currentItems.length > 0 ? (
-                                                currentItems.map((district, index) => (
-                                                    <tr key={district.id} className="hover:bg-gray-100">
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
-                                                        <td 
-                                                            className="p-2 md:p-3 text-blue-500 whitespace-nowrap cursor-pointer hover:underline"
-                                                            onClick={() => handleDistrictClick(district)}
-                                                        >
-                                                            {district.name}
-                                                        </td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{district.totalSchools}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{district.dataEntered}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{district.dataNotEntered}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{district.confirmed}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{district.notConfirmed}</td>
-                                                    </tr>
-                                                ))
-                                            ) : (
-                                                <tr>
-                                                    <td colSpan="7" className="p-4 text-center text-gray-500">
-                                                        No districts found {searchCode ? `for "${searchCode}"` : ''}
-                                                    </td>
+                    {loading ? (
+                        <div className="flex justify-center items-center h-40">
+                            <p>Loading districts...</p>
+                        </div>
+                    ) : error ? (
+                        <div className="flex justify-center items-center h-40 text-red-500">
+                            <p>{error}</p>
+                        </div>
+                    ) : (
+                        <div className="w-full">
+                            <div id="print-container" className="overflow-x-auto -mx-4 sm:mx-0">
+                                <div className="inline-block min-w-full align-middle px-4 sm:px-0">
+                                    <div ref={printRef} className="shadow overflow-hidden sm:rounded-lg">
+                                        <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
+                                            <thead className="bg-gray-50">
+                                                <tr className="text-gray-700">
+                                                    <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
+                                                    <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">District Name</th>
+                                                    <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Total Schools</th>
+                                                    <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Data Entered</th>
+                                                    <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Data Not Entered</th>
+                                                    <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Confirmed</th>
+                                                    <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Not Confirmed</th>
                                                 </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
+                                                {currentItems.length > 0 ? (
+                                                    currentItems.map((district, index) => (
+                                                        <tr key={district.id} className="hover:bg-gray-100">
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
+                                                            <td 
+                                                                className="p-2 md:p-3 text-blue-500 whitespace-nowrap cursor-pointer hover:underline"
+                                                                onClick={() => handleDistrictClick(district)}
+                                                            >
+                                                                {district.name}
+                                                            </td>
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{district.totalSchools}</td>
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{district.dataEntered}</td>
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{district.dataNotEntered}</td>
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{district.confirmed}</td>
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{district.notConfirmed}</td>
+                                                        </tr>
+                                                    ))
+                                                ) : (
+                                                    <tr>
+                                                        <td colSpan="7" className="p-4 text-center text-gray-500">
+                                                            No districts found {searchCode ? `for "${searchCode}"` : ''}
+                                                        </td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Pagination Controls */}
-                    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
-                        <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
-                            {filteredData.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} of ${filteredData.length} rows` : '0 rows'}
-                        </div>
-
-                        <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
-                            <button
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1}
-                                className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
-                            >
-                                <i className="fa-solid fa-angle-right transform rotate-180"></i>
-                                <span className="hidden sm:inline p-1">Previous</span>
-                            </button>
-                            <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
-                                {renderPageNumbers().map((page, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => page !== '...' && handlePageChange(page)}
-                                        className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${
-                                            currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
-                                        } ${page === '...' ? 'pointer-events-none' : ''}`}
-                                    >
-                                        {page}
-                                    </button>
-                                ))}
+                    {!loading && !error && (
+                        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
+                            <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
+                                {filteredData.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} of ${filteredData.length} rows` : '0 rows'}
                             </div>
-                            <button
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage === totalPages || totalPages === 0}
-                                className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
-                            >
-                                <span className="hidden sm:inline p-1">Next</span>
-                                <i className="fa-solid fa-angle-right"></i>
-                            </button>
+
+                            <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                                <button
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
+                                >
+                                    <i className="fa-solid fa-angle-right transform rotate-180"></i>
+                                    <span className="hidden sm:inline p-1">Previous</span>
+                                </button>
+                                <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+                                    {renderPageNumbers().map((page, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => page !== '...' && handlePageChange(page)}
+                                            className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${
+                                                currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                                            } ${page === '...' ? 'pointer-events-none' : ''}`}
+                                        >
+                                            {page}
+                                        </button>
+                                    ))}
+                                </div>
+                                <button
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages || totalPages === 0}
+                                    className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
+                                >
+                                    <span className="hidden sm:inline p-1">Next</span>
+                                    <i className="fa-solid fa-angle-right"></i>
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </>
