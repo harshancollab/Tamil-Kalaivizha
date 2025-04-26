@@ -1,14 +1,17 @@
+// It Admin user - edit user
+
 import React, { useState, useEffect, useRef } from 'react';
 import Header from '../components/Header';
 import Dash from '../components/Dash';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
+// import { updateUserAPI } from '../services/allAPI';
 
 const EditUser = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { userId } = useParams();
     
-    // Parse redirect URL from query parameters if available
+    
     const queryParams = new URLSearchParams(location.search);
     const redirectUrl = queryParams.get('redirect') || '/admin-panel';
 
@@ -329,7 +332,7 @@ const EditUser = () => {
             reqBody.append('password', formData.password);
         }
     
-        // Get token from session storage
+    
         const token = sessionStorage.getItem("token");
         
         if (token) {
@@ -339,7 +342,7 @@ const EditUser = () => {
             };
             
             try {
-                // Replace with your actual API call function
+               
                 const result = await updateUserAPI(userId, reqBody, reqHeader);
                 
                 if (result.status === 200) {

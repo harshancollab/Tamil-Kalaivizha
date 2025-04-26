@@ -1,3 +1,5 @@
+// It Admin user - add user
+
 import React, { useState, useEffect, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
@@ -8,7 +10,7 @@ const AddUser = () => {
     const navigate = useNavigate();
     const location = useLocation();
     
-    // Get the redirect URL from query parameters if available
+    
     const params = new URLSearchParams(location.search);
     const redirectUrl = params.get('redirect') || '/admin-panel';
 
@@ -70,7 +72,7 @@ const AddUser = () => {
         subDistrict: ""
     });
     
-    // Add state for managing dropdown visibility
+ 
     const [dropdownOpen, setDropdownOpen] = useState({
         district: false,
         subDistrict: false
@@ -261,7 +263,7 @@ const AddUser = () => {
             newFormData = {
                 ...formData,
                 [name]: value,
-                subDistrict: ""  // Reset sub-district when district changes
+                subDistrict: ""  
             };
             // Close district dropdown after selection
             setDropdownOpen(prev => ({...prev, district: false}));
@@ -400,6 +402,7 @@ const AddUser = () => {
         
         navigate(redirectWithFilters);
     };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -601,7 +604,6 @@ const AddUser = () => {
                                 </div>
                             )}
                             
-                            {/* Only show Sub-district dropdown for Sub-district Admin AND when a valid district is selected */}
                             {formData.userType === "Sub-district Admin" && 
                              formData.district && 
                              formData.district !== "Select District" && (
@@ -609,7 +611,6 @@ const AddUser = () => {
                                     <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Sub District</label>
                                     <div className="w-full md:w-80">
                                         <div className="relative" ref={subDistrictDropdownRef}>
-                                            {/* Custom sub-district dropdown button */}
                                             <div
                                                 onClick={() => toggleDropdown('subDistrict')}
                                                 className="border px-2 py-1 rounded-full w-full border-blue-600 flex justify-between items-center cursor-pointer bg-white"
@@ -618,10 +619,8 @@ const AddUser = () => {
                                                 <span className="text-xs">▼</span>
                                             </div>
                                             
-                                            {/* Dropdown menu */}
                                             {dropdownOpen.subDistrict && (
                                                 <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
-                                                    {/* Search input */}
                                                     <div className="p-2 border-b">
                                                         <input
                                                             type="text"
@@ -633,7 +632,6 @@ const AddUser = () => {
                                                         />
                                                     </div>
                                                     
-                                                    {/* Options list */}
                                                     <div className="max-h-48 overflow-y-auto">
                                                         {filteredSubDistricts.map((subDistrict, index) => (
                                                             <div

@@ -1,17 +1,70 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { getAllKalolsavamAPI } from '../services/allAPI'
 
 const CreateKalolsavam = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const [searchParams, setSearchParams] = useSearchParams();
+    
     const [kalolsavams, setKalolsavams] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    
+    // Get initial filter values from URL or default to 'Select'
+    const initialDistrict = searchParams.get('district') || 'Select';
+    const initialSubDistrict = searchParams.get('subDistrict') || 'Select';
+    
     // Pagination states
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1'));
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    
+    // Filter states
+    const [selectedDistrict, setSelectedDistrict] = useState(initialDistrict);
+    const [selectedSubDistrict, setSelectedSubDistrict] = useState(initialSubDistrict);
+    const [filteredKalolsavams, setFilteredKalolsavams] = useState([]);
+
+    const allSubDistricts = [
+        'Select',
+        'Munnar',
+        'Adimali',
+        'Kattappana',
+        'Nedumkandam',
+        'Devikulam',
+        'Chittur',
+        'Pattambi',
+        'Kuzhalmannam',
+        'Nemmara',
+        'Mannarkkad',
+        'vatakara',
+        'Ottapalam'
+    ];
+
+    const allDistricts = [
+        'Select',
+        'Idukki',
+        'Ernakulam',
+        'Palakkad',
+        'Kozhikode',
+        'Wayanad',
+        'Thrissur',
+    ];
+  
+    const districtToSubDistrict = {
+        'Idukki': ['Munnar', 'Adimali', 'Kattappana', 'Nedumkandam', 'Devikulam'],
+        'Palakkad': ['Chittur', 'Pattambi', 'Kuzhalmannam', 'Nemmara', 'Mannarkkad', 'Ottapalam'],
+        'Ernakulam': [],
+        'Kozhikode': ['vatakara'],
+        'Wayanad': [],
+        'Thrissur': []
+    };
+
+    // Calculate available sub-districts based on selected district
+    const availableSubDistricts = selectedDistrict === 'Select' 
+        ? ['Select'] 
+        : ['Select', ...districtToSubDistrict[selectedDistrict] || []];
 
     const dummyKalolsavams = [
         {
@@ -21,106 +74,85 @@ const CreateKalolsavam = () => {
             venue: "Kochi",
             startDate: "2024-12-01",
             endDate: "2024-12-05",
+            district: "Ernakulam",
+            subDistrict: ""
         },
+        // ... other kalolsavams (unchanged)
         {
-            id: 2,
+            id: 12,
             kalolsavamName: " Idukki District Kalolsavam",
             year: 2024,
-            venue: "Palakkad",
+            venue: "Devikulam",
             startDate: "2024-12-01",
             endDate: "2024-12-05",
-        },
-        {
-            id: 1,
-            kalolsavamName: " School Kalolsavam",
-            year: 2024,
-            venue: "Kochi",
-            startDate: "2024-12-01",
-            endDate: "2024-12-05",
-        },
-        {
-            id: 2,
-            kalolsavamName: " Idukki District Kalolsavam",
-            year: 2024,
-            venue: "Palakkad",
-            startDate: "2024-12-01",
-            endDate: "2024-12-05",
-        },
-        {
-            id: 1,
-            kalolsavamName: " School Kalolsavam",
-            year: 2024,
-            venue: "Kochi",
-            startDate: "2024-12-01",
-            endDate: "2024-12-05",
-        },
-        {
-            id: 2,
-            kalolsavamName: " Idukki District Kalolsavam",
-            year: 2024,
-            venue: "Palakkad",
-            startDate: "2024-12-01",
-            endDate: "2024-12-05",
-        },
-        {
-            id: 1,
-            kalolsavamName: " School Kalolsavam",
-            year: 2024,
-            venue: "Kochi",
-            startDate: "2024-12-01",
-            endDate: "2024-12-05",
-        },
-        {
-            id: 2,
-            kalolsavamName: " Idukki District Kalolsavam",
-            year: 2024,
-            venue: "Palakkad",
-            startDate: "2024-12-01",
-            endDate: "2024-12-05",
-        },
-        {
-            id: 1,
-            kalolsavamName: " School Kalolsavam",
-            year: 2024,
-            venue: "Kochi",
-            startDate: "2024-12-01",
-            endDate: "2024-12-05",
-        },
-        {
-            id: 2,
-            kalolsavamName: " Idukki District Kalolsavam",
-            year: 2024,
-            venue: "Palakkad",
-            startDate: "2024-12-01",
-            endDate: "2024-12-05",
-        },
-        {
-            id: 1,
-            kalolsavamName: " School Kalolsavam",
-            year: 2024,
-            venue: "Kochi",
-            startDate: "2024-12-01",
-            endDate: "2024-12-05",
-        },
-        {
-            id: 2,
-            kalolsavamName: " Idukki District Kalolsavam",
-            year: 2024,
-            venue: "Palakkad",
-            startDate: "2024-12-01",
-            endDate: "2024-12-05",
+            district: "Idukki",
+            subDistrict: "Devikulam"
         },
     ];
+
+    // Update URL parameters
+    const updateUrlParams = (district, subDistrict, page) => {
+        const params = new URLSearchParams();
+        
+        if (district !== 'Select') {
+            params.set('district', district);
+        }
+        
+        if (subDistrict !== 'Select') {
+            params.set('subDistrict', subDistrict);
+        }
+        
+        if (page > 1) {
+            params.set('page', page.toString());
+        }
+        
+        // Update URL without refreshing the page
+        setSearchParams(params);
+    };
+
+    // Handle district change
+    const handleDistrictChange = (e) => {
+        const district = e.target.value;
+        setSelectedDistrict(district);
+        setSelectedSubDistrict('Select'); // Reset sub-district when district changes
+        applyFilters(district, 'Select');
+        updateUrlParams(district, 'Select', 1);
+    };
+
+    // Handle sub-district change
+    const handleSubDistrictChange = (e) => {
+        const subDistrict = e.target.value;
+        setSelectedSubDistrict(subDistrict);
+        applyFilters(selectedDistrict, subDistrict);
+        updateUrlParams(selectedDistrict, subDistrict, 1);
+    };
+
+    // Apply filters function
+    const applyFilters = (district, subDistrict) => {
+        let filtered = [...kalolsavams];
+        
+        if (district !== 'Select') {
+            filtered = filtered.filter(item => item.district === district);
+        }
+        
+        if (subDistrict !== 'Select') {
+            filtered = filtered.filter(item => item.subDistrict === subDistrict);
+        }
+        
+        setFilteredKalolsavams(filtered);
+        setCurrentPage(1); // Reset to first page when filtering
+    };
 
     // Pagination logic
     const indexOfLastItem = currentPage * rowsPerPage;
     const indexOfFirstItem = indexOfLastItem - rowsPerPage;
-    const currentItems = kalolsavams.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(kalolsavams.length / rowsPerPage);
+    const currentItems = filteredKalolsavams.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredKalolsavams.length / rowsPerPage);
 
     const handlePageChange = (pageNumber) => {
         if (pageNumber > 0 && pageNumber <= totalPages) {
             setCurrentPage(pageNumber);
+            updateUrlParams(selectedDistrict, selectedSubDistrict, pageNumber);
         }
     };
 
@@ -167,15 +199,41 @@ const CreateKalolsavam = () => {
         return pageNumbers;
     };
 
+    // Effect to load Kalolsavams and apply initial filters
     useEffect(() => {
         setLoading(true);
         setTimeout(() => {
             setKalolsavams(dummyKalolsavams);
+            setFilteredKalolsavams(dummyKalolsavams);
+            
+            // Apply initial filters from URL if they exist
+            if (initialDistrict !== 'Select' || initialSubDistrict !== 'Select') {
+                applyFilters(initialDistrict, initialSubDistrict);
+            }
+            
             setLoading(false);
         }, 500);
-
+        
         // getAllKalolsavams();
     }, []);
+
+    // Effect to handle URL parameter changes (e.g., when back button is pressed)
+    useEffect(() => {
+        const urlDistrict = searchParams.get('district') || 'Select';
+        const urlSubDistrict = searchParams.get('subDistrict') || 'Select';
+        const urlPage = parseInt(searchParams.get('page') || '1');
+        
+        // Only update if different from current state
+        if (urlDistrict !== selectedDistrict || urlSubDistrict !== selectedSubDistrict) {
+            setSelectedDistrict(urlDistrict);
+            setSelectedSubDistrict(urlSubDistrict);
+            applyFilters(urlDistrict, urlSubDistrict);
+        }
+        
+        if (urlPage !== currentPage) {
+            setCurrentPage(urlPage);
+        }
+    }, [location.search]);
 
     const getAllKalolsavams = async () => {
         try {
@@ -190,6 +248,13 @@ const CreateKalolsavam = () => {
 
                 if (result.status === 200) {
                     setKalolsavams(result.data);
+                    setFilteredKalolsavams(result.data);
+                    
+                    // Apply initial filters from URL if they exist
+                    if (initialDistrict !== 'Select' || initialSubDistrict !== 'Select') {
+                        applyFilters(initialDistrict, initialSubDistrict);
+                    }
+                    
                     setLoading(false);
                 } else {
                     setError("Failed to fetch Kalolsavam events");
@@ -211,8 +276,13 @@ const CreateKalolsavam = () => {
     };
 
     const handleEditClick = (kalolsavam) => {
-        navigate(`/EditKalosmAdm/${kalolsavam.id}`, {
-            state: { kalolsavam }
+        // Preserve the current filters in the URL when navigating
+        const params = new URLSearchParams(searchParams);
+        navigate(`/EditKalosmAdm/${kalolsavam.id}?${params.toString()}`, {
+            state: { 
+                kalolsavam,
+                returnPath: `/CreateKalolsavam?${params.toString()}`  // Include return path with filters
+            }
         });
     };
 
@@ -256,6 +326,56 @@ const CreateKalolsavam = () => {
                             Create Kalolsavam
                         </h2>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
+                            {/* District Filter */}
+                            <div className="relative w-full sm:w-auto">
+                                <select
+                                    className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                                    id="district-select"
+                                    value={selectedDistrict}
+                                    onChange={handleDistrictChange}
+                                >
+                                    {allDistricts.map((option, index) => (
+                                        <option key={`district-${index}`} value={option}>
+                                            {option}
+                                        </option>
+                                    ))}
+                                </select>
+                                <label
+                                    htmlFor="district-select"
+                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                                >
+                                    District
+                                </label>
+                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                                    <i className="fa-solid fa-chevron-down"></i>
+                                </div>
+                            </div>
+
+                            {/* Sub-District Filter */}
+                            <div className="relative w-full sm:w-auto">
+                                <select
+                                    className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                                    id="sub-district-select"
+                                    value={selectedSubDistrict}
+                                    onChange={handleSubDistrictChange}
+                                >
+                                    {availableSubDistricts.map((option, index) => (
+                                        <option key={`sub-district-${index}`} value={option}>
+                                            {option}
+                                        </option>
+                                    ))}
+                                </select>
+                                <label
+                                    htmlFor="sub-district-select"
+                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-2 peer-focus:text-blue-800 left-3"
+                                >
+                                    Sub District
+                                </label>
+                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                                    <i className="fa-solid fa-chevron-down"></i>
+                                </div>
+                            </div>
+
                             <button onClick={handleAddClick}
                                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-8 rounded-full w-full sm:w-auto"
                             >
@@ -263,6 +383,8 @@ const CreateKalolsavam = () => {
                             </button>
                         </div>
                     </div>
+                    
+                    {/* Table and pagination sections remain unchanged */}
                     <div className="overflow-x-auto">
                         <table className="w-full min-w-[600px]">
                             <thead>
@@ -277,36 +399,42 @@ const CreateKalolsavam = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {currentItems.map((kalolsavam, index) => (
-                                    <tr
-                                        key={kalolsavam.id}
-                                        className="text-[#616262] hover:bg-gray-200"
-                                    >
-                                        <td className="text-black p-2 md:p-3">{indexOfFirstItem + index + 1}</td>
-                                        <td className="p-2 md:p-3 font-semibold whitespace-nowrap">{kalolsavam.kalolsavamName}</td>
-                                        <td className="p-2 md:p-3">{kalolsavam.year}</td>
-                                        <td className="p-2 md:p-3 whitespace-nowrap">{kalolsavam.venue}</td>
-                                        <td className="p-2 md:p-3">{kalolsavam.startDate}</td>
-                                        <td className="p-2 md:p-3">{kalolsavam.endDate}</td>
-                                        <td className="p-2 md:p-3">
-                                            <button
-                                                onClick={() => handleEditClick(kalolsavam)}
-                                                className="text-blue-500 hover:text-blue-700"
-                                            >
-                                                <i className="fa-solid fa-pen-to-square"></i>
-                                            </button>
-                                        </td>
+                                {currentItems.length > 0 ? (
+                                    currentItems.map((kalolsavam, index) => (
+                                        <tr
+                                            key={kalolsavam.id}
+                                            className="text-[#616262] hover:bg-gray-200"
+                                        >
+                                            <td className="text-black p-2 md:p-3">{indexOfFirstItem + index + 1}</td>
+                                            <td className="p-2 md:p-3 font-semibold whitespace-nowrap">{kalolsavam.kalolsavamName}</td>
+                                            <td className="p-2 md:p-3">{kalolsavam.year}</td>
+                                            <td className="p-2 md:p-3 whitespace-nowrap">{kalolsavam.venue}</td>
+                                            <td className="p-2 md:p-3">{kalolsavam.startDate}</td>
+                                            <td className="p-2 md:p-3">{kalolsavam.endDate}</td>
+                                            <td className="p-2 md:p-3">
+                                                <button
+                                                    onClick={() => handleEditClick(kalolsavam)}
+                                                    className="text-blue-500 hover:text-blue-700"
+                                                >
+                                                    <i className="fa-solid fa-pen-to-square"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="9" className="text-center p-4">No records found</td>
                                     </tr>
-                                ))}
+                                )}
                             </tbody>
                         </table>
                     </div>
 
-                    {/* Pagination Controls - Added from FestivalRegiList */}
+                    {/* Pagination Controls */}
                     <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
                         {/* Showing X of Y rows */}
                         <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
-                            {kalolsavams.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, kalolsavams.length)} of ${kalolsavams.length} rows` : '0 rows'}
+                            {filteredKalolsavams.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredKalolsavams.length)} of ${filteredKalolsavams.length} rows` : '0 rows'}
                         </div>
 
                         {/* Pagination Controls */}
@@ -314,7 +442,7 @@ const CreateKalolsavam = () => {
                             {/* Previous Button with icon */}
                             <button
                                 onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1}
+                                disabled={currentPage === 1 || totalPages === 0}
                                 className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
                             >
                                 <i className="fa-solid fa-angle-right transform rotate-180"></i>

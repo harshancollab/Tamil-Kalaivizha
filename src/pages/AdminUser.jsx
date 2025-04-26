@@ -178,23 +178,7 @@ const AdminUser = () => {
         }
     };
 
-    // Implement the API functions that were commented out
-    const getAllAdminuserAPI = async (reqHeader) => {
-        try {
-            // Replace this with your actual API call when available
-            const response = await fetch('/api/adminuser', {
-                method: 'GET',
-                headers: reqHeader
-            });
-            return {
-                status: 200,
-                data: [] // This would normally be response.json()
-            };
-        } catch (error) {
-            console.error("Error fetching admin users:", error);
-            throw error;
-        }
-    };
+  
     const getAllAdminuser = async () => {
         const token = sessionStorage.getItem("token");
         if (token) {
@@ -215,12 +199,12 @@ const AdminUser = () => {
         }
     }
 
-    // Handle edit user - MODIFIED TO PRESERVE FILTERS
+   
     const handleEditRedirect = (resultEntry) => {
-        // Create a query string with the current filter parameters
+      
         const params = new URLSearchParams();
 
-        // Add the current filter states to params
+    
         if (selectedUserType !== 'Select') {
             params.append('usertype', selectedUserType);
         }
@@ -233,18 +217,18 @@ const AdminUser = () => {
             params.append('subdistrict', selectedSubDistrict);
         }
 
-        // Also add the current search code if any
+ 
         if (searchCode) {
             params.append('code', searchCode);
         }
 
-        // Add return URL with all current params
+ 
         params.append('returnUrl', `/AdminUser?${searchParams.toString()}`);
 
         navigate(`/EditUser/${resultEntry.slNo}`, {
             state: {
                 resultEntry,
-                filterParams: params.toString() // Pass filter params in state as well as backup
+                filterParams: params.toString() 
             }
         });
     };
@@ -274,55 +258,46 @@ const AdminUser = () => {
                 return;
             }
 
-            // Uncomment when API is available
             // const result = await deleteAdminuserAPI(id, reqHeader);
 
-            // Check response status when API is implemented
+            
             // if (result.status === 200) {
-            //     // Success message
+            
             //     alert("User deleted successfully");
-            //     getAllAdminuser(); // Refresh the list
+            //     getAllAdminuser(); 
             // } else {
-            //     throw new Error("Failed to delete user");
+            //      Error("Failed to delete user");
             // }
 
             console.log("Delete clicked for ID:", id);
 
-            // For now, simulate success since API call is commented out
             alert("User would be deleted if API was connected");
             getAllAdminuser();
 
         } catch (err) {
             console.error("Error deleting user:", err);
 
-            // Provide specific error messages based on error type
             if (err.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
                 if (err.response.status === 401) {
                     alert("Session expired. Please login again.");
-                    // Optionally redirect to login page
                     // navigate('/login');
                 } else if (err.response.status === 403) {
                     alert("You don't have permission to delete this user");
                 } else if (err.response.status === 404) {
                     alert("User not found. It may have been already deleted.");
-                    getAllAdminuser(); // Refresh to show current state
+                    getAllAdminuser(); 
                 } else {
                     alert(`Error: ${err.response.data.message || "Failed to delete user"}`);
                 }
             } else if (err.request) {
-                // The request was made but no response was received
                 alert("Server is not responding. Please try again later.");
             } else {
-                // Something happened in setting up the request
                 alert("An error occurred while trying to delete the user");
             }
         } finally {
             setLoading(false);
         }
     };
-    // Dummy data
     const resultData = [
         { slNo: 1, regNo: "Idukii", code: "District Admin", district: "Idukki", subDistrict: "Munnar", mark2: 78, mark3: 92, total: 255, markPercentage: 85, rank: 2, grade: "A", point: 9.5 },
         { slNo: 2, regNo: "Palakkad", code: "District Admin", district: "Palakkad", subDistrict: "Chittur", mark2: 88, mark3: 95, total: 273, markPercentage: 91, rank: 1, grade: "A+", point: 10.0 },
@@ -337,32 +312,27 @@ const AdminUser = () => {
         { slNo: 11, regNo: "Mannarkkad", code: "Sub-district Admin", district: "Palakkad", subDistrict: "Mannarkkad" },
     ];
 
-    // Filter results based on search code and dropdown selections
     const filteredResultData = () => {
         let filtered = [...resultData];
 
-        // First filter by code if present
         if (searchCode) {
             filtered = filtered.filter(result =>
                 result.code && result.code.toLowerCase().includes(searchCode.toLowerCase())
             );
         }
 
-        // Filter by selected District
         if (selectedDistrict !== 'Select') {
             filtered = filtered.filter(result =>
                 result.district === selectedDistrict
             );
         }
 
-        // Filter by selected Sub District
         if (selectedSubDistrict !== 'Select') {
             filtered = filtered.filter(result =>
                 result.subDistrict === selectedSubDistrict
             );
         }
 
-        // Filter by selected User Type
         if (selectedUserType !== 'Select') {
             filtered = filtered.filter(result =>
                 result.code === selectedUserType
@@ -372,12 +342,10 @@ const AdminUser = () => {
         return filtered;
     };
 
-    // Reset pagination when search or filter changes
     useEffect(() => {
         setCurrentPage(1);
     }, [searchCode, selectedDistrict, selectedSubDistrict, selectedUserType]);
 
-    // Pagination logic
     const filteredData = filteredResultData();
     const indexOfLastItem = currentPage * rowsPerPage;
     const indexOfFirstItem = indexOfLastItem - rowsPerPage;
@@ -391,10 +359,8 @@ const AdminUser = () => {
     };
 
     const generatePDF = () => {
-        // Create a new div element for PDF content
         const pdfContent = document.createElement('div');
 
-        // Add title
         const titleElement = document.createElement('h2');
         titleElement.textContent = "Admin User List";
         titleElement.style.textAlign = 'center';
@@ -402,7 +368,6 @@ const AdminUser = () => {
         titleElement.style.fontWeight = 'bold';
         pdfContent.appendChild(titleElement);
 
-        // Add filter information if any filter is applied
         if (selectedDistrict !== 'Select' || selectedSubDistrict !== 'Select' || selectedUserType !== 'Select') {
             const filterInfo = document.createElement('div');
             filterInfo.style.marginBottom = '15px';
@@ -418,17 +383,14 @@ const AdminUser = () => {
             pdfContent.appendChild(filterInfo);
         }
 
-        // Create table
         const table = document.createElement('table');
         table.style.width = '100%';
         table.style.borderCollapse = 'collapse';
         table.style.marginBottom = '20px';
 
-        // Create table header
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
 
-        // Headers for the PDF table
         const headers = ['Sl No', 'User Name', 'User Type'];
         headers.forEach(headerText => {
             const th = document.createElement('th');
@@ -443,18 +405,15 @@ const AdminUser = () => {
         thead.appendChild(headerRow);
         table.appendChild(thead);
 
-        // Create table body
         const tbody = document.createElement('tbody');
 
-        // Use filtered data for PDF
         const filteredData = filteredResultData();
 
         filteredData.forEach((result, index) => {
             const row = document.createElement('tr');
 
-            // Add cells
             const cellData = [
-                index + 1, // Adjust serial number
+                index + 1, 
                 result.regNo || '-',
                 result.code || '-'
 
@@ -475,7 +434,6 @@ const AdminUser = () => {
         table.appendChild(tbody);
         pdfContent.appendChild(table);
 
-        // Footer with date and time
         const footer = document.createElement('div');
         footer.style.marginTop = '30px';
         footer.style.fontSize = '10px';
@@ -488,10 +446,8 @@ const AdminUser = () => {
 
         pdfContent.appendChild(footer);
 
-        // PDF filename
         const fileName = 'Admin_User_List.pdf';
 
-        // PDF options
         const options = {
             margin: 10,
             filename: fileName,
@@ -500,15 +456,12 @@ const AdminUser = () => {
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        // Generate and download PDF
         html2pdf().from(pdfContent).set(options).save();
     };
 
-    // Function to print directly to printer
     const handlePrintTable = () => {
         const printWindow = window.open('', '_blank');
 
-        // Create print content
         printWindow.document.write(`
             <html>
                 <head>
@@ -559,7 +512,6 @@ const AdminUser = () => {
                     <h2>Admin User List</h2>
         `);
 
-        // Add filter information if any filter is applied
         if (selectedDistrict !== 'Select' || selectedSubDistrict !== 'Select' || selectedUserType !== 'Select') {
             const filterDetails = [];
             if (selectedDistrict !== 'Select') filterDetails.push(`District: ${selectedDistrict}`);
@@ -573,7 +525,6 @@ const AdminUser = () => {
             `);
         }
 
-        // Add table
         printWindow.document.write('<table>');
         printWindow.document.write(`
             <thead>
@@ -586,7 +537,6 @@ const AdminUser = () => {
             </thead>
         `);
 
-        // Add table body with data
         printWindow.document.write('<tbody>');
 
         const filteredData = filteredResultData();
@@ -615,7 +565,6 @@ const AdminUser = () => {
         printWindow.document.write('</tbody>');
         printWindow.document.write('</table>');
 
-        // Add footer
         const currentDate = new Date();
         const dateTimeStr = currentDate.toLocaleString();
         printWindow.document.write(`
@@ -624,7 +573,6 @@ const AdminUser = () => {
             </div>
         `);
 
-        // Add print button
         printWindow.document.write(`
             <div class="no-print" style="text-align: center; margin-top: 20px;">
                 <button onclick="window.print();" style="padding: 8px 16px; background-color: #4285f4; color: white; border: none; border-radius: 4px; cursor: pointer;">
@@ -644,18 +592,14 @@ const AdminUser = () => {
 
     const renderPageNumbers = () => {
         const pageNumbers = [];
-        // Dynamically adjust number of page buttons based on screen size
         const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
 
         if (totalPages <= maxPageNumbersToShow) {
-            // Show all page numbers
             for (let i = 1; i <= totalPages; i++) {
                 pageNumbers.push(i);
             }
         } else {
-            // Show limited page numbers with dots
             if (currentPage <= 2) {
-                // Near the start
                 for (let i = 1; i <= 3; i++) {
                     if (i <= totalPages) pageNumbers.push(i);
                 }
@@ -664,14 +608,12 @@ const AdminUser = () => {
                     pageNumbers.push(totalPages);
                 }
             } else if (currentPage >= totalPages - 1) {
-                // Near the end
                 pageNumbers.push(1);
                 pageNumbers.push('...');
                 for (let i = totalPages - 2; i <= totalPages; i++) {
                     if (i > 0) pageNumbers.push(i);
                 }
             } else {
-                // Middle
                 pageNumbers.push(1);
                 if (currentPage > 3) pageNumbers.push('...');
                 pageNumbers.push(currentPage - 1);
@@ -686,15 +628,11 @@ const AdminUser = () => {
     };
 
 
-    // Modified to pass filter data to AddUser page and preserve current filters for return
     const handleAddClick = () => {
         const params = new URLSearchParams();
 
-        // If there's a redirect URL you want to return to, add it
-        // Include the current filters in the return URL
         params.append('redirect', `/AdminUser?${searchParams.toString()}`);
 
-        // Pass selected filters to the Add User page
         if (selectedUserType !== 'Select') {
             params.append('userType', selectedUserType);
         }
@@ -711,32 +649,24 @@ const AdminUser = () => {
         navigate(`/AddUser?${queryString}`);
     };
 
-    // Function to determine if District Select should be displayed
-    // Show District select for District Admin and Sub-district Admin types only
     const shouldShowDistrictSelect = () => {
         return selectedUserType === 'District Admin' || selectedUserType === 'Sub-district Admin';
     };
 
-    // Function to determine if Sub District Select should be displayed
-    // Only show Sub-district select when user type is Sub-district Admin AND a district is selected
     const shouldShowSubDistrictSelect = () => {
         return selectedUserType === 'Sub-district Admin' && selectedDistrict !== 'Select';
     };
 
-    // FIXED: Handle select changes with connected dropdown logic
     const handleSubDistrictChange = (e) => {
         const value = e.target.value;
         setSelectedSubDistrict(value);
 
-        // Update URL parameters consistently
         const updatedParams = new URLSearchParams(searchParams);
 
         if (value !== 'Select') {
-            // Set both specific and general parameters
             updatedParams.set('subdistrict', value);
             updatedParams.set('p', value);
 
-            // Make sure district is set correctly for this sub-district
             for (const [district, subDistricts] of Object.entries(districtToSubDistrict)) {
                 if (subDistricts.includes(value)) {
                     setSelectedDistrict(district);
@@ -745,9 +675,7 @@ const AdminUser = () => {
                 }
             }
         } else {
-            // Clear only the sub-district parameter, keep district
             updatedParams.delete('subdistrict');
-            // Don't clear p parameter if it matches another filter
             if (searchParams.get('p') === searchParams.get('subdistrict')) {
                 updatedParams.delete('p');
             }
@@ -756,30 +684,23 @@ const AdminUser = () => {
         setSearchParams(updatedParams);
     };
 
-    // FIXED: Handle district change
     const handleDistrictChange = (e) => {
         const value = e.target.value;
         setSelectedDistrict(value);
 
-        // Always reset sub-district when district changes
         setSelectedSubDistrict('Select');
         updateAvailableSubDistricts(value);
 
-        // Update URL parameters
         const updatedParams = new URLSearchParams(searchParams);
 
         if (value !== 'Select') {
-            // Set both specific parameter and general p parameter
             updatedParams.set('district', value);
             updatedParams.set('p', value);
-            // Clear sub-district when district changes
             updatedParams.delete('subdistrict');
         } else {
-            // Clear district and sub-district parameters
             updatedParams.delete('district');
             updatedParams.delete('subdistrict');
 
-            // Only clear p if it was set to the same value as district
             if (searchParams.get('p') === searchParams.get('district')) {
                 updatedParams.delete('p');
             }
@@ -788,28 +709,22 @@ const AdminUser = () => {
         setSearchParams(updatedParams);
     };
 
-    // FIXED: Handle user type change
     const handleUserTypeChange = (e) => {
         const value = e.target.value;
         setSelectedUserType(value);
 
-        // Reset dependent fields
         setSelectedDistrict('Select');
         setSelectedSubDistrict('Select');
         updateAvailableDistricts(value);
 
-        // Update URL parameters
         const updatedParams = new URLSearchParams(searchParams);
 
         if (value !== 'Select') {
-            // Set both usertype and p parameters
             updatedParams.set('usertype', value);
             updatedParams.set('p', value);
-            // Clear district and subdistrict filters
             updatedParams.delete('district');
             updatedParams.delete('subdistrict');
         } else {
-            // Clear all filter parameters
             updatedParams.delete('usertype');
             updatedParams.delete('district');
             updatedParams.delete('subdistrict');
@@ -833,7 +748,6 @@ const AdminUser = () => {
                                 Admin User
                             </h2>
                             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-4 mt-4 sm:mt-0">
-                                {/* Add User and Print buttons in the top row */}
                                 <button
                                     onClick={handleAddClick}
                                     className="text-transparent bg-clip-text bg-gradient-to-r from-blue-900 to-blue-400 border border-blue-500 py-2 px-6 rounded-full flex items-center justify-center shrink-0 w-full sm:w-auto hover:shadow-md transition-all duration-300"
@@ -849,9 +763,7 @@ const AdminUser = () => {
                             </div>
                         </div>
 
-                        {/* Dropdown selects in a separate row, aligned to the right */}
                         <div className="flex flex-col sm:flex-row gap-4 sm:gap-4 sm:justify-end">
-                            {/* Sub District Select - Only shown for Sub-district Admin when a district is selected */}
                             {shouldShowSubDistrictSelect() && (
                                 <div className="relative w-full sm:w-auto">
                                     <select
@@ -878,7 +790,6 @@ const AdminUser = () => {
                                     </div>
                                 </div>
                             )}
-                            {/* District Select - Only shown for District Admin and Sub-district Admin */}
                             {shouldShowDistrictSelect() && (
                                 <div className="relative w-full sm:w-auto">
                                     <select
@@ -904,7 +815,6 @@ const AdminUser = () => {
                                     </div>
                                 </div>
                             )}
-                            {/* User Type Select - Always shown */}
                             <div className="relative w-full sm:w-auto">
                                 <select
                                     className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
@@ -989,16 +899,11 @@ const AdminUser = () => {
                                             )}
                                         </tbody>
                                     </table>
-                                    {/* Pagination Controls */}
                                     <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
-                                        {/* Showing X of Y rows */}
                                         <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
                                             {filteredData.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} of ${filteredData.length} rows` : '0 rows'}
                                         </div>
-
-                                        {/* Pagination Controls */}
                                         <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
-                                            {/* Previous Button with icon */}
                                             <button
                                                 onClick={() => handlePageChange(currentPage - 1)}
                                                 disabled={currentPage === 1}
@@ -1008,7 +913,6 @@ const AdminUser = () => {
                                                 <span className="hidden sm:inline p-1">Previous</span>
                                             </button>
 
-                                            {/* Page Numbers */}
                                             <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
                                                 {renderPageNumbers().map((page, index) => (
                                                     <button
@@ -1021,8 +925,6 @@ const AdminUser = () => {
                                                     </button>
                                                 ))}
                                             </div>
-
-                                            {/* Next Button with icon */}
                                             <button
                                                 onClick={() => handlePageChange(currentPage + 1)}
                                                 disabled={currentPage === totalPages || totalPages === 0}

@@ -1,3 +1,4 @@
+// It admin result list
 import React, { useEffect, useState, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
@@ -57,14 +58,7 @@ const AdResult = () => {
         'Wayanad',
         'Thrissur',
     ];
-    const Festivel = [
-        'Select',
-        'ALL Festival',
-        'UP Kalaivizha',
-        'LP Kalaivizha',
-        'HS Kalaivizha',
-        'HSS Kalaivizha'
-    ];
+  
 
     const districtToSubDistrict = {
         'Idukki': ['Munnar', 'Adimali', 'Kattappana', 'Nedumkandam', 'Devikulam'],
@@ -74,6 +68,14 @@ const AdResult = () => {
         'Wayanad': [],
         'Thrissur': []
     };
+    const Festivel = [
+        'Select',
+        'ALL Festival',
+        'UP Kalaivizha',
+        'LP Kalaivizha',
+        'HS Kalaivizha',
+        'HSS Kalaivizha'
+    ];
 
     // Sample data for demonstration
     const resultData = [
@@ -595,29 +597,7 @@ const AdResult = () => {
                             Result List
                         </h2>
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-                            <div className="relative w-full sm:w-auto">
-                                <select
-                                    className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                                    id="festival-select"
-                                    onChange={handleFestivalChange}
-                                    value={selectedFestival}
-                                >
-                                    {Festivel.map((option, index) => (
-                                        <option key={`festival-${index}`} value={option}>
-                                            {option}
-                                        </option>
-                                    ))}
-                                </select>
-                                <label
-                                    htmlFor="festival-select"
-                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
-                                >
-                                    Festival
-                                </label>
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                                    <i className="fa-solid fa-chevron-down"></i>
-                                </div>
-                            </div>
+                            
 
                             {/* Reorder District and SubDistrict for correct display order */}
                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -671,6 +651,29 @@ const AdResult = () => {
                                         <i className="fa-solid fa-chevron-down"></i>
                                     </div>
                                 </div>
+                                <div className="relative w-full sm:w-auto">
+                                <select
+                                    className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                                    id="festival-select"
+                                    onChange={handleFestivalChange}
+                                    value={selectedFestival}
+                                >
+                                    {Festivel.map((option, index) => (
+                                        <option key={`festival-${index}`} value={option}>
+                                            {option}
+                                        </option>
+                                    ))}
+                                </select>
+                                <label
+                                    htmlFor="festival-select"
+                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                                >
+                                    Festival
+                                </label>
+                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                                    <i className="fa-solid fa-chevron-down"></i>
+                                </div>
+                            </div>
                             </div>
                             <button
                                 onClick={generatePDF}
