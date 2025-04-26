@@ -755,7 +755,7 @@ const Dash = () => {
                 <div className={`flex justify-between items-center w-full mb-6 ${isActive('/CreateKalolsavam') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''
                   }`}>
                   <Link to="/CreateKalolsavam" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i class="fa-solid fa-pen-to-square mr-3"></i> Create Kalolsavam
+                  <i class="fas fa-pen-to-square mr-3"></i> Create Kalolsavam
                   </Link>
                  
 
@@ -785,7 +785,7 @@ const Dash = () => {
                 <div className={`flex justify-between items-center w-full mb-6 ${isActive('/AdResult') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''
                   }`}>
                   <Link to="/AdResult" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i class="fa-solid fa-note-sticky mr-3"></i>Result List
+                  <i class="fa-solid fa-file mr-3"></i>Result List
                   </Link>
                  
 
@@ -800,7 +800,8 @@ const Dash = () => {
                 <div className={`flex justify-between items-center w-full mb-6 ${isActive('/ExportIT') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''
                   }`}>
                   <Link to="/ExportIT" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i class="fa-solid fa-note-sticky mr-3"></i>Export
+                  <i class="fa-solid fa-arrow-up-right-from-square mr-3"></i>
+                  Export
                   </Link>
                  
 
@@ -815,7 +816,8 @@ const Dash = () => {
                 <div className={`flex justify-between items-center w-full mb-6 ${isActive('/LogOut') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''
                   }`}>
                   <Link to="/LogOut" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i class="fa-solid fa-note-sticky mr-3"></i>Logo Out
+                  <i class="fa-solid fa-right-from-bracket mr-3"></i>
+                  Logo Out
                   </Link>
                  
 

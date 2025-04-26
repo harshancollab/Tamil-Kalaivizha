@@ -1,3 +1,4 @@
+// IT Admin  cerate kalolsavum
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import Header from '../components/Header'
@@ -25,6 +26,7 @@ const CreateKalolsavam = () => {
     const [selectedDistrict, setSelectedDistrict] = useState(initialDistrict);
     const [selectedSubDistrict, setSelectedSubDistrict] = useState(initialSubDistrict);
     const [filteredKalolsavams, setFilteredKalolsavams] = useState([]);
+    const [availableSubDistricts, setAvailableSubDistricts] = useState(['Select']);
 
     const allSubDistricts = [
         'Select',
@@ -61,11 +63,6 @@ const CreateKalolsavam = () => {
         'Thrissur': []
     };
 
-    // Calculate available sub-districts based on selected district
-    const availableSubDistricts = selectedDistrict === 'Select' 
-        ? ['Select'] 
-        : ['Select', ...districtToSubDistrict[selectedDistrict] || []];
-
     const dummyKalolsavams = [
         {
             id: 1,
@@ -90,41 +87,55 @@ const CreateKalolsavam = () => {
         },
     ];
 
-    // Update URL parameters
-    const updateUrlParams = (district, subDistrict, page) => {
-        const params = new URLSearchParams();
-        
-        if (district !== 'Select') {
-            params.set('district', district);
+    // Helper function to update URL params
+    const updateUrlParams = (newParams) => {
+        const currentParams = Object.fromEntries(searchParams.entries());
+        const updatedParams = { ...currentParams, ...newParams };
+
+        // Remove params with value 'Select' or empty values
+        Object.keys(updatedParams).forEach(key => {
+            if (updatedParams[key] === '' || 
+                (key !== 'page' && updatedParams[key] === 'Select')) {
+                delete updatedParams[key];
+            }
+        });
+
+        // If page is 1, remove it from the URL
+        if (updatedParams.page === '1') {
+            delete updatedParams.page;
         }
-        
-        if (subDistrict !== 'Select') {
-            params.set('subDistrict', subDistrict);
-        }
-        
-        if (page > 1) {
-            params.set('page', page.toString());
-        }
-        
-        // Update URL without refreshing the page
-        setSearchParams(params);
+
+        setSearchParams(updatedParams);
     };
 
     // Handle district change
     const handleDistrictChange = (e) => {
         const district = e.target.value;
         setSelectedDistrict(district);
-        setSelectedSubDistrict('Select'); // Reset sub-district when district changes
+        
+        // Update available sub-districts based on selected district
+        if (district === 'Select') {
+            setAvailableSubDistricts(['Select']);
+            setSelectedSubDistrict('Select');
+        } else {
+            const subDistricts = ['Select', ...(districtToSubDistrict[district] || [])];
+            setAvailableSubDistricts(subDistricts);
+            setSelectedSubDistrict('Select');
+        }
+        
+        // Update URL params and apply filters
+        updateUrlParams({ district: district, subDistrict: 'Select', page: '1' });
         applyFilters(district, 'Select');
-        updateUrlParams(district, 'Select', 1);
     };
 
     // Handle sub-district change
     const handleSubDistrictChange = (e) => {
         const subDistrict = e.target.value;
         setSelectedSubDistrict(subDistrict);
+        
+        // Update URL params and apply filters
+        updateUrlParams({ subDistrict: subDistrict, page: '1' });
         applyFilters(selectedDistrict, subDistrict);
-        updateUrlParams(selectedDistrict, subDistrict, 1);
     };
 
     // Apply filters function
@@ -152,7 +163,7 @@ const CreateKalolsavam = () => {
     const handlePageChange = (pageNumber) => {
         if (pageNumber > 0 && pageNumber <= totalPages) {
             setCurrentPage(pageNumber);
-            updateUrlParams(selectedDistrict, selectedSubDistrict, pageNumber);
+            updateUrlParams({ page: pageNumber.toString() });
         }
     };
 
@@ -206,6 +217,12 @@ const CreateKalolsavam = () => {
             setKalolsavams(dummyKalolsavams);
             setFilteredKalolsavams(dummyKalolsavams);
             
+            // Setup available sub-districts based on the initially selected district
+            if (initialDistrict !== 'Select') {
+                const subDistricts = ['Select', ...(districtToSubDistrict[initialDistrict] || [])];
+                setAvailableSubDistricts(subDistricts);
+            }
+            
             // Apply initial filters from URL if they exist
             if (initialDistrict !== 'Select' || initialSubDistrict !== 'Select') {
                 applyFilters(initialDistrict, initialSubDistrict);
@@ -226,7 +243,17 @@ const CreateKalolsavam = () => {
         // Only update if different from current state
         if (urlDistrict !== selectedDistrict || urlSubDistrict !== selectedSubDistrict) {
             setSelectedDistrict(urlDistrict);
-            setSelectedSubDistrict(urlSubDistrict);
+            
+            // Update available sub-districts based on selected district
+            if (urlDistrict === 'Select') {
+                setAvailableSubDistricts(['Select']);
+                setSelectedSubDistrict('Select');
+            } else {
+                const subDistricts = ['Select', ...(districtToSubDistrict[urlDistrict] || [])];
+                setAvailableSubDistricts(subDistricts);
+                setSelectedSubDistrict(urlSubDistrict);
+            }
+            
             applyFilters(urlDistrict, urlSubDistrict);
         }
         
@@ -250,6 +277,12 @@ const CreateKalolsavam = () => {
                     setKalolsavams(result.data);
                     setFilteredKalolsavams(result.data);
                     
+                    // Setup available sub-districts based on the initially selected district
+                    if (initialDistrict !== 'Select') {
+                        const subDistricts = ['Select', ...(districtToSubDistrict[initialDistrict] || [])];
+                        setAvailableSubDistricts(subDistricts);
+                    }
+                    
                     // Apply initial filters from URL if they exist
                     if (initialDistrict !== 'Select' || initialSubDistrict !== 'Select') {
                         applyFilters(initialDistrict, initialSubDistrict);
@@ -272,7 +305,9 @@ const CreateKalolsavam = () => {
     };
 
     const handleAddClick = () => {
-        navigate('/AddKalosavam');
+        // Preserve the current filters in the URL when navigating
+        const currentParams = new URLSearchParams(searchParams);
+        navigate(`/AddKalosavam?${currentParams.toString()}`);
     };
 
     const handleEditClick = (kalolsavam) => {
@@ -326,6 +361,33 @@ const CreateKalolsavam = () => {
                             Create Kalolsavam
                         </h2>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
+                            {/* Show Sub-District dropdown only when District is not 'Select' */}
+                            {selectedDistrict !== 'Select' && (
+                                <div className="relative w-full sm:w-auto">
+                                    <select
+                                        className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                                        id="sub-district-select"
+                                        value={selectedSubDistrict}
+                                        onChange={handleSubDistrictChange}
+                                    >
+                                        {availableSubDistricts.map((option, index) => (
+                                            <option key={`sub-district-${index}`} value={option}>
+                                                {option}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <label
+                                        htmlFor="sub-district-select"
+                                        className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-2 peer-focus:text-blue-800 left-3"
+                                    >
+                                        Sub District
+                                    </label>
+                                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                                        <i className="fa-solid fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* District Filter */}
                             <div className="relative w-full sm:w-auto">
                                 <select
@@ -351,31 +413,6 @@ const CreateKalolsavam = () => {
                                 </div>
                             </div>
 
-                            {/* Sub-District Filter */}
-                            <div className="relative w-full sm:w-auto">
-                                <select
-                                    className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                                    id="sub-district-select"
-                                    value={selectedSubDistrict}
-                                    onChange={handleSubDistrictChange}
-                                >
-                                    {availableSubDistricts.map((option, index) => (
-                                        <option key={`sub-district-${index}`} value={option}>
-                                            {option}
-                                        </option>
-                                    ))}
-                                </select>
-                                <label
-                                    htmlFor="sub-district-select"
-                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-2 peer-focus:text-blue-800 left-3"
-                                >
-                                    Sub District
-                                </label>
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                                    <i className="fa-solid fa-chevron-down"></i>
-                                </div>
-                            </div>
-
                             <button onClick={handleAddClick}
                                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-8 rounded-full w-full sm:w-auto"
                             >
@@ -384,7 +421,7 @@ const CreateKalolsavam = () => {
                         </div>
                     </div>
                     
-                    {/* Table and pagination sections remain unchanged */}
+                    {/* Table section remains largely unchanged */}
                     <div className="overflow-x-auto">
                         <table className="w-full min-w-[600px]">
                             <thead>

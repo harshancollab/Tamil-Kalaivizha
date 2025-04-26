@@ -16,12 +16,12 @@ const SchoolRegList = () => {
     const [showConfirmButton, setShowConfirmButton] = useState(true);
     const [resultsConfirmed, setResultsConfirmed] = useState(false);
 
-   
+
     const [selectedDistrict, setSelectedDistrict] = useState(searchParams.get('district') || '');
     const [selectedSubDistrict, setSelectedSubDistrict] = useState(searchParams.get('subDistrict') || '');
     const [availableSubDistricts, setAvailableSubDistricts] = useState([]);
 
-    
+
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const allSubDistricts = [
@@ -188,6 +188,7 @@ const SchoolRegList = () => {
         }
     };
 
+
     const generatePDF = () => {
         const pdfContent = document.createElement('div');
 
@@ -198,16 +199,15 @@ const SchoolRegList = () => {
         titleElement.style.fontWeight = 'bold';
         pdfContent.appendChild(titleElement);
 
-        if (searchCode || selectedDistrict !== '' || selectedSubDistrict !== '') {
+        if (selectedDistrict !== '' && selectedDistrict !== 'Select' || selectedSubDistrict !== '') {
             const filterInfo = document.createElement('div');
             filterInfo.style.margin = '10px 0';
             filterInfo.style.textAlign = 'center';
             filterInfo.style.fontStyle = 'italic';
 
-            let filterText = 'Filtered by: ';
-            if (searchCode) filterText += `Code: ${searchCode} `;
+            let filterText = '';
             if (selectedDistrict && selectedDistrict !== 'Select') filterText += `District: ${selectedDistrict} `;
-            if (selectedSubDistrict) filterText += `Sub-District: ${selectedSubDistrict} `;
+            if (selectedSubDistrict) filterText += `Sub District: ${selectedSubDistrict}`;
 
             filterInfo.textContent = filterText;
             pdfContent.appendChild(filterInfo);
@@ -410,7 +410,7 @@ const SchoolRegList = () => {
 
         updateURLParams({
             district: district,
-            subDistrict: '' 
+            subDistrict: ''
         });
     };
 

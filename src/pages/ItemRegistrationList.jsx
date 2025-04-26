@@ -113,7 +113,7 @@ const ItemRegistrationList = () => {
             filterInfo.style.textAlign = 'center';
             filterInfo.style.fontStyle = 'italic';
     
-            let filterText = 'Filtered by: ';
+            let filterText = '';
             if (searchTerm) filterText += `Search: ${searchTerm} `;
             if (selectedFestival && selectedFestival !== 'Select') {
                

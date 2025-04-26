@@ -379,7 +379,7 @@ const AdminUser = () => {
             if (selectedSubDistrict !== 'Select') filterDetails.push(`Sub District: ${selectedSubDistrict}`);
             if (selectedUserType !== 'Select') filterDetails.push(`User Type: ${selectedUserType}`);
 
-            filterInfo.textContent = `Filters Applied: ${filterDetails.join(' | ')}`;
+            filterInfo.textContent = ` ${filterDetails.join(' | ')}`;
             pdfContent.appendChild(filterInfo);
         }
 
@@ -520,7 +520,7 @@ const AdminUser = () => {
 
             printWindow.document.write(`
                 <div class="filter-info">
-                    Filters Applied: ${filterDetails.join(' | ')}
+                    ${filterDetails.join(' | ')}
                 </div>
             `);
         }
