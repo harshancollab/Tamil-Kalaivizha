@@ -676,10 +676,10 @@ const Dash = () => {
             <>
 
               <div className="p-2  ">
-                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/DistrictList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/DistrictList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''
                   }`}>
                   <Link to="/DistrictList" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i class="fa-solid fa-map mr-3"></i>  District Registration
+                  <i class="fa-solid fa-map mr-3"></i>  District List
                   </Link>
                  
 
@@ -691,10 +691,10 @@ const Dash = () => {
                     <i className="fa-solid fa-xmark" aria-hidden="true"></i>
                   </button>
                 </div>
-                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/SubDisRegList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/SubDisRegList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''
                   }`}>
                   <Link to="/SubDisRegList" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i class="fa-solid fa-vector-square mr-3"></i> Sub District Registration 
+                  <i class="fa-solid fa-vector-square mr-3"></i> Sub District List 
                   </Link>
                  
 
@@ -706,10 +706,10 @@ const Dash = () => {
                     <i className="fa-solid fa-xmark" aria-hidden="true"></i>
                   </button>
                 </div>
-                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/SchoolRegList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/SchoolRegList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''
                   }`}>
                   <Link to="/SchoolRegList" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i class="fa-solid fa-building mr-3"></i> School Registration 
+                  <i class="fa-solid fa-building mr-3"></i> School List 
                   </Link>
                  
 
@@ -721,10 +721,10 @@ const Dash = () => {
                     <i className="fa-solid fa-xmark" aria-hidden="true"></i>
                   </button>
                 </div>
-                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/FestivalRegiList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/FestivalRegiList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''
                   }`}>
                   <Link to="/FestivalRegiList" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i class="fa-solid fa-chart-diagram mr-3"></i>  Festival Registration
+                  <i class="fa-solid fa-chart-diagram mr-3"></i>  Festival List
                   </Link>
                  
 
@@ -736,10 +736,10 @@ const Dash = () => {
                     <i className="fa-solid fa-xmark" aria-hidden="true"></i>
                   </button>
                 </div>
-                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/ItemRegistrationList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/ItemRegistrationList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''
                   }`}>
                   <Link to="/ItemRegistrationList" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i class="fa-solid fa-diagram-project mr-3"></i>Item Registration
+                  <i class="fa-solid fa-diagram-project mr-3"></i>Item List
                   </Link>
                  
 
@@ -752,7 +752,7 @@ const Dash = () => {
                   </button>
                 </div>
                
-                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/CreateKalolsavam') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/CreateKalolsavam') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''
                   }`}>
                   <Link to="/CreateKalolsavam" className="text-lg font-semibold flex items-center cursor-pointer">
                   <i class="fa-solid fa-pen-to-square mr-3"></i> Create Kalolsavam
@@ -767,7 +767,7 @@ const Dash = () => {
                     <i className="fa-solid fa-xmark" aria-hidden="true"></i>
                   </button>
                 </div>
-                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/admin-panel') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/admin-panel') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''
                   }`}>
                   <Link to="/admin-panel" className="text-lg font-semibold flex items-center cursor-pointer">
                   <i class="fa-solid fa-user mr-3"></i> Admin User
@@ -782,10 +782,10 @@ const Dash = () => {
                     <i className="fa-solid fa-xmark" aria-hidden="true"></i>
                   </button>
                 </div>
-                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/AdResult') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/AdResult') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''
                   }`}>
                   <Link to="/AdResult" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i class="fa-solid fa-note-sticky mr-3"></i>Result
+                  <i class="fa-solid fa-note-sticky mr-3"></i>Result List
                   </Link>
                  
 
@@ -797,10 +797,10 @@ const Dash = () => {
                     <i className="fa-solid fa-xmark" aria-hidden="true"></i>
                   </button>
                 </div>
-                {/* <div className={`flex justify-between items-center w-full mb-6 ${isActive('/admin-panel') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-2 rounded' : ''
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/ExportIT') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''
                   }`}>
-                  <Link to="/admin-panel" className="text-lg font-semibold flex items-center cursor-pointer">
-                    <i className="fa-solid fa-table mr-3" aria-hidden="true"></i>  Export
+                  <Link to="/ExportIT" className="text-lg font-semibold flex items-center cursor-pointer">
+                  <i class="fa-solid fa-note-sticky mr-3"></i>Export
                   </Link>
                  
 
@@ -811,8 +811,17 @@ const Dash = () => {
                   >
                     <i className="fa-solid fa-xmark" aria-hidden="true"></i>
                   </button>
-                </div> */}
-               
+                </div>
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/LogOut') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''
+                  }`}>
+                  <Link to="/LogOut" className="text-lg font-semibold flex items-center cursor-pointer">
+                  <i class="fa-solid fa-note-sticky mr-3"></i>Logo Out
+                  </Link>
+                 
+
+                
+                </div>
+              
 
               </div>
               

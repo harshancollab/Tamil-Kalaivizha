@@ -586,7 +586,7 @@ const StageReport = () => {
               </div>
             )}
           </div>
-          )}
+         
         </div>
       </div>
     </>
