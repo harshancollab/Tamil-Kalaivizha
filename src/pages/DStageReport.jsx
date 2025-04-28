@@ -6,7 +6,7 @@ import { useSearchParams } from 'react-router-dom';
 // You'll need to create this API function in your services folder
 // import { getAllStageReportAPI } from '../services/allAPI'
 
-const StageReport = () => {
+const DStageReport = () => {
   const [stageList, setStageList] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const printRef = useRef();
@@ -601,4 +601,5 @@ const StageReport = () => {
   )
 }
 
-export default StageReport
+
+export default DStageReport

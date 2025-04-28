@@ -277,3 +277,9 @@ export const getAllParticipantsAPI = async (reqHeader) => {
 export const getParticipantByIdAPI = async (id, reqHeader) => {
   return await commonAPI('GET', `${BASE_URL}/participants/${id}`, null, reqHeader);
 };
+
+// 
+// In your API service file
+export const getDisAllPartcipteSclListAPI = (reqHeader, subDistrict) => {
+  return axios.get(`${BASE_URL}/api/schools?subDistrict=${subDistrict}`, reqHeader);
+};

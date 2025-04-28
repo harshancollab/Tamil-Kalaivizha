@@ -125,7 +125,7 @@ const CreateKalolsavam = () => {
         
         // Update URL params and apply filters
         updateUrlParams({ district: district, subDistrict: 'Select', page: '1' });
-        applyFilters(district, 'Select');
+        applyFilters(district, 'Select', kalolsavams);
     };
 
     // Handle sub-district change
@@ -135,12 +135,12 @@ const CreateKalolsavam = () => {
         
         // Update URL params and apply filters
         updateUrlParams({ subDistrict: subDistrict, page: '1' });
-        applyFilters(selectedDistrict, subDistrict);
+        applyFilters(selectedDistrict, subDistrict, kalolsavams);
     };
 
-    // Apply filters function
-    const applyFilters = (district, subDistrict) => {
-        let filtered = [...kalolsavams];
+    // Apply filters function - modified to accept data source
+    const applyFilters = (district, subDistrict, dataSource) => {
+        let filtered = [...dataSource];
         
         if (district !== 'Select') {
             filtered = filtered.filter(item => item.district === district);
@@ -213,9 +213,10 @@ const CreateKalolsavam = () => {
     // Effect to load Kalolsavams and apply initial filters
     useEffect(() => {
         setLoading(true);
-        setTimeout(() => {
-            setKalolsavams(dummyKalolsavams);
-            setFilteredKalolsavams(dummyKalolsavams);
+        
+        // This function will handle actual data loading, whether from API or dummy data
+        const loadData = (data) => {
+            setKalolsavams(data);
             
             // Setup available sub-districts based on the initially selected district
             if (initialDistrict !== 'Select') {
@@ -223,14 +224,18 @@ const CreateKalolsavam = () => {
                 setAvailableSubDistricts(subDistricts);
             }
             
-            // Apply initial filters from URL if they exist
-            if (initialDistrict !== 'Select' || initialSubDistrict !== 'Select') {
-                applyFilters(initialDistrict, initialSubDistrict);
-            }
+            // Apply initial filters from URL
+            applyFilters(initialDistrict, initialSubDistrict, data);
             
             setLoading(false);
+        };
+        
+        // Use dummy data for now, switch to API call when ready
+        setTimeout(() => {
+            loadData(dummyKalolsavams);
         }, 500);
         
+        // Uncomment to use the actual API
         // getAllKalolsavams();
     }, []);
 
@@ -254,13 +259,16 @@ const CreateKalolsavam = () => {
                 setSelectedSubDistrict(urlSubDistrict);
             }
             
-            applyFilters(urlDistrict, urlSubDistrict);
+            // Make sure we have data before applying filters
+            if (kalolsavams.length > 0) {
+                applyFilters(urlDistrict, urlSubDistrict, kalolsavams);
+            }
         }
         
         if (urlPage !== currentPage) {
             setCurrentPage(urlPage);
         }
-    }, [location.search]);
+    }, [location.search, kalolsavams.length]); // Added kalolsavams.length as dependency
 
     const getAllKalolsavams = async () => {
         try {
@@ -275,7 +283,6 @@ const CreateKalolsavam = () => {
 
                 if (result.status === 200) {
                     setKalolsavams(result.data);
-                    setFilteredKalolsavams(result.data);
                     
                     // Setup available sub-districts based on the initially selected district
                     if (initialDistrict !== 'Select') {
@@ -283,10 +290,8 @@ const CreateKalolsavam = () => {
                         setAvailableSubDistricts(subDistricts);
                     }
                     
-                    // Apply initial filters from URL if they exist
-                    if (initialDistrict !== 'Select' || initialSubDistrict !== 'Select') {
-                        applyFilters(initialDistrict, initialSubDistrict);
-                    }
+                    // Apply initial filters from URL
+                    applyFilters(initialDistrict, initialSubDistrict, result.data);
                     
                     setLoading(false);
                 } else {
@@ -304,23 +309,22 @@ const CreateKalolsavam = () => {
         }
     };
 
+ 
+
     const handleAddClick = () => {
-        // Preserve the current filters in the URL when navigating
-        const currentParams = new URLSearchParams(searchParams);
-        navigate(`/AddKalosavam?${currentParams.toString()}`);
-    };
-
-    const handleEditClick = (kalolsavam) => {
-        // Preserve the current filters in the URL when navigating
+        // Get current filter values directly from state
         const params = new URLSearchParams(searchParams);
-        navigate(`/EditKalosmAdm/${kalolsavam.id}?${params.toString()}`, {
-            state: { 
-                kalolsavam,
-                returnPath: `/CreateKalolsavam?${params.toString()}`  // Include return path with filters
-            }
-        });
+        
+        // Ensure we're passing the current selected values, not just what's in the URL
+        if (selectedDistrict !== 'Select') {
+            params.set('district', selectedDistrict);
+        }
+        if (selectedSubDistrict !== 'Select') {
+            params.set('subDistrict', selectedSubDistrict);
+        }
+        
+        navigate(`/AddKalosavam?${params.toString()}`);
     };
-
     if (loading) {
         return (
             <div>
@@ -421,7 +425,7 @@ const CreateKalolsavam = () => {
                         </div>
                     </div>
                     
-                    {/* Table section remains largely unchanged */}
+                    {/* Table section */}
                     <div className="overflow-x-auto">
                         <table className="w-full min-w-[600px]">
                             <thead>

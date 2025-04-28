@@ -3,7 +3,7 @@ import Header from '../components/Header'
 import Dash from '../components/Dash'
 import html2pdf from 'html2pdf.js';
 
-const ClashReportList = () => {
+const DClashRep = () => {
   const [showTooltip, setShowTooltip] = useState(null);
   const [selectedFestival, setSelectedFestival] = useState("ALL");
   const [selectedDate, setSelectedDate] = useState("ALL");
@@ -575,4 +575,4 @@ const ClashReportList = () => {
   );
 };
 
-export default ClashReportList;
+export default DClashRep;

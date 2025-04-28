@@ -23,7 +23,9 @@ const Dash = () => {
       results: ['/All-resultentry', '/item-result', '/Itemresult-list', '/All-Publishresult'].some(route => path === route),
       resultsReport: ['/ConfidentialResultlist', '/itemwisepoint', '/itemcodewise', '/SclWisePoint', '/Sclgradewise'].some(route => path === route),
       certificate: ['/certificate-template', '/certificate-item-wise', '/certificate-school-wise', '/CertificateRegno', '/ExportDatabase'].some(route => path === route),
-      Export: ['/Higherlvlcomp'].some(route => path === route)
+      Export: ['/Higherlvlcomp'].some(route => path === route),
+      dissettings: ['/ylKalolsavam'].some(route => path === route),
+
     };
   });
 
@@ -672,10 +674,1106 @@ const Dash = () => {
               </div>
             </>
           )}
+          
+            {user?.role === 'district admin' && (
+            <>
+              {/* Settings Menu */}
+              <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('settings')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                    <i className="fa-solid fa-cog mr-4" aria-hidden="true"></i> Settings
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.settings ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.settings && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/DDefnKalolsavam"
+                      className={`block py-2 text-gray-300 ${isActive('/DDefnKalolsavam')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Define Kalolsavam
+                    </Link>
+                    <Link
+                      to="/DSclEntry"
+                      className={`block py-2 text-gray-300 ${isActive('/DSclEntry')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      School Entry
+                    </Link>
+                    <Link
+                      to="/DClusterSclList"
+                      className={`block py-2 text-gray-300 ${isActive('/DClusterSclList')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Cluster School
+                    </Link>
+                    <Link
+                      to="/DSplOrderEntry"
+                      className={`block py-2 text-gray-300 ${isActive('/DSplOrderEntry')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Special Order Entry
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Stage Settings Menu */}
+              <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.stageSettings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('stageSettings')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                    <i class="fa-solid fa-microphone mr-5"></i> Stage Settings
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.stageSettings ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.stageSettings && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/DStageDurationList"
+                      className={`block py-2 text-gray-300 ${isActive('/DStageDurationList')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Stage Duration
+                    </Link>
+                    <Link
+                      to="/DDefineStageList"
+                      className={`block py-2 text-gray-300 ${isActive('/DDefineStageList')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Define Stage
+                    </Link>
+                    <Link
+                      to="/DStageAllotmtFest"
+                      className={`block py-2 text-gray-300 ${isActive('/DStageAllotmtFest')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Stage Allotment Festival Wise List
+                    </Link>
+                    <Link
+                      to="/DStageAllotItem"
+                      className={`block py-2 text-gray-300 ${isActive('/DStageAllotItem')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Stage Allotment Item Wise
+                    </Link>
+                    <Link
+                      to="/DClashRep"
+                      className={`block py-2 text-gray-300 ${isActive('/DClashRep')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Clash Report
+                    </Link>
+
+                  </div>
+                )}
+              </div>
+
+              {/* Stage Report Menu */}
+              {/* <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.stageReport ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('stageReport')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                    <i className="fa-solid fa-laptop mr-3"></i> Stage Report
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.stageReport ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.stageReport && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/AddCallsheet"
+                      className={`block py-2 text-gray-300 ${isActive('/AddCallsheet')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Call Sheet
+                    </Link>
+                    <Link
+                      to="/AddTimesheet"
+                      className={`block py-2 text-gray-300 ${isActive('/AddTimesheet')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Time Sheet
+                    </Link>
+                    <Link
+                      to="/AddScoresheet"
+                      className={`block py-2 text-gray-300 ${isActive('/AddScoresheet')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Score sheet
+                    </Link>
+                    <Link
+                      to="/AddTabulationsheet"
+                      className={`block py-2 text-gray-300 ${isActive('/AddTabulationsheet')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Tabulation Sheet
+                    </Link>
+                    <Link
+                      to="/Addreport"
+                      className={`block py-2 text-gray-300 ${isActive('/Addreport')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      All Report
+                    </Link>
+                  </div>
+                )}
+              </div> */}
+
+              {/* Pre Fest Report Menu */}
+              <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.preFestReport ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('preFestReport')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                    <i className="fa-regular fa-message mr-4"></i> Pre Fest Report
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.preFestReport ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.preFestReport && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/DParticipatingScl"
+                      className={`block py-2 text-gray-300 ${isActive('/DParticipatingScl')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                     s.d Participating Schools
+                    </Link>
+                  
+                    <Link
+                      to="/DFestWiseParti"
+                      className={`block py-2 text-gray-300 ${isActive('/DFestWiseParti')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      S.D Festival Wise Participants
+                    </Link>
+                    <Link
+                      to="/DdateWisepartici"
+                      className={`block py-2 text-gray-300 ${isActive('/DdateWisepartici')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                     S.D Date Wise Participants
+                    </Link>
+                    <Link
+                      to="/DParticipateCardlist"
+                      className={`block py-2 text-gray-300 ${isActive('/DParticipateCardlist')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                    S.D Participants Card List
+                    </Link>
+                    <Link
+                      to="/DparticipateListMorethan"
+                      className={`block py-2 text-gray-300 ${isActive('/DparticipateListMorethan')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Participants more than one item
+                    </Link>
+
+                    <Link
+                      to="/ClusterReport"
+                      className={`block py-2 text-gray-300 ${isActive('/ClusterReport')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Cluster Report
+                    </Link>
+                    <Link
+                      to="/DStageReport"
+                      className={`block py-2 text-gray-300 ${isActive('/DStageReport')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Stage Report
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Result Menu */}
+              <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.results ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('results')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                    <i className="fa-solid fa-note-sticky fa-rotate-270 mr-4"></i> Result
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.results ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.results && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/DAllresultentry"
+                      className={`block py-2 text-gray-300 ${isActive('/DAllresultentry')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Result Entry
+                    </Link>
+                    <Link
+                      to="/Itemresult-list"
+                      className={`block py-2 text-gray-300 ${isActive('/Itemresult-list')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Item Result List
+                    </Link>
+                    <Link
+                      to="/All-Publishresult"
+                      className={`block py-2 text-gray-300 ${isActive('/All-Publishresult')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Publish Result
+                    </Link>
+
+                  </div>
+                )}
+              </div>
+
+              {/* Result Report Menu */}
+              <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.resultsReport ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('resultsReport')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                    <i class="fas fa-paper-plane mr-4  "></i> Result Report
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.resultsReport ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.resultsReport && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/DConfidentialResult"
+                      className={`block py-2 text-gray-300 ${isActive('/DConfidentialResult')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Confidential Result
+                    </Link>
+                    <Link
+                      to="/DItemwisePoint"
+                      className={`block py-2 text-gray-300 ${isActive('/DItemwisePoint')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Item Wise Point
+                    </Link>
+                    <Link
+                      to="/DItemCodewise"
+                      className={`block py-2 text-gray-300 ${isActive('/DItemCodewise')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Item Code Wise Point
+                    </Link>
+                    <Link
+                      to="/DSclWisePoint"
+                      className={`block py-2 text-gray-300 ${isActive('/DSclWisePoint')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      School Wise Point
+                    </Link>
+                    <Link
+                      to="/DSclGradeWise"
+                      className={`block py-2 text-gray-300 ${isActive('/DSclGradeWise')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      School Grade Wise
+                    </Link>
+
+
+                  </div>
+                )}
+              </div>
+              <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.certificate ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('certificate')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                    <i class="fa-solid fa-file-circle-plus mr-4"></i>
+
+
+                    Certificate
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.certificate ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.certificate && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/certificate-template"
+                      className={`block py-2 text-gray-300 ${isActive('/certificate-template')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Certificate Template
+                    </Link>
+                    <Link
+                      to="/DCertificateItmWise"
+                      className={`block py-2 text-gray-300 ${isActive('/DCertificateItmWise')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Certificate Item Wise
+                    </Link>
+                    <Link
+                      to="/DCertificateScl"
+                      className={`block py-2 text-gray-300 ${isActive('/DCertificateScl')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Certificate School Wise
+                    </Link>
+                    <Link
+                      to="/DCertificateRegno"
+                      className={`block py-2 text-gray-300 ${isActive('/DCertificateRegno')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Certificate Reg No Wise
+                    </Link>
+
+
+                  </div>
+                )}
+              </div>
+              {/*  */}
+              <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.Export ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('Export')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                    <i class="fas fa-arrow-up-right-from-square mr-4"></i>Export
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.Export ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.Export && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/DHigherlvlComp"
+                      className={`block py-2 text-gray-300 ${isActive('/DHigherlvlComp')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Higher Level Competition
+                    </Link>
+                    <Link
+                      to="/DExport"
+                      className={`block py-2 text-gray-300 ${isActive('/DExport')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Export Database
+                    </Link>
+
+
+
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+            {user?.role === 'state admin' && (
+            <>
+              {/* Settings Menu */}
+              {/* <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('settings')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                    <i className="fa-solid fa-cog mr-4" aria-hidden="true"></i> Settings
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.settings ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.settings && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/AllKalolsavam"
+                      className={`block py-2 text-gray-300 ${isActive('/AllKalolsavam')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Define Kalolsavam
+                    </Link>
+                    <Link
+                      to="/schlentry"
+                      className={`block py-2 text-gray-300 ${isActive('/schlentry')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      School Entry
+                    </Link>
+                    <Link
+                      to="/All-schools"
+                      className={`block py-2 text-gray-300 ${isActive('/All-schools')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Cluster School
+                    </Link>
+                    <Link
+                      to="/Spl-entry"
+                      className={`block py-2 text-gray-300 ${isActive('/Spl-entry')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Special Order Entry
+                    </Link>
+                  </div>
+                )}
+              </div> */}
+
+              {/* Stage Settings Menu */}
+              {/* <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.stageSettings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('stageSettings')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                    <i class="fa-solid fa-microphone mr-5"></i> Stage Settings
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.stageSettings ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.stageSettings && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/stage-duration-list"
+                      className={`block py-2 text-gray-300 ${isActive('/stage-duration-list')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Stage Duration
+                    </Link>
+                    <Link
+                      to="/StageList"
+                      className={`block py-2 text-gray-300 ${isActive('/StageList')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Define Stage
+                    </Link>
+                    <Link
+                      to="/festivalwiselist"
+                      className={`block py-2 text-gray-300 ${isActive('/festivalwiselist')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Stage Allotment Festival Wise List
+                    </Link>
+                    <Link
+                      to="/Stage-itemwiselist"
+                      className={`block py-2 text-gray-300 ${isActive('/Stage-itemwiselist')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Stage Allotment Item Wise
+                    </Link>
+                    <Link
+                      to="/ClashReportList"
+                      className={`block py-2 text-gray-300 ${isActive('/ClashReportList')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Clash Report
+                    </Link>
+
+                  </div>
+                )}
+              </div> */}
+
+              {/* Stage Report Menu */}
+              {/* <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.stageReport ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('stageReport')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                    <i className="fa-solid fa-laptop mr-3"></i> Stage Report
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.stageReport ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.stageReport && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/AddCallsheet"
+                      className={`block py-2 text-gray-300 ${isActive('/AddCallsheet')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Call Sheet
+                    </Link>
+                    <Link
+                      to="/AddTimesheet"
+                      className={`block py-2 text-gray-300 ${isActive('/AddTimesheet')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Time Sheet
+                    </Link>
+                    <Link
+                      to="/AddScoresheet"
+                      className={`block py-2 text-gray-300 ${isActive('/AddScoresheet')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Score sheet
+                    </Link>
+                    <Link
+                      to="/AddTabulationsheet"
+                      className={`block py-2 text-gray-300 ${isActive('/AddTabulationsheet')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Tabulation Sheet
+                    </Link>
+                    <Link
+                      to="/Addreport"
+                      className={`block py-2 text-gray-300 ${isActive('/Addreport')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      All Report
+                    </Link>
+                  </div>
+                )}
+              </div> */}
+
+              {/* Pre Fest Report Menu */}
+              <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.preFestReport ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('preFestReport')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                    <i className="fa-regular fa-message mr-4"></i> Pre Fest Report
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.preFestReport ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.preFestReport && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/StateParticipatesclList"
+                      className={`block py-2 text-gray-300 ${isActive('/StateParticipatesclList')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                  District Participating Schools List
+                    </Link>
+                  
+                    <Link
+                      to="/StateParticipateFesWis"
+                      className={`block py-2 text-gray-300 ${isActive('/StateParticipateFesWis')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      District Festival Wise Participants 
+                    </Link>
+                    <Link
+                      to="/StateDatewisepaticipat"
+                      className={`block py-2 text-gray-300 ${isActive('/StateDatewisepaticipat')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                    District Date Wise Participants
+                    </Link>
+                    <Link
+                      to="/StateParticipateCardLis"
+                      className={`block py-2 text-gray-300 ${isActive('/DParticipateCardlist')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                    District Participants Card List
+                    </Link>
+                    <Link
+                      to="/StateParticipateCardLis"
+                      className={`block py-2 text-gray-300 ${isActive('/DParticipateCardlist')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Participants more than one item
+                    </Link>
+
+                    <Link
+                      to="/ClusterReport"
+                      className={`block py-2 text-gray-300 ${isActive('/ClusterReport')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Cluster Report
+                    </Link>
+                    <Link
+                      to="/StageReport"
+                      className={`block py-2 text-gray-300 ${isActive('/StageReport')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Stage Report
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Result Menu */}
+              {/* <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.results ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('results')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                    <i className="fa-solid fa-note-sticky fa-rotate-270 mr-4"></i> Result
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.results ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.results && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/All-resultentry"
+                      className={`block py-2 text-gray-300 ${isActive('/All-resultentry')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Result Entry
+                    </Link>
+                    <Link
+                      to="/Itemresult-list"
+                      className={`block py-2 text-gray-300 ${isActive('/Itemresult-list')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Item Result List
+                    </Link>
+                    <Link
+                      to="/All-Publishresult"
+                      className={`block py-2 text-gray-300 ${isActive('/All-Publishresult')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Publish Result
+                    </Link>
+
+                  </div>
+                )}
+              </div> */}
+
+              {/* Result Report Menu */}
+              {/* <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.resultsReport ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('resultsReport')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                    <i class="fas fa-paper-plane mr-4  "></i> Result Report
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.resultsReport ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.resultsReport && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/ConfidentialResultlist"
+                      className={`block py-2 text-gray-300 ${isActive('/ConfidentialResultlist')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Confidential Result
+                    </Link>
+                    <Link
+                      to="/itemwisepoint"
+                      className={`block py-2 text-gray-300 ${isActive('/itemwisepoint')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Item Wise Point
+                    </Link>
+                    <Link
+                      to="/itemcodewise"
+                      className={`block py-2 text-gray-300 ${isActive('/itemcodewise')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Item Code Wise Point
+                    </Link>
+                    <Link
+                      to="/SclWisePoint"
+                      className={`block py-2 text-gray-300 ${isActive('/SclWisePoint')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      School Wise Point
+                    </Link>
+                    <Link
+                      to="/Sclgradewise"
+                      className={`block py-2 text-gray-300 ${isActive('/Sclgradewise')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      School Grade Wise
+                    </Link>
+
+
+                  </div>
+                )}
+              </div> */}
+              {/* <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.certificate ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('certificate')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                    <i class="fa-solid fa-file-circle-plus mr-4"></i>
+
+
+                    Certificate
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.certificate ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.certificate && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/certificate-template"
+                      className={`block py-2 text-gray-300 ${isActive('/certificate-template')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Certificate Template
+                    </Link>
+                    <Link
+                      to="/certificate-item-wise"
+                      className={`block py-2 text-gray-300 ${isActive('/certificate-item-wise')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Certificate Item Wise
+                    </Link>
+                    <Link
+                      to="/certificate-school-wise"
+                      className={`block py-2 text-gray-300 ${isActive('/certificate-school-wise')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Certificate School Wise
+                    </Link>
+                    <Link
+                      to="/CertificateRegno"
+                      className={`block py-2 text-gray-300 ${isActive('/CertificateRegno')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Certificate Reg No Wise
+                    </Link>
+
+
+                  </div>
+                )}
+              </div> */}
+              {/*  */}
+              {/* <div className="mb-4">
+                <div
+                  className={`flex justify-between items-center w-full cursor-pointer ${openMenus.Export ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
+                    } p-2 rounded`}
+                  onClick={() => toggleMenu('Export')}
+                >
+                  <h2 className="text-lg font-semibold flex items-center">
+                    <i class="fas fa-arrow-up-right-from-square mr-4"></i>Export
+                  </h2>
+                  <i
+                    className={`fa-solid fa-chevron-${openMenus.Export ? 'up' : 'down'} text-sm`}
+                    aria-hidden="true"
+                  ></i>
+                </div>
+
+                {openMenus.Export && (
+                  <div className="mt-2 pl-4">
+                    <Link
+                      to="/Higherlvlcomp"
+                      className={`block py-2 text-gray-300 ${isActive('/Higherlvlcomp')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Higher Level Competition
+                    </Link>
+                    <Link
+                      to="/ExportDatabase"
+                      className={`block py-2 text-gray-300 ${isActive('/ExportDatabase')
+                        ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
+                        : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
+                        }`}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      Export Database
+                    </Link>
+
+
+
+                  </div>
+                )}
+              </div> */}
+            </>
+          )}
           {user?.role === 'It Admin' && (
             <>
 
               <div className="p-2  ">
+              <div className={`flex justify-between items-center w-full mb-6 ${isActive('/DistrictList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''
+                  }`}>
+                  <Link to="/DistrictList" className="text-lg font-semibold flex items-center cursor-pointer">
+                  <i class="fa-solid fa-map mr-3"></i>  Dashboard
+                  </Link>
+                 
+
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
                 <div className={`flex justify-between items-center w-full mb-6 ${isActive('/DistrictList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''
                   }`}>
                   <Link to="/DistrictList" className="text-lg font-semibold flex items-center cursor-pointer">

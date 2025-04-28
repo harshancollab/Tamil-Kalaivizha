@@ -59,6 +59,8 @@
 
 // sub district admin
 // It Admin
+// state admin
+// district admin
 import { createContext, useState, useContext } from 'react';
 
 const AuthContext = createContext();

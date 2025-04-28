@@ -1,6 +1,6 @@
 // It ADmin  Create Kalosvm EDit 
 import React, { useState, useRef, useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import Dash from '../components/Dash'
 import Header from '../components/Header'
 // import { AddKalolsavamAPI } from '../services/allAPI';
@@ -8,6 +8,8 @@ import Header from '../components/Header'
 const AddKalolsavam = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [availableSubDistricts, setAvailableSubDistricts] = useState(['Select']);
+  const [searchParams] = useSearchParams();
 
   const [formData, setFormData] = useState({
     logo: '',
@@ -72,6 +74,29 @@ const AddKalolsavam = () => {
     
   ];
 
+
+  useEffect(() => {
+    // Get district and subDistrict from URL parameters
+    const urlDistrict = searchParams.get('district');
+    const urlSubDistrict = searchParams.get('subDistrict');
+    
+    if (urlDistrict && urlDistrict !== 'Select') {
+        setFormData(prev => ({
+            ...prev,
+            district: urlDistrict,
+            // If urlSubDistrict exists and belongs to this district, use it
+            subDistrict: urlSubDistrict && 
+                         districtToSubDistrict[urlDistrict]?.includes(urlSubDistrict) 
+                         ? urlSubDistrict : 'Select'
+        }));
+        
+        // Update available sub-districts if district is selected
+        if (urlDistrict !== 'Select') {
+            const subDistricts = ['Select', ...(districtToSubDistrict[urlDistrict] || [])];
+            setAvailableSubDistricts(subDistricts);
+        }
+    }
+}, [searchParams]);
   // Handle clicks outside dropdowns
   useEffect(() => {
     const handleClickOutside = (event) => {

@@ -100,6 +100,45 @@ import ExportIT from './pages/ExportIT';
 import { LogOut } from 'lucide-react';
 import LogoOut from './pages/LogoOut';
 import EditItem from './pages/EditItem';
+import DParticipatingScl from './pages/DParticipatingScl';
+import DFestWiseParti from './pages/DFestWiseParti';
+import DdateWisepartici from './pages/DdateWisepartici';
+import DParticipateCardlist from './pages/DParticipateCardlist';
+import StateParticipatesclList from './pages/StateParticipatesclList';
+import StateParticipateFesWis from './pages/StateParticipateFesWis';
+import StateDatewisepaticipat from './pages/StateDatewisepaticipat';
+import StateParticipateCardLis from './pages/StateParticipateCardLis';
+import DDefnKalolsavam from './pages/DDefnKalolsavam';
+import DEditKalolsavam from './pages/DEditKalolsavam';
+import DSclEntry from './pages/DSclEntry';
+import DClusterSclList from './pages/DClusterSclList';
+import DSplOrderEntry from './pages/DSplOrderEntry';
+import DAddStagedurat from './pages/DAddStagedurat';
+import DStageDurationList from './pages/DStageDurationList';
+import DAddStage from './pages/DAddStage';
+import DDefineStageList from './pages/DDefineStageList';
+import DEditStage from './pages/DEditStage';
+import DStageAllotmtFest from './pages/DStageAllotmtFest';
+import DAddStageAllotfest from './pages/DAddStageAllotfest';
+import DEditStageAllotFest from './pages/DEditStageAllotFest';
+import DStageAllotItem from './pages/DStageAllotItem';
+import DClashRep from './pages/DClashRep';
+import DparticipateListMorethan from './pages/DparticipateListMorethan';
+import DStageReport from './pages/DStageReport';
+import DConfidentialResult from './pages/DConfidentialResult';
+import DItemwisePoint from './pages/DItemwisePoint';
+import DItemCodewise from './pages/DItemCodewise';
+import DSclWisePoint from './pages/DSclWisePoint';
+import DSclGradeWise from './pages/DSclGradeWise';
+import DCertificateItmWise from './pages/DCertificateItmWise';
+import DCertificateParti from './pages/DCertificateParti';
+import DCertificateScl from './pages/DCertificateScl';
+import DCertificateRegno from './pages/DCertificateRegno';
+import DCertificatedetails from './pages/DCertificatedetails';
+import DHigherlvlComp from './pages/DHigherlvlComp';
+import DExport from './pages/DExport';
+import DAddresultentry from './pages/DAddresultentry';
+import DAllresultentry from './pages/DAllresultentry';
 
 
 
@@ -137,7 +176,7 @@ function App() {
           <Route path="/participatelist" element={<ParticipateList />} />
         </Route>
 
-        {/* Routes ONLY for "sub district admin" */}
+       {/* Routes ONLY for "sub district admin" */}
         <Route element={<ProtectedRoute allowedRoles={['sub district admin']} />}>
           <Route path="/AllKalolsavam" element={<AllKalolsavam />} />
           <Route path="/edit-kalolsavam/:id" element={<EditKalsvmDetails />} />
@@ -191,7 +230,7 @@ function App() {
           <Route path="/ai" element={<Publish />} />
 
 
-        </Route>
+        </Route> 
 
         {/* Routes ONLY for "admin" */}
         <Route element={<ProtectedRoute allowedRoles={['It Admin']} />}>
@@ -245,6 +284,61 @@ function App() {
           <Route path="/ExportIT" element={<ExportIT />} />
           <Route path="/LogOut" element={<LogoOut />} />
         </Route>
+
+        {/* Routes ONLY for " district admin" */}
+        <Route element={<ProtectedRoute allowedRoles={['district admin']} />}>
+        <Route path="/DDefnKalolsavam" element={<DDefnKalolsavam />} />
+        <Route path="/DEditKalolsavam/:id" element={<DEditKalolsavam />} />
+        <Route path="/DSclEntry" element={<DSclEntry />} />
+        <Route path="/DClusterSclList" element={<DClusterSclList />} />
+        <Route path="/DSplOrderEntry" element={<DSplOrderEntry />} />
+        <Route path="/DAddStagedurat" element={<DAddStagedurat />} />
+        <Route path="/DStageDurationList" element={<DStageDurationList />} />
+        <Route path="/DAddStage" element={<DAddStage />} />
+        <Route path="/DDefineStageList" element={<DDefineStageList />} />
+        <Route path="/DEditStage" element={<DEditStage />} />
+        <Route path="/DStageAllotmtFest" element={<DStageAllotmtFest />} />
+        <Route path="/DAddStageAllotfest" element={<DAddStageAllotfest />} />
+        <Route path="/DEditStageAllotFest/:id" element={<DEditStageAllotFest />} />
+        <Route path="/DStageAllotItem" element={<DStageAllotItem />} />
+        <Route path="/DClashRep" element={<DClashRep />} />
+        <Route path="/DparticipateListMorethan" element={<DparticipateListMorethan />} />
+        <Route path="/DStageReport" element={<DStageReport />} />
+        <Route path="/DConfidentialResult" element={<DConfidentialResult />} />
+        <Route path="/DItemwisePoint" element={<DItemwisePoint />} />
+        <Route path="/DItemCodewise" element={<DItemCodewise />} />
+        <Route path="/DSclWisePoint" element={<DSclWisePoint />} />
+        <Route path="/DSclGradeWise" element={<DSclGradeWise />} />
+        <Route path="/DCertificateItmWise" element={<DCertificateItmWise />} />
+        <Route path="/DCertificateParti" element={<DCertificateParti />} />
+        <Route path="/DCertificateScl" element={<DCertificateScl />} />
+        <Route path="/DCertificateRegno" element={<DCertificateRegno />} />
+        <Route path="/DCertificatedetails" element={<DCertificatedetails />} />
+        <Route path="/DHigherlvlComp" element={<DHigherlvlComp />} />
+        <Route path="/DExport" element={<DExport />} />
+        <Route path="/DAllresultentry" element={<DAllresultentry />} />
+
+        <Route path="/DAddresultentry" element={<DAddresultentry />} />
+
+
+        
+        <Route path="/DParticipatingScl" element={<DParticipatingScl />} />
+        <Route path="/DFestWiseParti" element={<DFestWiseParti />} />
+        <Route path="/DdateWisepartici" element={<DdateWisepartici />} />
+        <Route path="/DParticipateCardlist" element={<DParticipateCardlist />} />
+
+        </Route> 
+        <Route element={<ProtectedRoute allowedRoles={['state admin']} />}>
+        
+        
+        <Route path="/StateParticipatesclList" element={<StateParticipatesclList />} />
+        <Route path="/StateParticipateFesWis" element={<StateParticipateFesWis />} />
+        <Route path="/StateDatewisepaticipat" element={<StateDatewisepaticipat />} />
+        <Route path="/StateParticipateCardLis" element={<StateParticipateCardLis />} />
+        
+
+        </Route> 
+
 
 
       </Routes>
