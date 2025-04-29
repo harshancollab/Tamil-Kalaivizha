@@ -10,6 +10,7 @@ const DCertificateScl = () => {
     const [filteredData, setFilteredData] = useState([]);
     const [searchParams, setSearchParams] = useSearchParams();
     const selectedFestival = searchParams.get('festival') || "UP Kalaivizha";
+    const searchQuery = searchParams.get('search') || "";
     const navigate = useNavigate();
     
     // Pagination states
@@ -21,8 +22,8 @@ const DCertificateScl = () => {
     }, []);
 
     useEffect(() => {
-        filterDataByFestival();
-    }, [selectedFestival, allItemResult]);
+        filterDataByFestivalAndSearch();
+    }, [selectedFestival, searchQuery, allItemResult]);
 
     const getAllItemResult = async () => {
         const token = sessionStorage.getItem("token");
@@ -44,9 +45,10 @@ const DCertificateScl = () => {
         }
     }
 
-    const filterDataByFestival = () => {
+    const filterDataByFestivalAndSearch = () => {
         if (!allItemResult.length) return;
 
+        // First filter by festival
         let filtered;
         switch (selectedFestival) {
             case "UP Kalaivizha":
@@ -80,6 +82,13 @@ const DCertificateScl = () => {
                 filtered = [...allItemResult];
         }
 
+        // Then filter by search query if it exists
+        if (searchQuery.trim() !== '') {
+            filtered = filtered.filter(item => 
+                item.printed.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
+
         // Add sequential numbering to filtered results
         filtered = filtered.map((item, index) => ({
             ...item,
@@ -92,7 +101,19 @@ const DCertificateScl = () => {
     }
 
     const handleFestivalChange = (e) => {
-        setSearchParams({ festival: e.target.value });
+        // Preserve search parameter when changing festival
+        setSearchParams({ 
+            festival: e.target.value,
+            search: searchQuery
+        });
+    };
+
+    const handleSearchChange = (e) => {
+        // Update search parameter in URL while preserving festival selection
+        setSearchParams({ 
+            festival: selectedFestival,
+            search: e.target.value
+        });
     };
 
     const handleSchoolClick = (schoolName) => {
@@ -187,8 +208,9 @@ const DCertificateScl = () => {
         table.appendChild(tbody);
         pdfContent.appendChild(table);
         
-        // PDF filename
-        const fileName = `${selectedFestival.replace(/ /g, '_')}_Certificate_School_Wise.pdf`;
+        // Add search criteria to the filename if present
+        const searchSuffix = searchQuery ? `_search_${searchQuery.replace(/[^a-z0-9]/gi, '_')}` : '';
+        const fileName = `${selectedFestival.replace(/ /g, '_')}${searchSuffix}_Certificate_School_Wise.pdf`;
         
         // PDF options
         const options = {
@@ -449,6 +471,19 @@ const DCertificateScl = () => {
                             </button>
                         </div>
                     </div>
+                    {/* Search Box */}
+                    <div className="relative flex mt-2 items-center w-full sm:w-64 h-9 border border-blue-800 rounded-full px-4">
+                        <input
+                            type="text"
+                            placeholder="Search school name..."
+                            className="w-full bg-transparent outline-none text-sm"
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                        />
+                        <div className="text-gray-500">
+                            <i className="fa-solid fa-magnifying-glass"></i>
+                        </div>
+                    </div>
 
                     <div className="w-full">
                         <div className="overflow-x-auto -mx-4 sm:mx-0">
@@ -483,7 +518,10 @@ const DCertificateScl = () => {
                                             ) : (
                                                 <tr>
                                                     <td colSpan="5" className="p-3 text-center text-gray-500">
-                                                        No records found for {selectedFestival}
+                                                        {searchQuery ? 
+                                                            `No schools found matching "${searchQuery}" in ${selectedFestival}` : 
+                                                            `No records found for ${selectedFestival}`
+                                                        }
                                                     </td>
                                                 </tr>
                                             )}
@@ -546,6 +584,5 @@ const DCertificateScl = () => {
         </>
     )
 }
-
 
 export default DCertificateScl

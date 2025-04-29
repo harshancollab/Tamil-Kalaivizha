@@ -12,6 +12,8 @@ const DparticipateListMorethan = () => {
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  // State for tooltip hover
+  const [showTooltip, setShowTooltip] = useState(null);
   
   // Get params from URL, with defaults if not present
   const selectedItems = searchParams.get('items') || "ALL";
@@ -29,7 +31,8 @@ const DparticipateListMorethan = () => {
       schoolCode: "40075",
       schoolName: "G. M. R. S. Peermedu",
       itemCode: "301",
-      itemCount: 3
+      itemCount: 3,
+      items: ["301-Story Telling", "302-Mono Act", "303-Fancy Dress"]
     },
     {
       slno:2,
@@ -40,7 +43,8 @@ const DparticipateListMorethan = () => {
       schoolCode: "30075",
       schoolName: "G. M. R. S. Peermedu",
       itemCode: "302",
-      itemCount: 2
+      itemCount: 2,
+      items: ["302-Mono Act", "304-Music"]
     },
     {
       slno:3,
@@ -51,7 +55,8 @@ const DparticipateListMorethan = () => {
       schoolCode: "30081",
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "401",
-      itemCount: 4
+      itemCount: 4,
+      items: ["401-Group Dance", "402-Solo Dance", "405-Painting", "408-Essay"]
     },
     {
       slno:4,
@@ -62,51 +67,56 @@ const DparticipateListMorethan = () => {
       schoolCode: "30081",
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "405",
-      itemCount: 5
+      itemCount: 5,
+      items: ["403-Singing", "405-Painting", "407-Poetry", "410-Quiz", "412-Speech"]
     },
     {
       slno:5,
-      regNo: "LP002",
-      name: "Anjali Raj",
-      gender: "Female",
-      class: "6",
+      regNo: "LP003",
+      name: "Ravi Kumar",
+      gender: "Male",
+      class: "5",
       schoolCode: "30081",
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "405",
-      itemCount: 5
+      itemCount: 5,
+      items: ["401-Group Dance", "403-Singing", "405-Painting", "406-Drawing", "409-Story Writing"]
     },
     {
       slno:6,
-      regNo: "LP002",
-      name: "Anjali Raj",
+      regNo: "LP004",
+      name: "Sneha Mathew",
       gender: "Female",
-      class: "6",
+      class: "7",
       schoolCode: "30081",
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "405",
-      itemCount: 5
+      itemCount: 5,
+      items: ["402-Solo Dance", "404-Classical Music", "407-Poetry", "410-Quiz", "412-Speech"]
     },
     {
       slno:7,
-      regNo: "LP002",
-      name: "Anjali Raj",
-      gender: "Female",
+      regNo: "LP005",
+      name: "Anoop Thomas",
+      gender: "Male",
       class: "6",
       schoolCode: "30081",
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "405",
-      itemCount: 5
+      itemCount: 5,
+      items: ["403-Singing", "406-Drawing", "408-Essay", "411-Debate", "412-Speech"]
     },
     {
       slno:8,
-      regNo: "LP002",
-      name: "Anjali Raj",
+      regNo: "LP006",
+      name: "Lakshmi S",
       gender: "Female",
-      class: "6",
+      class: "7",
       schoolCode: "30081",
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "405",
-      itemCount: 5
+      itemCount: 5,
+      items: ["401-Group Dance", "404-Classical Music", "407-Poetry", "409-Story Writing", "412-Speech"]
     },
     {
       slno:9,
@@ -117,7 +127,8 @@ const DparticipateListMorethan = () => {
       schoolCode: "30043",
       schoolName: "G. H. S. S. Anakara",
       itemCode: "501",
-      itemCount: 1
+      itemCount: 3,
+      items: ["501-Elocution", "503-Classical Dance", "507-Science Quiz"]
     },
     {
       slno:10,
@@ -128,7 +139,8 @@ const DparticipateListMorethan = () => {
       schoolCode: "30043",
       schoolName: "G. H. S. S. Anakara",
       itemCode: "502",
-      itemCount: 3
+      itemCount: 3,
+      items: ["502-Debate", "504-Folk Dance", "506-Art"]
     },
     {
       slno:11,
@@ -139,7 +151,8 @@ const DparticipateListMorethan = () => {
       schoolCode: "30083",
       schoolName: "G. H. S. Udumbhancola",
       itemCode: "601",
-      itemCount: 2
+      itemCount: 4,
+      items: ["601-Speech", "603-Drama", "605-Poetry", "607-Essay Writing"]
     },
     {
       slno:12,
@@ -150,7 +163,8 @@ const DparticipateListMorethan = () => {
       schoolCode: "30083",
       schoolName: "G. H. S. Udumbhancola",
       itemCode: "605",
-      itemCount: 4
+      itemCount: 4,
+      items: ["602-Debate", "604-Classical Dance", "606-Western Dance", "608-Quiz"]
     }
   ];
 
@@ -398,7 +412,7 @@ const DparticipateListMorethan = () => {
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     
-    const headers = ['Sl No', 'Reg No', 'Name', 'Gender', 'Class', 'School Code', 'School Name'];
+    const headers = ['Sl No', 'Reg No', 'Name', 'Gender', 'Class', 'School Code', 'School Name', 'Items'];
     headers.forEach(headerText => {
       const th = document.createElement('th');
       th.textContent = headerText;
@@ -426,7 +440,8 @@ const DparticipateListMorethan = () => {
         participant.gender || "-",
         participant.class || "-",
         participant.schoolCode || "-",
-        participant.schoolName || "-"
+        participant.schoolName || "-",
+        (participant.items && participant.items.length > 0) ? participant.items.join(", ") : "-"
       ];
       
       cellData.forEach(text => {
@@ -475,6 +490,29 @@ const DparticipateListMorethan = () => {
               Participants List more than one item
             </h2>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+                    {/* Items Dropdown with Floating Label */}
+                    <div className="relative w-full sm:w-auto">
+                <select
+                  className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                  id="items-select"
+                  onChange={handleItemsChange}
+                  value={selectedItems}
+                >
+                  <option value="ALL">All Items</option>
+                  <option value="2"> 2</option>
+                  <option value="3"> 3</option>
+                  <option value="4"> 4</option>
+                </select>
+                <label
+                  htmlFor="items-select"
+                  className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-2 peer-focus:text-blue-800 left-4"
+                >
+                  No of Items
+                </label>
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                  <i className="fa-solid fa-chevron-down"></i>
+                </div>
+              </div>
               {/* Festival Dropdown with Floating Label */}
               <div className="relative w-full sm:w-auto">
                 <select
@@ -500,29 +538,7 @@ const DparticipateListMorethan = () => {
                 </div>
               </div>
               
-              {/* Items Dropdown with Floating Label */}
-              <div className="relative w-full sm:w-auto">
-                <select
-                  className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                  id="items-select"
-                  onChange={handleItemsChange}
-                  value={selectedItems}
-                >
-                  <option value="ALL">All Items</option>
-                  <option value="2">More than 2</option>
-                  <option value="3">More than 3</option>
-                  <option value="4">More than 4</option>
-                </select>
-                <label
-                  htmlFor="items-select"
-                  className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
-                >
-                  No of Items
-                </label>
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                  <i className="fa-solid fa-chevron-down"></i>
-                </div>
-              </div>
+        
               
               {/* Print Button */}
               <button
@@ -575,7 +591,29 @@ const DparticipateListMorethan = () => {
                         <tr key={index} className="hover:bg-gray-100">
                           <td className="p-2 md:p-3">{participant.slNo}</td>
                           <td className="p-2 md:p-3">{participant.regNo || "-"}</td>
-                          <td className="p-2 md:p-3">{participant.itemCount || "-"}</td>
+                          <td className="p-2 md:p-3 relative">
+                            <span 
+                              className="cursor-pointer px-2 py-1 rounded no-print"
+                              onMouseEnter={() => setShowTooltip(participant.slNo)}
+                              onMouseLeave={() => setShowTooltip(null)}
+                            >
+                              {participant.itemCount || "-"}
+                              {showTooltip === participant.slNo && participant.items && participant.items.length > 0 && (
+                                <div className="absolute z-10 bg-gray-200 text-black text-xs rounded py-2 px-3 -mt-32 left-1/2 transform -translate-x-1/2 w-48 shadow-lg">
+                                  <ul className="text-left space-y-1">
+                                    {participant.items.map((item, idx) => (
+                                      <li key={idx} className="last:border-b-0 pb-1 last:pb-0">
+                                        {item}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </span>
+                            <span className="hidden print-only">
+                              {participant.itemCount || "-"}
+                            </span>
+                          </td>
                           <td className="p-2 md:p-3">{participant.name || "-"}</td>
                           <td className="p-2 md:p-3">{participant.schoolCode || "-"}</td>
                           <td className="p-2 md:p-3">{participant.schoolName || "-"}</td>

@@ -204,12 +204,12 @@ const DStageAllotItem = () => {
     };
 
     const handleAddClick = () => {
-        navigate('/DAddStageAllotfest');
+        navigate('/DAddStageallotitmwise');
     };
 
     const handleEditClick = (itemId) => {
         // Preserve the festival parameter when navigating
-        navigate(`/DEditStageAllotFest/${itemId}?festival=${selectedFestival}`);
+        navigate(`/DEditstgAllotitmwise/${itemId}?festival=${selectedFestival}`);
     };
 
     const handleSearch = (e) => {

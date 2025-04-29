@@ -190,6 +190,14 @@ const DItemwisePoint = () => {
     // Reset to first page when filters change
     setCurrentPage(1);
   }
+  const festivalOptions = [
+    { value: "All Festival", display: "All Festival" },
+    { value: "UP Kalaivizha", display: "UP Kalaivizha" },
+    { value: "LP Kalaivizha", display: "LP Kalaivizha" },
+    { value: "HS Kalaivizha", display: "HS Kalaivizha" },
+    { value: "HSS Kalaivizha", display: "HSS Kalaivizha" }
+  ];
+  
 
   const resultData = [
     { slNo: 1, itemCode: "301 - Story Writing", school: "GHSS Kozhikode", SchoolCode: 60001, studentName: "Rahul K", grade: "A", point: 9.5, totalPoint: 9.5 },
@@ -504,19 +512,27 @@ const DItemwisePoint = () => {
       All Schools
     </button>
 
-    <div className="relative w-full sm:w-40 mb-5">
+     {/* UPDATED: Festival filter with floating label */}
+     
+     <div className="relative w-full sm:w-40 mb-5">
       <select
-        className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
+        className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+        id="festival-select"
         onChange={handleFestivalChange}
         value={selectedFestival}
-        aria-label="Select Festival"
       >
-        <option value="All Festival">All Festival</option>
-        <option value="UP Kalaivizha">UP Kalaivizha</option>
-        <option value="LP Kalaivizha">LP Kalaivizha</option>
-        <option value="HS Kalaivizha">HS Kalaivizha</option>
-        <option value="HSS Kalaivizha">HSS Kalaivizha</option>
+        {festivalOptions.map(option => (
+          <option key={option.value} value={option.value}>
+            {option.display}
+          </option>
+        ))}
       </select>
+      <label
+        htmlFor="festival-select"
+        className="absolute text-xs text-blue-800 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-blue-800 left-3"
+      >
+        Festival
+      </label>
       <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
         <i className="fa-solid fa-chevron-down"></i>
       </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
@@ -8,23 +7,35 @@ import html2pdf from 'html2pdf.js'
 
 const DClusterSclList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchTerm, setSearchTerm] = useState(searchParams.get('query') || '');
-  const [searchType, setSearchType] = useState(searchParams.get('type') || 'code');
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('code') || '');
+  const [selectedSubDistrict, setSelectedSubDistrict] = useState(searchParams.get('subDistrict') || 'Select Sub District');
   const printRef = useRef();
+
+  // Available sub-districts (same as in DParticipatingScl)
+  const subDistricts = [
+    'Select Sub District',
+    'Munnar',
+    'Adimali',
+    'Kattappana',
+    'Nedumkandam',
+    'Devikulam',
+    'Chittur',
+    'Pattambi'
+  ];
 
   // State for schools data
   const [schools, setSchools] = useState([
-    { slno: 1, code: '6004', name: 'G. H. S. S Kumily', dataEntered: 'Yes', confirmed: 'No' },
-    { slno: 2, code: '6059', name: 'G. H. S. S Anakara', dataEntered: 'Yes', confirmed: 'No' },
-    { slno: 3, code: '30001', name: 'G. V. H. S. S Munnar', dataEntered: 'Yes', confirmed: 'No' },
-    { slno: 4, code: '30002', name: 'G. H. S. Sothuparai', dataEntered: 'Yes', confirmed: 'No' },
-    { slno: 5, code: '30003', name: 'G. H. S. S Vaguvurrai', dataEntered: 'Yes', confirmed: 'Yes' },
-    { slno: 6, code: '30006', name: 'L. F. G. H. S. Munnar', dataEntered: 'Yes', confirmed: 'Yes' },
-    { slno: 7, code: '30008', name: 'G. H. S. S Devikulam', dataEntered: 'Yes', confirmed: 'Yes' },
-    { slno: 8, code: '30009', name: 'G. H. S. S Marayoor', dataEntered: 'Yes', confirmed: 'Yes' },
-    { slno: 9, code: '30010', name: 'S. H. H. S. Kanthaloor', dataEntered: 'Yes', confirmed: 'No' },
-    { slno: 10, code: '3000', name: 'S. H. H. S. Kanthalloor', dataEntered: 'Yes', confirmed: 'No' },
-    { slno: 11, code: '0010', name: 'S. H. H. S. anthalloor', dataEntered: 'Yes', confirmed: 'No' },
+    { slno: 1, code: '6004', name: 'G. H. S. S Kumily', dataEntered: 'Yes', confirmed: 'No', subDistrict: 'Kattappana' },
+    { slno: 2, code: '6059', name: 'G. H. S. S Anakara', dataEntered: 'Yes', confirmed: 'No', subDistrict: 'Chittur' },
+    { slno: 3, code: '30001', name: 'G. V. H. S. S Munnar', dataEntered: 'Yes', confirmed: 'No', subDistrict: 'Munnar' },
+    { slno: 4, code: '30002', name: 'G. H. S. Sothuparai', dataEntered: 'Yes', confirmed: 'No', subDistrict: 'Devikulam' },
+    { slno: 5, code: '30003', name: 'G. H. S. S Vaguvurrai', dataEntered: 'Yes', confirmed: 'Yes', subDistrict: 'Munnar' },
+    { slno: 6, code: '30006', name: 'L. F. G. H. S. Munnar', dataEntered: 'Yes', confirmed: 'Yes', subDistrict: 'Munnar' },
+    { slno: 7, code: '30008', name: 'G. H. S. S Devikulam', dataEntered: 'Yes', confirmed: 'Yes', subDistrict: 'Devikulam' },
+    { slno: 8, code: '30009', name: 'G. H. S. S Marayoor', dataEntered: 'Yes', confirmed: 'Yes', subDistrict: 'Adimali' },
+    { slno: 9, code: '30010', name: 'S. H. H. S. Kanthaloor', dataEntered: 'Yes', confirmed: 'No', subDistrict: 'Nedumkandam' },
+    { slno: 10, code: '3000', name: 'S. H. H. S. Kanthalloor', dataEntered: 'Yes', confirmed: 'No', subDistrict: 'Pattambi' },
+    { slno: 11, code: '0010', name: 'S. H. H. S. anthalloor', dataEntered: 'Yes', confirmed: 'No', subDistrict: 'Chittur' },
   ]);
   const [filteredSchools, setFilteredSchools] = useState(schools);
   const [loading, setLoading] = useState(true);
@@ -63,19 +74,27 @@ const DClusterSclList = () => {
         setLoadingProgress(100);
         
         if (result.status === 200) {
-          const apiSchools = result.data.map((school, index) => ({
-            slno: index + 1,
-            code: school.code || '',
-            name: school.name || '',
-            dataEntered: school.dataEntered ? 'Yes' : 'No',
-            confirmed: school.confirmed ? 'Yes' : 'No'
-          }));
+          // Add subDistrict field to the API response data
+          // In a real app, this would come from the API
+          const apiSchools = result.data.map((school, index) => {
+            // Randomly assign a subDistrict for demonstration
+            const randomSubDistrict = subDistricts[Math.floor(Math.random() * (subDistricts.length - 1)) + 1];
+            
+            return {
+              slno: index + 1,
+              code: school.code || '',
+              name: school.name || '',
+              dataEntered: school.dataEntered ? 'Yes' : 'No',
+              confirmed: school.confirmed ? 'Yes' : 'No',
+              subDistrict: school.subDistrict || randomSubDistrict // Use API data if available, otherwise random
+            };
+          });
           
           setSchools(apiSchools.length > 0 ? apiSchools : schools);
-          setFilteredSchools(apiSchools.length > 0 ? apiSchools : schools);
+          filterSchoolsByTermAndSubDistrict(searchTerm, selectedSubDistrict, apiSchools.length > 0 ? apiSchools : schools);
         } else {
           setSchools(schools);
-          setFilteredSchools(schools);
+          filterSchoolsByTermAndSubDistrict(searchTerm, selectedSubDistrict, schools);
         }
         
         // Add a small delay to show 100% progress before hiding the loader
@@ -85,36 +104,68 @@ const DClusterSclList = () => {
       } catch (err) {
         console.error(err);
         setSchools(schools);
-        setFilteredSchools(schools);
+        filterSchoolsByTermAndSubDistrict(searchTerm, selectedSubDistrict, schools);
         setError("An error occurred while fetching schools. Using default data.");
         setLoading(false);
       }
     } else {
       setSchools(schools);
-      setFilteredSchools(schools);
+      filterSchoolsByTermAndSubDistrict(searchTerm, selectedSubDistrict, schools);
       setLoading(false);
     }
   };
 
   useEffect(() => {
     const initialSearchTerm = searchParams.get('code') || '';
+    const initialSubDistrict = searchParams.get('subDistrict') || 'Select Sub District';
+    
     setSearchTerm(initialSearchTerm);
-    filterSchools(initialSearchTerm);
+    setSelectedSubDistrict(initialSubDistrict);
+    
+    filterSchoolsByTermAndSubDistrict(initialSearchTerm, initialSubDistrict);
   }, [searchParams, schools]);
 
   const handleSearchChange = (event) => {
     const newSearchTerm = event.target.value;
     setSearchTerm(newSearchTerm);
-    setSearchParams(new URLSearchParams({ code: newSearchTerm }));
-    filterSchools(newSearchTerm);
+    
+    // Update URL parameters while preserving subDistrict parameter
+    const newParams = new URLSearchParams();
+    if (newSearchTerm) newParams.set('code', newSearchTerm);
+    if (selectedSubDistrict !== 'Select Sub District') newParams.set('subDistrict', selectedSubDistrict);
+    setSearchParams(newParams);
+    
+    filterSchoolsByTermAndSubDistrict(newSearchTerm, selectedSubDistrict);
     setCurrentPage(1); // Reset to first page when searching
   };
 
-  const filterSchools = (term) => {
+  const handleSubDistrictChange = (e) => {
+    const newSubDistrict = e.target.value;
+    setSelectedSubDistrict(newSubDistrict);
+    
+    // Update URL parameters while preserving search term
+    const newParams = new URLSearchParams();
+    if (searchTerm) newParams.set('code', searchTerm);
+    if (newSubDistrict !== 'Select Sub District') newParams.set('subDistrict', newSubDistrict);
+    setSearchParams(newParams);
+    
+    filterSchoolsByTermAndSubDistrict(searchTerm, newSubDistrict);
+    setCurrentPage(1); // Reset to first page when changing sub-district
+  };
+
+  const filterSchoolsByTermAndSubDistrict = (term = '', subDistrict = 'Select Sub District', schoolsData = schools) => {
     const lowercasedTerm = term.toLowerCase();
-    const results = schools.filter(school =>
+    
+    // First filter by search term
+    const termFiltered = term === '' ? schoolsData : schoolsData.filter(school =>
       school.code.toLowerCase().includes(lowercasedTerm)
     );
+    
+    // Then filter by subDistrict if one is selected
+    const results = subDistrict === 'Select Sub District' 
+      ? termFiltered 
+      : termFiltered.filter(school => school.subDistrict === subDistrict);
+    
     setFilteredSchools(results);
   };
 
@@ -173,6 +224,12 @@ const DClusterSclList = () => {
     return pageNumbers;
   };
 
+  // Get PDF title based on selected filters
+  const getPrintTitle = () => {
+    const subDistrictPart = selectedSubDistrict === "Select Sub District" ? "All Sub Districts" : selectedSubDistrict;
+    return `Cluster School List - Sub District - ${subDistrictPart}`;
+  };
+
   // PDF generation function using html2pdf.js
   const generatePDF = () => {
     // Create a clone of the table for PDF generation
@@ -180,7 +237,7 @@ const DClusterSclList = () => {
     
     // Add title
     const titleElement = document.createElement('h2');
-    titleElement.textContent = "Cluster School List";
+    titleElement.textContent = getPrintTitle();
     titleElement.style.textAlign = 'center';
     titleElement.style.margin = '20px 0';
     titleElement.style.fontWeight = 'bold';
@@ -222,7 +279,8 @@ const DClusterSclList = () => {
         school.code || "-",
         school.name || "-",
         school.dataEntered || "-",
-        school.confirmed || "-"
+        school.confirmed || "-",
+        
       ];
       
       cellData.forEach(text => {
@@ -241,7 +299,7 @@ const DClusterSclList = () => {
     pdfContent.appendChild(table);
     
     // PDF filename
-    const fileName = `Cluster_Schools_List.pdf`;
+    const fileName = `Cluster_Schools_List_${selectedSubDistrict.replace(/ /g, '_')}.pdf`;
     
     // PDF options
     const options = {
@@ -252,7 +310,7 @@ const DClusterSclList = () => {
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     
-    // Generate and download PDF
+    // Generate and download PDF 
     html2pdf().from(pdfContent).set(options).save();
   };
 
@@ -288,16 +346,43 @@ const DClusterSclList = () => {
       <div className="flex flex-col md:flex-row min-h-screen">
         <Dash />
         <div className="flex-1 p-4 md:p-6 lg:p-8">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
             <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
               Cluster School List 
             </h2>
-            <button 
-              onClick={generatePDF}
-              className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full"
-            >
-              Print
-            </button>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              {/* Sub-District Select with floating label */}
+              <div className="relative w-full sm:w-40">
+                <select
+                  className="border-blue-800 border text-blue-700 px-3 py-2  text-sm rounded-full w-full bg-white cursor-pointer appearance-none  peer"
+                  id="sub-district-select"
+                  value={selectedSubDistrict}
+                  onChange={handleSubDistrictChange}
+                >
+                  {subDistricts.map((option, index) => (
+                    <option key={`sub-district-${index}`} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+                <label
+                  htmlFor="sub-district-select"
+                  className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                >
+                  Sub District
+                </label>
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                  <i className="fa-solid fa-chevron-down"></i>
+                </div>
+              </div>
+
+              <button 
+                onClick={generatePDF}
+                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
+              >
+                Print
+              </button>
+            </div>
           </div>
           
           {error && (
@@ -322,7 +407,7 @@ const DClusterSclList = () => {
           <div ref={printRef} className="w-full">
             <div className="overflow-x-auto mt-4 -mx-4 sm:mx-0">
               <div className="inline-block min-w-full align-middle px-4 sm:px-0">
-                <table className="min-w-full  border-separate border-spacing-y-2">
+                <table className="min-w-full border-separate border-spacing-y-2">
                   <thead>
                     <tr className="text-gray-700">
                       <th className="p-2 md:p-3">Sl No</th>
@@ -330,7 +415,7 @@ const DClusterSclList = () => {
                       <th className="p-2 md:p-3">School Name</th>
                       <th className="p-2 md:p-3">Data Entered</th>
                       <th className="p-2 md:p-3">Confirmed</th>
-                      {/* <th className="p-2 md:p-3">Status</th> */}
+                      
                       <th className="p-2 md:p-3">Reset</th>
                     </tr>
                   </thead>
@@ -343,9 +428,6 @@ const DClusterSclList = () => {
                           <td className="p-2 md:p-3">{school.name}</td>
                           <td className="p-2 md:p-3">{school.dataEntered}</td>
                           <td className="p-2 md:p-3">{school.confirmed}</td>
-                          {/* <td className="p-2 text-blue-500 md:p-3">
-                            {school.confirmed === 'Yes' ? 'Publish' : 'Unpublish'}
-                          </td> */}
                           <td className="p-2 md:p-3">
                             <i className="text-blue-500 fa-solid fa-arrow-rotate-right"></i>
                           </td>
@@ -414,6 +496,5 @@ const DClusterSclList = () => {
     </>
   );
 };
-
 
 export default DClusterSclList

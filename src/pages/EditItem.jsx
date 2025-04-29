@@ -1,4 +1,3 @@
-// IT admin EDIT item In item List
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import Dash from '../components/Dash';
@@ -10,12 +9,18 @@ const EditItem = () => {
     const [searchParams] = useSearchParams();
     const { itemId } = useParams(); // Get item ID from URL params
     const festivalDropdownRef = useRef(null);
+    const stageDropdownRef = useRef(null);
 
     const festivalOptions = [
         "UP Tamilkalaivizha",
         "LP Tamilkalaivizha",
         "Hs Tamilkalaivizha",
         "Hss Tamilkalaivizha"
+    ];
+    
+    const stageOptions = [
+        "ON Stage",
+        "Off Stage",
     ];
 
     const [formData, setFormData] = useState({
@@ -25,7 +30,8 @@ const EditItem = () => {
         itemType: '',          
         maxStudents: '',    
         pinnany: '0',          
-        duration: ''         
+        duration: '',
+        stageType: ''         
     });
 
     const [errors, setErrors] = useState({
@@ -34,15 +40,18 @@ const EditItem = () => {
         festival: '',
         itemType: '',
         maxStudents: '',
-        duration: ''
+        duration: '',
+        stageType: ''
     });
 
     const [dropdownOpen, setDropdownOpen] = useState({
-        festival: false
+        festival: false,
+        stageType: false
     });
 
     const [searchText, setSearchText] = useState({
-        festival: ''
+        festival: '',
+        stageType: ''
     });
 
     const [isLoading, setIsLoading] = useState(true);
@@ -84,7 +93,8 @@ const EditItem = () => {
                         itemType: 'Group',
                         maxStudents: '10',
                         pinnany: '2',
-                        duration: '5 minutes'
+                        duration: '5 minutes',
+                        stageType: 'ON Stage'
                     };
                     setFormData(mockData);
                     setIsLoading(false);
@@ -116,11 +126,19 @@ const EditItem = () => {
         ? festivalOptions.filter(festival =>
             festival.toLowerCase().includes(searchText.festival.toLowerCase()))
         : festivalOptions;
+        
+    const filteredStages = searchText.stageType
+        ? stageOptions.filter(stage =>
+            stage.toLowerCase().includes(searchText.stageType.toLowerCase()))
+        : stageOptions;
 
     useEffect(() => {
         function handleClickOutside(event) {
             if (festivalDropdownRef.current && !festivalDropdownRef.current.contains(event.target)) {
                 setDropdownOpen(prev => ({ ...prev, festival: false }));
+            }
+            if (stageDropdownRef.current && !stageDropdownRef.current.contains(event.target)) {
+                setDropdownOpen(prev => ({ ...prev, stageType: false }));
             }
         }
 
@@ -172,6 +190,10 @@ const EditItem = () => {
             case 'duration':
                 if (!value.trim()) return 'Duration is required';
                 return '';
+                
+            case 'stageType':
+                if (!value.trim()) return 'Stage Type is required';
+                return '';
 
             default:
                 return '';
@@ -182,7 +204,7 @@ const EditItem = () => {
         const newErrors = {};
         let isValid = true;
         
-        const fieldsToValidate = ['festivalName', 'fromClass', 'festival', 'itemType', 'maxStudents', 'duration'];
+        const fieldsToValidate = ['festivalName', 'fromClass', 'festival', 'itemType', 'maxStudents', 'duration', 'stageType'];
         
         fieldsToValidate.forEach(key => {
             const error = validateField(key, formData[key]);
@@ -217,6 +239,10 @@ const EditItem = () => {
         if (name === 'festival') {
             setDropdownOpen(prev => ({ ...prev, festival: false }));
             setSearchText(prev => ({ ...prev, festival: '' }));
+        }
+        if (name === 'stageType') {
+            setDropdownOpen(prev => ({ ...prev, stageType: false }));
+            setSearchText(prev => ({ ...prev, stageType: '' }));
         }
     };
 
@@ -350,7 +376,6 @@ const EditItem = () => {
                                             </div>
                                             {dropdownOpen.festival && (
                                                 <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
-                                            
                                                     <div className="p-2 border-b">
                                                         <input
                                                             type="text"
@@ -436,6 +461,52 @@ const EditItem = () => {
                                             className={`w-full px-3 sm:px-4 py-2 border ${errors.duration ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
                                         />
                                         {errors.duration && <p className="text-red-500 text-xs mt-1 ml-2">{errors.duration}</p>}
+                                    </div>
+                                </div>
+                                <div className="flex flex-col sm:flex-row sm:items-center">
+                                    <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Stage Type</label>
+                                    <div className="w-full sm:w-2/3">
+                                        <div className="relative" ref={stageDropdownRef}>
+                                            <div
+                                                onClick={() => toggleDropdown('stageType')}
+                                                className={`border px-3 sm:px-4 py-2 rounded-full w-full ${errors.stageType ? 'border-red-500' : 'border-blue-600'} flex justify-between items-center cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                            >
+                                                <span className="text-gray-600">{formData.stageType || 'Select Stage Type'}</span>
+                                                <span className="text-xs">▼</span>
+                                            </div>
+                                            {dropdownOpen.stageType && (
+                                                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+                                                    <div className="p-2 border-b">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Search stage type..."
+                                                            value={searchText.stageType}
+                                                            onChange={(e) => handleSearchChange(e, 'stageType')}
+                                                            className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        />
+                                                    </div>
+                                                    <div className="max-h-48 overflow-y-auto">
+                                                        {filteredStages.length > 0 ? (
+                                                            filteredStages.map((stage, index) => (
+                                                                <div
+                                                                    key={index}
+                                                                    className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.stageType === stage ? 'bg-blue-200' : ''}`}
+                                                                    onClick={() => handleInputChange({
+                                                                        target: { name: 'stageType', value: stage }
+                                                                    })}
+                                                                >
+                                                                    {stage}
+                                                                </div>
+                                                            ))
+                                                        ) : (
+                                                            <div className="px-4 py-2 text-gray-500">No results found</div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                        {errors.stageType && <p className="text-red-500 text-xs mt-1 ml-2">{errors.stageType}</p>}
                                     </div>
                                 </div>
                             </form>

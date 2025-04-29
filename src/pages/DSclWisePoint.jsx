@@ -13,25 +13,39 @@ const DSclWisePoint = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const selectedFestival = searchParams.get('festival') || "UP Kalaivizha";
+    const selectedSubDistrict = searchParams.get('subDistrict') || "Select Sub District";
     const searchQuery = searchParams.get('search') || '';
+
+    // Available sub-districts (same as in DClusterSclList)
+    const subDistricts = [
+        'Select Sub District',
+        'Munnar',
+        'Adimali',
+        'Kattappana',
+        'Nedumkandam',
+        'Devikulam',
+        'Chittur',
+        'Pattambi'
+    ];
 
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
     // Dummy data with festival-related information (using itemCode to determine festival)
+    // Adding subDistrict to the dummy data
     const dummyResultData = [
-        { slNo: 1, regNo: "3016", code: "GHSS Kozhikode", mark1: 5, mark2: 8, mark3: 2, total: "67", markPercentage: 85, rank: 2, grade: "A", point: 9.5, itemCode: "301" },
-        { slNo: 2, regNo: "3015", code: "MES HSS", mark1: 9, mark2: 8, mark3: 5, total: "66", markPercentage: 91, rank: 1, grade: "A+", point: 10.0, itemCode: "302" },
-        { slNo: 3, regNo: "3016", code: "G. H. S. S Anakara", mark1: 7, mark2: 2, mark3: 8, total: "45", markPercentage: 82, rank: 3, grade: "A-", point: 9.0, itemCode: "303" },
-        { slNo: 4, regNo: "3445", code: "G. H. S. S Kumily", mark1: 8, mark2: 2, mark3: 7, total: "43", markPercentage: 72, rank: 7, grade: "B+", point: 8.0, itemCode: "401" },
-        { slNo: 5, regNo: "675", code: "G. H. S. S. Vaguvurrai", mark1: 2, mark2: 0, mark3: 8, total: "45", markPercentage: 87, rank: 4, grade: "A", point: 9.5, itemCode: "402" },
-        { slNo: 6, regNo: "8905", code: "St. Mary's School", mark1: 8, mark2: 7, mark3: 8, total: "33", markPercentage: 78, rank: 5, grade: "B+", point: 8.5, itemCode: "501" },
-        { slNo: 7, regNo: "4589", code: "DAV Public School", mark1: 5, mark2: 0, mark3: 8, total: "55", markPercentage: 68, rank: 8, grade: "B", point: 7.5, itemCode: "502" },
-        { slNo: 8, regNo: "6787", code: "Kendriya Vidyalaya", mark1: 0, mark2: 6, mark3: 0, total: "26", markPercentage: 75, rank: 6, grade: "B+", point: 8.0, itemCode: "601" },
-        { slNo: 9, regNo: "6787", code: "Kendriya Vidyalaya", mark1: 0, mark2: 6, mark3: 0, total: "26", markPercentage: 75, rank: 6, grade: "B+", point: 8.0, itemCode: "601" },
-        { slNo: 10, regNo: "6787", code: "Kendriya Vidyalaya", mark1: 0, mark2: 6, mark3: 0, total: "26", markPercentage: 75, rank: 6, grade: "B+", point: 8.0, itemCode: "601" },
-        { slNo: 11, regNo: "6787", code: "Kendriya Vidyalaya", mark1: 0, mark2: 6, mark3: 0, total: "26", markPercentage: 75, rank: 6, grade: "B+", point: 8.0, itemCode: "601" }
+        { slNo: 1, regNo: "3016", code: "GHSS Kozhikode", mark1: 5, mark2: 8, mark3: 2, total: "67", markPercentage: 85, rank: 2, grade: "A", point: 9.5, itemCode: "301", subDistrict: "Kattappana" },
+        { slNo: 2, regNo: "3015", code: "MES HSS", mark1: 9, mark2: 8, mark3: 5, total: "66", markPercentage: 91, rank: 1, grade: "A+", point: 10.0, itemCode: "302", subDistrict: "Munnar" },
+        { slNo: 3, regNo: "3016", code: "G. H. S. S Anakara", mark1: 7, mark2: 2, mark3: 8, total: "45", markPercentage: 82, rank: 3, grade: "A-", point: 9.0, itemCode: "303", subDistrict: "Chittur" },
+        { slNo: 4, regNo: "3445", code: "G. H. S. S Kumily", mark1: 8, mark2: 2, mark3: 7, total: "43", markPercentage: 72, rank: 7, grade: "B+", point: 8.0, itemCode: "401", subDistrict: "Kattappana" },
+        { slNo: 5, regNo: "675", code: "G. H. S. S. Vaguvurrai", mark1: 2, mark2: 0, mark3: 8, total: "45", markPercentage: 87, rank: 4, grade: "A", point: 9.5, itemCode: "402", subDistrict: "Munnar" },
+        { slNo: 6, regNo: "8905", code: "St. Mary's School", mark1: 8, mark2: 7, mark3: 8, total: "33", markPercentage: 78, rank: 5, grade: "B+", point: 8.5, itemCode: "501", subDistrict: "Devikulam" },
+        { slNo: 7, regNo: "4589", code: "DAV Public School", mark1: 5, mark2: 0, mark3: 8, total: "55", markPercentage: 68, rank: 8, grade: "B", point: 7.5, itemCode: "502", subDistrict: "Nedumkandam" },
+        { slNo: 8, regNo: "6787", code: "Kendriya Vidyalaya", mark1: 0, mark2: 6, mark3: 0, total: "26", markPercentage: 75, rank: 6, grade: "B+", point: 8.0, itemCode: "601", subDistrict: "Pattambi" },
+        { slNo: 9, regNo: "6787", code: "Kendriya Vidyalaya", mark1: 0, mark2: 6, mark3: 0, total: "26", markPercentage: 75, rank: 6, grade: "B+", point: 8.0, itemCode: "601", subDistrict: "Adimali" },
+        { slNo: 10, regNo: "6787", code: "Kendriya Vidyalaya", mark1: 0, mark2: 6, mark3: 0, total: "26", markPercentage: 75, rank: 6, grade: "B+", point: 8.0, itemCode: "601", subDistrict: "Pattambi" },
+        { slNo: 11, regNo: "6787", code: "Kendriya Vidyalaya", mark1: 0, mark2: 6, mark3: 0, total: "26", markPercentage: 75, rank: 6, grade: "B+", point: 8.0, itemCode: "601", subDistrict: "Chittur" }
     ];
 
     useEffect(() => {
@@ -43,12 +57,12 @@ const DSclWisePoint = () => {
         }
     }, []);
 
-    // Filter data whenever selectedFestival or allResultData changes
+    // Filter data whenever selectedFestival, selectedSubDistrict or allResultData changes
     useEffect(() => {
         if (allResultData.length > 0) {
             filterData();
         }
-    }, [selectedFestival, allResultData]);
+    }, [selectedFestival, selectedSubDistrict, allResultData]);
 
     // React to searchText changes directly without updating URL
     useEffect(() => {
@@ -118,7 +132,12 @@ const DSclWisePoint = () => {
                 filtered = [...allResultData];
         }
 
-        // Then filter by search text (not searchQuery from URL)
+        // Then filter by subDistrict
+        if (selectedSubDistrict !== 'Select Sub District') {
+            filtered = filtered.filter(item => item.subDistrict === selectedSubDistrict);
+        }
+
+        // Finally filter by search text (not searchQuery from URL)
         if (searchText && searchText.trim() !== '') {
             const searchLower = searchText.toLowerCase().trim();
             filtered = filtered.filter(item => 
@@ -139,28 +158,56 @@ const DSclWisePoint = () => {
     }
 
     const getPrintTitle = () => {
+        let festivalPart;
         switch (selectedFestival) {
             case "UP Kalaivizha":
-                return "UP Tamil Kalaivizha - School Wise Point Report";
+                festivalPart = "UP Tamil Kalaivizha";
+                break;
             case "LP Kalaivizha":
-                return "LP Tamil Kalaivizha - School Wise Point Report";
+                festivalPart = "LP Tamil Kalaivizha";
+                break;
             case "HS Kalaivizha":
-                return "HS Tamil Kalaivizha - School Wise Point Report";
+                festivalPart = "HS Tamil Kalaivizha";
+                break;
             case "HSS Kalaivizha":
-                return "HSS Tamil Kalaivizha - School Wise Point Report";
+                festivalPart = "HSS Tamil Kalaivizha";
+                break;
             case "All Festival":
-                return "All Festival Tamil Kalaivizha - School Wise Point Report";
+                festivalPart = "All Festival Tamil Kalaivizha";
+                break;
             default:
-                return "School Wise Point Report";
+                festivalPart = selectedFestival;
         }
+        
+        const subDistrictPart = selectedSubDistrict === "Select Sub District" ? "All Sub Districts" : selectedSubDistrict;
+        return `${festivalPart} - ${subDistrictPart} - School Wise Point Report`;
     };
 
     const handleFestivalChange = (e) => {
         const newFestival = e.target.value;
-        setSearchParams({ festival: newFestival });
+        
+        // Update URL parameters while preserving subDistrict
+        const newParams = new URLSearchParams();
+        newParams.set('festival', newFestival);
+        if (selectedSubDistrict !== 'Select Sub District') {
+            newParams.set('subDistrict', selectedSubDistrict);
+        }
+        setSearchParams(newParams);
         
         // Reset search text when changing festival
         setSearchText('');
+    };
+
+    const handleSubDistrictChange = (e) => {
+        const newSubDistrict = e.target.value;
+        
+        // Update URL parameters while preserving festival
+        const newParams = new URLSearchParams();
+        newParams.set('festival', selectedFestival);
+        if (newSubDistrict !== 'Select Sub District') {
+            newParams.set('subDistrict', newSubDistrict);
+        }
+        setSearchParams(newParams);
     };
 
     const handleSearchInputChange = (e) => {
@@ -245,8 +292,10 @@ const DSclWisePoint = () => {
         table.appendChild(tbody);
         pdfContent.appendChild(table);
         
-        // PDF filename
-        const fileName = `${selectedFestival.replace(/ /g, '_')}_School_Wise_Points.pdf`;
+        // PDF filename with festival and subDistrict
+        const festivalPart = selectedFestival.replace(/ /g, '_');
+        const subDistrictPart = selectedSubDistrict === "Select Sub District" ? "All_SubDistricts" : selectedSubDistrict.replace(/ /g, '_');
+        const fileName = `${festivalPart}_${subDistrictPart}_School_Wise_Points.pdf`;
         
         // PDF options
         const options = {
@@ -334,6 +383,7 @@ const DSclWisePoint = () => {
                         School Wise Point List
                         </h2>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
+                            {/* Festival Select */}
                             <div className="relative w-full sm:w-40">
                                 <select
                                     className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
@@ -350,6 +400,32 @@ const DSclWisePoint = () => {
                                     <i className="fa-solid fa-chevron-down"></i>
                                 </div>
                             </div>
+                            
+                            {/* Sub-District Select with floating label */}
+                            <div className="relative w-full sm:w-40">
+                                <select
+                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                                    id="sub-district-select"
+                                    value={selectedSubDistrict}
+                                    onChange={handleSubDistrictChange}
+                                >
+                                    {subDistricts.map((option, index) => (
+                                        <option key={`sub-district-${index}`} value={option}>
+                                            {option}
+                                        </option>
+                                    ))}
+                                </select>
+                                <label
+                                    htmlFor="sub-district-select"
+                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                                >
+                                    Sub District
+                                </label>
+                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                                    <i className="fa-solid fa-chevron-down"></i>
+                                </div>
+                            </div>
+                            
                             <button
                                 onClick={generatePDF}
                                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
@@ -366,7 +442,6 @@ const DSclWisePoint = () => {
                             value={searchText}
                             onChange={handleSearchInputChange}
                         />
-                     
                         <div className="text-gray-500">
                             <i className="fa-solid fa-magnifying-glass"></i>
                         </div>
@@ -403,8 +478,8 @@ const DSclWisePoint = () => {
                                         <tr>
                                             <td colSpan="7" className="p-3 text-center text-gray-500">
                                                 {searchText 
-                                                    ? `No schools found matching "${searchText}" in ${selectedFestival}` 
-                                                    : `No records found for ${selectedFestival}`}
+                                                    ? `No schools found matching "${searchText}" in ${selectedFestival}${selectedSubDistrict !== 'Select Sub District' ? ` for ${selectedSubDistrict}` : ''}` 
+                                                    : `No records found for ${selectedFestival}${selectedSubDistrict !== 'Select Sub District' ? ` in ${selectedSubDistrict}` : ''}`}
                                             </td>
                                         </tr>
                                     )}

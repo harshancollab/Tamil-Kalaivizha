@@ -139,6 +139,53 @@ import DHigherlvlComp from './pages/DHigherlvlComp';
 import DExport from './pages/DExport';
 import DAddresultentry from './pages/DAddresultentry';
 import DAllresultentry from './pages/DAllresultentry';
+import DItemresultList from './pages/DItemresultList';
+import DCallSheet from './pages/DCallSheet';
+import DTimesheet from './pages/DTimesheet';
+import DScoreSheet from './pages/DScoreSheet';
+import DTabulationSheet from './pages/DTabulationSheet';
+import DAllReport from './pages/DAllReport';
+import DClusterReport from './pages/DClusterReport';
+import SDefineKalolsavm from './pages/SDefineKalolsavm';
+import SEditKallosvm from './pages/SEditKallosvm';
+import SSClEntry from './pages/SSClEntry';
+import SClusterScl from './pages/SClusterScl';
+import SsplOrderEntry from './pages/SsplOrderEntry';
+import SstageDurationList from './pages/SstageDurationList';
+import SAddstagduratn from './pages/SAddstagduratn';
+import SdefineStagelist from './pages/SdefineStagelist';
+import SAddStage from './pages/SAddStage';
+import SeditStage from './pages/SeditStage';
+import SStageAlloteFestwise from './pages/SStageAlloteFestwise';
+import SAddStgAllotFest from './pages/SAddStgAllotFest';
+import SEditStgAllotFest from './pages/SEditStgAllotFest';
+import SstageAllotItemwi from './pages/SstageAllotItemwi';
+import SAddStgAlloteItmWis from './pages/SAddStgAlloteItmWis';
+import SEditstgeAllotItemwis from './pages/SEditstgeAllotItemwis';
+import SClashReport from './pages/SClashReport';
+import SClusterReport from './pages/SClusterReport';
+import SStageReport from './pages/SStageReport';
+import SResultentryList from './pages/SResultentryList';
+import SAddResultentry from './pages/SAddResultentry';
+import SEditResultentry from './pages/SEditResultentry';
+import SitemResultList from './pages/SitemResultList';
+import SConfidenal from './pages/SConfidenal';
+import SItemwisePoint from './pages/SItemwisePoint';
+import SItemCodewise from './pages/SItemCodewise';
+import SsclwisePoint from './pages/SsclwisePoint';
+import SsclGradewise from './pages/SsclGradewise';
+import SCertificateRegNo from './pages/SCertificateRegNo';
+import SCertificateItemwise from './pages/SCertificateItemwise';
+import ScertificateParticipate from './pages/ScertificateParticipate';
+import SCertificatesclwise from './pages/SCertificatesclwise';
+import SCertificateDetails from './pages/SCertificateDetails';
+import DEditResultentry from './pages/DEditResultentry';
+import DAddStageallotitmwise from './pages/DAddStageallotitmwise';
+import DEditstgAllotitmwise from './pages/DEditstgAllotitmwise';
+import SParticipateMorethan from './pages/SParticipateMorethan';
+import SPublishDeclarList from './pages/SPublishDeclarList';
+import SExport from './pages/SExport';
+import ShigherLevel from './pages/ShigherLevel';
 
 
 
@@ -317,8 +364,19 @@ function App() {
         <Route path="/DHigherlvlComp" element={<DHigherlvlComp />} />
         <Route path="/DExport" element={<DExport />} />
         <Route path="/DAllresultentry" element={<DAllresultentry />} />
-
+        <Route path="/DCallSheet" element={<DCallSheet />} />
+        <Route path="/DTimesheet" element={<DTimesheet />} />
+        <Route path="/DScoreSheet" element={<DScoreSheet />} />
+        <Route path="/DTabulationSheet" element={<DTabulationSheet />} />
+        <Route path="/DAllReport" element={<DAllReport />} />
+        <Route path="/DEditResultentry/:id" element={<DEditResultentry />} />
         <Route path="/DAddresultentry" element={<DAddresultentry />} />
+        <Route path="/DItemresultList" element={<DItemresultList />} />
+        <Route path="/DClusterReport" element={<DClusterReport />} />
+        <Route path="/DAddStageallotitmwise" element={<DAddStageallotitmwise />} />
+        <Route path="/DEditstgAllotitmwise/:id" element={<DEditstgAllotitmwise />} />
+
+
 
 
         
@@ -330,7 +388,54 @@ function App() {
         </Route> 
         <Route element={<ProtectedRoute allowedRoles={['state admin']} />}>
         
-        
+        <Route path="/SDefineKalolsavm" element={<SDefineKalolsavm />} />
+        <Route path="/SEditKallosvm/:id" element={<SEditKallosvm />} />
+        <Route path="/SSClEntry" element={<SSClEntry />} />
+        <Route path="/SClusterScl" element={<SClusterScl />} />
+        <Route path="/SsplOrderEntry" element={<SsplOrderEntry />} />
+        <Route path="/SstageDurationList" element={<SstageDurationList />} />
+        <Route path="/SAddstagduratn" element={<SAddstagduratn />} />
+        <Route path="/SdefineStagelist" element={<SdefineStagelist />} />
+        <Route path="/SAddStage" element={<SAddStage />} />
+        <Route path="/SeditStage" element={<SeditStage />} />
+        <Route path="/SStageAlloteFestwise" element={<SStageAlloteFestwise />} />
+        <Route path="/SAddStgAllotFest" element={<SAddStgAllotFest />} />
+        <Route path="/SEditStgAllotFest/:id" element={<SEditStgAllotFest />} />
+        <Route path="/SstageAllotItemwi" element={<SstageAllotItemwi />} />
+        <Route path="/SAddStgAlloteItmWis" element={<SAddStgAlloteItmWis />} />
+        <Route path="/SEditstgeAllotItemwis/:id" element={<SEditstgeAllotItemwis />} />
+        <Route path="/SClashReport" element={<SClashReport />} />
+        <Route path="/SClusterReport" element={<SClusterReport />} />
+        <Route path="/SStageReport" element={<SStageReport />} />
+        <Route path="/SResultentryList" element={<SResultentryList />} />
+        <Route path="/SAddResultentry" element={<SAddResultentry />} />
+        <Route path="/SEditResultentry/:id" element={<SEditResultentry />} />
+        <Route path="/SitemResultList" element={<SitemResultList />} />
+        <Route path="/SConfidenal" element={<SConfidenal />} />
+        <Route path="/SItemwisePoint" element={<SItemwisePoint />} />
+        <Route path="/SItemCodewise" element={<SItemCodewise />} />
+        <Route path="/SsclwisePoint" element={<SsclwisePoint />} />
+        <Route path="/SsclGradewise" element={<SsclGradewise />} />
+        <Route path="/SCertificateRegNo" element={<SCertificateRegNo />} />
+        <Route path="/SCertificateItemwise" element={<SCertificateItemwise />} />
+        <Route path="/ScertificateParticipate" element={<ScertificateParticipate />} />
+        <Route path="/SCertificatesclwise" element={<SCertificatesclwise />} />
+        <Route path="/SCertificateDetails" element={<SCertificateDetails />} />
+        <Route path="/SParticipateMorethan" element={<SParticipateMorethan />} />
+        <Route path="/SPublishDeclarList" element={<SPublishDeclarList />} />
+        <Route path="/SExport" element={<SExport />} />
+        <Route path="/ShigherLevel" element={<ShigherLevel />} />
+
+
+
+
+
+
+
+
+
+
+
         <Route path="/StateParticipatesclList" element={<StateParticipatesclList />} />
         <Route path="/StateParticipateFesWis" element={<StateParticipateFesWis />} />
         <Route path="/StateDatewisepaticipat" element={<StateDatewisepaticipat />} />

@@ -12,6 +12,18 @@ const DSclGradeWise = () => {
     const printRef = useRef();
     const [searchParams, setSearchParams] = useSearchParams();
 
+    // Available sub-districts (same as in DClusterSclList)
+    const subDistricts = [
+        'Select Sub District',
+        'Munnar',
+        'Adimali',
+        'Kattappana',
+        'Nedumkandam',
+        'Devikulam',
+        'Chittur',
+        'Pattambi'
+    ];
+
     // Initialize values from session storage if available, otherwise use URL params or defaults
     const getInitialFestival = () => {
         const sessionFestival = sessionStorage.getItem("selectedFestival");
@@ -25,20 +37,32 @@ const DSclGradeWise = () => {
         return sessionGrade || urlGrade || "All Grade";
     };
 
+    const getInitialSubDistrict = () => {
+        const sessionSubDistrict = sessionStorage.getItem("selectedSubDistrict");
+        const urlSubDistrict = searchParams.get('subDistrict');
+        return sessionSubDistrict || urlSubDistrict || "Select Sub District";
+    };
+
     const selectedFestival = getInitialFestival();
     const selectedGrade = getInitialGrade();
+    const [selectedSubDistrict, setSelectedSubDistrict] = useState(getInitialSubDistrict());
     const searchQuery = searchParams.get('search') || '';
 
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [loading, setLoading] = useState(true);
+    const [loadingProgress, setLoadingProgress] = useState(0);
 
     // Update URL params based on initial values
     useEffect(() => {
-        setSearchParams({
-            festival: selectedFestival,
-            grade: selectedGrade
-        });
+        const newParams = new URLSearchParams();
+        newParams.set('festival', selectedFestival);
+        newParams.set('grade', selectedGrade);
+        if (selectedSubDistrict !== 'Select Sub District') {
+            newParams.set('subDistrict', selectedSubDistrict);
+        }
+        setSearchParams(newParams);
         
         // Initialize search text from URL on component mount
         if (searchQuery) {
@@ -46,22 +70,22 @@ const DSclGradeWise = () => {
         }
     }, []);
 
-    // Dummy data with item codes to help with filtering
+    // Dummy data with item codes and sub-districts to help with filtering
     const dummyResultData = [
-        { slNo: 1, participantName: "John Doe", schoolName: "Central High", item: "Story Writing", itemCode: "301", category: "Single", points: 9.5, grade: "B" },
-        { slNo: 2, participantName: "Jane Smith", schoolName: "Springfield Elementary", item: "Story Writing", itemCode: "302", category: "Single", points: 10.0, grade: "A" },
-        { slNo: 3, participantName: "Alex Johnson", schoolName: "Oak Ridge School", item: "Story Writing", itemCode: "303", category: "Single", points: 9.0, grade: "A" },
-        { slNo: 4, participantName: "Sara Williams", schoolName: "Liberty Middle School", item: "Group Song", itemCode: "401", category: "Group", points: 8.0, grade: "B" },
-        { slNo: 5, participantName: "Michael Brown", schoolName: "Riverdale Academy", item: "Painting", itemCode: "402", category: "Single", points: 5, grade: "C" },
-        { slNo: 6, participantName: "Emily Davis", schoolName: "Westview High", item: "Classical Dance", itemCode: "501", category: "Single", points: 8.5, grade: "B" },
-        { slNo: 7, participantName: "David Wilson", schoolName: "Pinewood Elementary", item: "Recitation", itemCode: "502", category: "Single", points: 7.5, grade: "B" },
-        { slNo: 8, participantName: "Sophie Miller", schoolName: "Greenwood School", item: "Folk Dance", itemCode: "601", category: "Group", points: 8.0, grade: "C" },
-        { slNo: 9, participantName: "Robert Taylor", schoolName: "Greenwood School", item: "Folk Dance", itemCode: "601", category: "Group", points: 8.0, grade: "C" },
-        { slNo: 10, participantName: "Emma Johnson", schoolName: "Central High", item: "Essay Writing", itemCode: "302", category: "Single", points: 7.2, grade: "B" },
-        { slNo: 11, participantName: "Noah Garcia", schoolName: "Riverdale Academy", item: "Poetry", itemCode: "303", category: "Single", points: 8.8, grade: "C" },
-        { slNo: 12, participantName: "Olivia Martinez", schoolName: "Springfield Elementary", item: "Debate", itemCode: "401", category: "Group", points: 7.9, grade: "B" },
-        { slNo: 13, participantName: "Liam Rodriguez", schoolName: "Oak Ridge School", item: "Solo Music", itemCode: "502", category: "Single", points: 8.7, grade: "B" },
-        { slNo: 14, participantName: "Ava Lopez", schoolName: "Westview High", item: "Drama", itemCode: "601", category: "Group", points: 7.5, grade: "C" }
+        { slNo: 1, participantName: "John Doe", schoolName: "Central High", item: "Story Writing", itemCode: "301", category: "Single", points: 9.5, grade: "B", subDistrict: "Munnar" },
+        { slNo: 2, participantName: "Jane Smith", schoolName: "Springfield Elementary", item: "Story Writing", itemCode: "302", category: "Single", points: 10.0, grade: "A", subDistrict: "Adimali" },
+        { slNo: 3, participantName: "Alex Johnson", schoolName: "Oak Ridge School", item: "Story Writing", itemCode: "303", category: "Single", points: 9.0, grade: "A", subDistrict: "Kattappana" },
+        { slNo: 4, participantName: "Sara Williams", schoolName: "Liberty Middle School", item: "Group Song", itemCode: "401", category: "Group", points: 8.0, grade: "B", subDistrict: "Nedumkandam" },
+        { slNo: 5, participantName: "Michael Brown", schoolName: "Riverdale Academy", item: "Painting", itemCode: "402", category: "Single", points: 5, grade: "C", subDistrict: "Devikulam" },
+        { slNo: 6, participantName: "Emily Davis", schoolName: "Westview High", item: "Classical Dance", itemCode: "501", category: "Single", points: 8.5, grade: "B", subDistrict: "Chittur" },
+        { slNo: 7, participantName: "David Wilson", schoolName: "Pinewood Elementary", item: "Recitation", itemCode: "502", category: "Single", points: 7.5, grade: "B", subDistrict: "Pattambi" },
+        { slNo: 8, participantName: "Sophie Miller", schoolName: "Greenwood School", item: "Folk Dance", itemCode: "601", category: "Group", points: 8.0, grade: "C", subDistrict: "Munnar" },
+        { slNo: 9, participantName: "Robert Taylor", schoolName: "Greenwood School", item: "Folk Dance", itemCode: "601", category: "Group", points: 8.0, grade: "C", subDistrict: "Adimali" },
+        { slNo: 10, participantName: "Emma Johnson", schoolName: "Central High", item: "Essay Writing", itemCode: "302", category: "Single", points: 7.2, grade: "B", subDistrict: "Kattappana" },
+        { slNo: 11, participantName: "Noah Garcia", schoolName: "Riverdale Academy", item: "Poetry", itemCode: "303", category: "Single", points: 8.8, grade: "C", subDistrict: "Nedumkandam" },
+        { slNo: 12, participantName: "Olivia Martinez", schoolName: "Springfield Elementary", item: "Debate", itemCode: "401", category: "Group", points: 7.9, grade: "B", subDistrict: "Devikulam" },
+        { slNo: 13, participantName: "Liam Rodriguez", schoolName: "Oak Ridge School", item: "Solo Music", itemCode: "502", category: "Single", points: 8.7, grade: "B", subDistrict: "Chittur" },
+        { slNo: 14, participantName: "Ava Lopez", schoolName: "Westview High", item: "Drama", itemCode: "601", category: "Group", points: 7.5, grade: "C", subDistrict: "Pattambi" }
     ];
 
     useEffect(() => {
@@ -69,12 +93,13 @@ const DSclGradeWise = () => {
     }, []);
 
     useEffect(() => {
-        filterDataByFestivalGradeAndSearch();
+        filterDataByFestivalGradeSubDistrictAndSearch();
 
         // Save selections to session storage whenever they change
         sessionStorage.setItem("selectedFestival", selectedFestival);
         sessionStorage.setItem("selectedGrade", selectedGrade);
-    }, [selectedFestival, selectedGrade, searchText, allResultData]);
+        sessionStorage.setItem("selectedSubDistrict", selectedSubDistrict);
+    }, [selectedFestival, selectedGrade, selectedSubDistrict, searchText, allResultData]);
 
     const getAllResultData = async () => {
         const token = sessionStorage.getItem("token");
@@ -83,20 +108,42 @@ const DSclGradeWise = () => {
                 "Authorization": `Bearer ${token}`
             }
             try {
+                setLoading(true);
+                // Simulate loading progress
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 10;
+                    if (progress <= 90) {
+                        setLoadingProgress(progress);
+                    } else {
+                        clearInterval(progressInterval);
+                    }
+                }, 200);
+                
                 const result = await getAllsclGradewiseAPI(reqHeader)
+                clearInterval(progressInterval);
+                setLoadingProgress(100);
+                
                 if (result.status === 200) {
                     setAllResultData(result.data);
                 }
+                
+                // Add a small delay to show 100% progress before hiding the loader
+                setTimeout(() => {
+                    setLoading(false);
+                }, 300);
             } catch (err) {
                 console.log(err);
                 setAllResultData(dummyResultData);
+                setLoading(false);
             }
         } else {
             setAllResultData(dummyResultData);
+            setLoading(false);
         }
     }
 
-    const filterDataByFestivalGradeAndSearch = () => {
+    const filterDataByFestivalGradeSubDistrictAndSearch = () => {
         if (!allResultData.length) return;
 
         // Step 1: Filter by festival (based on item code ranges)
@@ -133,35 +180,46 @@ const DSclGradeWise = () => {
                 festivalFiltered = [...allResultData];
         }
 
-    // Step 2: Filter by grade
-let gradeFiltered;
-if (selectedGrade === "All Grade") {
-    gradeFiltered = festivalFiltered;
-} else {
-    gradeFiltered = festivalFiltered.filter(item => {
-        const grade = item.grade ? item.grade.toUpperCase() : "";
-        
-        if (selectedGrade === "Grade A") {
-            return ["A", "A+", "A-"].includes(grade);
-        } else if (selectedGrade === "Grade B") {
-            return ["B", "B+", "B-"].includes(grade);
-        } else if (selectedGrade === "Grade C") {
-            return ["C", "C+", "C-"].includes(grade);
+        // Step 2: Filter by grade
+        let gradeFiltered;
+        if (selectedGrade === "All Grade") {
+            gradeFiltered = festivalFiltered;
+        } else {
+            gradeFiltered = festivalFiltered.filter(item => {
+                const grade = item.grade ? item.grade.toUpperCase() : "";
+                
+                if (selectedGrade === "Grade A") {
+                    return ["A", "A+", "A-"].includes(grade);
+                } else if (selectedGrade === "Grade B") {
+                    return ["B", "B+", "B-"].includes(grade);
+                } else if (selectedGrade === "Grade C") {
+                    return ["C", "C+", "C-"].includes(grade);
+                }
+                return false; // Default case if none match
+            });
         }
-        return false; // Default case if none match
-    });
-}
-        // Step 3: Filter by search text
-        let searchFiltered = gradeFiltered;
+
+        // Step 3: Filter by sub-district
+        let subDistrictFiltered;
+        if (selectedSubDistrict === "Select Sub District") {
+            subDistrictFiltered = gradeFiltered;
+        } else {
+            subDistrictFiltered = gradeFiltered.filter(item => 
+                item.subDistrict === selectedSubDistrict
+            );
+        }
+
+        // Step 4: Filter by search text
+        let searchFiltered = subDistrictFiltered;
         if (searchText && searchText.trim() !== '') {
             const searchLower = searchText.toLowerCase().trim();
-            searchFiltered = gradeFiltered.filter(item => 
+            searchFiltered = subDistrictFiltered.filter(item => 
                 (item.participantName && item.participantName.toLowerCase().includes(searchLower)) || 
                 (item.schoolName && item.schoolName.toLowerCase().includes(searchLower))
             );
         }
 
-        // Step 4: Add sequential numbering
+        // Step 5: Add sequential numbering
         const numberedResults = searchFiltered.map((item, index) => ({
             ...item,
             slNo: index + 1
@@ -183,15 +241,19 @@ if (selectedGrade === "All Grade") {
             default: festivalTitle = "Tamil Kalaivizha"; break;
         }
 
-        return `${festivalTitle} - ${selectedGrade} - School Wise Report`;
+        const subDistrictPart = selectedSubDistrict === "Select Sub District" ? "" : ` - ${selectedSubDistrict}`;
+        return `${festivalTitle} - ${selectedGrade}${subDistrictPart} - School Wise Report`;
     };
 
     const handleFestivalChange = (e) => {
         const newFestival = e.target.value;
-        setSearchParams({
-            festival: newFestival,
-            grade: selectedGrade
-        });
+        const newParams = new URLSearchParams();
+        newParams.set('festival', newFestival);
+        newParams.set('grade', selectedGrade);
+        if (selectedSubDistrict !== 'Select Sub District') {
+            newParams.set('subDistrict', selectedSubDistrict);
+        }
+        setSearchParams(newParams);
 
         // Update session storage
         sessionStorage.setItem("selectedFestival", newFestival);
@@ -199,13 +261,32 @@ if (selectedGrade === "All Grade") {
 
     const handleGradeChange = (e) => {
         const newGrade = e.target.value;
-        setSearchParams({
-            festival: selectedFestival,
-            grade: newGrade
-        });
+        const newParams = new URLSearchParams();
+        newParams.set('festival', selectedFestival);
+        newParams.set('grade', newGrade);
+        if (selectedSubDistrict !== 'Select Sub District') {
+            newParams.set('subDistrict', selectedSubDistrict);
+        }
+        setSearchParams(newParams);
 
         // Update session storage
         sessionStorage.setItem("selectedGrade", newGrade);
+    };
+
+    const handleSubDistrictChange = (e) => {
+        const newSubDistrict = e.target.value;
+        setSelectedSubDistrict(newSubDistrict);
+        
+        const newParams = new URLSearchParams();
+        newParams.set('festival', selectedFestival);
+        newParams.set('grade', selectedGrade);
+        if (newSubDistrict !== 'Select Sub District') {
+            newParams.set('subDistrict', newSubDistrict);
+        }
+        setSearchParams(newParams);
+        
+        // Update session storage
+        sessionStorage.setItem("selectedSubDistrict", newSubDistrict);
     };
 
     const handleSearchInputChange = (e) => {
@@ -240,7 +321,7 @@ if (selectedGrade === "All Grade") {
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
         
-        const headers = ['Sl No', 'Name of Participants', 'School Name', 'Item', 'Points', 'Grade'];
+        const headers = ['Sl No', 'Name of Participants', 'School Name',  'Item', 'Points', 'Grade'];
         headers.forEach(headerText => {
           const th = document.createElement('th');
           th.textContent = headerText;
@@ -266,6 +347,7 @@ if (selectedGrade === "All Grade") {
             item.slNo,
             item.participantName || "-",
             item.schoolName || "-",
+        
             item.item || "-",
             item.points || "-",
             item.grade || "-"
@@ -287,7 +369,7 @@ if (selectedGrade === "All Grade") {
         pdfContent.appendChild(table);
         
         // PDF filename
-        const fileName = `${selectedFestival.replace(/ /g, '_')}_${selectedGrade.replace(/ /g, '_')}_Report.pdf`;
+        const fileName = `${selectedFestival.replace(/ /g, '_')}_${selectedGrade.replace(/ /g, '_')}${selectedSubDistrict !== 'Select Sub District' ? '_' + selectedSubDistrict.replace(/ /g, '_') : ''}_Report.pdf`;
         
         // PDF options
         const options = {
@@ -363,6 +445,32 @@ if (selectedGrade === "All Grade") {
         return pageNumbers;
     };
 
+    if (loading) {
+        return (
+            <>
+                <Header />
+                <div className="flex flex-col md:flex-row min-h-screen">
+                    <Dash />
+                    <div className="flex-1 p-4 md:p-6 lg:p-8 flex items-center justify-center">
+                        <div className="text-center w-64">
+                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500 mx-auto mb-4"></div>
+                            <p className="text-gray-600 mb-2">Loading results data...</p>
+                            
+                            {/* Progress bar */}
+                            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                                <div 
+                                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" 
+                                    style={{ width: `${loadingProgress}%` }}
+                                ></div>
+                            </div>
+                            <p className="text-xs text-gray-500">{loadingProgress}% complete</p>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
+    }
+
     return (
         <>
             <Header />
@@ -374,9 +482,35 @@ if (selectedGrade === "All Grade") {
                             School Grade Wise List
                         </h2>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
+                             {/* Sub-District Select with floating label */}
+                             <div className="relative w-full sm:w-40">
+                                <select
+                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                                    id="sub-district-select"
+                                    value={selectedSubDistrict}
+                                    onChange={handleSubDistrictChange}
+                                >
+                                    {subDistricts.map((option, index) => (
+                                        <option key={`sub-district-${index}`} value={option}>
+                                            {option}
+                                        </option>
+                                    ))}
+                                </select>
+                                <label
+                                    htmlFor="sub-district-select"
+                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                                >
+                                    Sub District
+                                </label>
+                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                                    <i className="fa-solid fa-chevron-down"></i>
+                                </div>
+                            </div>
+                            {/* Grade Select with floating label */}
                             <div className="relative w-full sm:w-40">
                                 <select
-                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
+                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                                    id="grade-select"
                                     onChange={handleGradeChange}
                                     value={selectedGrade}
                                 >
@@ -384,15 +518,23 @@ if (selectedGrade === "All Grade") {
                                     <option value="Grade A">Grade A</option>
                                     <option value="Grade B">Grade B</option>
                                     <option value="Grade C">Grade C</option>
-
                                 </select>
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                <label
+                                    htmlFor="grade-select"
+                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                                >
+                                    Grade
+                                </label>
+                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
                                     <i className="fa-solid fa-chevron-down"></i>
                                 </div>
                             </div>
+
+                            {/* Festival Select with floating label */}
                             <div className="relative w-full sm:w-40">
                                 <select
-                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
+                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                                    id="festival-select"
                                     onChange={handleFestivalChange}
                                     value={selectedFestival}
                                 >
@@ -402,10 +544,19 @@ if (selectedGrade === "All Grade") {
                                     <option value="HS Kalaivizha">HS Kalaivizha</option>
                                     <option value="HSS Kalaivizha">HSS Kalaivizha</option>
                                 </select>
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                <label
+                                    htmlFor="festival-select"
+                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                                >
+                                    Festival
+                                </label>
+                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
                                     <i className="fa-solid fa-chevron-down"></i>
                                 </div>
                             </div>
+
+                           
+
                             <button
                                 onClick={handlePrint}
                                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
@@ -415,7 +566,7 @@ if (selectedGrade === "All Grade") {
                         </div>
                     </div>
 
-                    {/* Add search input */}
+                    {/* Search input with icon */}
                     <div className="relative flex mt-2 items-center w-full sm:w-64 h-9 border border-blue-800 rounded-full px-4">
                         <input
                             type="text"
@@ -424,7 +575,6 @@ if (selectedGrade === "All Grade") {
                             value={searchText}
                             onChange={handleSearchInputChange}
                         />
-                       
                         <div className="text-gray-500">
                             <i className="fa-solid fa-magnifying-glass"></i>
                         </div>
@@ -442,7 +592,6 @@ if (selectedGrade === "All Grade") {
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Item</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Points</th>
-                                               
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
@@ -454,15 +603,14 @@ if (selectedGrade === "All Grade") {
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.schoolName}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.item}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.points}</td>
-                                                        
                                                     </tr>
                                                 ))
                                             ) : (
                                                 <tr>
                                                     <td colSpan="6" className="p-3 text-center text-gray-500">
                                                         {searchText 
-                                                            ? `No records found matching "${searchText}" in ${selectedFestival} with ${selectedGrade}` 
-                                                            : `No records found for ${selectedFestival} with ${selectedGrade}`}
+                                                            ? `No records found matching "${searchText}" in ${selectedFestival} with ${selectedGrade} in ${selectedSubDistrict !== 'Select Sub District' ? selectedSubDistrict : 'any Sub District'}` 
+                                                            : `No records found for ${selectedFestival} with ${selectedGrade} in ${selectedSubDistrict !== 'Select Sub District' ? selectedSubDistrict : 'any Sub District'}`}
                                                     </td>
                                                 </tr>
                                             )}
@@ -525,6 +673,5 @@ if (selectedGrade === "All Grade") {
         </>
     );
 };
-
 
 export default DSclGradeWise

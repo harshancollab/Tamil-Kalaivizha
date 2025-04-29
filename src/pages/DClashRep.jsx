@@ -7,6 +7,7 @@ const DClashRep = () => {
   const [showTooltip, setShowTooltip] = useState(null);
   const [selectedFestival, setSelectedFestival] = useState("ALL");
   const [selectedDate, setSelectedDate] = useState("ALL");
+  const [selectedSubDistrict, setSelectedSubDistrict] = useState("ALL");
   const [clashReports, setClashReports] = useState([]);
   const [filteredReports, setFilteredReports] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,6 +17,18 @@ const DClashRep = () => {
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  // Sub-districts list (changed ALL to Select Sub District)
+  const subDistricts = [
+    'ALL',
+    'Munnar',
+    'Adimali',
+    'Kattappana',
+    'Nedumkandam',
+    'Devikulam',
+    'Chittur',
+    'Pattambi'
+  ];
 
   // Dummy data for development with dates added
   const dummyClashReports = [
@@ -27,6 +40,7 @@ const DClashRep = () => {
       schoolName: "St. Joseph School",
       festival: "UP",
       date: "2025-04-01",
+      subDistrict: "Munnar",
       clashItems: ["Storytelling (9:30 AM)", "Monoact (9:30 AM)", "Essay (8:30 AM)"]
     },
     {
@@ -37,6 +51,7 @@ const DClashRep = () => {
       schoolName: "Mount Carmel School",
       festival: "LP",
       date: "2025-04-01",
+      subDistrict: "Kattappana",
       clashItems: ["Drawing (10:30 AM)", "Painting (10:30 AM)", "Speech (11:00 AM)"]
     },
     {
@@ -47,6 +62,7 @@ const DClashRep = () => {
       schoolName: "Holy Cross School",
       festival: "HS",
       date: "2025-04-02",
+      subDistrict: "Devikulam",
       clashItems: ["Debate (1:00 PM)", "Quiz (1:00 PM)", "Essay (2:30 PM)"]
     },
     {
@@ -57,6 +73,7 @@ const DClashRep = () => {
       schoolName: "St. Thomas School",
       festival: "HSS",
       date: "2025-04-02",
+      subDistrict: "Chittur",
       clashItems: ["Group Song (11:30 AM)", "Solo Song (11:30 AM)", "Classical Dance (12:30 PM)"]
     },
     {
@@ -67,6 +84,7 @@ const DClashRep = () => {
       schoolName: "Little Flower School",
       festival: "UP",
       date: "2025-04-03",
+      subDistrict: "Pattambi",
       clashItems: ["Elocution (2:00 PM)", "Story Writing (2:00 PM)"]
     },
     {
@@ -77,6 +95,7 @@ const DClashRep = () => {
       schoolName: "Sacred Heart School",
       festival: "LP",
       date: "2025-04-03",
+      subDistrict: "Adimali",
       clashItems: ["Clay Modeling (9:00 AM)", "Origami (9:00 AM)"]
     },
     {
@@ -87,6 +106,7 @@ const DClashRep = () => {
       schoolName: "Don Bosco School",
       festival: "HS",
       date: "2025-04-04",
+      subDistrict: "Nedumkandam",
       clashItems: ["Chess (3:00 PM)", "Carrom (3:00 PM)"]
     },
     {
@@ -97,6 +117,7 @@ const DClashRep = () => {
       schoolName: "Maria Montessori School",
       festival: "HSS",
       date: "2025-04-04",
+      subDistrict: "Munnar",
       clashItems: ["Instrumental Music (1:30 PM)", "Western Dance (1:30 PM)"]
     },
     {
@@ -107,6 +128,7 @@ const DClashRep = () => {
       schoolName: "St. Xavier's School",
       festival: "UP",
       date: "2025-04-01",
+      subDistrict: "Kattappana",
       clashItems: ["Drawing (10:00 AM)", "Painting (10:00 AM)"]
     },
     {
@@ -117,6 +139,7 @@ const DClashRep = () => {
       schoolName: "Carmel School",
       festival: "LP",
       date: "2025-04-01",
+      subDistrict: "Devikulam",
       clashItems: ["Recitation (11:00 AM)", "Storytelling (11:00 AM)"]
     },
     {
@@ -127,6 +150,7 @@ const DClashRep = () => {
       schoolName: "Good Shepherd School",
       festival: "HS",
       date: "2025-04-02",
+      subDistrict: "Munnar",
       clashItems: ["Debate (2:30 PM)", "Elocution (2:30 PM)"]
     },
     {
@@ -137,6 +161,7 @@ const DClashRep = () => {
       schoolName: "Vidya Niketan School",
       festival: "HSS",
       date: "2025-04-03",
+      subDistrict: "Chittur",
       clashItems: ["Classical Dance (3:30 PM)", "Folk Dance (3:30 PM)"]
     },
     {
@@ -147,6 +172,7 @@ const DClashRep = () => {
       schoolName: "Modern School",
       festival: "UP",
       date: "2025-04-04",
+      subDistrict: "Pattambi",
       clashItems: ["Recitation (9:00 AM)", "Singing (9:00 AM)"]
     }
   ];
@@ -156,6 +182,7 @@ const DClashRep = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const festivalParam = urlParams.get('festival');
     const dateParam = urlParams.get('date');
+    const subDistrictParam = urlParams.get('subDistrict');
     
     if (festivalParam) {
       setSelectedFestival(festivalParam.toUpperCase());
@@ -163,6 +190,10 @@ const DClashRep = () => {
     
     if (dateParam) {
       setSelectedDate(dateParam);
+    }
+    
+    if (subDistrictParam) {
+      setSelectedSubDistrict(subDistrictParam);
     }
   }, []);
 
@@ -178,10 +209,14 @@ const DClashRep = () => {
       urlParams.set('date', selectedDate);
     }
     
+    if (selectedSubDistrict !== "ALL") {
+      urlParams.set('subDistrict', selectedSubDistrict);
+    }
+    
     // Update URL without page reload
     const newUrl = `${window.location.pathname}${urlParams.toString() ? '?' + urlParams.toString() : ''}`;
     window.history.pushState({}, '', newUrl);
-  }, [selectedFestival, selectedDate]);
+  }, [selectedFestival, selectedDate, selectedSubDistrict]);
 
   // Pagination logic
   const indexOfLastItem = currentPage * rowsPerPage;
@@ -238,7 +273,7 @@ const DClashRep = () => {
     return pageNumbers;
   };
 
-  // Apply filters based on festival and date
+  // Apply filters based on festival, date, and subDistrict
   useEffect(() => {
     setLoading(true);
     
@@ -256,12 +291,17 @@ const DClashRep = () => {
         filteredData = filteredData.filter(report => report.date === selectedDate);
       }
       
+      // Apply sub-district filter
+      if (selectedSubDistrict !== "ALL") {
+        filteredData = filteredData.filter(report => report.subDistrict === selectedSubDistrict);
+      }
+      
       setClashReports(filteredData);
       setFilteredReports(filteredData);
       setLoading(false);
       setCurrentPage(1); // Reset to first page when changing filters
     }, 500); // Simulate a half-second loading time
-  }, [selectedFestival, selectedDate]);
+  }, [selectedFestival, selectedDate, selectedSubDistrict]);
 
   const handleFestivalChange = (e) => {
     setSelectedFestival(e.target.value);
@@ -270,6 +310,11 @@ const DClashRep = () => {
   // Add date change handler
   const handleDateChange = (e) => {
     setSelectedDate(e.target.value);
+  };
+
+  // Add sub-district change handler
+  const handleSubDistrictChange = (e) => {
+    setSelectedSubDistrict(e.target.value);
   };
 
   // Generate the appropriate title based on the selected filters
@@ -292,6 +337,11 @@ const DClashRep = () => {
         day: 'numeric' 
       });
       title += ` - ${formattedDate}`;
+    }
+    
+    // Sub-district part of the title
+    if (selectedSubDistrict !== "ALL") {
+      title += ` - ${selectedSubDistrict} Sub-district`;
     }
     
     title += " - Clash List Report";
@@ -320,7 +370,7 @@ const DClashRep = () => {
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     
-    const headers = ['Sl No', 'Reg No', 'Name', 'School Code', 'School Name', 'Clash Items'];
+    const headers = ['Sl No', 'Reg No', 'Name', 'School Code', 'School Name', 'Sub District', 'Clash Items'];
     headers.forEach(headerText => {
       const th = document.createElement('th');
       th.textContent = headerText;
@@ -347,6 +397,7 @@ const DClashRep = () => {
         report.studentName || "-",
         report.schoolCode || "-",
         report.schoolName || "-",
+        report.subDistrict || "-",
         report.clashItems.join(", ") || "-"
       ];
       
@@ -369,6 +420,9 @@ const DClashRep = () => {
     let fileName = `${selectedFestival}`;
     if (selectedDate !== "ALL") {
       fileName += `_${selectedDate}`;
+    }
+    if (selectedSubDistrict !== "ALL") {
+      fileName += `_${selectedSubDistrict}`;
     }
     fileName += `_Clash_Report.pdf`;
     
@@ -396,7 +450,32 @@ const DClashRep = () => {
               Clash List
             </h2>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
-              {/* Updated Date dropdown with floating label */}
+                {/* Sub-District dropdown with floating label */}
+                <div className="relative w-full sm:w-auto">
+                <select
+                  className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                  id="sub-district-select"
+                  onChange={handleSubDistrictChange}
+                  value={selectedSubDistrict}
+                >
+                  <option value="ALL">Select Sub District</option>
+                  {subDistricts.slice(1).map((option, index) => (
+                    <option key={`sub-district-${index}`} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+                <label
+                  htmlFor="sub-district-select"
+                  className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                >
+                  Sub District
+                </label>
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                  <i className="fa-solid fa-chevron-down"></i>
+                </div>
+              </div>
+              {/* Date dropdown with floating label */}
               <div className="relative w-full sm:w-auto">
                 <select
                   className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
@@ -421,7 +500,9 @@ const DClashRep = () => {
                 </div>
               </div>
               
-              {/* Updated Festival dropdown with floating label */}
+            
+              
+              {/* Festival dropdown with floating label */}
               <div className="relative w-full sm:w-auto">
                 <select
                   className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
@@ -468,6 +549,7 @@ const DClashRep = () => {
                       No clash reports found
                       {selectedFestival !== "ALL" ? ` for ${selectedFestival}` : ""}
                       {selectedDate !== "ALL" ? ` on ${new Date(selectedDate).toLocaleDateString()}` : ""}
+                      {selectedSubDistrict !== "ALL" ? ` in ${selectedSubDistrict} sub-district` : ""}
                     </div>
                   </div>
                 ) : (

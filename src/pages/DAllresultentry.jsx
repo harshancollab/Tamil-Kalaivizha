@@ -57,7 +57,7 @@ const DAllresultentry = () => {
     };
 
     const handleEditRedirect = (resultEntry) => {
-        navigate(`/edit-resultentry/${resultEntry.slNo}`, {
+        navigate(`/DEditResultentry/${resultEntry.slNo}`, {
             state: { resultEntry }
         });
     };

@@ -813,7 +813,7 @@ const Dash = () => {
               </div>
 
               {/* Stage Report Menu */}
-              {/* <div className="mb-4">
+              <div className="mb-4">
                 <div
                   className={`flex justify-between items-center w-full cursor-pointer ${openMenus.stageReport ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
                     } p-2 rounded`}
@@ -831,8 +831,8 @@ const Dash = () => {
                 {openMenus.stageReport && (
                   <div className="mt-2 pl-4">
                     <Link
-                      to="/AddCallsheet"
-                      className={`block py-2 text-gray-300 ${isActive('/AddCallsheet')
+                      to="/DCallSheet"
+                      className={`block py-2 text-gray-300 ${isActive('/DCallSheet')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -841,8 +841,8 @@ const Dash = () => {
                       Call Sheet
                     </Link>
                     <Link
-                      to="/AddTimesheet"
-                      className={`block py-2 text-gray-300 ${isActive('/AddTimesheet')
+                      to="/DTimesheet"
+                      className={`block py-2 text-gray-300 ${isActive('/DTimesheet')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -851,8 +851,8 @@ const Dash = () => {
                       Time Sheet
                     </Link>
                     <Link
-                      to="/AddScoresheet"
-                      className={`block py-2 text-gray-300 ${isActive('/AddScoresheet')
+                      to="/DScoreSheet"
+                      className={`block py-2 text-gray-300 ${isActive('/DScoreSheet')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -861,8 +861,8 @@ const Dash = () => {
                       Score sheet
                     </Link>
                     <Link
-                      to="/AddTabulationsheet"
-                      className={`block py-2 text-gray-300 ${isActive('/AddTabulationsheet')
+                      to="/DTabulationSheet"
+                      className={`block py-2 text-gray-300 ${isActive('/DTabulationSheet')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -871,8 +871,8 @@ const Dash = () => {
                       Tabulation Sheet
                     </Link>
                     <Link
-                      to="/Addreport"
-                      className={`block py-2 text-gray-300 ${isActive('/Addreport')
+                      to="/DAllReport"
+                      className={`block py-2 text-gray-300 ${isActive('/DAllReport')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -882,7 +882,7 @@ const Dash = () => {
                     </Link>
                   </div>
                 )}
-              </div> */}
+              </div>
 
               {/* Pre Fest Report Menu */}
               <div className="mb-4">
@@ -955,8 +955,8 @@ const Dash = () => {
                     </Link>
 
                     <Link
-                      to="/ClusterReport"
-                      className={`block py-2 text-gray-300 ${isActive('/ClusterReport')
+                      to="/DClusterReport"
+                      className={`block py-2 text-gray-300 ${isActive('/DClusterReport')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1007,8 +1007,8 @@ const Dash = () => {
                       Result Entry
                     </Link>
                     <Link
-                      to="/Itemresult-list"
-                      className={`block py-2 text-gray-300 ${isActive('/Itemresult-list')
+                      to="/DItemresultList"
+                      className={`block py-2 text-gray-300 ${isActive('/DItemresultList')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1218,7 +1218,7 @@ const Dash = () => {
             {user?.role === 'state admin' && (
             <>
               {/* Settings Menu */}
-              {/* <div className="mb-4">
+              <div className="mb-4">
                 <div
                   className={`flex justify-between items-center w-full cursor-pointer ${openMenus.settings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
                     } p-2 rounded`}
@@ -1236,8 +1236,8 @@ const Dash = () => {
                 {openMenus.settings && (
                   <div className="mt-2 pl-4">
                     <Link
-                      to="/AllKalolsavam"
-                      className={`block py-2 text-gray-300 ${isActive('/AllKalolsavam')
+                      to="/SDefineKalolsavm"
+                      className={`block py-2 text-gray-300 ${isActive('/SDefineKalolsavm')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1246,8 +1246,8 @@ const Dash = () => {
                       Define Kalolsavam
                     </Link>
                     <Link
-                      to="/schlentry"
-                      className={`block py-2 text-gray-300 ${isActive('/schlentry')
+                      to="/SSClEntry"
+                      className={`block py-2 text-gray-300 ${isActive('/SSClEntry')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1256,8 +1256,8 @@ const Dash = () => {
                       School Entry
                     </Link>
                     <Link
-                      to="/All-schools"
-                      className={`block py-2 text-gray-300 ${isActive('/All-schools')
+                      to="/SClusterScl"
+                      className={`block py-2 text-gray-300 ${isActive('/SClusterScl')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1266,8 +1266,8 @@ const Dash = () => {
                       Cluster School
                     </Link>
                     <Link
-                      to="/Spl-entry"
-                      className={`block py-2 text-gray-300 ${isActive('/Spl-entry')
+                      to="/SsplOrderEntry"
+                      className={`block py-2 text-gray-300 ${isActive('/SsplOrderEntry')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1277,10 +1277,10 @@ const Dash = () => {
                     </Link>
                   </div>
                 )}
-              </div> */}
+              </div>
 
               {/* Stage Settings Menu */}
-              {/* <div className="mb-4">
+              <div className="mb-4">
                 <div
                   className={`flex justify-between items-center w-full cursor-pointer ${openMenus.stageSettings ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
                     } p-2 rounded`}
@@ -1298,8 +1298,8 @@ const Dash = () => {
                 {openMenus.stageSettings && (
                   <div className="mt-2 pl-4">
                     <Link
-                      to="/stage-duration-list"
-                      className={`block py-2 text-gray-300 ${isActive('/stage-duration-list')
+                      to="/SstageDurationList"
+                      className={`block py-2 text-gray-300 ${isActive('/SstageDurationList')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1308,8 +1308,8 @@ const Dash = () => {
                       Stage Duration
                     </Link>
                     <Link
-                      to="/StageList"
-                      className={`block py-2 text-gray-300 ${isActive('/StageList')
+                      to="/SdefineStagelist"
+                      className={`block py-2 text-gray-300 ${isActive('/SdefineStagelist')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1318,8 +1318,8 @@ const Dash = () => {
                       Define Stage
                     </Link>
                     <Link
-                      to="/festivalwiselist"
-                      className={`block py-2 text-gray-300 ${isActive('/festivalwiselist')
+                      to="/SStageAlloteFestwise"
+                      className={`block py-2 text-gray-300 ${isActive('/SStageAlloteFestwise')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1328,8 +1328,8 @@ const Dash = () => {
                       Stage Allotment Festival Wise List
                     </Link>
                     <Link
-                      to="/Stage-itemwiselist"
-                      className={`block py-2 text-gray-300 ${isActive('/Stage-itemwiselist')
+                      to="/SstageAllotItemwi"
+                      className={`block py-2 text-gray-300 ${isActive('/SstageAllotItemwi')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1338,8 +1338,8 @@ const Dash = () => {
                       Stage Allotment Item Wise
                     </Link>
                     <Link
-                      to="/ClashReportList"
-                      className={`block py-2 text-gray-300 ${isActive('/ClashReportList')
+                      to="/SClashReport"
+                      className={`block py-2 text-gray-300 ${isActive('/SClashReport')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1350,10 +1350,10 @@ const Dash = () => {
 
                   </div>
                 )}
-              </div> */}
+              </div>
 
               {/* Stage Report Menu */}
-              {/* <div className="mb-4">
+              <div className="mb-4">
                 <div
                   className={`flex justify-between items-center w-full cursor-pointer ${openMenus.stageReport ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
                     } p-2 rounded`}
@@ -1422,7 +1422,7 @@ const Dash = () => {
                     </Link>
                   </div>
                 )}
-              </div> */}
+              </div>
 
               {/* Pre Fest Report Menu */}
               <div className="mb-4">
@@ -1484,8 +1484,8 @@ const Dash = () => {
                     District Participants Card List
                     </Link>
                     <Link
-                      to="/StateParticipateCardLis"
-                      className={`block py-2 text-gray-300 ${isActive('/DParticipateCardlist')
+                      to="/SParticipateMorethan"
+                      className={`block py-2 text-gray-300 ${isActive('/SParticipateMorethan')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1495,8 +1495,8 @@ const Dash = () => {
                     </Link>
 
                     <Link
-                      to="/ClusterReport"
-                      className={`block py-2 text-gray-300 ${isActive('/ClusterReport')
+                      to="/SClusterReport"
+                      className={`block py-2 text-gray-300 ${isActive('/SClusterReport')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1505,8 +1505,8 @@ const Dash = () => {
                       Cluster Report
                     </Link>
                     <Link
-                      to="/StageReport"
-                      className={`block py-2 text-gray-300 ${isActive('/StageReport')
+                      to="/SStageReport"
+                      className={`block py-2 text-gray-300 ${isActive('/SStageReport')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1519,7 +1519,7 @@ const Dash = () => {
               </div>
 
               {/* Result Menu */}
-              {/* <div className="mb-4">
+              <div className="mb-4">
                 <div
                   className={`flex justify-between items-center w-full cursor-pointer ${openMenus.results ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
                     } p-2 rounded`}
@@ -1537,8 +1537,8 @@ const Dash = () => {
                 {openMenus.results && (
                   <div className="mt-2 pl-4">
                     <Link
-                      to="/All-resultentry"
-                      className={`block py-2 text-gray-300 ${isActive('/All-resultentry')
+                      to="/SResultentryList"
+                      className={`block py-2 text-gray-300 ${isActive('/SResultentryList')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1547,8 +1547,8 @@ const Dash = () => {
                       Result Entry
                     </Link>
                     <Link
-                      to="/Itemresult-list"
-                      className={`block py-2 text-gray-300 ${isActive('/Itemresult-list')
+                      to="/SitemResultList"
+                      className={`block py-2 text-gray-300 ${isActive('/SitemResultList')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1557,8 +1557,8 @@ const Dash = () => {
                       Item Result List
                     </Link>
                     <Link
-                      to="/All-Publishresult"
-                      className={`block py-2 text-gray-300 ${isActive('/All-Publishresult')
+                      to="/SPublishDeclarList"
+                      className={`block py-2 text-gray-300 ${isActive('/SPublishDeclarList')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1569,10 +1569,10 @@ const Dash = () => {
 
                   </div>
                 )}
-              </div> */}
+              </div>
 
               {/* Result Report Menu */}
-              {/* <div className="mb-4">
+              <div className="mb-4">
                 <div
                   className={`flex justify-between items-center w-full cursor-pointer ${openMenus.resultsReport ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
                     } p-2 rounded`}
@@ -1590,8 +1590,8 @@ const Dash = () => {
                 {openMenus.resultsReport && (
                   <div className="mt-2 pl-4">
                     <Link
-                      to="/ConfidentialResultlist"
-                      className={`block py-2 text-gray-300 ${isActive('/ConfidentialResultlist')
+                      to="/SConfidenal"
+                      className={`block py-2 text-gray-300 ${isActive('/SConfidenal')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1600,8 +1600,8 @@ const Dash = () => {
                       Confidential Result
                     </Link>
                     <Link
-                      to="/itemwisepoint"
-                      className={`block py-2 text-gray-300 ${isActive('/itemwisepoint')
+                      to="/SItemwisePoint"
+                      className={`block py-2 text-gray-300 ${isActive('/SItemwisePoint')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1610,8 +1610,8 @@ const Dash = () => {
                       Item Wise Point
                     </Link>
                     <Link
-                      to="/itemcodewise"
-                      className={`block py-2 text-gray-300 ${isActive('/itemcodewise')
+                      to="/SItemCodewise"
+                      className={`block py-2 text-gray-300 ${isActive('/SItemCodewise')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1620,8 +1620,8 @@ const Dash = () => {
                       Item Code Wise Point
                     </Link>
                     <Link
-                      to="/SclWisePoint"
-                      className={`block py-2 text-gray-300 ${isActive('/SclWisePoint')
+                      to="/SsclwisePoint"
+                      className={`block py-2 text-gray-300 ${isActive('/SsclwisePoint')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1630,8 +1630,8 @@ const Dash = () => {
                       School Wise Point
                     </Link>
                     <Link
-                      to="/Sclgradewise"
-                      className={`block py-2 text-gray-300 ${isActive('/Sclgradewise')
+                      to="/SsclGradewise"
+                      className={`block py-2 text-gray-300 ${isActive('/SsclGradewise')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1643,8 +1643,8 @@ const Dash = () => {
 
                   </div>
                 )}
-              </div> */}
-              {/* <div className="mb-4">
+              </div>
+              <div className="mb-4">
                 <div
                   className={`flex justify-between items-center w-full cursor-pointer ${openMenus.certificate ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
                     } p-2 rounded`}
@@ -1675,8 +1675,8 @@ const Dash = () => {
                       Certificate Template
                     </Link>
                     <Link
-                      to="/certificate-item-wise"
-                      className={`block py-2 text-gray-300 ${isActive('/certificate-item-wise')
+                      to="/SCertificateItemwise"
+                      className={`block py-2 text-gray-300 ${isActive('/SCertificateItemwise')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1685,8 +1685,8 @@ const Dash = () => {
                       Certificate Item Wise
                     </Link>
                     <Link
-                      to="/certificate-school-wise"
-                      className={`block py-2 text-gray-300 ${isActive('/certificate-school-wise')
+                      to="/SCertificatesclwise"
+                      className={`block py-2 text-gray-300 ${isActive('/SCertificatesclwise')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1695,8 +1695,8 @@ const Dash = () => {
                       Certificate School Wise
                     </Link>
                     <Link
-                      to="/CertificateRegno"
-                      className={`block py-2 text-gray-300 ${isActive('/CertificateRegno')
+                      to="/SCertificateRegNo"
+                      className={`block py-2 text-gray-300 ${isActive('/SCertificateRegNo')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1708,9 +1708,9 @@ const Dash = () => {
 
                   </div>
                 )}
-              </div> */}
+              </div>
               {/*  */}
-              {/* <div className="mb-4">
+              <div className="mb-4">
                 <div
                   className={`flex justify-between items-center w-full cursor-pointer ${openMenus.Export ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4]' : ''
                     } p-2 rounded`}
@@ -1728,8 +1728,8 @@ const Dash = () => {
                 {openMenus.Export && (
                   <div className="mt-2 pl-4">
                     <Link
-                      to="/Higherlvlcomp"
-                      className={`block py-2 text-gray-300 ${isActive('/Higherlvlcomp')
+                      to="/ShigherLevel"
+                      className={`block py-2 text-gray-300 ${isActive('/ShigherLevel')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1738,8 +1738,8 @@ const Dash = () => {
                       Higher Level Competition
                     </Link>
                     <Link
-                      to="/ExportDatabase"
-                      className={`block py-2 text-gray-300 ${isActive('/ExportDatabase')
+                      to="/SExport"
+                      className={`block py-2 text-gray-300 ${isActive('/SExport')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}
@@ -1752,7 +1752,7 @@ const Dash = () => {
 
                   </div>
                 )}
-              </div> */}
+              </div>
             </>
           )}
           {user?.role === 'It Admin' && (

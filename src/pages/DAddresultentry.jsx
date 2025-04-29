@@ -6,8 +6,21 @@ import { useNavigate } from 'react-router-dom'
 
 const DAddresultentry = () => {
     const navigate = useNavigate();
-    
+
+    // Mock database of item codes (similar to DAddStagedurat)
+    const itemDatabase = {
+        '101': { name: 'Essay Writing', participants: '3', judges: '4' },
+        '202': { name: 'Research Paper', participants: '1', judges: '3' },
+        '304': { name: 'Story Writing', participants: '2', judges: '5' },
+        '405': { name: 'Technical Report', participants: '4', judges: '3' },
+        '506': { name: 'Presentation', participants: '5', judges: '4' }
+    };
+
     const [formData, setFormData] = useState({
+        itemCode: '',
+        itemName: '',
+        participants: '',
+        judges: '',
         regNo: '',
         code: '',
         mark1: '',
@@ -21,6 +34,7 @@ const DAddresultentry = () => {
     });
 
     const [errors, setErrors] = useState({
+        itemCode: '',
         regNo: '',
         code: '',
         mark1: '',
@@ -33,6 +47,7 @@ const DAddresultentry = () => {
     });
 
     const [touched, setTouched] = useState({
+        itemCode: false,
         regNo: false,
         code: false,
         mark1: false,
@@ -46,10 +61,25 @@ const DAddresultentry = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
+        
+        // Special handling for itemCode
+        if (name === 'itemCode') {
+            const itemData = itemDatabase[value] || { name: '', participants: '', judges: '' };
+            
+            setFormData(prevState => ({
+                ...prevState,
+                [name]: value,
+                itemName: itemData.name,
+                participants: itemData.participants,
+                judges: itemData.judges
+            }));
+        } else {
+            setFormData({
+                ...formData,
+                [name]: value
+            });
+        }
+        
         validateField(name, value);
     };
 
@@ -65,6 +95,10 @@ const DAddresultentry = () => {
         let errorMessage = "";
 
         switch (field) {
+            case "itemCode":
+                if (!value) errorMessage = "Item code is required";
+                else if (!/^[A-Za-z0-9]+$/.test(value)) errorMessage = "Item code should be alphanumeric";
+                break;
             case "regNo":
                 if (!value) errorMessage = "Registration number is required";
                 else if (!/^[A-Za-z0-9]+$/.test(value)) errorMessage = "Registration number should be alphanumeric";
@@ -108,6 +142,7 @@ const DAddresultentry = () => {
 
     const validateForm = () => {
         const fieldValidations = {
+            itemCode: validateField("itemCode", formData.itemCode),
             regNo: validateField("regNo", formData.regNo),
             code: validateField("code", formData.code),
             mark1: validateField("mark1", formData.mark1),
@@ -121,6 +156,7 @@ const DAddresultentry = () => {
 
         // Mark all fields as touched
         setTouched({
+            itemCode: true,
             regNo: true,
             code: true,
             mark1: true,
@@ -216,9 +252,6 @@ const DAddresultentry = () => {
         }
     };
 
-    const handleCancel = () => {
-        navigate('/all-resultentry');
-    };
 
     return (
         <>
@@ -235,20 +268,20 @@ const DAddresultentry = () => {
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-3 md:gap-y-4 gap-x-4 md:gap-x-6 text-[#003566] p-2 md:p-4">
-                        <div className="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-4">
+                            <div className="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-4">
                                 <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0">Item Code</label>
                                 <div className="w-full">
                                     <input
                                         type="text"
-                                        name="regNo"
-                                        value={formData.regNo}
+                                        name="itemCode"
+                                        value={formData.itemCode}
                                         onChange={handleChange}
-                                        onBlur={() => handleBlur("regNo")}
-                                        className={`border ${touched.regNo && errors.regNo ? "border-red-500" : "border-blue-600"} px-2 py-1 rounded-full w-full mb-1 md:mb-2 text-sm md:text-base`}
+                                        onBlur={() => handleBlur("itemCode")}
+                                        className={`border ${touched.itemCode && errors.itemCode ? "border-red-500" : "border-blue-600"} px-2 py-1 rounded-full w-full mb-1 md:mb-2 text-sm md:text-base`}
                                         required
                                     />
-                                    {touched.regNo && errors.regNo && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.regNo}</p>
+                                    {touched.itemCode && errors.itemCode && (
+                                        <p className="text-sm text-red-500 mt-1">{errors.itemCode}</p>
                                     )}
                                 </div>
                             </div>
@@ -257,59 +290,41 @@ const DAddresultentry = () => {
                                 <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0 md:pl-4">Item Name</label>
                                 <div className="w-full">
                                     <input
-                                    placeholder='stroy writing'
                                         type="text"
-                                        name="code"
-                                        value={formData.code}
-                                        onChange={handleChange}
-                                        onBlur={() => handleBlur("code")}
-                                        className={`   px-2 py-1  w-full mb-1 md:mb-2 text-sm md:text-base`}
-                                        required
+                                        name="itemName"
+                                        value={formData.itemName}
+                                        readOnly
+                                        className="px-2 py-1 rounded-full w-full bg-gray-200 mb-1 md:mb-2 text-sm md:text-base"
                                     />
-                                    {touched.code && errors.code && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.code}</p>
-                                    )}
                                 </div>
                             </div>
 
                             <div className="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-4">
                                 <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0">No of Participants</label>
                                 <div className="w-full">
-                                <input
-                                    placeholder='5'
+                                    <input
                                         type="text"
-                                        name="code"
-                                        value={formData.code}
-                                        onChange={handleChange}
-                                        onBlur={() => handleBlur("code")}
-                                        className={`   px-2 py-1  w-full mb-1 md:mb-2 text-sm md:text-base`}
-                                        required
+                                        name="participants"
+                                        value={formData.participants}
+                                        readOnly
+                                        className="px-2 py-1 rounded-full w-full bg-gray-200 mb-1 md:mb-2 text-sm md:text-base"
                                     />
-                                    {touched.mark1 && errors.mark1 && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.mark1}</p>
-                                    )}
                                 </div>
                             </div>
 
                             <div className="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-2">
-                                <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0 md:pl-4">No of Judges </label>
+                                <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0 md:pl-4">No of Judges</label>
                                 <div className="w-full">
-                                <input
-                                    placeholder='4'
+                                    <input
                                         type="text"
-                                        name="code"
-                                        value={formData.code}
-                                        onChange={handleChange}
-                                        onBlur={() => handleBlur("code")}
-                                        className={`   px-2 py-1  w-full mb-1 md:mb-2 text-sm md:text-base`}
-                                        required
+                                        name="judges"
+                                        value={formData.judges}
+                                        readOnly
+                                        className="px-2 py-1 rounded-full w-full bg-gray-200 mb-1 md:mb-2 text-sm md:text-base"
                                     />
-                                    {touched.mark2 && errors.mark2 && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.mark2}</p>
-                                    )}
                                 </div>
                             </div>
-                           
+
                             <div className="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-4">
                                 <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0">Reg No</label>
                                 <div className="w-full">
@@ -414,87 +429,12 @@ const DAddresultentry = () => {
                                 </div>
                             </div>
 
-                            <div className="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-4">
-                                <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0">Mark %</label>
-                                <div className="w-full">
-                                    <input
-                                        type="text"
-                                        name="markPercentage"
-                                        value={formData.markPercentage}
-                                        onChange={handleChange}
-                                        onBlur={() => handleBlur("markPercentage")}
-                                        className={`border ${touched.markPercentage && errors.markPercentage ? "border-red-500" : "border-blue-500"} px-2 py-1 rounded-full w-full mb-1 md:mb-2 text-sm md:text-base`}
-                                        required
-                                    />
-                                    {touched.markPercentage && errors.markPercentage && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.markPercentage}</p>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-2">
-                                <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0 md:pl-4">Rank</label>
-                                <div className="w-full">
-                                    <input
-                                        type="text"
-                                        name="rank"
-                                        value={formData.rank}
-                                        onChange={handleChange}
-                                        onBlur={() => handleBlur("rank")}
-                                        className={`border ${touched.rank && errors.rank ? "border-red-500" : "border-blue-500"} px-2 py-1 rounded-full w-full mb-1 md:mb-2 text-sm md:text-base`}
-                                        required
-                                    />
-                                    {touched.rank && errors.rank && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.rank}</p>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-4">
-                                <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0">Grade</label>
-                                <div className="w-full">
-                                    <input
-                                        type="text"
-                                        name="grade"
-                                        value={formData.grade}
-                                        onChange={handleChange}
-                                        onBlur={() => handleBlur("grade")}
-                                        className={`border ${touched.grade && errors.grade ? "border-red-500" : "border-blue-500"} px-2 py-1 rounded-full w-full mb-1 md:mb-2 text-sm md:text-base`}
-                                        required
-                                    />
-                                    {touched.grade && errors.grade && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.grade}</p>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col md:flex-row md:items-center space-y-1 md:space-y-0 md:space-x-2">
-                                <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0 md:pl-4">Point</label>
-                                <div className="w-full">
-                                    <input
-                                        type="text"
-                                        name="point"
-                                        value={formData.point}
-                                        onChange={handleChange}
-                                        onBlur={() => handleBlur("point")}
-                                        className={`border ${touched.point && errors.point ? "border-red-500" : "border-blue-500"} px-2 py-1 rounded-full w-full mb-1 md:mb-2 text-sm md:text-base`}
-                                        required
-                                    />
-                                    {touched.point && errors.point && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.point}</p>
-                                    )}
-                                </div>
-                            </div>
+                        
+                         
+                         
                         </div>
 
-                        <div className="mt-6 md:mt-10 lg:mt-32 text-right px-2 md:px-4 md:mr-8">
-                            {/* <button
-                                type="button"
-                                onClick={handleCancel}
-                                className="border mr-2 md:mr-20 border-blue-600 rounded-full px-4 md:px-6 lg:px-10 text-blue-700 py-1 md:py-2 text-sm md:text-base hover:shadow-lg transition-shadow duration-300"
-                            >
-                                Cancel
-                            </button> */}
+                        <div className="mt-6 md:mt-10 lg:mt-10 text-right px-2 md:px-4 md:mr-8">
                             <button
                                 type="submit"
                                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] rounded-full px-4 md:px-6 lg:px-10 text-white py-1 md:py-2 text-sm md:text-base hover:shadow-lg transition-shadow duration-300"

@@ -4,6 +4,15 @@ import Dash from '../components/Dash';
 import { addStageDurationAPI } from '../services/allAPI';
 
 const DAddStagedurat = () => {
+  // Mock database of item codes
+  const itemDatabase = {
+    '101': { name: 'Essay Writing', participants: '3', time: '120 min' },
+    '202': { name: 'Research Paper', participants: '1', time: '180 min' },
+    '304': { name: 'Story Writing', participants: '2', time: '90 min' },
+    '405': { name: 'Technical Report', participants: '4', time: '150 min' },
+    '506': { name: 'Presentation', participants: '5', time: '60 min' }
+  };
+
   const [formData, setFormData] = useState({
     itemCode: '',
     itemName: '',
@@ -39,10 +48,25 @@ const DAddStagedurat = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value,
-    }));
+    
+    // Special handling for itemCode
+    if (name === 'itemCode') {
+      const itemData = itemDatabase[value] || { name: '', participants: '', time: '' };
+      
+      setFormData(prevState => ({
+        ...prevState,
+        [name]: value,
+        itemName: itemData.name,
+        participants: itemData.participants,
+        time: itemData.time
+      }));
+    } else {
+      setFormData(prevState => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
+    
     validateField(name, value);
   };
 
@@ -61,16 +85,6 @@ const DAddStagedurat = () => {
       case "itemCode":
         if (!value) errorMessage = "Item code is required";
         else if (!/^[A-Za-z0-9]+$/.test(value)) errorMessage = "Item code should be alphanumeric";
-        break;
-      case "itemName":
-        if (!value) errorMessage = "Item name is required";
-        break;
-      case "participants":
-        if (!value) errorMessage = "Number of participants is required";
-        else if (isNaN(value) || parseInt(value) <= 0) errorMessage = "Please enter a valid number";
-        break;
-      case "time":
-        if (!value) errorMessage = "Time is required";
         break;
       case "completionTime":
         if (!value) errorMessage = "Completion time is required";
@@ -97,21 +111,21 @@ const DAddStagedurat = () => {
   };
 
   const validateForm = () => {
-    const fields = Object.keys(formData);
+    // Only validate non-readonly fields
+    const fieldsToValidate = ['itemCode', 'completionTime', 'stage', 'date', 'timeSecond'];
     const fieldValidations = {};
     
-    fields.forEach(field => {
+    fieldsToValidate.forEach(field => {
       fieldValidations[field] = validateField(field, formData[field]);
     });
 
-    
     const touchedFields = {};
-    fields.forEach(field => {
+    fieldsToValidate.forEach(field => {
       touchedFields[field] = true;
     });
-    setTouched(touchedFields);
+    setTouched({...touched, ...touchedFields});
 
-    return Object.values(fieldValidations).every(Boolean);
+    return Object.keys(fieldValidations).every(key => fieldValidations[key]);
   };
 
   const handleSubmit = async (e) => {
@@ -197,16 +211,13 @@ const DAddStagedurat = () => {
                     name="itemName"
                     value={formData.itemName}
                     onChange={handleInputChange}
-                    onBlur={() => handleBlur("itemName")}
-                    className={`border ${touched.itemName && errors.itemName ? 'border-red-500' : 'border-blue-900'} px-2 py-1 rounded-full w-full`}
+                    readOnly
+                    className="px-2 py-1 rounded-full w-full bg-gray-200"
                   />
-                  {touched.itemName && errors.itemName && (
-                    <p className="text-sm text-red-500 mt-1 ml-2">{errors.itemName}</p>
-                  )}
                 </div>
               </div>
               
-              <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4">
+              <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4 mt-5">
                 <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0">No of Participants</label>
                 <div className="w-full">
                   <input
@@ -214,33 +225,27 @@ const DAddStagedurat = () => {
                     name="participants"
                     value={formData.participants}
                     onChange={handleInputChange}
-                    onBlur={() => handleBlur("participants")}
-                    className={`border ${touched.participants && errors.participants ? 'border-red-500' : 'border-blue-900'} px-2 py-1 rounded-full w-full`}
+                    readOnly
+                    className="px-2 py-1 rounded-full w-full bg-gray-200"
                   />
-                  {touched.participants && errors.participants && (
-                    <p className="text-sm text-red-500 mt-1 ml-2">{errors.participants}</p>
-                  )}
                 </div>
               </div>
               
               <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-2">
-                <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0 pl-4">Time</label>
+                <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0 pl-4">Assigned Time</label>
                 <div className="w-full">
                   <input
                     type="text"
                     name="time"
                     value={formData.time}
                     onChange={handleInputChange}
-                    onBlur={() => handleBlur("time")}
-                    className={`border ${touched.time && errors.time ? 'border-red-500' : 'border-blue-900'} px-2 py-1 rounded-full w-full`}
+                    readOnly
+                    className="px-2 py-1 rounded-full w-full bg-gray-200"
                   />
-                  {touched.time && errors.time && (
-                    <p className="text-sm text-red-500 mt-1 ml-2">{errors.time}</p>
-                  )}
                 </div>
               </div>
               
-              <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4">
+              <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4 mt-5">
                 <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0">Completion Time</label>
                 <div className="w-full">
                   <input
@@ -274,7 +279,7 @@ const DAddStagedurat = () => {
                 </div>
               </div>
               
-              <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4">
+              <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-4 mt-5">
                 <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0">Date</label>
                 <div className="w-full">
                   <input
@@ -292,7 +297,7 @@ const DAddStagedurat = () => {
               </div>
               
               <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-2">
-                <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0 pl-4">Time</label>
+                <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0 pl-4">Start Time</label>
                 <div className="w-full">
                   <input
                     type="time"
@@ -323,6 +328,5 @@ const DAddStagedurat = () => {
     </>
   );
 };
-
 
 export default DAddStagedurat

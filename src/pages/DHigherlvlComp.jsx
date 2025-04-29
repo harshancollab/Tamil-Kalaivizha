@@ -13,6 +13,16 @@ const DHigherlvlComp = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [festivalOptions, setFestivalOptions] = useState(["All Festival"]);
     const [dataLoaded, setDataLoaded] = useState(false);
+    const [subDistricts, setSubDistricts] = useState([
+        'Select Sub District',
+        'Munnar',
+        'Adimali',
+        'Kattappana',
+        'Nedumkandam',
+        'Devikulam',
+        'Chittur',
+        'Pattambi'
+    ]);
 
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
@@ -28,6 +38,7 @@ const DHigherlvlComp = () => {
 
     const selectedFestival = searchParams.get('festival') || "All Festival";
     const searchQuery = searchParams.get('search') || '';
+    const selectedSubDistrict = searchParams.get('subDistrict') || 'Select Sub District';
 
     useEffect(() => {
         getAllItemResult();
@@ -42,14 +53,14 @@ const DHigherlvlComp = () => {
         if (dataLoaded) {
             // Generate festival options from the actual data
             generateFestivalOptions();
-            filterItemsByFestivalAndSearchText();
+            filterItemsByFestivalSubDistrictAndSearchText();
         }
-    }, [selectedFestival, dataLoaded]);
+    }, [selectedFestival, selectedSubDistrict, dataLoaded]);
 
     // React to searchText changes directly
     useEffect(() => {
         if (dataLoaded) {
-            filterItemsByFestivalAndSearchText();
+            filterItemsByFestivalSubDistrictAndSearchText();
         }
     }, [searchText]);
 
@@ -83,21 +94,36 @@ const DHigherlvlComp = () => {
             try {
                 const result = await getAllHigherlvlcompAPI(reqHeader)
                 if (result.status === 200) {
-                    setItemresult(result.data);
+                    // Add subDistrict to each item randomly for demo purposes
+                    const enrichedData = result.data.map(item => ({
+                        ...item,
+                        subDistrict: subDistricts[Math.floor(Math.random() * (subDistricts.length - 1)) + 1]
+                    }));
+                    setItemresult(enrichedData);
                     setDataLoaded(true);
                 }
             } catch (err) {
                 console.log(err);
-                setItemresult(resultData);
+                // Add subDistrict to the mock data
+                const enrichedMockData = resultData.map(item => ({
+                    ...item,
+                    subDistrict: subDistricts[Math.floor(Math.random() * (subDistricts.length - 1)) + 1]
+                }));
+                setItemresult(enrichedMockData);
                 setDataLoaded(true);
             }
         } else {
-            setItemresult(resultData);
+            // Add subDistrict to the mock data
+            const enrichedMockData = resultData.map(item => ({
+                ...item,
+                subDistrict: subDistricts[Math.floor(Math.random() * (subDistricts.length - 1)) + 1]
+            }));
+            setItemresult(enrichedMockData);
             setDataLoaded(true);
         }
     }
 
-    const filterItemsByFestivalAndSearchText = () => {
+    const filterItemsByFestivalSubDistrictAndSearchText = () => {
         if (!Allitemresult.length) return;
 
         // First filter by festival
@@ -110,6 +136,11 @@ const DHigherlvlComp = () => {
                 const itemCode = parseInt(item.itemCode);
                 return itemCode >= range.min && itemCode <= range.max;
             });
+        }
+
+        // Next filter by subDistrict
+        if (selectedSubDistrict !== "Select Sub District") {
+            filtered = filtered.filter(item => item.subDistrict === selectedSubDistrict);
         }
 
         // Then filter by search text
@@ -228,27 +259,34 @@ const DHigherlvlComp = () => {
     ];
 
     const getPrintTitle = () => {
-        switch (selectedFestival) {
-            case "UP Kalaivizha":
-                return "UP Tamil Kalaivizha - Higher Level Competition";
-            case "LP Kalaivizha":
-                return "LP Tamil Kalaivizha - Higher Level Competition";
-            case "HS Kalaivizha":
-                return "HS Tamil Kalaivizha - Higher Level Competition";
-            case "HSS Kalaivizha":
-                return "HSS Tamil Kalaivizha - Higher Level Competition";
-            case "All Festival":
-                return "All Festival Tamil Kalaivizha - Higher Level Competition";
-            default:
-                return "Higher Level Competition";
-        }
+        const festivalPart = selectedFestival === "All Festival" ? "All Festival" : selectedFestival;
+        const subDistrictPart = selectedSubDistrict === "Select Sub District" ? "All Sub Districts" : selectedSubDistrict;
+        
+        return `${festivalPart} - ${subDistrictPart} - Higher Level Competition`;
     };
 
     const handleFestivalChange = (e) => {
         const festival = e.target.value;
-        setSearchParams({ festival });
+        // Update URL parameters while preserving subDistrict parameter
+        const newParams = new URLSearchParams();
+        newParams.set('festival', festival);
+        if (selectedSubDistrict !== 'Select Sub District') {
+            newParams.set('subDistrict', selectedSubDistrict);
+        }
+        setSearchParams(newParams);
         // Reset search text when changing festival
         setSearchText('');
+    };
+
+    const handleSubDistrictChange = (e) => {
+        const subDistrict = e.target.value;
+        // Update URL parameters while preserving festival parameter
+        const newParams = new URLSearchParams();
+        newParams.set('festival', selectedFestival);
+        if (subDistrict !== 'Select Sub District') {
+            newParams.set('subDistrict', subDistrict);
+        }
+        setSearchParams(newParams);
     };
 
     const handleSearchInputChange = (e) => {
@@ -279,7 +317,7 @@ const DHigherlvlComp = () => {
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
         
-        const headers = ['Sl No', 'Item Code & Item Name', 'Name of Participant', 'Class', 'School Name'];
+        const headers = ['Sl No', 'Item Code & Item Name', 'Name of Participant', 'Class', 'School Name', 'Sub District'];
         headers.forEach(headerText => {
             const th = document.createElement('th');
             th.textContent = headerText;
@@ -308,7 +346,8 @@ const DHigherlvlComp = () => {
                     `${item.itemCode} - ${item.itemName}`,
                     item.participantName,
                     item.class,
-                    item.schoolName
+                    item.schoolName,
+                    item.subDistrict
                 ];
                 
                 cellData.forEach(text => {
@@ -330,7 +369,7 @@ const DHigherlvlComp = () => {
             emptyCell.style.border = '1px solid #ddd';
             emptyCell.style.padding = '10px';
             emptyCell.style.textAlign = 'center';
-            emptyCell.colSpan = 5;
+            emptyCell.colSpan = 6;
             
             emptyRow.appendChild(emptyCell);
             tbody.appendChild(emptyRow);
@@ -340,7 +379,7 @@ const DHigherlvlComp = () => {
         pdfContent.appendChild(table);
         
         // PDF filename
-        const fileName = `${selectedFestival.replace(/ /g, '_')}_Higher_Level_Competition.pdf`;
+        const fileName = `${selectedFestival.replace(/ /g, '_')}_${selectedSubDistrict.replace(/ /g, '_')}_Higher_Level_Competition.pdf`;
         
         // PDF options
         const options = {
@@ -423,9 +462,36 @@ const DHigherlvlComp = () => {
                             Higher Level Competition
                         </h2>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
+                            
+                            {/* Sub-District Select with floating label */}
                             <div className="relative w-full sm:w-40">
                                 <select
-                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
+                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                                    id="sub-district-select"
+                                    value={selectedSubDistrict}
+                                    onChange={handleSubDistrictChange}
+                                >
+                                    {subDistricts.map((option, index) => (
+                                        <option key={`sub-district-${index}`} value={option}>
+                                            {option}
+                                        </option>
+                                    ))}
+                                </select>
+                                <label
+                                    htmlFor="sub-district-select"
+                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                                >
+                                    Sub District
+                                </label>
+                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                                    <i className="fa-solid fa-chevron-down"></i>
+                                </div>
+                            </div>
+                            {/* Festival Select with floating label */}
+                            <div className="relative w-full sm:w-40">
+                                <select
+                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                                    id="festival-select"
                                     onChange={handleFestivalChange}
                                     value={selectedFestival}
                                 >
@@ -435,10 +501,18 @@ const DHigherlvlComp = () => {
                                         </option>
                                     ))}
                                 </select>
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                <label
+                                    htmlFor="festival-select"
+                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                                >
+                                    Festival
+                                </label>
+                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
                                     <i className="fa-solid fa-chevron-down"></i>
                                 </div>
                             </div>
+
+
                             <button
                                 onClick={handlePrint}
                                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
@@ -490,7 +564,7 @@ const DHigherlvlComp = () => {
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan="5" className="p-4 text-center text-gray-500">
+                                                    <td colSpan="6" className="p-4 text-center text-gray-500">
                                                         {!dataLoaded ? "Loading..." : "No participants found. Please try a different search."}
                                                     </td>
                                                 </tr>

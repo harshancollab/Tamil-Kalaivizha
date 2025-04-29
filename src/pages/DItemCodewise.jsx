@@ -140,15 +140,23 @@ const DItemCodewise = () => {
 
     setFilteredItems(filtered);
   }
+  const festivalOptions = [
+    { value: "All Festival", display: "All Festival" },
+    { value: "UP Kalaivizha", display: "UP Kalaivizha" },
+    { value: "LP Kalaivizha", display: "LP Kalaivizha" },
+    { value: "HS Kalaivizha", display: "HS Kalaivizha" },
+    { value: "HSS Kalaivizha", display: "HSS Kalaivizha" }
+  ];
+  
 
   const resultData = [
-    { slNo: 1, itemCode: "301 - Story Writing", school: "GHSS Kozhikode", SchoolCode: 60001, studentName: "Rahul K", grade: "A", point: 9.5, totalPoint: 9.5 },
-    { slNo: 2, itemCode: "302 - Essay Writing", school: "St. Joseph HSS", SchoolCode: 4003, studentName: "Anjali S", grade: "A", point: 10.0, totalPoint: 10.0 },
-    { slNo: 3, itemCode: "401 - LP Story Writing", school: "MES HSS", SchoolCode: 30001, studentName: "Arun P", grade: "A", point: 9.0, totalPoint: 9.0 },
-    { slNo: 4, itemCode: "402 - LP Essay Writing", school: "Govt HSS", SchoolCode: 30001, studentName: "Meera T", grade: "B", point: 8.0, totalPoint: 8.0 },
-    { slNo: 5, itemCode: "403 - LP Poem Recitation", school: "Sacred Heart HSS", SchoolCode: 7601, studentName: "Vishnu M", grade: "A", point: 9.5, totalPoint: 9.5 },
-    { slNo: 6, itemCode: "504 - HS Elocution", school: "Kendriya Vidyalaya", SchoolCode: 67001, studentName: "Sameera N", grade: "B", point: 8.5, totalPoint: 8.5 },
-    { slNo: 7, itemCode: "605 - HSS Group Song", school: "Christ HSS", SchoolCode: 9001, studentName: "Team A", grade: "B", point: 7.5, totalPoint: 7.5 },
+    { slNo: 1, itemCode: "301 - Story Writing", school: "GHSS Kozhikode", SchoolCode: 60001,Sub:"Ottapalam", studentName: "Rahul K", grade: "A", point: 9.5, totalPoint: 9.5 },
+    { slNo: 2, itemCode: "302 - Essay Writing", school: "St. Joseph HSS", SchoolCode: 4003,Sub:"Pattambi", studentName: "Anjali S", grade: "A", point: 10.0, totalPoint: 10.0 },
+    { slNo: 3, itemCode: "401 - LP Story Writing", school: "MES HSS", SchoolCode: 30001,Sub:"Kottay", studentName: "Arun P", grade: "A", point: 9.0, totalPoint: 9.0 },
+    { slNo: 4, itemCode: "402 - LP Essay Writing", school: "Govt HSS", SchoolCode: 30001,Sub:"Chittur", studentName: "Meera T", grade: "B", point: 8.0, totalPoint: 8.0 },
+    { slNo: 5, itemCode: "403 - LP Poem Recitation", school: "Sacred Heart HSS", SchoolCode: 7601,Sub:"Kozhlmanam", studentName: "Vishnu M", grade: "A", point: 9.5, totalPoint: 9.5 },
+    { slNo: 6, itemCode: "504 - HS Elocution", school: "Kendriya Vidyalaya", SchoolCode: 67001,Sub:"Ottapalam", studentName: "Sameera N", grade: "B", point: 8.5, totalPoint: 8.5 },
+    { slNo: 7, itemCode: "605 - HSS Group Song", school: "Christ HSS", SchoolCode: 9001,Sub:"Ottapalam", studentName: "Team A", grade: "B", point: 7.5, totalPoint: 7.5 },
     { slNo: 8, itemCode: "606 - HSS Folk Dance", school: "St. Mary's HSS", SchoolCode: 20001, studentName: "Dance Group", grade: "B", point: 8.0, totalPoint: 8.0 },
     { slNo: 9, itemCode: "504 - HS Elocution", school: "Kendriya Vidyalaya", SchoolCode: 67001, studentName: "Sameera N", grade: "B", point: 8.5, totalPoint: 8.5 },
     { slNo: 10, itemCode: "605 - HSS Group Song", school: "Christ HSS", SchoolCode: 9001, studentName: "Team A", grade: "B", point: 7.5, totalPoint: 7.5 },
@@ -421,23 +429,29 @@ const DItemCodewise = () => {
               </div>
               
               {/* Festival Dropdown */}
-              <div className="relative w-full sm:w-40">
-                <select
-                  className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
-                  onChange={handleFestivalChange}
-                  value={selectedFestival}
-                  aria-label="Select Festival"
-                >
-                  <option value="All Festival">All Festival</option>
-                  <option value="UP Kalaivizha">UP Kalaivizha</option>
-                  <option value="LP Kalaivizha">LP Kalaivizha</option>
-                  <option value="HS Kalaivizha">HS Kalaivizha</option>
-                  <option value="HSS Kalaivizha">HSS Kalaivizha</option>
-                </select>
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                  <i className="fa-solid fa-chevron-down"></i>
-                </div>
-              </div>
+              <div className="relative w-full sm:w-40 mb-5">
+      <select
+        className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+        id="festival-select"
+        onChange={handleFestivalChange}
+        value={selectedFestival}
+      >
+        {festivalOptions.map(option => (
+          <option key={option.value} value={option.value}>
+            {option.display}
+          </option>
+        ))}
+      </select>
+      <label
+        htmlFor="festival-select"
+        className="absolute text-xs text-blue-800 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-blue-800 left-3"
+      >
+        Festival
+      </label>
+      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+        <i className="fa-solid fa-chevron-down"></i>
+      </div>
+    </div>
               
               {/* Print Button */}
               <button
@@ -462,6 +476,7 @@ const DItemCodewise = () => {
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Student Name</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School</th>
+                          <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Rank</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Point</th>
@@ -494,6 +509,7 @@ const DItemCodewise = () => {
                               <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.studentName}</td>
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.SchoolCode}-{result.school}</td>
+                              <td className="p-2 md:p-3 whitespace-nowrap">{result.Sub}</td>
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.point}</td>
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.totalPoint}</td>

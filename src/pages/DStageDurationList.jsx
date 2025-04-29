@@ -603,12 +603,12 @@ const DStageDurationList = () => {
                         <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700 bg-gray-50 z-10">Sl No</th>
                         <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Item Code</th>
                         <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Item Name</th>
-                        <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Time</th>
+                        <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Assigned Time</th>
                         <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Participants</th>
                         <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Completion Time</th>
                         <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Stage</th>
                         <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Date</th>
-                        <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Time</th>
+                        <th className="p-2 md:p-3 text-xs md:text-sm font-medium text-gray-700">Start Time</th>
                       </tr>
                     </thead>
                     <tbody>
