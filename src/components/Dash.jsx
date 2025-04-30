@@ -24,7 +24,8 @@ const Dash = () => {
       resultsReport: ['/ConfidentialResultlist', '/itemwisepoint', '/itemcodewise', '/SclWisePoint', '/Sclgradewise'].some(route => path === route),
       certificate: ['/certificate-template', '/certificate-item-wise', '/certificate-school-wise', '/CertificateRegno', '/ExportDatabase'].some(route => path === route),
       Export: ['/Higherlvlcomp'].some(route => path === route),
-      dissettings: ['/ylKalolsavam'].some(route => path === route),
+     
+      settings: ['/DDefnKalolsavam','/DSclEntry','/DClusterSclList','/DSplOrderEntry','/DStageDurationList','/DDefineStageList'].some(route => path === route),
 
     };
   });
@@ -45,7 +46,9 @@ const Dash = () => {
       results: openMenus.results || ['/All-resultentry', '/item-result', '/Itemresult-list', '/All-Publishresult', '/'].some(route => path === route),
       resultsReport: openMenus.resultsReport || ['/ConfidentialResultlist', '/itemwisepoint', '/itemcodewise', '/SclWisePoint', '/Sclgradewise'].some(route => path === route),
       certificate: openMenus.certificate || ['/certificate-template', '/certificate-item-wise', '/certificate-school-wise', '/CertificateRegno', '/ExportDatabase'].some(route => path === route),
-      Export: openMenus.Export || ['/Higherlvlcomp'].some(route => path === route)
+      Export: openMenus.Export || ['/Higherlvlcomp'].some(route => path === route),
+      settings: openMenus.settings || ['/DDefnKalolsavam','/DSclEntry','/DClusterSclList','/DSplOrderEntry','/DStageDurationList','/DDefineStageList'].some(route => path === route),
+
     };
 
     setOpenMenus(newOpenMenus);
@@ -61,7 +64,7 @@ const Dash = () => {
       results: menuName === 'results' ? !openMenus[menuName] : false,
       resultsReport: menuName === 'resultsReport' ? !openMenus[menuName] : false,
       certificate: menuName === 'certificate' ? !openMenus[menuName] : false,
-      Export: menuName === 'Export' ? !openMenus[menuName] : false
+      Export: menuName === 'Export' ? !openMenus[menuName] : false,
     });
   };
 
@@ -1017,8 +1020,8 @@ const Dash = () => {
                       Item Result List
                     </Link>
                     <Link
-                      to="/All-Publishresult"
-                      className={`block py-2 text-gray-300 ${isActive('/All-Publishresult')
+                      to="/DPublishdeclare"
+                      className={`block py-2 text-gray-300 ${isActive('/DPublishdeclare')
                         ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] font-semibold text-white'
                         : 'hover:bg-gradient-to-r from-[#003566] to-[#05B9F4]'
                         }`}

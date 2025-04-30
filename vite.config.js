@@ -93,7 +93,6 @@
 //     }),
 //   ],
 // })
-
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -106,7 +105,7 @@ export default defineConfig({
       srcDir: "src",
       filename: "services-worker.js", // Make sure this matches your actual file name
       injectManifest: {
-        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // Increase to 3MB
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // Increased to 5MB
       },
       workbox: {
         swSrc: "src/services-worker.js", // Make sure this matches the actual file path in your project
@@ -152,6 +151,6 @@ export default defineConfig({
         }
       }
     },
-    chunkSizeWarningLimit: 1000, // Increase the warning limit to 1000kb
+    chunkSizeWarningLimit: 2000, // Increased to 2000kb (2MB)
   }
 })

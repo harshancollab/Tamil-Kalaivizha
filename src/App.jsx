@@ -186,6 +186,7 @@ import SParticipateMorethan from './pages/SParticipateMorethan';
 import SPublishDeclarList from './pages/SPublishDeclarList';
 import SExport from './pages/SExport';
 import ShigherLevel from './pages/ShigherLevel';
+import DPublishdeclare from './pages/DPublishdeclare';
 
 
 
@@ -375,6 +376,7 @@ function App() {
         <Route path="/DClusterReport" element={<DClusterReport />} />
         <Route path="/DAddStageallotitmwise" element={<DAddStageallotitmwise />} />
         <Route path="/DEditstgAllotitmwise/:id" element={<DEditstgAllotitmwise />} />
+        <Route path="/DPublishdeclare" element={<DPublishdeclare />} />
 
 
 
