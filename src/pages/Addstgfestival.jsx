@@ -465,6 +465,7 @@
 
 // export default Addstgfestival
 
+
 import React, { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
@@ -478,11 +479,11 @@ const fetchItemDetailsByCode = async (code) => {
     setTimeout(() => {
       // Mock data mapping - in a real app, this would come from your backend
       const itemDatabase = {
-        "001": { name: "Solo Dance", participants: 1 },
-        "002": { name: "Group Dance", participants: 8 },
-        "03": { name: "Vocal Solo", participants: 1 },
-        "004": { name: "Group Song", participants: 6 },
-        "005": { name: "Skit", participants: 10 },
+        "001": { name: "Solo Dance", participants: 1, approxTime: "5 minutes" },
+        "002": { name: "Group Dance", participants: 8, approxTime: "12 minutes" },
+        "03": { name: "Vocal Solo", participants: 1, approxTime: "4 minutes" },
+        "004": { name: "Group Song", participants: 6, approxTime: "8 minutes" },
+        "005": { name: "Skit", participants: 10, approxTime: "15 minutes" },
       };
       
       resolve(itemDatabase[code] || null);
@@ -505,7 +506,8 @@ const Addstgfestival = () => {
 
   const [readOnlyFields, setReadOnlyFields] = useState({
     itemName: false,
-    numberOfParticipants: false
+    numberOfParticipants: false,
+    approxTimeTaken: false
   });
 
   const [errors, setErrors] = useState({
@@ -547,33 +549,38 @@ const Addstgfestival = () => {
             setFormData(prev => ({
               ...prev,
               itemName: itemDetails.name,
-              numberOfParticipants: itemDetails.participants
+              numberOfParticipants: itemDetails.participants,
+              approxTimeTaken: itemDetails.approxTime // Added approx time
             }));
             
             // Make the fields read-only
             setReadOnlyFields({
               itemName: true,
-              numberOfParticipants: true
+              numberOfParticipants: true,
+              approxTimeTaken: true
             });
             
             // Clear errors for these fields
             setErrors(prev => ({
               ...prev,
               itemName: "",
-              numberOfParticipants: ""
+              numberOfParticipants: "",
+              approxTimeTaken: ""
             }));
             
             // Mark fields as touched
             setTouched(prev => ({
               ...prev,
               itemName: true,
-              numberOfParticipants: true
+              numberOfParticipants: true,
+              approxTimeTaken: true
             }));
           } else {
             // Reset if item code not found
             setReadOnlyFields({
               itemName: false,
-              numberOfParticipants: false
+              numberOfParticipants: false,
+              approxTimeTaken: false
             });
           }
         } catch (error) {
@@ -582,10 +589,19 @@ const Addstgfestival = () => {
           setIsLoading(false);
         }
       } else {
-        // Reset if item code is empty
+        // Reset if item code is empty - clear the three fields
+        setFormData(prev => ({
+          ...prev,
+          itemName: "",
+          numberOfParticipants: "",
+          approxTimeTaken: ""
+        }));
+        
+        // Reset read-only states
         setReadOnlyFields({
           itemName: false,
-          numberOfParticipants: false
+          numberOfParticipants: false,
+          approxTimeTaken: false
         });
       }
     };
@@ -731,7 +747,8 @@ const Addstgfestival = () => {
             
             setReadOnlyFields({
               itemName: false,
-              numberOfParticipants: false
+              numberOfParticipants: false,
+              approxTimeTaken: false
             });
             
           } else {
@@ -788,7 +805,8 @@ const Addstgfestival = () => {
     // Reset read-only states
     setReadOnlyFields({
       itemName: false,
-      numberOfParticipants: false
+      numberOfParticipants: false,
+      approxTimeTaken: false
     });
   };
 
@@ -836,24 +854,22 @@ const Addstgfestival = () => {
                   <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Item Name</label>
                   <div className="w-full sm:w-full md:w-80">
                     <input
+                    readOnly
                       type="text"
                       name="itemName"
                       value={formData.itemName}
                       onChange={handleInputChange}
                       onBlur={() => handleBlur("itemName")}
-                      className={`border px-2 py-1 rounded-full w-full mb-2 ${
+                      className={`border border-gray-200 px-2 py-1 rounded-full w-full mb-2 ${
                         touched.itemName && errors.itemName
                           ? "border-red-500 focus:outline-red-500"
                           : readOnlyFields.itemName 
-                            ? "border-gray-600 focus:outline-gray-600 "
+                            ? "border-gray-600 focus:outline-gray-600 bg-gray-100"
                             : "border-blue-600 focus:outline-blue-600"
                       }`}
-                      readOnly={readOnlyFields.itemName}
                       required
                     />
-                    {touched.itemName && errors.itemName && (
-                      <p className="text-xs sm:text-sm text-red-500 mt-1">{errors.itemName}</p>
-                    )}
+                    
                   </div>
                 </div>
 
@@ -861,24 +877,45 @@ const Addstgfestival = () => {
                   <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">No of Participants</label>
                   <div className="w-full sm:w-full md:w-80">
                     <input
+                    readOnly
                       type="number"
                       name="numberOfParticipants"
                       value={formData.numberOfParticipants}
                       onChange={handleInputChange}
                       onBlur={() => handleBlur("numberOfParticipants")}
-                      className={`border px-2 py-1 rounded-full w-full mb-2 ${
+                      className={`border border-gray-200 px-2 py-1 rounded-full w-full mb-2 ${
                         touched.numberOfParticipants && errors.numberOfParticipants
                           ? "border-red-500 focus:outline-red-500"
                           : readOnlyFields.numberOfParticipants
-                            ? "border-gray-600 focus:outline-gray-200 "
+                            ? "border-gray-600 focus:outline-gray-200 bg-gray-100"
                             : "border-blue-600 focus:outline-blue-600"
                       }`}
-                      readOnly={readOnlyFields.numberOfParticipants}
                       required
                     />
-                    {touched.numberOfParticipants && errors.numberOfParticipants && (
-                      <p className="text-xs sm:text-sm text-red-500 mt-1">{errors.numberOfParticipants}</p>
-                    )}
+                  
+                  </div>
+                </div>
+                <div className="flex flex-col md:flex-row mb-3 sm:mb-4">
+                  <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Appr Time Taken</label>
+                  <div className="w-full sm:w-full md:w-80">
+                    <input
+                    readOnly
+                      type="text"
+                      name="approxTimeTaken"
+                      value={formData.approxTimeTaken}
+                      onChange={handleInputChange}
+                      onBlur={() => handleBlur("approxTimeTaken")}
+                      className={`border border-gray-200 px-2 py-1 rounded-full w-full mb-2 ${
+                        touched.approxTimeTaken && errors.approxTimeTaken
+                          ? "border-red-500 focus:outline-red-500"
+                          : readOnlyFields.approxTimeTaken
+                            ? "border-gray-600 focus:outline-gray-200 bg-gray-100"
+                            : "border-blue-600 focus:outline-blue-600"
+                      }`}
+                      required
+                      placeholder="e.g. 30 minutes"
+                    />
+                  
                   </div>
                 </div>
 
@@ -907,6 +944,27 @@ const Addstgfestival = () => {
                     )}
                   </div>
                 </div>
+                <div className="flex flex-col md:flex-row mb-3 sm:mb-4">
+                  <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Date</label>
+                  <div className="w-full sm:w-full md:w-80">
+                    <input
+                      type="date"
+                      name="date"
+                      value={formData.date}
+                      onChange={handleInputChange}
+                      onBlur={() => handleBlur("date")}
+                      className={`border px-2 py-1 rounded-full w-full mb-2 ${
+                        touched.date && errors.date
+                          ? "border-red-500 focus:outline-red-500"
+                          : "border-blue-600 focus:outline-blue-600"
+                      }`}
+                      required
+                    />
+                    {touched.date && errors.date && (
+                      <p className="text-xs sm:text-sm text-red-500 mt-1">{errors.date}</p>
+                    )}
+                  </div>
+                </div>
 
                 <div className="flex flex-col md:flex-row mb-3 sm:mb-4">
                   <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Time</label>
@@ -930,76 +988,11 @@ const Addstgfestival = () => {
                   </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row mb-3 sm:mb-4">
-                  <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">No of Judges</label>
-                  <div className="w-full sm:w-full md:w-80">
-                    <select
-                      name="numberOfJudges"
-                      value={formData.numberOfJudges}
-                      onChange={handleInputChange}
-                      onBlur={() => handleBlur("numberOfJudges")}
-                      className={`border px-2 py-1 rounded-full w-full mb-2 ${
-                        touched.numberOfJudges && errors.numberOfJudges
-                          ? "border-red-500 focus:outline-red-500"
-                          : "border-blue-600 focus:outline-blue-600"
-                      }`}
-                      required
-                    >
-                      <option value="">Select</option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
-                    </select>
-                    {touched.numberOfJudges && errors.numberOfJudges && (
-                      <p className="text-xs sm:text-sm text-red-500 mt-1">{errors.numberOfJudges}</p>
-                    )}
-                  </div>
-                </div>
+             
 
-                <div className="flex flex-col md:flex-row mb-3 sm:mb-4">
-                  <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Appr Time Taken</label>
-                  <div className="w-full sm:w-full md:w-80">
-                    <input
-                      type="text"
-                      name="approxTimeTaken"
-                      value={formData.approxTimeTaken}
-                      onChange={handleInputChange}
-                      onBlur={() => handleBlur("approxTimeTaken")}
-                      className={`border px-2 py-1 rounded-full w-full mb-2 ${
-                        touched.approxTimeTaken && errors.approxTimeTaken
-                          ? "border-red-500 focus:outline-red-500"
-                          : "border-blue-600 focus:outline-blue-600"
-                      }`}
-                      required
-                      placeholder="e.g. 30 minutes"
-                    />
-                    {touched.approxTimeTaken && errors.approxTimeTaken && (
-                      <p className="text-xs sm:text-sm text-red-500 mt-1">{errors.approxTimeTaken}</p>
-                    )}
-                  </div>
-                </div>
+               
 
-                <div className="flex flex-col md:flex-row mb-3 sm:mb-4">
-                  <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Date</label>
-                  <div className="w-full sm:w-full md:w-80">
-                    <input
-                      type="date"
-                      name="date"
-                      value={formData.date}
-                      onChange={handleInputChange}
-                      onBlur={() => handleBlur("date")}
-                      className={`border px-2 py-1 rounded-full w-full mb-2 ${
-                        touched.date && errors.date
-                          ? "border-red-500 focus:outline-red-500"
-                          : "border-blue-600 focus:outline-blue-600"
-                      }`}
-                      required
-                    />
-                    {touched.date && errors.date && (
-                      <p className="text-xs sm:text-sm text-red-500 mt-1">{errors.date}</p>
-                    )}
-                  </div>
-                </div>
+               
 
                 <div className="flex flex-col md:flex-row mb-3 sm:mb-4">
                   <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">No of Clusters</label>
@@ -1026,7 +1019,33 @@ const Addstgfestival = () => {
                     )}
                   </div>
                 </div>
+                <div className="flex flex-col md:flex-row mb-3 sm:mb-4">
+                  <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">No of Judges</label>
+                  <div className="w-full sm:w-full md:w-80">
+                    <select
+                      name="numberOfJudges"
+                      value={formData.numberOfJudges}
+                      onChange={handleInputChange}
+                      onBlur={() => handleBlur("numberOfJudges")}
+                      className={`border px-2 py-1 rounded-full w-full mb-2 ${
+                        touched.numberOfJudges && errors.numberOfJudges
+                          ? "border-red-500 focus:outline-red-500"
+                          : "border-blue-600 focus:outline-blue-600"
+                      }`}
+                      required
+                    >
+                      <option value="">Select</option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                    </select>
+                    {touched.numberOfJudges && errors.numberOfJudges && (
+                      <p className="text-xs sm:text-sm text-red-500 mt-1">{errors.numberOfJudges}</p>
+                    )}
+                  </div>
+                </div>
               </div>
+
 
               <div className='text-center px-2 sm:mr-0 md:mr-16 lg:mr-72 mt-6 sm:mt-8 md:mt-12 max-w-full'>
                 <button

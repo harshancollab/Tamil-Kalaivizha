@@ -260,7 +260,7 @@ const SEditKallosvm = () => {
                     readOnly
                     type="text"
                     name="kalolsavamName"
-                    className="w-full sm:max-w-md sm:ml-10 border border-blue-600 px-4 sm:px-6 py-2 rounded-full bg-gray-100"
+                    className="w-full sm:max-w-md sm:ml-10 border border-blue-600 px-4 sm:px-6 py-2 rounded-full bg-gray-200"
                     value={formData.kalolsavamName}
                     aria-label="Kalolsavam Name"
                   />

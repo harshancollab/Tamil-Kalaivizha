@@ -462,32 +462,6 @@ const DHigherlvlComp = () => {
                             Higher Level Competition
                         </h2>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
-                            
-                            {/* Sub-District Select with floating label */}
-                            <div className="relative w-full sm:w-40">
-                                <select
-                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                                    id="sub-district-select"
-                                    value={selectedSubDistrict}
-                                    onChange={handleSubDistrictChange}
-                                >
-                                    {subDistricts.map((option, index) => (
-                                        <option key={`sub-district-${index}`} value={option}>
-                                            {option}
-                                        </option>
-                                    ))}
-                                </select>
-                                <label
-                                    htmlFor="sub-district-select"
-                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
-                                >
-                                    Sub District
-                                </label>
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                                    <i className="fa-solid fa-chevron-down"></i>
-                                </div>
-                            </div>
-                            {/* Festival Select with floating label */}
                             <div className="relative w-full sm:w-40">
                                 <select
                                     className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
@@ -549,6 +523,7 @@ const DHigherlvlComp = () => {
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Name of Participant</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Class</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
@@ -560,6 +535,7 @@ const DHigherlvlComp = () => {
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.participantName}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.class}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.schoolName}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.subDistrict}</td>
                                                     </tr>
                                                 ))
                                             ) : (

@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
-import { updateStageItemwiseAPI, getStageItemByIdAPI } from '../services/allAPI'
+// import { updateStageItemwiseAPI, addStageItemwiseAPI } from '../services/allAPI';
 
 const EditStageitem = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  
+  // Mock database of item codes - similar to the one in DAddStagedurat
+  const itemDatabase = {
+    '101': { name: 'Essay Writing', participants: '3', approxTime: '120 min' },
+    '202': { name: 'Research Paper', participants: '1', approxTime: '180 min' },
+    '304': { name: 'Story Writing', participants: '2', approxTime: '90 min' },
+    '405': { name: 'Technical Report', participants: '4', approxTime: '150 min' },
+    '506': { name: 'Presentation', participants: '5', approxTime: '60 min' }
+  };
   
   const [formData, setFormData] = useState({
     itemName: "",
@@ -44,7 +52,8 @@ const EditStageitem = () => {
     numberOfClusters: false
   });
 
-  // Fetch existing data when component mounts
+  console.log(formData);
+
   useEffect(() => {
     const fetchItemDetails = async () => {
       const token = sessionStorage.getItem("token");
@@ -53,29 +62,13 @@ const EditStageitem = () => {
           "Authorization": `Bearer ${token}`
         };
         try {
-          // First try to fetch real data from API
-          const result = await getStageItemByIdAPI(id, reqHeader);
-          if (result?.status === 200) {
+          const result = await (id, reqHeader);
+          if (result.status === 200) {
             setFormData(result.data);
           }
         } catch (err) {
-          console.log("Error fetching real data:", err);
-          
-        
-          const mockItems = [
-            { id: 1, itemCode: '3001', itemName: 'Item1', numberOfParticipants: 50, date: '2025-04-05', time: '09:00', stageName: 'Stage 1', numberOfClusters: 5, numberOfJudges: 3, approxTimeTaken: '30 minutes', stage: 'Stage 1' },
-            { id: 2, itemCode: '4004', itemName: 'Item 2', numberOfParticipants: 25, date: '2025-04-06', time: '14:30', stageName: 'stage 3', numberOfClusters: 2, numberOfJudges: 5, approxTimeTaken: '20 minutes', stage: 'Stage 3' },
-            { id: 3, itemCode: '4003', itemName: 'item 3', numberOfParticipants: 15, date: '2025-04-07', time: '10:15', stageName: 'Stage 4', numberOfClusters: 1, numberOfJudges: 7, approxTimeTaken: '15 minutes', stage: 'Stage 4' },
-            { id: 4, itemCode: '3454', itemName: 'Item 4', numberOfParticipants: 60, date: '2025-04-05', time: '11:45', stageName: 'stage 4', numberOfClusters: 6, numberOfJudges: 2, approxTimeTaken: '45 minutes', stage: 'Stage 4' },
-            { id: 5, itemCode: '3405', itemName: 'item 5', numberOfParticipants: 30, date: '2025-04-06', time: '16:00', stageName: 'Stage 5', numberOfClusters: 3, numberOfJudges: 4, approxTimeTaken: '25 minutes', stage: 'Stage 5' },
-          ];
-          
-          const mockItem = mockItems.find(item => item.id === parseInt(id));
-          if (mockItem) {
-            setFormData(mockItem);
-          } else {
-            alert("Failed to fetch item details");
-          }
+          console.log(err);
+          alert("Failed to fetch item details");
         }
       }
     };
@@ -85,10 +78,24 @@ const EditStageitem = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    
+    // Special handling for itemCode
+    if (name === 'itemCode') {
+      const itemData = itemDatabase[value] || { name: '', participants: '', approxTime: '' };
+      
+      setFormData({
+        ...formData,
+        [name]: value,
+        itemName: itemData.name,
+        numberOfParticipants: itemData.participants,
+        approxTimeTaken: itemData.approxTime
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
     
     validateField(name, value);
   };
@@ -158,6 +165,7 @@ const EditStageitem = () => {
       numberOfClusters: validateField("numberOfClusters", formData.numberOfClusters)
     };
 
+
     setTouched({
       itemName: true,
       itemCode: true,
@@ -185,10 +193,9 @@ const EditStageitem = () => {
         };
         
         try {
-          const result = await updateStageItemwiseAPI(id, formData, reqHeader);
+          const result = await (id, formData, reqHeader);
           if (result.status === 200) {
             alert("Updated successfully!");
-            navigate('/Stage-itemwise-list'); 
           }
         } catch (err) {
           console.log(err);
@@ -201,7 +208,8 @@ const EditStageitem = () => {
   };
 
   const handleCancel = () => {
-    navigate('/Stage-itemwise-list'); 
+    // Navigate back or reset form
+    window.history.back();
   };
 
   return (
@@ -215,7 +223,7 @@ const EditStageitem = () => {
             onSubmit={handleUpdate}
           >
             <div className="mb-4 mt-2 md:mb-5 md:mt-3">
-              <h2 className="text-xl md:text-2xl font-semibold">Update Stage Allotment Itemwise</h2>
+              <h2 className="text-xl md:text-2xl font-semibold">Update Stage Allotment Item Wise</h2>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-y-3 md:gap-y-4 gap-x-4 md:gap-x-6 text-[#003566] p-2 md:p-4">
@@ -249,17 +257,9 @@ const EditStageitem = () => {
                     name="itemName"
                     value={formData.itemName}
                     onChange={handleChange}
-                    onBlur={() => handleBlur("itemName")}
-                    className={`border px-2 py-1 rounded-full w-full text-sm md:text-base ${
-                      touched.itemName && errors.itemName
-                        ? "border-red-500 focus:outline-red-500"
-                        : "border-blue-500 focus:outline-blue-500"
-                    }`}
-                    required
+                    readOnly
+                    className="px-2 py-1 rounded-full w-full text-sm md:text-base bg-gray-200"
                   />
-                  {touched.itemName && errors.itemName && (
-                    <p className="text-xs md:text-sm text-red-500 mt-1">{errors.itemName}</p>
-                  )}
                 </div>
               </div>
 
@@ -267,21 +267,13 @@ const EditStageitem = () => {
                 <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0">No of Participants</label>
                 <div className="w-full">
                   <input
-                    type="number"
+                    type="text"
                     name="numberOfParticipants"
                     value={formData.numberOfParticipants}
                     onChange={handleChange}
-                    onBlur={() => handleBlur("numberOfParticipants")}
-                    className={`border px-2 py-1 rounded-full w-full text-sm md:text-base ${
-                      touched.numberOfParticipants && errors.numberOfParticipants
-                        ? "border-red-500 focus:outline-red-500"
-                        : "border-blue-500 focus:outline-blue-500"
-                    }`}
-                    required
+                    readOnly
+                    className="px-2 py-1 rounded-full w-full text-sm md:text-base bg-gray-200"
                   />
-                  {touched.numberOfParticipants && errors.numberOfParticipants && (
-                    <p className="text-xs md:text-sm text-red-500 mt-1">{errors.numberOfParticipants}</p>
-                  )}
                 </div>
               </div>
 
@@ -293,18 +285,10 @@ const EditStageitem = () => {
                     name="approxTimeTaken"
                     value={formData.approxTimeTaken}
                     onChange={handleChange}
-                    onBlur={() => handleBlur("approxTimeTaken")}
-                    className={`border px-2 py-1 rounded-full w-full text-sm md:text-base ${
-                      touched.approxTimeTaken && errors.approxTimeTaken
-                        ? "border-red-500 focus:outline-red-500"
-                        : "border-blue-500 focus:outline-blue-500"
-                    }`}
-                    required
+                    readOnly
+                    className="px-2 py-1 rounded-full w-full text-sm md:text-base bg-gray-200"
                     placeholder="e.g. 30 minutes"
                   />
-                  {touched.approxTimeTaken && errors.approxTimeTaken && (
-                    <p className="text-xs md:text-sm text-red-500 mt-1">{errors.approxTimeTaken}</p>
-                  )}
                 </div>
               </div>
 
@@ -327,8 +311,6 @@ const EditStageitem = () => {
                     <option value="Stage 1">Stage 1</option>
                     <option value="Stage 2">Stage 2</option>
                     <option value="Stage 3">Stage 3</option>
-                    <option value="Stage 4">Stage 4</option>
-                    <option value="Stage 5">Stage 5</option>
                   </select>
                   {touched.stage && errors.stage && (
                     <p className="text-xs md:text-sm text-red-500 mt-1">{errors.stage}</p>
@@ -399,9 +381,6 @@ const EditStageitem = () => {
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
                   </select>
                   {touched.numberOfClusters && errors.numberOfClusters && (
                     <p className="text-xs md:text-sm text-red-500 mt-1">{errors.numberOfClusters}</p>
@@ -428,10 +407,6 @@ const EditStageitem = () => {
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
                   </select>
                   {touched.numberOfJudges && errors.numberOfJudges && (
                     <p className="text-xs md:text-sm text-red-500 mt-1">{errors.numberOfJudges}</p>
@@ -461,5 +436,9 @@ const EditStageitem = () => {
     </>
   );
 };
+
+
+
+
 
 export default EditStageitem

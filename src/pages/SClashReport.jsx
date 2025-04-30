@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
-import html2pdf from 'html2pdf.js';
+import html2pdf from 'html2pdf.js'
 
 const SClashReport = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -463,7 +463,7 @@ const SClashReport = () => {
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     
-    const headers = ['Sl No', 'Reg No', 'Name', 'School Code', 'School Name', 'Clash Items'];
+    const headers = ['Sl No', 'Reg No', 'Name', 'School Code', 'School Name','subDistrict','District', 'Clash Items'];
     headers.forEach(headerText => {
       const th = document.createElement('th');
       th.textContent = headerText;
@@ -490,6 +490,8 @@ const SClashReport = () => {
         report.studentName || "-",
         report.schoolCode || "-",
         report.schoolName || "-",
+        report.subDistrict || "-",
+        report.district || "-",
         report.clashItems.join(", ") || "-"
       ];
       
@@ -545,56 +547,7 @@ const SClashReport = () => {
               Clash List
             </h2>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4 flex-wrap">
-                  {/* Sub-District dropdown - Only show when District is selected */}
-                  {selectedDistrict !== 'Select' && availableSubDistricts.length > 1 && (
-                <div className="relative w-full sm:w-auto">
-                  <select
-                    className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                    id="sub-district-select"
-                    value={selectedSubDistrict}
-                    onChange={handleSubDistrictChange}
-                  >
-                    {availableSubDistricts.map((option, index) => (
-                      <option key={`sub-district-${index}`} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                  <label
-                    htmlFor="sub-district-select"
-                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
-                  >
-                    Sub District
-                  </label>
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                    <i className="fa-solid fa-chevron-down"></i>
-                  </div>
-                </div>
-              )}
-                    {/* District Filter */}
-                    <div className="relative w-full sm:w-auto">
-                <select
-                  className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                  id="district-select"
-                  value={selectedDistrict}
-                  onChange={handleDistrictChange}
-                >
-                  {allDistricts.map((option, index) => (
-                    <option key={`district-${index}`} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-                <label
-                  htmlFor="district-select"
-                  className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
-                >
-                  District
-                </label>
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                  <i className="fa-solid fa-chevron-down"></i>
-                </div>
-              </div>
+              
 
               {/* Date Filter */}
               <div className="relative w-full sm:w-auto">
@@ -685,6 +638,8 @@ const SClashReport = () => {
                           <th className="p-2 md:p-3">Name</th>
                           <th className="p-2 md:p-3">School code</th>
                           <th className="p-2 md:p-3">School Name</th>
+                          <th className="p-2 md:p-3">Sub District</th>
+                          <th className="p-2 md:p-3">District</th>
                           <th className="p-2 md:p-3">Clash Items</th>
                         </tr>
                       </thead>
@@ -696,6 +651,8 @@ const SClashReport = () => {
                             <td className="p-2 md:p-3">{report.studentName}</td>
                             <td className="p-2 md:p-3">{report.schoolCode}</td>
                             <td className="p-2 md:p-3">{report.schoolName}</td>
+                            <td className="p-2 md:p-3">{report.subDistrict}</td>
+                            <td className="p-2 md:p-3">{report.district}</td>
                             <td className="p-2 md:p-3 relative">
                               <span 
                                 className="cursor-pointer px-2 py-1 rounded no-print"

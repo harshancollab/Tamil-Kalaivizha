@@ -163,7 +163,7 @@ const SCertificatesclwise = () => {
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
         
-        const headers = ['Sl No', 'School', 'No of Students', 'Participation', 'Non-Participant'];
+        const headers = ['Sl No', 'School','Sub District','District', 'No of Students', 'Participation', 'Non-Participant'];
         headers.forEach(headerText => {
             const th = document.createElement('th');
             th.textContent = headerText;
@@ -190,6 +190,8 @@ const SCertificatesclwise = () => {
             const cellData = [
                 item.slNo,
                 item.printed,
+                item.subDistrict,
+                item.district,
                 item.totalStudents,
                 item.participation,
                 item.nonParticipant
@@ -239,7 +241,8 @@ const SCertificatesclwise = () => {
             nonParticipant: 2,
             gradeA: 10,
             gradeB: 8,
-            gradeC: 4
+            gradeC: 4,
+             district: "Kozhikode", subDistrict: "vatakara"
         },
         {
             slNo: 2,
@@ -252,7 +255,8 @@ const SCertificatesclwise = () => {
             nonParticipant: 2,
             gradeA: 7,
             gradeB: 5,
-            gradeC: 4
+            gradeC: 4,
+            district: "Ernakulam", subDistrict: "vypin" 
         },
         {
             slNo: 3,
@@ -265,7 +269,8 @@ const SCertificatesclwise = () => {
             nonParticipant: 0,
             gradeA: 8,
             gradeB: 5,
-            gradeC: 2
+            gradeC: 2,
+            district: "Palakkad", subDistrict: "Mannarkkad"
         },
         {
             slNo: 4,
@@ -278,7 +283,8 @@ const SCertificatesclwise = () => {
             nonParticipant: 2,
             gradeA: 15,
             gradeB: 12,
-            gradeC: 3
+            gradeC: 3,
+            district: "Palakkad", subDistrict: "Chittur"
         },
         {
             slNo: 5,
@@ -291,7 +297,8 @@ const SCertificatesclwise = () => {
             nonParticipant: 3,
             gradeA: 18,
             gradeB: 5,
-            gradeC: 2
+            gradeC: 2,
+            district: "Palakkad", subDistrict: "Ottapalam"
         },
         {
             slNo: 6,
@@ -304,7 +311,8 @@ const SCertificatesclwise = () => {
             nonParticipant: 2,
             gradeA: 9,
             gradeB: 7,
-            gradeC: 2
+            gradeC: 2,
+            district: "Palakkad", subDistrict: "Kottayi"
         },
         {
             slNo: 7,
@@ -317,7 +325,8 @@ const SCertificatesclwise = () => {
             nonParticipant: 2,
             gradeA: 9,
             gradeB: 7,
-            gradeC: 2
+            gradeC: 2,
+           district: "Idukki", subDistrict: "Munnar"
         },
         {
             slNo: 8,
@@ -330,7 +339,8 @@ const SCertificatesclwise = () => {
             nonParticipant: 1,
             gradeA: 6,
             gradeB: 5,
-            gradeC: 3
+            gradeC: 3,
+            district: "Idukki", subDistrict: "Munnar"
         },
         {
             slNo: 9,
@@ -343,7 +353,8 @@ const SCertificatesclwise = () => {
             nonParticipant: 2,
             gradeA: 10,
             gradeB: 7,
-            gradeC: 3
+            gradeC: 3,
+            district: "Idukki", subDistrict: "Munnar"
         },
         {
             slNo: 10,
@@ -356,7 +367,8 @@ const SCertificatesclwise = () => {
             nonParticipant: 1,
             gradeA: 8,
             gradeB: 6,
-            gradeC: 3
+            gradeC: 3,
+            district: "Idukki", subDistrict: "Munnar"
         },
         {
             slNo: 11,
@@ -369,7 +381,8 @@ const SCertificatesclwise = () => {
             nonParticipant: 2,
             gradeA: 12,
             gradeB: 8,
-            gradeC: 3
+            gradeC: 3,
+            district: "Idukki", subDistrict: "Munnar"
         }
     ];
 
@@ -496,6 +509,8 @@ const SCertificatesclwise = () => {
                                             <tr className="text-gray-700">
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">District</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">No of Students</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Participation</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Non-Participant</th>
@@ -512,6 +527,8 @@ const SCertificatesclwise = () => {
                                                         >
                                                             {item.printed}
                                                         </td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{item.subDistrict}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{item.district}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{item.totalStudents}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{item.participation}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{item.nonParticipant}</td>

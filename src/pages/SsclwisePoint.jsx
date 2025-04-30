@@ -49,16 +49,16 @@ const SsclwisePoint = () => {
     // Dummy data with festival-related information (using itemCode to determine festival)
     const dummyResultData = [
         { slNo: 1, regNo: "3016", code: "GHSS Kozhikode", mark1: 5, mark2: 8, mark3: 2, total: "67", markPercentage: 85, rank: 2, grade: "A", point: 9.5, itemCode: "301", district: "Kozhikode", subDistrict: "vatakara" },
-        { slNo: 2, regNo: "3015", code: "MES HSS", mark1: 9, mark2: 8, mark3: 5, total: "66", markPercentage: 91, rank: 1, grade: "A+", point: 10.0, itemCode: "302", district: "Ernakulam", subDistrict: "" },
+        { slNo: 2, regNo: "3015", code: "MES HSS", mark1: 9, mark2: 8, mark3: 5, total: "66", markPercentage: 91, rank: 1, grade: "A+", point: 10.0, itemCode: "302", district: "Ernakulam", subDistrict: "Edapally" },
         { slNo: 3, regNo: "3016", code: "G. H. S. S Anakara", mark1: 7, mark2: 2, mark3: 8, total: "45", markPercentage: 82, rank: 3, grade: "A-", point: 9.0, itemCode: "303", district: "Palakkad", subDistrict: "Mannarkkad" },
         { slNo: 4, regNo: "3445", code: "G. H. S. S Kumily", mark1: 8, mark2: 2, mark3: 7, total: "43", markPercentage: 72, rank: 7, grade: "B+", point: 8.0, itemCode: "401", district: "Idukki", subDistrict: "Kattappana" },
         { slNo: 5, regNo: "675", code: "G. H. S. S. Vaguvurrai", mark1: 2, mark2: 0, mark3: 8, total: "45", markPercentage: 87, rank: 4, grade: "A", point: 9.5, itemCode: "402", district: "Idukki", subDistrict: "Munnar" },
         { slNo: 6, regNo: "8905", code: "St. Mary's School", mark1: 8, mark2: 7, mark3: 8, total: "33", markPercentage: 78, rank: 5, grade: "B+", point: 8.5, itemCode: "501", district: "Palakkad", subDistrict: "Chittur" },
         { slNo: 7, regNo: "4589", code: "DAV Public School", mark1: 5, mark2: 0, mark3: 8, total: "55", markPercentage: 68, rank: 8, grade: "B", point: 7.5, itemCode: "502", district: "Wayanad", subDistrict: "" },
-        { slNo: 8, regNo: "6787", code: "Kendriya Vidyalaya", mark1: 0, mark2: 6, mark3: 0, total: "26", markPercentage: 75, rank: 6, grade: "B+", point: 8.0, itemCode: "601", district: "Thrissur", subDistrict: "" },
-        { slNo: 9, regNo: "6787", code: "Kendriya Vidyalaya", mark1: 0, mark2: 6, mark3: 0, total: "26", markPercentage: 75, rank: 6, grade: "B+", point: 8.0, itemCode: "601", district: "Thrissur", subDistrict: "" },
-        { slNo: 10, regNo: "6787", code: "Kendriya Vidyalaya", mark1: 0, mark2: 6, mark3: 0, total: "26", markPercentage: 75, rank: 6, grade: "B+", point: 8.0, itemCode: "601", district: "Thrissur", subDistrict: "" },
-        { slNo: 11, regNo: "6787", code: "Kendriya Vidyalaya", mark1: 0, mark2: 6, mark3: 0, total: "26", markPercentage: 75, rank: 6, grade: "B+", point: 8.0, itemCode: "601", district: "Thrissur", subDistrict: "" }
+        { slNo: 8, regNo: "6787", code: "Kendriya Vidyalaya", mark1: 0, mark2: 6, mark3: 0, total: "26", markPercentage: 75, rank: 6, grade: "B+", point: 8.0, itemCode: "601", district: "Thrissur", subDistrict: "Chavakkad" },
+        { slNo: 9, regNo: "6787", code: "Kendriya Vidyalaya", mark1: 0, mark2: 6, mark3: 0, total: "26", markPercentage: 75, rank: 6, grade: "B+", point: 8.0, itemCode: "601", district: "Thrissur", subDistrict: "Chalakudy" },
+        { slNo: 10, regNo: "6787", code: "Kendriya Vidyalaya", mark1: 0, mark2: 6, mark3: 0, total: "26", markPercentage: 75, rank: 6, grade: "B+", point: 8.0, itemCode: "601", district: "Thrissur", subDistrict: "Kondungallur" },
+        { slNo: 11, regNo: "6787", code: "Kendriya Vidyalaya", mark1: 0, mark2: 6, mark3: 0, total: "26", markPercentage: 75, rank: 6, grade: "B+", point: 8.0, itemCode: "601", district: "Idukki", subDistrict: "Devikulam" }
     ];
 
     // Helper function to update URL params
@@ -303,7 +303,7 @@ const SsclwisePoint = () => {
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
         
-        const headers = ['Sl No', 'School Code', 'School Name', 'Grade A', 'Grade B', 'Grade C', 'Points'];
+        const headers = ['Sl No', 'School Code', 'School Name','Sub District','District', 'Grade A', 'Grade B', 'Grade C', 'Points'];
         headers.forEach(headerText => {
             const th = document.createElement('th');
             th.textContent = headerText;
@@ -331,6 +331,8 @@ const SsclwisePoint = () => {
                 item.slNo || index + 1,
                 item.regNo || "-",
                 item.code || "-",
+                item.subDistrict || "-",
+                item.district || "-",
                 item.mark1 || "-",
                 item.mark2 || "-",
                 item.mark3 || "-",
@@ -450,59 +452,6 @@ const SsclwisePoint = () => {
                         School Wise Point List
                         </h2>
                         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
-                           
-
-                            {/* Show Sub-District dropdown only when District is not 'Select' */}
-                            {selectedDistrict !== 'Select' && (
-                                <div className="relative w-full sm:w-auto">
-                                    <select
-                                        className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                                        id="sub-district-select"
-                                        value={selectedSubDistrict}
-                                        onChange={handleSubDistrictChange}
-                                    >
-                                        {availableSubDistricts.map((option, index) => (
-                                            <option key={`sub-district-${index}`} value={option}>
-                                                {option}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <label
-                                        htmlFor="sub-district-select"
-                                        className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-2 peer-focus:text-blue-800 left-3"
-                                    >
-                                        Sub District
-                                    </label>
-                                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                                        <i className="fa-solid fa-chevron-down"></i>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* District Filter */}
-                            <div className="relative w-full sm:w-auto">
-                                <select
-                                    className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                                    id="district-select"
-                                    value={selectedDistrict}
-                                    onChange={handleDistrictChange}
-                                >
-                                    {allDistricts.map((option, index) => (
-                                        <option key={`district-${index}`} value={option}>
-                                            {option}
-                                        </option>
-                                    ))}
-                                </select>
-                                <label
-                                    htmlFor="district-select"
-                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
-                                >
-                                    District
-                                </label>
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                                    <i className="fa-solid fa-chevron-down"></i>
-                                </div>
-                            </div>
                              {/* Festival dropdown */}
                              <div className="relative w-full sm:w-40">
                                 <select
@@ -551,6 +500,8 @@ const SsclwisePoint = () => {
                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code</th>
                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
+                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">District</th>
                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade A</th>
                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade B</th>
                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade C</th>
@@ -563,7 +514,10 @@ const SsclwisePoint = () => {
                                             <tr key={index} className="hover:bg-gray-100">
                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.slNo}</td>
                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.regNo}</td>
+                                              
                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.code}</td>
+                                                <td className="p-2 md:p-3 whitespace-nowrap">{result.subDistrict}</td>
+                                                <td className="p-2 md:p-3 whitespace-nowrap">{result.district}</td>
                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.mark1}</td>
                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.mark2}</td>
                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.mark3}</td>

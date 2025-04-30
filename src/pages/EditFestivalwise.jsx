@@ -7,6 +7,15 @@ import Dash from '../components/Dash'
 const EditFestivalwise = () => {
   const { id } = useParams();
   
+  // Mock database of item codes - similar to the one in DAddStagedurat
+  const itemDatabase = {
+    '101': { name: 'Essay Writing', participants: '3', approxTime: '120 min' },
+    '202': { name: 'Research Paper', participants: '1', approxTime: '180 min' },
+    '304': { name: 'Story Writing', participants: '2', approxTime: '90 min' },
+    '405': { name: 'Technical Report', participants: '4', approxTime: '150 min' },
+    '506': { name: 'Presentation', participants: '5', approxTime: '60 min' }
+  };
+  
   const [formData, setFormData] = useState({
     itemName: "",
     itemCode: "",
@@ -45,7 +54,6 @@ const EditFestivalwise = () => {
 
   console.log(formData);
 
-
   useEffect(() => {
     const fetchItemDetails = async () => {
       const token = sessionStorage.getItem("token");
@@ -70,10 +78,24 @@ const EditFestivalwise = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    
+    // Special handling for itemCode
+    if (name === 'itemCode') {
+      const itemData = itemDatabase[value] || { name: '', participants: '', approxTime: '' };
+      
+      setFormData({
+        ...formData,
+        [name]: value,
+        itemName: itemData.name,
+        numberOfParticipants: itemData.participants,
+        approxTimeTaken: itemData.approxTime
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
     
     validateField(name, value);
   };
@@ -235,17 +257,9 @@ const EditFestivalwise = () => {
                     name="itemName"
                     value={formData.itemName}
                     onChange={handleChange}
-                    onBlur={() => handleBlur("itemName")}
-                    className={`border px-2 py-1 rounded-full w-full text-sm md:text-base ${
-                      touched.itemName && errors.itemName
-                        ? "border-red-500 focus:outline-red-500"
-                        : "border-blue-500 focus:outline-blue-500"
-                    }`}
-                    required
+                    readOnly
+                    className="px-2 py-1 rounded-full w-full text-sm md:text-base bg-gray-200"
                   />
-                  {touched.itemName && errors.itemName && (
-                    <p className="text-xs md:text-sm text-red-500 mt-1">{errors.itemName}</p>
-                  )}
                 </div>
               </div>
 
@@ -253,21 +267,13 @@ const EditFestivalwise = () => {
                 <label className="font-semibold text-blue-900 w-full md:w-40 flex-shrink-0">No of Participants</label>
                 <div className="w-full">
                   <input
-                    type="number"
+                    type="text"
                     name="numberOfParticipants"
                     value={formData.numberOfParticipants}
                     onChange={handleChange}
-                    onBlur={() => handleBlur("numberOfParticipants")}
-                    className={`border px-2 py-1 rounded-full w-full text-sm md:text-base ${
-                      touched.numberOfParticipants && errors.numberOfParticipants
-                        ? "border-red-500 focus:outline-red-500"
-                        : "border-blue-500 focus:outline-blue-500"
-                    }`}
-                    required
+                    readOnly
+                    className="px-2 py-1 rounded-full w-full text-sm md:text-base bg-gray-200"
                   />
-                  {touched.numberOfParticipants && errors.numberOfParticipants && (
-                    <p className="text-xs md:text-sm text-red-500 mt-1">{errors.numberOfParticipants}</p>
-                  )}
                 </div>
               </div>
 
@@ -279,18 +285,10 @@ const EditFestivalwise = () => {
                     name="approxTimeTaken"
                     value={formData.approxTimeTaken}
                     onChange={handleChange}
-                    onBlur={() => handleBlur("approxTimeTaken")}
-                    className={`border px-2 py-1 rounded-full w-full text-sm md:text-base ${
-                      touched.approxTimeTaken && errors.approxTimeTaken
-                        ? "border-red-500 focus:outline-red-500"
-                        : "border-blue-500 focus:outline-blue-500"
-                    }`}
-                    required
+                    readOnly
+                    className="px-2 py-1 rounded-full w-full text-sm md:text-base bg-gray-200"
                     placeholder="e.g. 30 minutes"
                   />
-                  {touched.approxTimeTaken && errors.approxTimeTaken && (
-                    <p className="text-xs md:text-sm text-red-500 mt-1">{errors.approxTimeTaken}</p>
-                  )}
                 </div>
               </div>
 
@@ -438,5 +436,7 @@ const EditFestivalwise = () => {
     </>
   );
 };
+
+
 
 export default EditFestivalwise

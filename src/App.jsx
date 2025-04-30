@@ -187,6 +187,14 @@ import SPublishDeclarList from './pages/SPublishDeclarList';
 import SExport from './pages/SExport';
 import ShigherLevel from './pages/ShigherLevel';
 import DPublishdeclare from './pages/DPublishdeclare';
+import SCallSheet from './pages/SCallSheet';
+import STimesheet from './pages/STimesheet';
+import SScoresheet from './pages/SScoresheet';
+import STablulation from './pages/STablulation';
+import SAllReport from './pages/SAllReport';
+import SFestivalItemtotal from './pages/SFestivalItemtotal';
+import DCertificate from './pages/DCertificate';
+import SCertificatetemp from './pages/SCertificatetemp';
 
 
 
@@ -204,7 +212,7 @@ function App() {
         <Route path="/not-authorized" element={<h1>Not Authorized</h1>} />
 
         {/* Protected Routes for All Authenticated Users */}
-        <Route element={<ProtectedRoute allowedRoles={['admin', 'school admin', 'sub district admin']} />}>
+        <Route element={<ProtectedRoute allowedRoles={['district admin','state admin', 'school admin', 'sub district admin']} />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/result" element={<Result />} />
           <Route path="/form" element={<MultiStep />} />
@@ -323,7 +331,7 @@ function App() {
 
           {/* sub reg */}
 
-         
+        
           
           <Route path="/AdResult" element={<AdResult />} />
 
@@ -377,7 +385,8 @@ function App() {
         <Route path="/DAddStageallotitmwise" element={<DAddStageallotitmwise />} />
         <Route path="/DEditstgAllotitmwise/:id" element={<DEditstgAllotitmwise />} />
         <Route path="/DPublishdeclare" element={<DPublishdeclare />} />
-
+        
+        <Route path="/DCertificate" element={<DCertificate />} />
 
 
 
@@ -427,6 +436,13 @@ function App() {
         <Route path="/SPublishDeclarList" element={<SPublishDeclarList />} />
         <Route path="/SExport" element={<SExport />} />
         <Route path="/ShigherLevel" element={<ShigherLevel />} />
+        <Route path="/SCallSheet" element={<SCallSheet />} />
+        <Route path="/STimesheet" element={<STimesheet />} />
+        <Route path="/SScoresheet" element={<SScoresheet />} />
+        <Route path="/STablulation" element={<STablulation />} />
+        <Route path="/SAllReport" element={<SAllReport />} />
+        <Route path="/festival-details" element={<SFestivalItemtotal />} />
+        <Route path="/SCertificatetemp" element={<SCertificatetemp />} />
 
 
 

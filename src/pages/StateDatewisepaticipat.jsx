@@ -462,7 +462,7 @@ const StateDatewisepaticipat = () => {
           {/* Header section with title and controls */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
             <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
-              District Date Wise Participants
+            District No of Participation Date Wise List
             </h2>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
                   {/* Sub District selection dropdown - Only show when District is selected */}

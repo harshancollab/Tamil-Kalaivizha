@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react'
 import Header from '../components/Header';
 import Dash from '../components/Dash';
@@ -200,18 +199,18 @@ const DItemwisePoint = () => {
   
 
   const resultData = [
-    { slNo: 1, itemCode: "301 - Story Writing", school: "GHSS Kozhikode", SchoolCode: 60001, studentName: "Rahul K", grade: "A", point: 9.5, totalPoint: 9.5 },
-    { slNo: 2, itemCode: "302 - Essay Writing", school: "St. Joseph HSS", SchoolCode: 4003, studentName: "Anjali S", grade: "A", point: 10.0, totalPoint: 10.0 },
-    { slNo: 3, itemCode: "401 - LP Story Writing", school: "MES HSS", SchoolCode: 30001, studentName: "Arun P", grade: "A", point: 9.0, totalPoint: 9.0 },
-    { slNo: 4, itemCode: "402 - LP Essay Writing", school: "Govt HSS", SchoolCode: 30001, studentName: "Meera T", grade: "B", point: 8.0, totalPoint: 8.0 },
-    { slNo: 5, itemCode: "403 - LP Poem Recitation", school: "Sacred Heart HSS", SchoolCode: 7601, studentName: "Vishnu M", grade: "A", point: 9.5, totalPoint: 9.5 },
-    { slNo: 6, itemCode: "504 - HS Elocution", school: "Kendriya Vidyalaya", SchoolCode: 67001, studentName: "Sameera N", grade: "B", point: 8.5, totalPoint: 8.5 },
-    { slNo: 7, itemCode: "605 - HSS Group Song", school: "Christ HSS", SchoolCode: 9001, studentName: "Team A", grade: "B", point: 7.5, totalPoint: 7.5 },
-    { slNo: 8, itemCode: "606 - HSS Folk Dance", school: "St. Mary's HSS", SchoolCode: 20001, studentName: "Dance Group", grade: "B", point: 8.0, totalPoint: 8.0 },
-    { slNo: 9, itemCode: "504 - HS Elocution", school: "Kendriya Vidyalaya", SchoolCode: 67001, studentName: "Sameera N", grade: "B", point: 8.5, totalPoint: 8.5 },
-    { slNo: 10, itemCode: "605 - HSS Group Song", school: "Christ HSS", SchoolCode: 9001, studentName: "Team A", grade: "B", point: 7.5, totalPoint: 7.5 },
-    { slNo: 11, itemCode: "506 - HSS Folk Dance", school: "St. Mary's HSS", SchoolCode: 20001, studentName: "Dance Group", grade: "B", point: 8.0, totalPoint: 8.0 },
-    { slNo: 12, itemCode: "506 - HSS Folk Dance", school: "St. Mary's HSS", SchoolCode: 20001, studentName: "Dance Group", grade: "B", point: 8.0, totalPoint: 8.0 }
+    { slNo: 1, itemCode: "301 - Story Writing", school: "GHSS Kozhikode", SchoolCode: 60001, studentName: "Rahul K", grade: "A", point: 9.5, totalPoint: 9.5, sub: "Ottapalm" },
+    { slNo: 2, itemCode: "302 - Essay Writing", school: "St. Joseph HSS", SchoolCode: 4003, studentName: "Anjali S", grade: "A", point: 10.0, totalPoint: 10.0, sub: "Kottayi" },
+    { slNo: 3, itemCode: "401 - LP Story Writing", school: "MES HSS", SchoolCode: 30001, studentName: "Arun P", grade: "A", point: 9.0, totalPoint: 9.0, sub: "Kollengode" },
+    { slNo: 4, itemCode: "402 - LP Essay Writing", school: "Govt HSS", SchoolCode: 30001, studentName: "Meera T", grade: "B", point: 8.0, totalPoint: 8.0, sub: "Pattambi" },
+    { slNo: 5, itemCode: "403 - LP Poem Recitation", school: "Sacred Heart HSS", SchoolCode: 7601, studentName: "Vishnu M", grade: "A", point: 9.5, totalPoint: 9.5, sub: "Ottapalm" },
+    { slNo: 6, itemCode: "504 - HS Elocution", school: "Kendriya Vidyalaya", SchoolCode: 67001, studentName: "Sameera N", grade: "B", point: 8.5, totalPoint: 8.5, sub: "Parali" },
+    { slNo: 7, itemCode: "605 - HSS Group Song", school: "Christ HSS", SchoolCode: 9001, studentName: "Team A", grade: "B", point: 7.5, totalPoint: 7.5, sub: "Ellapully" },
+    { slNo: 8, itemCode: "606 - HSS Folk Dance", school: "St. Mary's HSS", SchoolCode: 20001, studentName: "Dance Group", grade: "B", point: 8.0, totalPoint: 8.0, sub: "Mankara" },
+    { slNo: 9, itemCode: "504 - HS Elocution", school: "Kendriya Vidyalaya", SchoolCode: 67001, studentName: "Sameera N", grade: "B", point: 8.5, totalPoint: 8.5, sub: "Mundur" },
+    { slNo: 10, itemCode: "605 - HSS Group Song", school: "Christ HSS", SchoolCode: 9001, studentName: "Team A", grade: "B", point: 7.5, totalPoint: 7.5, sub: "Ellapully" },
+    { slNo: 11, itemCode: "506 - HSS Folk Dance", school: "St. Mary's HSS", SchoolCode: 20001, studentName: "Dance Group", grade: "B", point: 8.0, totalPoint: 8.0, sub: "Nenmara" },
+    { slNo: 12, itemCode: "506 - HSS Folk Dance", school: "St. Mary's HSS", SchoolCode: 20001, studentName: "Dance Group", grade: "B", point: 8.0, totalPoint: 8.0, sub: "Mankara" }
   ];
 
   const handleSchoolSearchChange = (e) => {
@@ -498,8 +497,9 @@ const DItemwisePoint = () => {
       {/* School name display area - fixed height placeholder */}
       <div className="h-6"> {/* This empty div maintains consistent height */}
         {schoolCodeSearch && showSchoolName && schoolName && (
-          <div className="absolute ml-32 mt-1 text-sm text-blue-800 font-medium">
-            {schoolName}
+          <div className="absolute ml-10 mt-1 text-sm text-blue-800 font-medium">
+            {schoolName} 
+            {currentItems[0]?.sub && `(${currentItems[0].sub} - Sub District)`} 
           </div>
         )}
       </div>
@@ -571,9 +571,12 @@ const DItemwisePoint = () => {
                         <tr className="text-gray-700">
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Item Code & Item Name</th>
-                          {/* Only show school column when not filtering by school code */}
+                          {/* Only show school and sub district columns when not filtering by school code */}
                           {showSchoolColumn && (
-                            <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School</th>
+                            <>
+                              <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School</th>
+                              <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
+                            </>
                           )}
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Student Name</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade</th>
@@ -584,7 +587,7 @@ const DItemwisePoint = () => {
                       <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
                         {(isFiltering && allDisplayData.length === 0) ? (
                           <tr>
-                            <td colSpan={showSchoolColumn ? "7" : "6"} className="p-4 text-center">
+                            <td colSpan={showSchoolColumn ? "8" : "6"} className="p-4 text-center">
                               <div className="flex flex-col items-center justify-center p-6">
                                 <p className="text-red-500 font-medium mb-2">No results found</p>
                                 <p>
@@ -608,9 +611,12 @@ const DItemwisePoint = () => {
                             <tr key={result.slNo} className="hover:bg-gray-100">
                               <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.itemCode}</td>
-                              {/* Only show school column when not filtering by school code */}
+                              {/* Only show school and sub district columns when not filtering by school code */}
                               {showSchoolColumn && (
-                                <td className="p-2 md:p-3 whitespace-nowrap">{result.school}</td>
+                                <>
+                                  <td className="p-2 md:p-3 whitespace-nowrap">{result.school}</td>
+                                  <td className="p-2 md:p-3 whitespace-nowrap">{result.sub || "-"}</td>
+                                </>
                               )}
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.studentName}</td>
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>

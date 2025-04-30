@@ -5,6 +5,7 @@ import { useSearchParams } from 'react-router-dom'
 import { getAllPublishentryListAPI } from '../services/allAPI'
 import html2pdf from 'html2pdf.js'
 import StatusFest from '../components/StatusFest'
+import SStatusFest from '../components/SStatusFest'
 
 const SPublishDeclarList = () => {
     const printRef = useRef();
@@ -72,6 +73,8 @@ const SPublishDeclarList = () => {
             noOfParticipate: 1,
             schoolName: "St. Mary's High School",
             schoolCode: "SMHS-01",
+            sub:"ottaplam",
+            dis:"Palakkad",
             grade: "A",
             point: 9.5
         },
@@ -426,11 +429,11 @@ const SPublishDeclarList = () => {
             
             // Set the appropriate headers based on the selected result type
             if (selectedResultType === "School Points") {
-                headers = ['Sl No', 'School Code', 'School Name', 'Point'];
+                headers = ['Sl No', 'School Code', 'School Name','Sub District','District', 'Point'];
             } else {
                 headers = [
                     'Sl No', 'Item Code & Item Name', 'Reg No', 'Code No', 'Name', 
-                    'No of participate', 'School name', 'Grade', 'Point'
+                    'No of participate', 'School name','Sub District','District', 'Grade', 'Point'
                 ];
             }
             
@@ -459,6 +462,8 @@ const SPublishDeclarList = () => {
                         index + 1,
                         school.schoolCode || "-",
                         school.schoolName || "-",
+                        result.sub || "-",
+                        result.dis || "-",
                         school.point.toFixed(1) || "-"
                     ];
                     
@@ -488,6 +493,8 @@ const SPublishDeclarList = () => {
                         result.name || "-",
                         result.noOfParticipate || "-",
                         result.schoolName || "-",
+                        result.sub || "-",
+                        result.dis || "-",
                         result.grade || "-",
                         result.point || "-"
                     ];
@@ -656,7 +663,7 @@ const SPublishDeclarList = () => {
                     {/* Render StatusFest component when Status of Festival is selected */}
                     {isStatusOfFestivalSelected ? (
                         <div ref={printRef} >
-                            <StatusFest festival={selectedFestival} />
+                            <SStatusFest festival={selectedFestival} />
                         </div>
                     ) : (
                         <div ref={printRef} className={`w-full `}>
@@ -671,6 +678,8 @@ const SPublishDeclarList = () => {
                                                             <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
                                                             <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code</th>
                                                             <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                                                            <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
+                                                            <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">District</th>
                                                             <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Point</th>
                                                         </tr>
                                                     </thead>
@@ -681,6 +690,8 @@ const SPublishDeclarList = () => {
                                                                     <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
                                                                     <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolCode}</td>
                                                                     <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolName}</td>
+                                                                    <td className="p-2 md:p-3 whitespace-nowrap">{school.sub}</td>
+                                                                    <td className="p-2 md:p-3 whitespace-nowrap">{school.dis}</td>
                                                                     <td className="p-2 md:p-3 whitespace-nowrap">{school.point.toFixed(1)}</td>
                                                                 </tr>
                                                             ))
@@ -711,6 +722,8 @@ const SPublishDeclarList = () => {
                                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Name</th>
                                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">No of partcipate</th>
                                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School name</th>
+                                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
+                                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">District</th>
                                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade</th>
                                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Point</th>
                                                     </tr>
@@ -726,6 +739,8 @@ const SPublishDeclarList = () => {
                                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.name}</td>
                                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.noOfParticipate}</td>
                                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.schoolName}</td>
+                                                                <td className="p-2 md:p-3 whitespace-nowrap">{result.sub}</td>
+                                                                <td className="p-2 md:p-3 whitespace-nowrap">{result.dis}</td>
                                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
                                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.point}</td>
                                                             </tr>

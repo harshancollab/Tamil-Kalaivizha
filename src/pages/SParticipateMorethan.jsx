@@ -32,6 +32,8 @@ const SParticipateMorethan = () => {
       schoolName: "G. M. R. S. Peermedu",
       itemCode: "301",
       itemCount: 3,
+      district: "Idukki",
+      subDistrict: "Munnar",
       items: ["301-Story Telling", "302-Mono Act", "303-Fancy Dress"]
     },
     {
@@ -44,6 +46,8 @@ const SParticipateMorethan = () => {
       schoolName: "G. M. R. S. Peermedu",
       itemCode: "302",
       itemCount: 2,
+      district: "Idukki",
+      subDistrict: "Adimali",
       items: ["302-Mono Act", "304-Music"]
     },
     {
@@ -56,6 +60,8 @@ const SParticipateMorethan = () => {
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "401",
       itemCount: 4,
+      district: "Palakkad",
+      subDistrict: "Chittur",
       items: ["401-Group Dance", "402-Solo Dance", "405-Painting", "408-Essay"]
     },
     {
@@ -68,6 +74,8 @@ const SParticipateMorethan = () => {
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "405",
       itemCount: 5,
+      district: "Palakkad",
+      subDistrict: "Pattambi",
       items: ["403-Singing", "405-Painting", "407-Poetry", "410-Quiz", "412-Speech"]
     },
     {
@@ -80,6 +88,8 @@ const SParticipateMorethan = () => {
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "405",
       itemCount: 5,
+      district: "Ernakulam",
+      subDistrict: "",
       items: ["401-Group Dance", "403-Singing", "405-Painting", "406-Drawing", "409-Story Writing"]
     },
     {
@@ -92,6 +102,8 @@ const SParticipateMorethan = () => {
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "405",
       itemCount: 5,
+      district: "Kozhikode",
+      subDistrict: "vatakara",
       items: ["402-Solo Dance", "404-Classical Music", "407-Poetry", "410-Quiz", "412-Speech"]
     },
     {
@@ -104,6 +116,8 @@ const SParticipateMorethan = () => {
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "405",
       itemCount: 5,
+      district: "Wayanad",
+      subDistrict: "",
       items: ["403-Singing", "406-Drawing", "408-Essay", "411-Debate", "412-Speech"]
     },
     {
@@ -116,6 +130,8 @@ const SParticipateMorethan = () => {
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "405",
       itemCount: 5,
+      district: "Idukki",
+      subDistrict: "Kattappana",
       items: ["401-Group Dance", "404-Classical Music", "407-Poetry", "409-Story Writing", "412-Speech"]
     },
     {
@@ -152,6 +168,8 @@ const SParticipateMorethan = () => {
       schoolName: "G. H. S. Udumbhancola",
       itemCode: "601",
       itemCount: 4,
+      district: "Palakkad",
+      subDistrict: "Mannarkkad",
       items: ["601-Speech", "603-Drama", "605-Poetry", "607-Essay Writing"]
     },
     {
@@ -164,6 +182,8 @@ const SParticipateMorethan = () => {
       schoolName: "G. H. S. Udumbhancola",
       itemCode: "605",
       itemCount: 4,
+      district: "Idukki",
+      subDistrict: "Nedumkandam",
       items: ["602-Debate", "604-Classical Dance", "606-Western Dance", "608-Quiz"]
     }
   ];
@@ -412,7 +432,7 @@ const SParticipateMorethan = () => {
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     
-    const headers = ['Sl No', 'Reg No', 'Name', 'Gender', 'Class', 'School Code', 'School Name', 'Items'];
+    const headers = ['Sl No', 'Reg No', 'Name', 'Gender', 'Class', 'School Code', 'School Name', 'Sub District','District', 'Items'];
     headers.forEach(headerText => {
       const th = document.createElement('th');
       th.textContent = headerText;
@@ -441,6 +461,8 @@ const SParticipateMorethan = () => {
         participant.class || "-",
         participant.schoolCode || "-",
         participant.schoolName || "-",
+        participant.subDistrict || "-",
+        participant.district || "-",
         (participant.items && participant.items.length > 0) ? participant.items.join(", ") : "-"
       ];
       
@@ -583,6 +605,10 @@ const SParticipateMorethan = () => {
                       <th className="p-2 md:p-3">Name</th>
                       <th className="p-2 md:p-3">School code</th>
                       <th className="p-2 md:p-3">School Name</th>
+                      <th className="p-2 md:p-3"> subDistrict</th>
+                      <th className="p-2 md:p-3"> District</th>
+
+
                     </tr>
                   </thead>
                   <tbody className="text-xs sm:text-sm">
@@ -617,6 +643,8 @@ const SParticipateMorethan = () => {
                           <td className="p-2 md:p-3">{participant.name || "-"}</td>
                           <td className="p-2 md:p-3">{participant.schoolCode || "-"}</td>
                           <td className="p-2 md:p-3">{participant.schoolName || "-"}</td>
+                          <td className="p-2 md:p-3">{participant.subDistrict}</td>
+                          <td className="p-2 md:p-3">{participant.district}</td>
                         </tr>
                       ))
                     ) : (

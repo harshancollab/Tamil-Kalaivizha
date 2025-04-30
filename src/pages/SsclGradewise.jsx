@@ -63,17 +63,17 @@ const SsclGradewise = () => {
     // Dummy data with item codes to help with filtering
     const dummyResultData = [
         { slNo: 1, participantName: "John Doe", schoolName: "Central High", item: "Story Writing", itemCode: "301", category: "Single", points: 9.5, grade: "B", district: "Kozhikode", subDistrict: "vatakara" },
-        { slNo: 2, participantName: "Jane Smith", schoolName: "Springfield Elementary", item: "Story Writing", itemCode: "302", category: "Single", points: 10.0, grade: "A", district: "Ernakulam", subDistrict: "" },
+        { slNo: 2, participantName: "Jane Smith", schoolName: "Springfield Elementary", item: "Story Writing", itemCode: "302", category: "Single", points: 10.0, grade: "A", district: "Ernakulam", subDistrict: "vypin" },
         { slNo: 3, participantName: "Alex Johnson", schoolName: "Oak Ridge School", item: "Story Writing", itemCode: "303", category: "Single", points: 9.0, grade: "A", district: "Palakkad", subDistrict: "Mannarkkad" },
         { slNo: 4, participantName: "Sara Williams", schoolName: "Liberty Middle School", item: "Group Song", itemCode: "401", category: "Group", points: 8.0, grade: "B", district: "Idukki", subDistrict: "Kattappana" },
         { slNo: 5, participantName: "Michael Brown", schoolName: "Riverdale Academy", item: "Painting", itemCode: "402", category: "Single", points: 5, grade: "C", district: "Idukki", subDistrict: "Munnar" },
         { slNo: 6, participantName: "Emily Davis", schoolName: "Westview High", item: "Classical Dance", itemCode: "501", category: "Single", points: 8.5, grade: "B", district: "Palakkad", subDistrict: "Chittur" },
         { slNo: 7, participantName: "David Wilson", schoolName: "Pinewood Elementary", item: "Recitation", itemCode: "502", category: "Single", points: 7.5, grade: "B", district: "Wayanad", subDistrict: "" },
-        { slNo: 8, participantName: "Sophie Miller", schoolName: "Greenwood School", item: "Folk Dance", itemCode: "601", category: "Group", points: 8.0, grade: "C", district: "Thrissur", subDistrict: "" },
-        { slNo: 9, participantName: "Robert Taylor", schoolName: "Greenwood School", item: "Folk Dance", itemCode: "601", category: "Group", points: 8.0, grade: "C", district: "Thrissur", subDistrict: "" },
+        { slNo: 8, participantName: "Sophie Miller", schoolName: "Greenwood School", item: "Folk Dance", itemCode: "601", category: "Group", points: 8.0, grade: "C", district: "Thrissur", subDistrict: "Chavakkad" },
+        { slNo: 9, participantName: "Robert Taylor", schoolName: "Greenwood School", item: "Folk Dance", itemCode: "601", category: "Group", points: 8.0, grade: "C", district: "Thrissur", subDistrict: "Chalkudy" },
         { slNo: 10, participantName: "Emma Johnson", schoolName: "Central High", item: "Essay Writing", itemCode: "302", category: "Single", points: 7.2, grade: "B", district: "Kozhikode", subDistrict: "vatakara" },
         { slNo: 11, participantName: "Noah Garcia", schoolName: "Riverdale Academy", item: "Poetry", itemCode: "303", category: "Single", points: 8.8, grade: "C", district: "Idukki", subDistrict: "Munnar" },
-        { slNo: 12, participantName: "Olivia Martinez", schoolName: "Springfield Elementary", item: "Debate", itemCode: "401", category: "Group", points: 7.9, grade: "B", district: "Ernakulam", subDistrict: "" },
+        { slNo: 12, participantName: "Olivia Martinez", schoolName: "Springfield Elementary", item: "Debate", itemCode: "401", category: "Group", points: 7.9, grade: "B", district: "Ernakulam", subDistrict: "Edapally" },
         { slNo: 13, participantName: "Liam Rodriguez", schoolName: "Oak Ridge School", item: "Solo Music", itemCode: "502", category: "Single", points: 8.7, grade: "B", district: "Palakkad", subDistrict: "Mannarkkad" },
         { slNo: 14, participantName: "Ava Lopez", schoolName: "Westview High", item: "Drama", itemCode: "601", category: "Group", points: 7.5, grade: "C", district: "Palakkad", subDistrict: "Chittur" }
     ];
@@ -335,7 +335,7 @@ const SsclGradewise = () => {
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
         
-        const headers = ['Sl No', 'Name of Participants', 'School Name', 'Item', 'Points', 'Grade'];
+        const headers = ['Sl No', 'Name of Participants', 'School Name','Sub District','District', 'Item', 'Points', 'Grade'];
         headers.forEach(headerText => {
           const th = document.createElement('th');
           th.textContent = headerText;
@@ -361,6 +361,8 @@ const SsclGradewise = () => {
             item.slNo,
             item.participantName || "-",
             item.schoolName || "-",
+            item.subDistrict || "-",
+            item.district || "-",
             item.item || "-",
             item.points || "-",
             item.grade || "-"
@@ -478,59 +480,6 @@ const SsclGradewise = () => {
                             School Grade Wise List
                         </h2>
                         <div className="flex flex-wrap sm:flex-row items-start sm:items-center gap-4">
-                               {/* Show Sub-District dropdown only when District is not 'Select' */}
-                               {selectedDistrict !== 'Select' && (
-                                <div className="relative w-full sm:w-auto">
-                                    <select
-                                        className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                                        id="sub-district-select"
-                                        value={selectedSubDistrict}
-                                        onChange={handleSubDistrictChange}
-                                    >
-                                        {availableSubDistricts.map((option, index) => (
-                                            <option key={`sub-district-${index}`} value={option}>
-                                                {option}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <label
-                                        htmlFor="sub-district-select"
-                                        className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-2 peer-focus:text-blue-800 left-3"
-                                    >
-                                        Sub District
-                                    </label>
-                                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                                        <i className="fa-solid fa-chevron-down"></i>
-                                    </div>
-                                </div>
-                            )}
-                            {/* District Filter */}
-                            <div className="relative w-full sm:w-auto">
-                                <select
-                                    className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                                    id="district-select"
-                                    value={selectedDistrict}
-                                    onChange={handleDistrictChange}
-                                >
-                                    {allDistricts.map((option, index) => (
-                                        <option key={`district-${index}`} value={option}>
-                                            {option}
-                                        </option>
-                                    ))}
-                                </select>
-                                <label
-                                    htmlFor="district-select"
-                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
-                                >
-                                    District
-                                </label>
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                                    <i className="fa-solid fa-chevron-down"></i>
-                                </div>
-                            </div>
-
-                         
-
                             {/* Grade dropdown */}
                             <div className="relative w-full sm:w-auto">
                                 <select
@@ -614,6 +563,9 @@ const SsclGradewise = () => {
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Name of Participants</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
+
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Item</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Points</th>
                                                
@@ -626,6 +578,8 @@ const SsclGradewise = () => {
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.slNo}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.participantName}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.schoolName}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.subDistrict}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.district}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.item}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.points}</td>
                                                         

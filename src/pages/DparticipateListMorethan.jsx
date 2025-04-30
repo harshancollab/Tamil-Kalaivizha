@@ -56,7 +56,8 @@ const DparticipateListMorethan = () => {
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "401",
       itemCount: 4,
-      items: ["401-Group Dance", "402-Solo Dance", "405-Painting", "408-Essay"]
+      items: ["401-Group Dance", "402-Solo Dance", "405-Painting", "408-Essay"],
+      Sub:"pathiripala"
     },
     {
       slno:4,
@@ -68,7 +69,8 @@ const DparticipateListMorethan = () => {
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "405",
       itemCount: 5,
-      items: ["403-Singing", "405-Painting", "407-Poetry", "410-Quiz", "412-Speech"]
+      items: ["403-Singing", "405-Painting", "407-Poetry", "410-Quiz", "412-Speech"],
+       Sub:"Pattambi"
     },
     {
       slno:5,
@@ -80,7 +82,8 @@ const DparticipateListMorethan = () => {
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "405",
       itemCount: 5,
-      items: ["401-Group Dance", "403-Singing", "405-Painting", "406-Drawing", "409-Story Writing"]
+      items: ["401-Group Dance", "403-Singing", "405-Painting", "406-Drawing", "409-Story Writing"],
+       Sub:"Chittur"
     },
     {
       slno:6,
@@ -92,7 +95,8 @@ const DparticipateListMorethan = () => {
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "405",
       itemCount: 5,
-      items: ["402-Solo Dance", "404-Classical Music", "407-Poetry", "410-Quiz", "412-Speech"]
+      items: ["402-Solo Dance", "404-Classical Music", "407-Poetry", "410-Quiz", "412-Speech"],
+       Sub:"Ottapalam"
     },
     {
       slno:7,
@@ -104,7 +108,8 @@ const DparticipateListMorethan = () => {
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "405",
       itemCount: 5,
-      items: ["403-Singing", "406-Drawing", "408-Essay", "411-Debate", "412-Speech"]
+      items: ["403-Singing", "406-Drawing", "408-Essay", "411-Debate", "412-Speech"],
+       Sub:"Kozhilmanam"
     },
     {
       slno:8,
@@ -116,7 +121,8 @@ const DparticipateListMorethan = () => {
       schoolName: "G. H. S. Vanchivayal",
       itemCode: "405",
       itemCount: 5,
-      items: ["401-Group Dance", "404-Classical Music", "407-Poetry", "409-Story Writing", "412-Speech"]
+      items: ["401-Group Dance", "404-Classical Music", "407-Poetry", "409-Story Writing", "412-Speech"],
+       Sub:"Kottai"
     },
     {
       slno:9,
@@ -412,7 +418,7 @@ const DparticipateListMorethan = () => {
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     
-    const headers = ['Sl No', 'Reg No', 'Name', 'Gender', 'Class', 'School Code', 'School Name', 'Items'];
+    const headers = ['Sl No', 'Reg No', 'Name', 'Gender', 'Class', 'School Code', 'School Name','Sub District','Items'];
     headers.forEach(headerText => {
       const th = document.createElement('th');
       th.textContent = headerText;
@@ -441,6 +447,7 @@ const DparticipateListMorethan = () => {
         participant.class || "-",
         participant.schoolCode || "-",
         participant.schoolName || "-",
+        participant.Sub || "-",
         (participant.items && participant.items.length > 0) ? participant.items.join(", ") : "-"
       ];
       
@@ -583,6 +590,7 @@ const DparticipateListMorethan = () => {
                       <th className="p-2 md:p-3">Name</th>
                       <th className="p-2 md:p-3">School code</th>
                       <th className="p-2 md:p-3">School Name</th>
+                      <th className="p-2 md:p-3">Sub District</th>
                     </tr>
                   </thead>
                   <tbody className="text-xs sm:text-sm">
@@ -617,6 +625,7 @@ const DparticipateListMorethan = () => {
                           <td className="p-2 md:p-3">{participant.name || "-"}</td>
                           <td className="p-2 md:p-3">{participant.schoolCode || "-"}</td>
                           <td className="p-2 md:p-3">{participant.schoolName || "-"}</td>
+                          <td className="p-2 md:p-3">{participant.Sub || "-"}</td>
                         </tr>
                       ))
                     ) : (

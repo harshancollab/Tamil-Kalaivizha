@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 
-const DAllReport = () => {
+const SAllReport = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showOptions, setShowOptions] = useState(false);
     const [selectedOption, setSelectedOption] = useState('');
@@ -338,5 +338,4 @@ const DAllReport = () => {
     )
 }
 
-
-export default DAllReport
+export default SAllReport

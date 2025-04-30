@@ -227,7 +227,7 @@ const DClusterSclList = () => {
   // Get PDF title based on selected filters
   const getPrintTitle = () => {
     const subDistrictPart = selectedSubDistrict === "Select Sub District" ? "All Sub Districts" : selectedSubDistrict;
-    return `Cluster School List - Sub District - ${subDistrictPart}`;
+    return `Cluster School List `;
   };
 
   // PDF generation function using html2pdf.js
@@ -253,7 +253,7 @@ const DClusterSclList = () => {
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     
-    const headers = ['Sl No', 'School Code', 'School Name', 'Data Entered', 'Confirmed'];
+    const headers = ['Sl No', 'School Code', 'School Name','Sub District', 'Data Entered', 'Confirmed'];
     headers.forEach(headerText => {
       const th = document.createElement('th');
       th.textContent = headerText;
@@ -278,8 +278,10 @@ const DClusterSclList = () => {
         school.slno,
         school.code || "-",
         school.name || "-",
+        school.subDistrict || "-",
         school.dataEntered || "-",
         school.confirmed || "-",
+      
         
       ];
       
@@ -351,30 +353,7 @@ const DClusterSclList = () => {
               Cluster School List 
             </h2>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              {/* Sub-District Select with floating label */}
-              <div className="relative w-full sm:w-40">
-                <select
-                  className="border-blue-800 border text-blue-700 px-3 py-2  text-sm rounded-full w-full bg-white cursor-pointer appearance-none  peer"
-                  id="sub-district-select"
-                  value={selectedSubDistrict}
-                  onChange={handleSubDistrictChange}
-                >
-                  {subDistricts.map((option, index) => (
-                    <option key={`sub-district-${index}`} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-                <label
-                  htmlFor="sub-district-select"
-                  className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
-                >
-                  Sub District
-                </label>
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                  <i className="fa-solid fa-chevron-down"></i>
-                </div>
-              </div>
+            
 
               <button 
                 onClick={generatePDF}
@@ -413,6 +392,7 @@ const DClusterSclList = () => {
                       <th className="p-2 md:p-3">Sl No</th>
                       <th className="p-2 md:p-3">School Code</th>
                       <th className="p-2 md:p-3">School Name</th>
+                      <th className="p-2 md:p-3">Sub District</th>
                       <th className="p-2 md:p-3">Data Entered</th>
                       <th className="p-2 md:p-3">Confirmed</th>
                       
@@ -426,6 +406,7 @@ const DClusterSclList = () => {
                           <td className="p-2 md:p-3">{school.slno}</td>
                           <td className="p-2 md:p-3">{school.code}</td>
                           <td className="p-2 md:p-3">{school.name}</td>
+                          <td className="p-2 md:p-3">{school.subDistrict}</td>
                           <td className="p-2 md:p-3">{school.dataEntered}</td>
                           <td className="p-2 md:p-3">{school.confirmed}</td>
                           <td className="p-2 md:p-3">

@@ -161,7 +161,7 @@ const DCertificateScl = () => {
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
         
-        const headers = ['Sl No', 'School', 'No of Students', 'Participation', 'Non-Participant'];
+        const headers = ['Sl No', 'School','Sub District', 'No of Students', 'Participation', 'Non-Participant'];
         headers.forEach(headerText => {
             const th = document.createElement('th');
             th.textContent = headerText;
@@ -188,8 +188,11 @@ const DCertificateScl = () => {
             const cellData = [
                 item.slNo,
                 item.printed,
+                item.sub,
                 item.totalStudents,
+                
                 item.participation,
+             
                 item.nonParticipant
             ];
             
@@ -237,7 +240,8 @@ const DCertificateScl = () => {
             nonParticipant: 2,
             gradeA: 10,
             gradeB: 8,
-            gradeC: 4
+            gradeC: 4,
+            sub:"Pathiripala"
         },
         {
             slNo: 2,
@@ -250,7 +254,8 @@ const DCertificateScl = () => {
             nonParticipant: 2,
             gradeA: 7,
             gradeB: 5,
-            gradeC: 4
+            gradeC: 4,
+            sub:"Ottapalam"
         },
         {
             slNo: 3,
@@ -263,7 +268,8 @@ const DCertificateScl = () => {
             nonParticipant: 0,
             gradeA: 8,
             gradeB: 5,
-            gradeC: 2
+            gradeC: 2,
+            sub:"Kollengode"
         },
         {
             slNo: 4,
@@ -276,7 +282,8 @@ const DCertificateScl = () => {
             nonParticipant: 2,
             gradeA: 15,
             gradeB: 12,
-            gradeC: 3
+            gradeC: 3,
+            sub:"Mankara"
         },
         {
             slNo: 5,
@@ -289,7 +296,8 @@ const DCertificateScl = () => {
             nonParticipant: 3,
             gradeA: 18,
             gradeB: 5,
-            gradeC: 2
+            gradeC: 2,
+            sub:"Kottayi"
         },
         {
             slNo: 6,
@@ -302,7 +310,8 @@ const DCertificateScl = () => {
             nonParticipant: 2,
             gradeA: 9,
             gradeB: 7,
-            gradeC: 2
+            gradeC: 2,
+            sub:"Nenmara"
         },
         {
             slNo: 7,
@@ -315,7 +324,8 @@ const DCertificateScl = () => {
             nonParticipant: 2,
             gradeA: 9,
             gradeB: 7,
-            gradeC: 2
+            gradeC: 2,
+            sub:"Chittur"
         },
         {
             slNo: 8,
@@ -328,7 +338,8 @@ const DCertificateScl = () => {
             nonParticipant: 1,
             gradeA: 6,
             gradeB: 5,
-            gradeC: 3
+            gradeC: 3,
+            sub:"Ellapully"
         },
         {
             slNo: 9,
@@ -494,6 +505,7 @@ const DCertificateScl = () => {
                                             <tr className="text-gray-700">
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">No of Students</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Participation</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Non-Participant</th>
@@ -510,6 +522,7 @@ const DCertificateScl = () => {
                                                         >
                                                             {item.printed}
                                                         </td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{item.sub}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{item.totalStudents}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{item.participation}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{item.nonParticipant}</td>

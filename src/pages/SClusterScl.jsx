@@ -356,7 +356,7 @@ const SClusterScl = () => {
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     
-    const headers = ['Sl No', 'School Code', 'School Name', 'Data Entered', 'Confirmed'];
+    const headers = ['Sl No', 'School Code', 'School Name','subDistrict','District', 'Data Entered', 'Confirmed'];
     headers.forEach(headerText => {
       const th = document.createElement('th');
       th.textContent = headerText;
@@ -381,6 +381,8 @@ const SClusterScl = () => {
         school.slno,
         school.code || "-",
         school.name || "-",
+        school.subDistrict || "-",
+        school.district || "-",
        
         school.dataEntered || "-",
         school.confirmed || "-"
@@ -454,57 +456,7 @@ const SClusterScl = () => {
               Cluster School List 
             </h2>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
-                {/* Show Sub-District dropdown only when District is not 'Select' */}
-            {selectedDistrict !== 'Select' && (
-              <div className="relative w-full sm:w-auto">
-                <select
-                  className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                  id="sub-district-select"
-                  value={selectedSubDistrict}
-                  onChange={handleSubDistrictChange}
-                >
-                  {availableSubDistricts.map((option, index) => (
-                    <option key={`sub-district-${index}`} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-                <label
-                  htmlFor="sub-district-select"
-                  className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-2 peer-focus:text-blue-800 left-3"
-                >
-                  Sub District
-                </label>
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                  <i className="fa-solid fa-chevron-down"></i>
-                </div>
-              </div>
-            )}
-                           
-            <div className="relative w-full sm:w-auto">
-              
-              <select
-                className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                id="district-select"
-                value={selectedDistrict}
-                onChange={handleDistrictChange}
-              >
-                {allDistricts.map((option, index) => (
-                  <option key={`district-${index}`} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-              <label
-                htmlFor="district-select"
-                className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
-              >
-                District
-              </label>
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                <i className="fa-solid fa-chevron-down"></i>
-              </div>
-            </div>
+            
 
           
              <button 
@@ -551,7 +503,8 @@ const SClusterScl = () => {
                       <th className="p-2 md:p-3">Sl No</th>
                       <th className="p-2 md:p-3">School Code</th>
                       <th className="p-2 md:p-3">School Name</th>
-                    
+                      <th className="p-2 md:p-3">Sub District</th>
+                      <th className="p-2 md:p-3">District</th>
                       <th className="p-2 md:p-3">Data Entered</th>
                       <th className="p-2 md:p-3">Confirmed</th>
                       <th className="p-2 md:p-3">Reset</th>
@@ -564,6 +517,8 @@ const SClusterScl = () => {
                           <td className="p-2 md:p-3">{school.slno}</td>
                           <td className="p-2 md:p-3">{school.code}</td>
                           <td className="p-2 md:p-3">{school.name}</td>
+                          <td className="p-2 md:p-3">{school.subDistrict}</td>
+                          <td className="p-2 md:p-3">{school.district}</td>
                           <td className="p-2 md:p-3">{school.dataEntered}</td>
                           <td className="p-2 md:p-3">{school.confirmed}</td>
                           <td className="p-2 md:p-3">

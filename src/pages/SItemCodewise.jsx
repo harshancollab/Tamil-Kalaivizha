@@ -150,18 +150,18 @@ const SItemCodewise = () => {
   
 
   const resultData = [
-    { slNo: 1, itemCode: "301 - Story Writing", school: "GHSS Kozhikode", SchoolCode: 60001, studentName: "Rahul K", grade: "A", point: 9.5, totalPoint: 9.5 },
-    { slNo: 2, itemCode: "302 - Essay Writing", school: "St. Joseph HSS", SchoolCode: 4003, studentName: "Anjali S", grade: "A", point: 10.0, totalPoint: 10.0 },
-    { slNo: 3, itemCode: "401 - LP Story Writing", school: "MES HSS", SchoolCode: 30001, studentName: "Arun P", grade: "A", point: 9.0, totalPoint: 9.0 },
-    { slNo: 4, itemCode: "402 - LP Essay Writing", school: "Govt HSS", SchoolCode: 30001, studentName: "Meera T", grade: "B", point: 8.0, totalPoint: 8.0 },
-    { slNo: 5, itemCode: "403 - LP Poem Recitation", school: "Sacred Heart HSS", SchoolCode: 7601, studentName: "Vishnu M", grade: "A", point: 9.5, totalPoint: 9.5 },
-    { slNo: 6, itemCode: "504 - HS Elocution", school: "Kendriya Vidyalaya", SchoolCode: 67001, studentName: "Sameera N", grade: "B", point: 8.5, totalPoint: 8.5 },
-    { slNo: 7, itemCode: "605 - HSS Group Song", school: "Christ HSS", SchoolCode: 9001, studentName: "Team A", grade: "B", point: 7.5, totalPoint: 7.5 },
-    { slNo: 8, itemCode: "606 - HSS Folk Dance", school: "St. Mary's HSS", SchoolCode: 20001, studentName: "Dance Group", grade: "B", point: 8.0, totalPoint: 8.0 },
-    { slNo: 9, itemCode: "504 - HS Elocution", school: "Kendriya Vidyalaya", SchoolCode: 67001, studentName: "Sameera N", grade: "B", point: 8.5, totalPoint: 8.5 },
-    { slNo: 10, itemCode: "605 - HSS Group Song", school: "Christ HSS", SchoolCode: 9001, studentName: "Team A", grade: "B", point: 7.5, totalPoint: 7.5 },
-    { slNo: 11, itemCode: "506 - HSS Folk Dance", school: "St. Mary's HSS", SchoolCode: 20001, studentName: "Dance Group", grade: "B", point: 8.0, totalPoint: 8.0 },
-    { slNo: 12, itemCode: "506 - HSS Folk Dance", school: "St. Mary's HSS", SchoolCode: 20001, studentName: "Dance Group", grade: "B", point: 8.0, totalPoint: 8.0 }
+    { slNo: 1, itemCode: "301 - Story Writing", school: "GHSS Kozhikode", SchoolCode: 60001, studentName: "Rahul K", grade: "A", point: 9.5, totalPoint: 9.5, sub: "Ottapalm",district:"Palakkad" },
+    { slNo: 2, itemCode: "302 - Essay Writing", school: "St. Joseph HSS", SchoolCode: 4003, studentName: "Anjali S", grade: "A", point: 10.0, totalPoint: 10.0, sub: "Pattambi",district:"Palakkad" },
+    { slNo: 3, itemCode: "401 - LP Story Writing", school: "MES HSS", SchoolCode: 30001, studentName: "Arun P", grade: "A", point: 9.0, totalPoint: 9.0, sub: "Chittur",district:"Palakkad" },
+    { slNo: 4, itemCode: "402 - LP Essay Writing", school: "Govt HSS", SchoolCode: 30001, studentName: "Meera T", grade: "B", point: 8.0, totalPoint: 8.0,sub: "Munnar",district:"Idukki" },
+    { slNo: 5, itemCode: "403 - LP Poem Recitation", school: "Sacred Heart HSS", SchoolCode: 7601, studentName: "Vishnu M", grade: "A", point: 9.5, totalPoint: 9.5,sub: "Payyanur",district:"Kozhikode" },
+    { slNo: 6, itemCode: "504 - HS Elocution", school: "Kendriya Vidyalaya", SchoolCode: 67001, studentName: "Sameera N", grade: "B", point: 8.5, totalPoint: 8.5,sub: "Munnar",district:"Idukki" },
+    { slNo: 7, itemCode: "605 - HSS Group Song", school: "Christ HSS", SchoolCode: 9001, studentName: "Team A", grade: "B", point: 7.5, totalPoint: 7.5,sub: "Devikulam",district:"Idukki" },
+    { slNo: 8, itemCode: "606 - HSS Folk Dance", school: "St. Mary's HSS", SchoolCode: 20001, studentName: "Dance Group", grade: "B", point: 8.0, totalPoint: 8.0,sub: "North Paravur",district:"Kochi" },
+    { slNo: 9, itemCode: "504 - HS Elocution", school: "Kendriya Vidyalaya", SchoolCode: 67001, studentName: "Sameera N", grade: "B", point: 8.5, totalPoint: 8.5,sub: "Munnar",district:"Idukki" },
+    { slNo: 10, itemCode: "605 - HSS Group Song", school: "Christ HSS", SchoolCode: 9001, studentName: "Team A", grade: "B", point: 7.5, totalPoint: 7.5,sub: "Munnar",district:"Idukki" },
+    { slNo: 11, itemCode: "506 - HSS Folk Dance", school: "St. Mary's HSS", SchoolCode: 20001, studentName: "Dance Group", grade: "B", point: 8.0, totalPoint: 8.0 ,sub: "Mannarkkad",district:"Palakkad"},
+    { slNo: 12, itemCode: "506 - HSS Folk Dance", school: "St. Mary's HSS", SchoolCode: 20001, studentName: "Dance Group", grade: "B", point: 8.0, totalPoint: 8.0,sub: "Kakknad",district:"Kochi" }
   ];
 
   const handleSchoolSearchChange = (e) => {
@@ -476,6 +476,8 @@ const SItemCodewise = () => {
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Student Name</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School</th>
+                          <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
+                          <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">District</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Rank</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Point</th>
@@ -508,6 +510,8 @@ const SItemCodewise = () => {
                               <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.studentName}</td>
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.SchoolCode}-{result.school}</td>
+                              <td className="p-2 md:p-3 whitespace-nowrap">{result.sub}</td>
+                              <td className="p-2 md:p-3 whitespace-nowrap">{result.district}</td>
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.point}</td>
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.totalPoint}</td>

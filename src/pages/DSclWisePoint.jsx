@@ -243,7 +243,7 @@ const DSclWisePoint = () => {
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
         
-        const headers = ['Sl No', 'School Code', 'School Name', 'Grade A', 'Grade B', 'Grade C', 'Points'];
+        const headers = ['Sl No', 'School Code', 'School Name', "Sub District",'Grade A', 'Grade B', 'Grade C', 'Points'];
         headers.forEach(headerText => {
             const th = document.createElement('th');
             th.textContent = headerText;
@@ -271,6 +271,7 @@ const DSclWisePoint = () => {
                 item.slNo || index + 1,
                 item.regNo || "-",
                 item.code || "-",
+                item.subDistrict || "-",
                 item.mark1 || "-",
                 item.mark2 || "-",
                 item.mark3 || "-",
@@ -401,30 +402,7 @@ const DSclWisePoint = () => {
                                 </div>
                             </div>
                             
-                            {/* Sub-District Select with floating label */}
-                            <div className="relative w-full sm:w-40">
-                                <select
-                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                                    id="sub-district-select"
-                                    value={selectedSubDistrict}
-                                    onChange={handleSubDistrictChange}
-                                >
-                                    {subDistricts.map((option, index) => (
-                                        <option key={`sub-district-${index}`} value={option}>
-                                            {option}
-                                        </option>
-                                    ))}
-                                </select>
-                                <label
-                                    htmlFor="sub-district-select"
-                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
-                                >
-                                    Sub District
-                                </label>
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                                    <i className="fa-solid fa-chevron-down"></i>
-                                </div>
-                            </div>
+                           
                             
                             <button
                                 onClick={generatePDF}
@@ -455,6 +433,8 @@ const DSclWisePoint = () => {
                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code</th>
                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
+
                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade A</th>
                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade B</th>
                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade C</th>
@@ -468,6 +448,7 @@ const DSclWisePoint = () => {
                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.slNo}</td>
                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.regNo}</td>
                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.code}</td>
+                                                <td className="p-2 md:p-3 whitespace-nowrap">{result.subDistrict}</td>
                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.mark1}</td>
                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.mark2}</td>
                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.mark3}</td>
