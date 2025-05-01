@@ -9,9 +9,10 @@ const CertificateSclwise = () => {
     const [allItemResult, setAllItemResult] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [searchParams, setSearchParams] = useSearchParams();
-    const selectedFestival = searchParams.get('festival') || "UP Kalaivizha";
+    const selectedFestival = searchParams.get('festival') || "All Festival";
+    const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
     const navigate = useNavigate();
-    
+
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -22,7 +23,7 @@ const CertificateSclwise = () => {
 
     useEffect(() => {
         filterDataByFestival();
-    }, [selectedFestival, allItemResult]);
+    }, [selectedFestival, allItemResult, searchTerm]); // Re-filter when searchTerm changes
 
     const getAllItemResult = async () => {
         const token = sessionStorage.getItem("token");
@@ -47,7 +48,7 @@ const CertificateSclwise = () => {
     const filterDataByFestival = () => {
         if (!allItemResult.length) return;
 
-        let filtered;
+        let filtered = [...allItemResult];
         switch (selectedFestival) {
             case "UP Kalaivizha":
                 filtered = allItemResult.filter(item => {
@@ -80,28 +81,46 @@ const CertificateSclwise = () => {
                 filtered = [...allItemResult];
         }
 
-        // Add sequential numbering to filtered results
+        // Add sequential numbering
         filtered = filtered.map((item, index) => ({
             ...item,
             slNo: index + 1
         }));
 
+        // Apply search filter
+        if (searchTerm) {
+            const lowerCaseSearchTerm = searchTerm.toLowerCase();
+            filtered = filtered.filter(item =>
+                item.printed.toLowerCase().includes(lowerCaseSearchTerm) ||
+                item.printed.split(' - ')[0].toLowerCase().includes(lowerCaseSearchTerm) // Search by school code
+            );
+        }
+
         setFilteredData(filtered);
-        // Reset to first page when filters change
-        setCurrentPage(1);
+        setCurrentPage(1); // Reset to first page on filter change
     }
 
     const handleFestivalChange = (e) => {
-        setSearchParams({ festival: e.target.value });
+        setSearchParams(params => {
+            params.set('festival', e.target.value);
+            return params;
+        });
+    };
+
+    const handleSearch = (e) => {
+        const newSearchTerm = e.target.value;
+        setSearchTerm(newSearchTerm);
+        setSearchParams(params => {
+            params.set('search', newSearchTerm);
+            return params;
+        });
     };
 
     const handleSchoolClick = (schoolName) => {
-        // Extract just the school name part after the code
         const schoolNameOnly = schoolName.split(' - ')[1];
         navigate(`/Add-certificate?school=${encodeURIComponent(schoolNameOnly)}`);
     };
 
-    // Get the appropriate title based on the selected festival
     const getPrintTitle = () => {
         switch (selectedFestival) {
             case "UP Kalaivizha":
@@ -113,16 +132,13 @@ const CertificateSclwise = () => {
             case "HSS Kalaivizha":
                 return "HSS Kalaivizha - Certificate School Wise Report";
             default:
-                return "All Festival - Certificate School Wise Report";
+                return " Certificate School Wise Report";
         }
     };
 
-    // Updated printing function using html2pdf
     const handlePrint = () => {
-        // Create a clone of the table for PDF generation
         const pdfContent = document.createElement('div');
-        
-        // Add title
+
         const titleElement = document.createElement('h2');
         titleElement.textContent = getPrintTitle();
         titleElement.style.textAlign = 'center';
@@ -130,16 +146,14 @@ const CertificateSclwise = () => {
         titleElement.style.fontWeight = 'bold';
         pdfContent.appendChild(titleElement);
 
-        // Create table clone
         const table = document.createElement('table');
         table.style.width = '100%';
         table.style.borderCollapse = 'collapse';
         table.style.marginTop = '20px';
-        
-        // Create table header
+
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
-        
+
         const headers = ['Sl No', 'School', 'No of Students', 'Participation', 'Non-Participant'];
         headers.forEach(headerText => {
             const th = document.createElement('th');
@@ -150,20 +164,18 @@ const CertificateSclwise = () => {
             th.style.fontWeight = 'bold';
             headerRow.appendChild(th);
         });
-        
+
         thead.appendChild(headerRow);
         table.appendChild(thead);
-        
-        // Create table body
+
         const tbody = document.createElement('tbody');
-        
-        const displayData = filteredData.length > 0 ? filteredData : 
+
+        const displayDataForPrint = filteredData.length > 0 ? filteredData :
             (allItemResult.length > 0 ? allItemResult : certificateItemData);
-            
-        displayData.forEach((item, index) => {
+
+        displayDataForPrint.forEach((item) => {
             const row = document.createElement('tr');
-            
-            // Add cells
+
             const cellData = [
                 item.slNo,
                 item.printed,
@@ -171,8 +183,8 @@ const CertificateSclwise = () => {
                 item.participation,
                 item.nonParticipant
             ];
-            
-            cellData.forEach((text, cellIndex) => {
+
+            cellData.forEach((text) => {
                 const td = document.createElement('td');
                 td.textContent = text;
                 td.style.border = '1px solid #ddd';
@@ -180,17 +192,15 @@ const CertificateSclwise = () => {
                 td.style.textAlign = 'center';
                 row.appendChild(td);
             });
-            
+
             tbody.appendChild(row);
         });
-        
+
         table.appendChild(tbody);
         pdfContent.appendChild(table);
-        
-        // PDF filename
-        const fileName = `${selectedFestival.replace(/ /g, '_')}_Certificate_School_Wise.pdf`;
-        
-        // PDF options
+
+        const fileName = `Certificate_School_Wise.pdf`;
+
         const options = {
             margin: 10,
             filename: fileName,
@@ -198,8 +208,7 @@ const CertificateSclwise = () => {
             html2canvas: { scale: 2, useCORS: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
-        
-        // Generate and download PDF
+
         html2pdf().from(pdfContent).set(options).save();
     };
 
@@ -349,7 +358,6 @@ const CertificateSclwise = () => {
         }
     ];
 
-    // Initialize filtered data at component mount
     useEffect(() => {
         if (allItemResult.length === 0 && certificateItemData.length > 0) {
             setAllItemResult(certificateItemData);
@@ -370,18 +378,14 @@ const CertificateSclwise = () => {
 
     const renderPageNumbers = () => {
         const pageNumbers = [];
-        // Dynamically adjust number of page buttons based on screen size
         const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
-        
+
         if (totalPages <= maxPageNumbersToShow) {
-            // Show all page numbers
             for (let i = 1; i <= totalPages; i++) {
                 pageNumbers.push(i);
             }
         } else {
-            // Show limited page numbers with dots
             if (currentPage <= 2) {
-                // Near the start
                 for (let i = 1; i <= 3; i++) {
                     if (i <= totalPages) pageNumbers.push(i);
                 }
@@ -390,14 +394,12 @@ const CertificateSclwise = () => {
                     pageNumbers.push(totalPages);
                 }
             } else if (currentPage >= totalPages - 1) {
-                // Near the end
                 pageNumbers.push(1);
                 pageNumbers.push('...');
                 for (let i = totalPages - 2; i <= totalPages; i++) {
                     if (i > 0) pageNumbers.push(i);
                 }
             } else {
-                // Middle
                 pageNumbers.push(1);
                 if (currentPage > 3) pageNumbers.push('...');
                 pageNumbers.push(currentPage - 1);
@@ -407,11 +409,10 @@ const CertificateSclwise = () => {
                 pageNumbers.push(totalPages);
             }
         }
-        
+
         return pageNumbers;
     };
 
-    // Determine what data to display
     const displayData = currentItems.length > 0 ? currentItems : [];
 
     return (
@@ -424,32 +425,36 @@ const CertificateSclwise = () => {
                         <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
                             Certificate School Wise
                         </h2>
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
-                            <div className="relative w-full sm:w-40">
-                                <select
-                                    className="border-blue-800 border text-blue-700 px-3 py-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10"
-                                    onChange={handleFestivalChange}
-                                    value={selectedFestival}
-                                >
-                                    <option value="All Festival">All Festival</option>
-                                    <option value="UP Kalaivizha">UP Kalaivizha</option>
-                                    <option value="LP Kalaivizha">LP Kalaivizha</option>
-                                    <option value="HS Kalaivizha">HS Kalaivizha</option>
-                                    <option value="HSS Kalaivizha">HSS Kalaivizha</option>
-                                </select>
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                                    <i className="fa-solid fa-chevron-down"></i>
-                                </div>
-                            </div>
-                            <button
-                                onClick={handlePrint}
-                                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
-                            >
-                                Print
-                            </button>
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
+
+                           
+
+                            <button
+
+                                onClick={handlePrint}
+
+                                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
+
+                            >
+
+                                Print
+
+                            </button>
+
+                        </div>
+                    </div>
+                    <div className="relative flex mt-2 items-center w-full sm:w-64 h-9 border border-blue-800 rounded-full px-4">
+                        <input
+                            type="text"
+                            placeholder="Search School Name/Code..."
+                            className="w-full bg-transparent outline-none text-sm"
+                            onChange={handleSearch}
+                            value={searchTerm}
+                        />
+                        <div className="text-gray-500">
+                            <i className="fa-solid fa-magnifying-glass"></i>
                         </div>
                     </div>
-
                     <div className="w-full">
                         <div className="overflow-x-auto -mx-4 sm:mx-0">
                             <div className="inline-block min-w-full align-middle px-4 sm:px-0">

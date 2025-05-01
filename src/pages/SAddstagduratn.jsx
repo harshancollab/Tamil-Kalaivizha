@@ -503,8 +503,10 @@ const SAddstagduratn = () => {
     <>
       <Header />
       <div className="flex flex-col md:flex-row bg-gray-200 min-h-screen">
+      <div className="md:w-64">
         <Dash />
-        <div className="w-full p-2 md:p-4 lg:p-6 ">
+        </div>
+        <div className="w-full p-2 md:p-4 lg:p-6  ">
           <form 
             className="bg-white p-2 md:p-2 lg:p-6 rounded-lg shadow-md w-full min-h-screen"
             onSubmit={handleSubmit}
@@ -652,6 +654,7 @@ const SAddstagduratn = () => {
             </div>
           </form>
         </div>
+     
       </div>
     </>
   );

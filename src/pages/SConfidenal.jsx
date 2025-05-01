@@ -515,12 +515,12 @@ const SConfidenal = () => {
                                     <i className="fa-solid fa-chevron-down"></i>
                                 </div>
                             </div>
-                            <button
+                            {/* <button
                                 onClick={generatePDF}
                                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
                             >
                                 Print
-                            </button>
+                            </button> */}
                         </div>
                     </div>
 

@@ -195,6 +195,10 @@ import SAllReport from './pages/SAllReport';
 import SFestivalItemtotal from './pages/SFestivalItemtotal';
 import DCertificate from './pages/DCertificate';
 import SCertificatetemp from './pages/SCertificatetemp';
+import DPubl from './pages/DPubl';
+import DPublishSTatusfest from './pages/DPublishSTatusfest';
+import SDeclared from './components/SDeclared';
+import SPubStatus from './pages/SPubStatus';
 
 
 
@@ -384,12 +388,13 @@ function App() {
         <Route path="/DClusterReport" element={<DClusterReport />} />
         <Route path="/DAddStageallotitmwise" element={<DAddStageallotitmwise />} />
         <Route path="/DEditstgAllotitmwise/:id" element={<DEditstgAllotitmwise />} />
-        <Route path="/DPublishdeclare" element={<DPublishdeclare />} />
+        
         
         <Route path="/DCertificate" element={<DCertificate />} />
 
-
-
+        <Route path="/DPublishdeclare" element={<DPubl />} />
+        <Route path="/festival-status" element={<DPublishSTatusfest />} />
+        {/* <Route path="/DPublishdeclare" element={<DPublishdeclare />} /> */}
         
         <Route path="/DParticipatingScl" element={<DParticipatingScl />} />
         <Route path="/DFestWiseParti" element={<DFestWiseParti />} />
@@ -434,6 +439,9 @@ function App() {
         <Route path="/SCertificateDetails" element={<SCertificateDetails />} />
         <Route path="/SParticipateMorethan" element={<SParticipateMorethan />} />
         <Route path="/SPublishDeclarList" element={<SPublishDeclarList />} />
+        <Route path="/festival-statu" element={<SPubStatus />} />
+
+
         <Route path="/SExport" element={<SExport />} />
         <Route path="/ShigherLevel" element={<ShigherLevel />} />
         <Route path="/SCallSheet" element={<SCallSheet />} />

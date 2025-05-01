@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
-    // Mock data for demonstration purposes
-    // In a real application, you would fetch this data from an API
+const SDeclared = ({ searchTerm, selectedFestival, printRef }) => {
+    // Mock data with added district field and proper Kerala districts with their sub-districts
     const [allResults, setAllResults] = useState([
         {
             id: 1,
@@ -12,8 +11,9 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
             codeNo: 'EL01',
             name: 'Arun Kumar',
             className: 'V',
-            schoolName: 'Govt Higher Secondary School',
-            subDistrict: 'Coimbatore North',
+            schoolName: ' Secondary School',
+            subDistrict: 'Neyyattinkara',
+            district: 'Thiruvananthapuram',
             grade: 'A',
             point: 85,
             festival: 'UP Tamil Kalaivizha'
@@ -27,7 +27,8 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
             name: 'Priya Sharma',
             className: 'VII',
             schoolName: 'St. Mary',
-            subDistrict: 'Coimbatore South',
+            subDistrict: 'Punalur',
+            district: 'Kollam',
             grade: 'B',
             point: 78,
             festival: 'Lp Tamil Kalaivizha'
@@ -41,7 +42,8 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
             name: 'Vijay Rajan',
             className: 'IX',
             schoolName: 'Modern Public School',
-            subDistrict: 'Pollachi',
+            subDistrict: 'Aluva',
+            district: 'Ernakulam',
             grade: 'A+',
             point: 92,
             festival: 'Hs Tamil Kalaivizha'
@@ -55,7 +57,8 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
             name: 'Sneha Nair',
             className: 'XI',
             schoolName: 'Vidya Mandir',
-            subDistrict: 'Udumalpet',
+            subDistrict: 'Vadakara',
+            district: 'Kozhikode',
             grade: 'A',
             point: 88,
             festival: 'Hss Tamil Kalaivizha'
@@ -69,7 +72,8 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
             name: 'Karthik Verma',
             className: 'IV',
             schoolName: 'Little Flower School',
-            subDistrict: 'Valparai',
+            subDistrict: 'Chavakkad',
+            district: 'Thrissur',
             grade: 'B+',
             point: 80,
             festival: 'UP Tamil Kalaivizha'
@@ -83,7 +87,8 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
             name: 'Meera Menon',
             className: 'VI',
             schoolName: 'Chinmaya Vidyalaya',
-            subDistrict: 'Kinathukadavu',
+            subDistrict: 'Ottapalam',
+            district: 'Palakkad',
             grade: 'A',
             point: 86,
             festival: 'Lp Tamil Kalaivizha'
@@ -97,7 +102,8 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
             name: 'Team Harmony',
             className: 'X',
             schoolName: 'Bharathi Vidyalaya',
-            subDistrict: 'Sulur',
+            subDistrict: 'Cherthala',
+            district: 'Alappuzha',
             grade: 'A+',
             point: 95,
             festival: 'Hs Tamil Kalaivizha'
@@ -111,12 +117,13 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
             name: 'Group Rhythms',
             className: 'XII',
             schoolName: 'Kendriya Vidyalaya',
-            subDistrict: 'Mettupalayam',
+            subDistrict: 'Thalassery',
+            district: 'Kannur',
             grade: 'A',
             point: 90,
             festival: 'Hss Tamil Kalaivizha'
         },
-        // Added more mock data to demonstrate pagination
+        // Added more mock data with Kerala sub-districts
         {
             id: 9,
             itemCode: '301B',
@@ -126,7 +133,8 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
             name: 'Rohit Singh',
             className: 'V',
             schoolName: 'Delhi Public School',
-            subDistrict: 'Coimbatore East',
+            subDistrict: 'Perinthalmanna',
+            district: 'Malappuram',
             grade: 'A',
             point: 87,
             festival: 'UP Tamil Kalaivizha'
@@ -140,7 +148,8 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
             name: 'Kavya Reddy',
             className: 'VII',
             schoolName: 'Angels Academy',
-            subDistrict: 'Coimbatore West',
+            subDistrict: 'Hosdurg',
+            district: 'Kasaragod',
             grade: 'A+',
             point: 93,
             festival: 'Lp Tamil Kalaivizha'
@@ -154,7 +163,8 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
             name: 'Abhinav Mehta',
             className: 'IX',
             schoolName: 'Vidya Niketan',
-            subDistrict: 'Pollachi',
+            subDistrict: 'Mananthavady',
+            district: 'Wayanad',
             grade: 'A',
             point: 89,
             festival: 'Hs Tamil Kalaivizha'
@@ -168,10 +178,41 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
             name: 'Arjun Das',
             className: 'XI',
             schoolName: 'St. Thomas',
-            subDistrict: 'Udumalpet',
+            subDistrict: 'Ranni',
+            district: 'Pathanamthitta',
             grade: 'B+',
             point: 81,
             festival: 'Hss Tamil Kalaivizha'
+        },
+        {
+            id: 13,
+            itemCode: '315A',
+            itemName: 'Classical Dance',
+            regNo: 'UP008',
+            codeNo: 'CD03',
+            name: 'Lakshmi Nair',
+            className: 'V',
+            schoolName: 'Mount Carmel School',
+            subDistrict: 'Varkala',
+            district: 'Thiruvananthapuram',
+            grade: 'A',
+            point: 89,
+            festival: 'UP Tamil Kalaivizha'
+        },
+        {
+            id: 14,
+            itemCode: '418B',
+            itemName: 'Mono Act',
+            regNo: 'LP022',
+            codeNo: 'MA07',
+            name: 'Anand Menon',
+            className: 'VII',
+            schoolName: 'St. Joseph',
+            subDistrict: 'Kottarakkara',
+            district: 'Kollam',
+            grade: 'A',
+            point: 84,
+            festival: 'Lp Tamil Kalaivizha'
         }
     ]);
     const [filteredResults, setFilteredResults] = useState([]);
@@ -196,7 +237,9 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
                 result.itemCode.toLowerCase().includes(searchLower) ||
                 result.itemName.toLowerCase().includes(searchLower) ||
                 result.regNo.toLowerCase().includes(searchLower) ||
-                result.codeNo.toLowerCase().includes(searchLower)
+                result.codeNo.toLowerCase().includes(searchLower) ||
+                result.district.toLowerCase().includes(searchLower) ||
+                result.subDistrict.toLowerCase().includes(searchLower)
             );
         });
         setFilteredResults(searchTermFiltered);
@@ -264,7 +307,7 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
     return (
         <div className="overflow-x-auto -mx-4 sm:mx-0">
             <div className="inline-block min-w-full align-middle px-4 sm:px-0">
-                <div className=" overflow-hidden border-gray-200 sm:rounded-lg">
+                <div className="overflow-hidden border-gray-200 sm:rounded-lg">
                     <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
                         <thead className="bg-gray-50">
                             <tr className="text-gray-700">
@@ -276,6 +319,7 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Class</th>
                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
+                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">District</th>
                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade</th>
                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Point</th>
                             </tr>
@@ -292,13 +336,14 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.className}</td>
                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.schoolName}</td>
                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.subDistrict}</td>
+                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.district}</td>
                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.point}</td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="10" className="p-4 text-center text-gray-500">
+                                    <td colSpan="11" className="p-4 text-center text-gray-500">
                                         No results found
                                     </td>
                                 </tr>
@@ -307,7 +352,7 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
                     </table>
                 </div>
                 
-                {/* Pagination Controls - Similar to ClusterSchls component */}
+                {/* Pagination Controls */}
                 {filteredResults.length > 0 && (
                     <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
                         {/* Showing X of Y rows */}
@@ -359,4 +404,4 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
     );
 };
 
-export default DeclaredResult;
+export default SDeclared;

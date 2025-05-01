@@ -470,28 +470,23 @@ const Dash = () => {
   const [openMenus, setOpenMenus] = useState(() => {
     const path = location.pathname;
     return {
-      // Settings menu should be open if current path matches any of its links
-      settings: ['/AllKalolsavam', '/schlentry', '/All-schools', '/Spl-entry'].some(route => path === route),
-      // Stage Settings menu should be open if current path matches any of its links
-      stageSettings: ['/stage-duration-list', '/StageList', '/Stage-itemwiselist', '/festivalwiselist'].some(route => path === route),
-      // Stage Report menu should be open if current path matches any of its links
-      stageReport: ['/AddCallsheet', '/AddTimesheet', '/AddScoresheet', '/AddTabulationsheet', '/Addreport'].some(route => path === route),
-      // Pre Fest Report menu should be open if current path matches any of its links
-      preFestReport: ['/eligible-schools', '/Partcipatescllist', '/SclContactList', '/festwiseList', '/DateWiseList', '/ParticipantsCardList', '/ParticipantsMorethan', '/ClusterReport', '/StageReport'].some(route => path === route),
-      // Result menu should be open if current path matches any of its links
-      results: ['/All-resultentry', '/item-result', '/Itemresult-list', '/All-Publishresult'].some(route => path === route),
-      resultsReport: ['/ConfidentialResultlist', '/itemwisepoint', '/itemcodewise', '/SclWisePoint', '/Sclgradewise'].some(route => path === route),
-      certificate: ['/certificate-template', '/certificate-item-wise', '/certificate-school-wise', '/CertificateRegno'].some(route => path === route),
-      Export: ['/Higherlvlcomp','/ExportDatabase'].some(route => path === route),
+
      
-      settings: ['/DDefnKalolsavam','/SDefineKalolsavm','/SSClEntry','/SClusterScl','/SsplOrderEntry','/DSclEntry','/DClusterSclList','/DSplOrderEntry'].some(route => path === route),
-      stageSettings: ['/DStageDurationList', '/DDefineStageList', '/DStageAllotmtFest', '/DStageAllotItem','/DClashRep','/SstageDurationList', '/SdefineStagelist', '/SStageAlloteFestwise', '/SstageAllotItemwi', '/SClashReport'].some(route => path === route),
-      stageReport: ['/DCallSheet', '/DTimesheet', '/DScoreSheet', '/DTabulationSheet', '/DAllReport','/SCallSheet', '/STimesheet', '/SScoresheet', '/STablulation', '/SAllReport'].some(route => path === route),
-      preFestReport: ['/DParticipatingScl', '/DFestWiseParti', '/DdateWisepartici', '/DParticipateCardlist', '/DparticipateListMorethan', '/DClusterReport', '/DStageReport','/StateParticipatesclList', '/StateParticipateFesWis', '/StateDatewisepaticipat', '/StateParticipateCardLis', '/SParticipateMorethan', '/SClusterReport', '/SStageReport'].some(route => path === route),
-      results: ['/DAllresultentry', '/DItemresultList', '/DPublishdeclare', '/All-Publishresult','/SResultentryList', '/SitemResultList', '/SPublishDeclarList'].some(route => path === route),
-      resultsReport: ['/DConfidentialResult', '/DItemwisePoint', '/DItemCodewise', '/DSclWisePoint', '/DSclGradeWise','/SConfidenal', '/SItemwisePoint', '/SItemCodewise', '/SsclwisePoint', '/SsclGradewise'].some(route => path === route),
-      certificate: ['/certificate-template','/SCertificatetemp', '/DCertificateItmWise', '/DCertificateScl', '/DCertificateRegno','/SCertificateItemwise', '/SCertificatesclwise', '/SCertificateRegNo'].some(route => path === route),
-      Export: ['/DHigherlvlComp','/DExport','/ShigherLevel', '/SExport'].some(route => path === route),
+      settings: ['/DEditKalolsavam/:id','/AllKalolsavam', '/schlentry', '/All-schools', '/Spl-entry','/DDefnKalolsavam','/SDefineKalolsavm','/SSClEntry','/SClusterScl','/SsplOrderEntry','/DSclEntry','/DClusterSclList','/DSplOrderEntry'].some(route => path === route),
+      stageSettings: ['/SAddstagduratn','/SAddStage','/SeditStage','/SAddStgAllotFest','/SEditStgAllotFest/:id', '/SAddStgAlloteItmWis','/DAddStage','/DEditStage','/DAddStageAllotfest','/DEditStageAllotFest/:id','/DAddStageallotitmwise', '/DEditstgAllotitmwise/:id','/DAddStagedurat','/stage-duration-list', '/StageList', '/Stage-itemwiselist', '/festivalwiselist','/DStageDurationList', '/DDefineStageList', '/DStageAllotmtFest', '/DStageAllotItem','/DClashRep','/SstageDurationList', '/SdefineStagelist', '/SStageAlloteFestwise', '/SstageAllotItemwi', '/SClashReport'].some(route => path === route),
+      stageReport: ['/AddCallsheet', '/AddTimesheet', '/AddScoresheet', '/AddTabulationsheet', '/Addreport','/DCallSheet', '/DTimesheet', '/DScoreSheet', '/DTabulationSheet', '/DAllReport','/SCallSheet', '/STimesheet', '/SScoresheet', '/STablulation', '/SAllReport'].some(route => path === route),
+      preFestReport: ['/eligible-schools', '/Partcipatescllist', '/SclContactList', '/festwiseList', '/DateWiseList', '/ParticipantsCardList', '/ParticipantsMorethan', '/ClusterReport', '/StageReport','/DParticipatingScl', '/DFestWiseParti', '/DdateWisepartici', '/DParticipateCardlist', '/DparticipateListMorethan', '/DClusterReport', '/DStageReport','/StateParticipatesclList', '/StateParticipateFesWis', '/StateDatewisepaticipat', '/StateParticipateCardLis', '/SParticipateMorethan', '/SClusterReport', '/SStageReport'].some(route => path === route),
+      results: ['/edit-resultentry/:id','/result-entry','/SAddResultentry','/SEditResultentry/:id','/festival-statu','/SEditstgeAllotItemwis/:id','/DAddresultentry','/DEditResultentry/:id','/festival-status','/All-resultentry', '/item-result', '/Itemresult-list', '/All-Publishresult','/DAllresultentry', '/DItemresultList', '/DPublishdeclare', '/All-Publishresult','/SResultentryList', '/SitemResultList', '/SPublishDeclarList'].some(route => path === route),
+      resultsReport: ['/ConfidentialResultlist', '/itemwisepoint', '/itemcodewise', '/SclWisePoint', '/Sclgradewise','/DConfidentialResult', '/DItemwisePoint', '/DItemCodewise', '/DSclWisePoint', '/DSclGradeWise','/SConfidenal', '/SItemwisePoint', '/SItemCodewise', '/SsclwisePoint', '/SsclGradewise'].some(route => path === route),
+      certificate: ['/certificate-template', '/certificate-item-wise', '/certificate-school-wise', '/CertificateRegno','/certificate-template','/SCertificatetemp', '/DCertificateItmWise', '/DCertificateScl', '/DCertificateRegno','/SCertificateItemwise', '/SCertificatesclwise', '/SCertificateRegNo'].some(route => path === route),
+      Export: ['/Higherlvlcomp','/ExportDatabase','/DHigherlvlComp','/DExport','/ShigherLevel', '/SExport'].some(route => path === route),
+
+
+
+
+
+
+
     };
   });
 
@@ -505,7 +500,7 @@ const Dash = () => {
     // Determine which menu should be open based on current path
     const newOpenMenus = {
       settings: openMenus.settings || ['/AllKalolsavam', '/schlentry', '/All-schools', '/Spl-entry'].some(route => path === route),
-      stageSettings: openMenus.stageSettings || ['/stage-duration-list', '/AddStage', '/EditStage', '/stage-duration', '/Addfestivalwise', '/StageList', '/Stage-itemwiselist', '/festivalwiselist', '/ClashReportList'].some(route => path === route),
+      stageSettings: openMenus.stageSettings || ['/stage-duration-list','/DEditStage', '/AddStage', '/EditStage', '/stage-duration', '/Addfestivalwise', '/StageList', '/Stage-itemwiselist', '/festivalwiselist', '/ClashReportList'].some(route => path === route),
       stageReport: openMenus.stageReport || ['/AddCallsheet', '/AddTimesheet', '/AddScoresheet', '/AddTabulationsheet', '/Addreport'].some(route => path === route),
       preFestReport: openMenus.preFestReport || ['/eligible-schools', '/Partcipatescllist', '/SclContactList', '/festwiseList', '/DateWiseList', '/ParticipantsCardList', '/ClusterReport', '/StageReport'].some(route => path === route),
       results: openMenus.results || ['/All-resultentry', '/item-result', '/Itemresult-list', '/All-Publishresult', '/'].some(route => path === route),
@@ -1376,7 +1371,7 @@ const Dash = () => {
               }`}
             onClick={() => setIsSidebarOpen(false)}
           >
-           s.d Participating Schools
+           S.d Participating Schools
           </Link>
         
           <Link

@@ -323,7 +323,7 @@ const SClusterScl = () => {
     
     // Add title
     const titleElement = document.createElement('h2');
-    titleElement.textContent = "Cluster School List";
+    titleElement.textContent = "Cluster School List Report";
     titleElement.style.textAlign = 'center';
     titleElement.style.margin = '20px 0';
     titleElement.style.fontWeight = 'bold';
@@ -356,7 +356,7 @@ const SClusterScl = () => {
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     
-    const headers = ['Sl No', 'School Code', 'School Name','subDistrict','District', 'Data Entered', 'Confirmed'];
+    const headers = ['Sl No', 'School Code', 'School Name','SubDistrict','District', 'Data Entered', 'Confirmed'];
     headers.forEach(headerText => {
       const th = document.createElement('th');
       th.textContent = headerText;

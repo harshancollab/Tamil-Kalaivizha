@@ -293,7 +293,7 @@ const StateParticipatesclList = () => {
     const districtPart = selectedDistrict === "Select District" ? "All Districts" : selectedDistrict;
     const subDistrictPart = selectedSubDistrict === "Select Sub District" ? "All Sub Districts" : selectedSubDistrict;
     
-    return `${festivalPart} - ${districtPart} - ${subDistrictPart} Participating Schools List`;
+    return `${festivalPart} -District: ${districtPart} -Sub District : ${subDistrictPart} Participating Schools List`;
   };
 
   // PDF generation using html2pdf which has better browser compatibility

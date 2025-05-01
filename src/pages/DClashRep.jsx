@@ -450,31 +450,7 @@ const DClashRep = () => {
               Clash List
             </h2>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
-                {/* Sub-District dropdown with floating label */}
-                <div className="relative w-full sm:w-auto">
-                <select
-                  className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                  id="sub-district-select"
-                  onChange={handleSubDistrictChange}
-                  value={selectedSubDistrict}
-                >
-                  <option value="ALL">Select Sub District</option>
-                  {subDistricts.slice(1).map((option, index) => (
-                    <option key={`sub-district-${index}`} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-                <label
-                  htmlFor="sub-district-select"
-                  className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
-                >
-                  Sub District
-                </label>
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                  <i className="fa-solid fa-chevron-down"></i>
-                </div>
-              </div>
+              
               {/* Date dropdown with floating label */}
               <div className="relative w-full sm:w-auto">
                 <select
@@ -562,6 +538,7 @@ const DClashRep = () => {
                           <th className="p-2 md:p-3">Name</th>
                           <th className="p-2 md:p-3">School code</th>
                           <th className="p-2 md:p-3">School Name</th>
+                          <th className="p-2 md:p-3">Sub District</th>
                           <th className="p-2 md:p-3">Clash Items</th>
                         </tr>
                       </thead>
@@ -573,6 +550,7 @@ const DClashRep = () => {
                             <td className="p-2 md:p-3">{report.studentName}</td>
                             <td className="p-2 md:p-3">{report.schoolCode}</td>
                             <td className="p-2 md:p-3">{report.schoolName}</td>
+                            <td className="p-2 md:p-3">{report.subDistrict}</td>
                             <td className="p-2 md:p-3 relative">
                               <span 
                                 className="cursor-pointer px-2 py-1 rounded no-print"

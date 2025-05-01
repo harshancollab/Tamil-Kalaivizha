@@ -589,31 +589,7 @@ const DateWiseParticipation = () => {
             Sub District No of Participation Date Wise List
             </h2>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
-              {/* Date selection dropdown */}
-              <div className="relative w-full sm:w-auto">
-                <select
-                  className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                  id="date-select"
-                  onChange={handleDateChange}
-                  value={selectedDate}
-                >
-                  <option value="ALL">All Dates</option>
-                  <option value="2025-04-01">April 1, 2025</option>
-                  <option value="2025-04-02">April 2, 2025</option>
-                  <option value="2025-04-03">April 3, 2025</option>
-                  <option value="2025-04-04">April 4, 2025</option>
-                </select>
-                <label
-                  htmlFor="date-select"
-                  className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
-                >
-                  Date
-                </label>
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                  <i className="fa-solid fa-chevron-down"></i>
-                </div>
-              </div>
-              
+            
               {/* Sub District selection dropdown */}
               <div className="relative w-full sm:w-auto">
                 <select
@@ -638,6 +614,31 @@ const DateWiseParticipation = () => {
                   <i className="fa-solid fa-chevron-down"></i>
                 </div>
               </div>
+                {/* Date selection dropdown */}
+                <div className="relative w-full sm:w-auto">
+                <select
+                  className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                  id="date-select"
+                  onChange={handleDateChange}
+                  value={selectedDate}
+                >
+                  <option value="ALL">All Dates</option>
+                  <option value="2025-04-01">April 1, 2025</option>
+                  <option value="2025-04-02">April 2, 2025</option>
+                  <option value="2025-04-03">April 3, 2025</option>
+                  <option value="2025-04-04">April 4, 2025</option>
+                </select>
+                <label
+                  htmlFor="date-select"
+                  className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                >
+                  Date
+                </label>
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                  <i className="fa-solid fa-chevron-down"></i>
+                </div>
+              </div>
+              
               
               <button
                 onClick={generatePDF}
