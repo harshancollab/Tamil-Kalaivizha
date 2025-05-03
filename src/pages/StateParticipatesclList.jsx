@@ -391,11 +391,10 @@ const StateParticipatesclList = () => {
             District Participating Schools List
             </h2>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:space-x-4">
-            
               
               {/* Show Sub-District Select only when District is selected */}
               {selectedDistrict !== "Select District" && (
-                <div className="relative w-full sm:w-auto">
+                <div className="relative w-full sm:w-auto animate-fadeIn transition-all duration-300 transform origin-top">
                   <select
                     className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
                     id="sub-district-select"
@@ -419,8 +418,9 @@ const StateParticipatesclList = () => {
                   </div>
                 </div>
               )}
-                {/* District Select with floating label */}
-                <div className="relative w-full sm:w-auto">
+              
+              {/* District Select with floating label */}
+              <div className="relative w-full sm:w-auto">
                 <select
                   className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
                   id="district-select"

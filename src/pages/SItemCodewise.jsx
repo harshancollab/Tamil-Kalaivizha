@@ -10,7 +10,7 @@ const SItemCodewise = () => {
   const [Allitemwiswpoint, setItemwiswpoint] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [itemNameDisplay, setItemNameDisplay] = useState(''); // New state to store item name
+  const [itemNameDisplay, setItemNameDisplay] = useState(''); // State to store item name
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -393,6 +393,9 @@ const SItemCodewise = () => {
     readURLParams();
   }, []);
 
+  // Check if item code search is empty to show the prompt message
+  const showItemPrompt = !isSearching;
+
   return (
     <>
       <Header />
@@ -430,155 +433,167 @@ const SItemCodewise = () => {
               
               {/* Festival Dropdown */}
               <div className="relative w-full sm:w-40 mb-5">
-      <select
-        className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-        id="festival-select"
-        onChange={handleFestivalChange}
-        value={selectedFestival}
-      >
-        {festivalOptions.map(option => (
-          <option key={option.value} value={option.value}>
-            {option.display}
-          </option>
-        ))}
-      </select>
-      <label
-        htmlFor="festival-select"
-        className="absolute text-xs text-blue-800 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-blue-800 left-3"
-      >
-        Festival
-      </label>
-      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-        <i className="fa-solid fa-chevron-down"></i>
-      </div>
-    </div>
+                <select
+                  className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                  id="festival-select"
+                  onChange={handleFestivalChange}
+                  value={selectedFestival}
+                >
+                  {festivalOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.display}
+                    </option>
+                  ))}
+                </select>
+                <label
+                  htmlFor="festival-select"
+                  className="absolute text-xs text-blue-800 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-blue-800 left-3"
+                >
+                  Festival
+                </label>
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                  <i className="fa-solid fa-chevron-down"></i>
+                </div>
+              </div>
               
               {/* Print Button */}
               <button
                 className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto"
                 onClick={handlePrint}
                 aria-label="Print report"
+                disabled={showItemPrompt}
               >
                 Print
               </button>
             </div>
           </div>
 
-          {/* Table section */}
-          <div className="w-full mt-6">
-            <div className="overflow-x-auto">
-              <div className="inline-block min-w-full align-middle">
-                <div className="shadow overflow-hidden border-gray-200 sm:rounded-lg">
-                  <div id="item-wise-point-table" className="overflow-x-scroll md:overflow-hidden">
-                    <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
-                      <thead className="bg-gray-50">
-                        <tr className="text-gray-700">
-                          <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
-                          <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Student Name</th>
-                          <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School</th>
-                          <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
-                          <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">District</th>
-                          <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Rank</th>
-                          <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade</th>
-                          <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Point</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
-                        {(isFiltering && allDisplayData.length === 0) ? (
-                          <tr>
-                            <td colSpan="7" className="p-4 text-center">
-                              <div className="flex flex-col items-center justify-center p-6">
-                                <p className="text-red-500 font-medium mb-2">No results found</p>
-                                <p>
-                                  No items found for {selectedFestival}
-                                  {isSearching ? ` with item code containing "${schoolCodeSearch}"` : ''}
-                                </p>
-                                {isSearching && (
-                                  <button
-                                    onClick={clearSearch}
-                                    className="mt-4 bg-blue-100 text-blue-700 hover:bg-blue-200 font-medium py-2 px-4 rounded-full"
-                                  >
-                                    Clear Search
-                                  </button>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        ) : (
-                          currentItems.map((result, index) => (
-                            <tr key={result.slNo} className="hover:bg-gray-100">
-                              <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
-                              <td className="p-2 md:p-3 whitespace-nowrap">{result.studentName}</td>
-                              <td className="p-2 md:p-3 whitespace-nowrap">{result.SchoolCode}-{result.school}</td>
-                              <td className="p-2 md:p-3 whitespace-nowrap">{result.sub}</td>
-                              <td className="p-2 md:p-3 whitespace-nowrap">{result.district}</td>
-                              <td className="p-2 md:p-3 whitespace-nowrap">{result.point}</td>
-                              <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
-                              <td className="p-2 md:p-3 whitespace-nowrap">{result.totalPoint}</td>
+          {/* Show prompt message when no item code is entered */}
+          {showItemPrompt ? (
+            <div className="flex flex-col items-center justify-center p-8 mt-10 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="text-5xl text-blue-400 mb-4">
+                <i className="fa-solid fa-search"></i>
+              </div>
+              <h3 className="text-xl font-semibold text-blue-700 mb-2">Please Enter an Item Code</h3>
+              <p className="text-blue-600 text-center max-w-md">
+                Enter an item code in the search field above to view the corresponding results.
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Table section - Only show when item code is entered */}
+              <div className="w-full mt-6">
+                <div className="overflow-x-auto">
+                  <div className="inline-block min-w-full align-middle">
+                    <div className="shadow overflow-hidden border-gray-200 sm:rounded-lg">
+                      <div id="item-wise-point-table" className="overflow-x-scroll md:overflow-hidden">
+                        <table className="min-w-full text-center border-separate border-spacing-y-2 print-table">
+                          <thead className="bg-gray-50">
+                            <tr className="text-gray-700">
+                              <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
+                              <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Student Name</th>
+                              <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School</th>
+                              <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
+                              <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">District</th>
+                              <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Rank</th>
+                              <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade</th>
+                              <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Point</th>
                             </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
+                            {allDisplayData.length === 0 ? (
+                              <tr>
+                                <td colSpan="8" className="p-4 text-center">
+                                  <div className="flex flex-col items-center justify-center p-6">
+                                    <p className="text-red-500 font-medium mb-2">No results found</p>
+                                    <p>
+                                      No items found for {selectedFestival}
+                                      {isSearching ? ` with item code containing "${schoolCodeSearch}"` : ''}
+                                    </p>
+                                    <button
+                                      onClick={clearSearch}
+                                      className="mt-4 bg-blue-100 text-blue-700 hover:bg-blue-200 font-medium py-2 px-4 rounded-full"
+                                    >
+                                      Clear Search
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ) : (
+                              currentItems.map((result, index) => (
+                                <tr key={result.slNo} className="hover:bg-gray-100">
+                                  <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
+                                  <td className="p-2 md:p-3 whitespace-nowrap">{result.studentName}</td>
+                                  <td className="p-2 md:p-3 whitespace-nowrap">{result.SchoolCode}-{result.school}</td>
+                                  <td className="p-2 md:p-3 whitespace-nowrap">{result.sub}</td>
+                                  <td className="p-2 md:p-3 whitespace-nowrap">{result.district}</td>
+                                  <td className="p-2 md:p-3 whitespace-nowrap">{result.point}</td>
+                                  <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
+                                  <td className="p-2 md:p-3 whitespace-nowrap">{result.totalPoint}</td>
+                                </tr>
+                              ))
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          
-          {/* Pagination Controls */}
-          {allDisplayData.length > 0 && (
-            <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
-              {/* Showing X of Y rows */}
-              <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
-                {`${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, allDisplayData.length)} of ${allDisplayData.length} rows`}
-              </div>
               
-              {/* Pagination Controls */}
-              <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
-                {/* Previous Button with icon */}
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
-                >
-                  <i className="fa-solid fa-angle-right transform rotate-180"></i>
-                  <span className="hidden sm:inline p-1">Previous</span>
-                </button>
-                
-                {/* Page Numbers */}
-                <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
-                  {renderPageNumbers().map((page, index) => (
+              {/* Pagination Controls - Only show when there are results */}
+              {allDisplayData.length > 0 && (
+                <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
+                  {/* Showing X of Y rows */}
+                  <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
+                    {`${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, allDisplayData.length)} of ${allDisplayData.length} rows`}
+                  </div>
+                  
+                  {/* Pagination Controls */}
+                  <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                    {/* Previous Button with icon */}
                     <button
-                      key={index}
-                      onClick={() => page !== '...' && handlePageChange(page)}
-                      className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${
-                        currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
-                      } ${page === '...' ? 'pointer-events-none' : ''}`}
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
                     >
-                      {page}
+                      <i className="fa-solid fa-angle-right transform rotate-180"></i>
+                      <span className="hidden sm:inline p-1">Previous</span>
                     </button>
-                  ))}
+                    
+                    {/* Page Numbers */}
+                    <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+                      {renderPageNumbers().map((page, index) => (
+                        <button
+                          key={index}
+                          onClick={() => page !== '...' && handlePageChange(page)}
+                          className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${
+                            currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                          } ${page === '...' ? 'pointer-events-none' : ''}`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                    </div>
+                    
+                    {/* Next Button with icon */}
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages || totalPages === 0}
+                      className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
+                    >
+                      <span className="hidden sm:inline p-1">Next</span>
+                      <i className="fa-solid fa-angle-right"></i>
+                    </button>
+                  </div>
                 </div>
-                
-                {/* Next Button with icon */}
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages || totalPages === 0}
-                  className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
-                >
-                  <span className="hidden sm:inline p-1">Next</span>
-                  <i className="fa-solid fa-angle-right"></i>
-                </button>
-              </div>
-            </div>
+              )}
+            </>
           )}
         </div>
       </div>
     </>
   )
 }
-
-
 
 export default SItemCodewise

@@ -484,8 +484,8 @@ const SItemwisePoint = () => {
     Item Wise Point List
   </h2>
   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
-    <div className="flex flex-col w-full sm:w-auto relative ml-2">
-      <div className="flex items-center gap-2 w-full sm:w-auto ">
+  <div className="flex flex-col w-full sm:w-auto relative ml-2">
+      <div className="flex items-center gap-2 w-full sm:w-auto">
         <label className="text-blue-700 whitespace-nowrap min-w-max">School Code</label>
         <input
           type="text"
@@ -495,20 +495,21 @@ const SItemwisePoint = () => {
           onChange={handleSchoolSearchChange}
         />
       </div>
-   {/* School name display area - fixed height placeholder */}
-   <div className="h-6"> 
+      
+      {/* School name display area - fixed height placeholder */}
+      <div className="h-6">
         {schoolCodeSearch && showSchoolName && schoolName && (
-          <div className="absolute ml-2 mt-1  text-sm text-blue-800 font-medium">
-            {schoolName} 
+          <div className="absolute ml-2  mt-1 text-sm text-blue-800 font-medium whitespace-nowrap">
+            {schoolName}
             {currentItems[0]?.sub && currentItems[0]?.district && 
-              `( ${currentItems[0].district}-District,${currentItems[0].sub} )`} 
+              ` (${currentItems[0].sub} -Sub District, ${currentItems[0].district}- District)`
+            }
           </div>
         )}
       </div>
     </div>
-    
     <button
-      className="border-blue-800 border text-blue-900 py-2 px-4 rounded-full min-w-max whitespace-nowrap mb-5"
+      className="border-blue-800 border text-blue-900 py-2 px-4 rounded-full min-w-max whitespace-nowrap w-full sm:w-auto mb-6"
       onClick={resetAllFilters}
     >
       All Schools
@@ -516,7 +517,7 @@ const SItemwisePoint = () => {
 
      {/* UPDATED: Festival filter with floating label */}
      
-     <div className="relative w-full sm:w-40 mb-5">
+     <div className="relative w-full sm:w-40 mb-6">
       <select
         className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
         id="festival-select"
