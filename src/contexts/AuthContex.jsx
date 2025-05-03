@@ -46,7 +46,7 @@
 
 // export const AuthProvider = ({ children }) => {
 //   // Simulating a logged-in school admin user
-//   const [user, setUser] = useState({ role: 'school admin', isAuthenticated: true });
+//   const [user, setUser] = useState({ role: 'state admin', isAuthenticated: true });
 
 //   return (
 //     <AuthContext.Provider value={{ user, setUser }}>
@@ -61,19 +61,39 @@
 // It Admin
 // state admin
 // district admin
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  // Simulating a logged-in sub district admin user (for testing)
-  const [user, setUser] = useState({ role: 'state admin', isAuthenticated: true });
+  const [user, setUser] = useState({ role: null, isAuthenticated: false });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const storedRole = localStorage.getItem("isAdmin");
+    if (storedRole) {
+      setUser({ role: storedRole, isAuthenticated: true });
+    }
+    setLoading(false);
+  }, []);
+
+  const login = (role) => {
+    localStorage.setItem("isAdmin", role);
+    setUser({ role, isAuthenticated: true });
+  };
+
+  const logout = () => {
+    localStorage.removeItem("isAdmin");
+    setUser({ role: null, isAuthenticated: false });
+  };
 
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
-      {children}
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => useContext(AuthContext);
+
+

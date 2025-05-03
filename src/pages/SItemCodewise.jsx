@@ -425,7 +425,7 @@ const SItemCodewise = () => {
                 </div>
                 {/* Item name display */}
                 {itemNameDisplay && (
-                  <div className="absolute mt-1 ml-20 text-sm font-medium text-blue-700">
+                  <div className="absolute mt-1 ml-20 text-sm font-medium text-blue-700 animate-fadeIn transition-all duration-300 transform origin-top">
                     {itemNameDisplay}
                   </div>
                 )}

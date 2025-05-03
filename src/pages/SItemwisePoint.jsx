@@ -499,7 +499,7 @@ const SItemwisePoint = () => {
       {/* School name display area - fixed height placeholder */}
       <div className="h-6">
         {schoolCodeSearch && showSchoolName && schoolName && (
-          <div className="absolute ml-2  mt-1 text-sm text-blue-800 font-medium whitespace-nowrap">
+          <div className="absolute ml-2  mt-1 text-sm text-blue-800 font-medium whitespace-nowrap animate-fadeIn transition-all duration-300 transform origin-top">
             {schoolName}
             {currentItems[0]?.sub && currentItems[0]?.district && 
               ` (${currentItems[0].sub} -Sub District, ${currentItems[0].district}- District)`
