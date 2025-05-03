@@ -58,9 +58,10 @@
 // export const useAuth = () => useContext(AuthContext);
 
 // sub district admin
-// It Admin
-// state admin
-// district admin
+// It Admin   
+// state admin   
+//  district admin   
+
 import { createContext, useState, useContext, useEffect } from 'react';
 
 const AuthContext = createContext();

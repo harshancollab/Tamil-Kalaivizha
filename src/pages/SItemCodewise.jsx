@@ -423,12 +423,7 @@ const SItemCodewise = () => {
                     onChange={handleSchoolSearchChange}
                   />
                 </div>
-                {/* Item name display */}
-                {itemNameDisplay && (
-                  <div className="absolute mt-1 ml-20 text-sm font-medium text-blue-700 animate-fadeIn transition-all duration-300 transform origin-top">
-                    {itemNameDisplay}
-                  </div>
-                )}
+                
               </div>
               
               {/* Festival Dropdown */}
@@ -467,6 +462,13 @@ const SItemCodewise = () => {
               </button>
             </div>
           </div>
+          <div className="flex justify-center items-center">
+  {itemNameDisplay && (
+    <div className="absolute mt-1 text-sm font-medium text-blue-700">
+      {itemNameDisplay}
+    </div>
+  )}
+</div>
 
           {/* Show prompt message when no item code is entered */}
           {showItemPrompt ? (

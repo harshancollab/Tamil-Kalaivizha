@@ -15,7 +15,7 @@ const DItemwisePoint = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [nameSearch, setNameSearch] = useState('');
   const [isInitialized, setIsInitialized] = useState(false);
-  
+
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -69,20 +69,20 @@ const DItemwisePoint = () => {
     // Only run filtering after component is fully initialized
     if (isInitialized && Allitemwiswpoint.length > 0) {
       filterItems(selectedFestival, schoolCodeSearch, nameSearch);
-      
+
       // Update search state based on input values
       const isActiveSearch = schoolCodeSearch.trim() !== '' || nameSearch.trim() !== '';
       setIsSearching(isActiveSearch);
-      
+
       // Hide school column when filtering by school code
       setShowSchoolColumn(schoolCodeSearch.trim() === '');
-      
+
       // Update school name when searching by school code
       if (schoolCodeSearch.trim() !== '') {
-        const school = Allitemwiswpoint.find(item => 
+        const school = Allitemwiswpoint.find(item =>
           item.SchoolCode && item.SchoolCode.toString().includes(schoolCodeSearch)
         );
-        
+
         if (school) {
           setSchoolName(school.school);
           setShowSchoolName(true);
@@ -160,7 +160,7 @@ const DItemwisePoint = () => {
       filtered = filtered.filter(item =>
         item.SchoolCode && item.SchoolCode.toString().includes(schoolCode)
       );
-      
+
       // Update school name when filtering by school code
       if (filtered.length > 0) {
         setSchoolName(filtered[0].school);
@@ -185,7 +185,7 @@ const DItemwisePoint = () => {
     }));
 
     setFilteredItems(filtered);
-    
+
     // Reset to first page when filters change
     setCurrentPage(1);
   }
@@ -196,7 +196,7 @@ const DItemwisePoint = () => {
     { value: "HS Kalaivizha", display: "HS Kalaivizha" },
     { value: "HSS Kalaivizha", display: "HSS Kalaivizha" }
   ];
-  
+
 
   const resultData = [
     { slNo: 1, itemCode: "301 - Story Writing", school: "GHSS Kozhikode", SchoolCode: 60001, studentName: "Rahul K", grade: "A", point: 9.5, totalPoint: 9.5, sub: "Ottapalm" },
@@ -216,26 +216,26 @@ const DItemwisePoint = () => {
   const handleSchoolSearchChange = (e) => {
     const searchValue = e.target.value;
     setSchoolCodeSearch(searchValue);
-    
+
     // Set isSearching based on whether there's text in the search field
     setIsSearching(searchValue.trim() !== '' || nameSearch.trim() !== '');
-    
+
     // Update URL with search parameters
     updateURLParams(searchValue, selectedFestival, nameSearch);
-    
+
     // When school code changes, we want to find the corresponding school name
     if (searchValue.trim() !== '') {
-      const school = Allitemwiswpoint.find(item => 
+      const school = Allitemwiswpoint.find(item =>
         item.SchoolCode && item.SchoolCode.toString().includes(searchValue)
       );
-      
+
       if (school) {
         setSchoolName(school.school);
         setShowSchoolName(true);
       } else {
         setSchoolName('School not found');
       }
-      
+
       // Hide school column when searching by school code
       setShowSchoolColumn(false);
     } else {
@@ -247,10 +247,10 @@ const DItemwisePoint = () => {
   const handleNameSearchChange = (e) => {
     const searchValue = e.target.value;
     setNameSearch(searchValue);
-    
+
     // Set isSearching based on whether there's text in the search field
     setIsSearching(searchValue.trim() !== '' || schoolCodeSearch.trim() !== '');
-    
+
     // Update URL with search parameters
     updateURLParams(schoolCodeSearch, selectedFestival, searchValue);
   };
@@ -394,7 +394,7 @@ const DItemwisePoint = () => {
 
     // Force a re-filter with empty search and default festival
     filterItems('All Festival', '', '');
-    
+
     // Reset to first page
     setCurrentPage(1);
   };
@@ -402,17 +402,17 @@ const DItemwisePoint = () => {
   // Calculate pagination values
   const indexOfLastItem = currentPage * rowsPerPage;
   const indexOfFirstItem = indexOfLastItem - rowsPerPage;
-  
+
   // Determine if we're actively filtering
   const isFiltering = isSearching || selectedFestival !== 'All Festival';
 
   // Determine what data to display - filtered or full dataset
   const allDisplayData = isFiltering ? filteredItems :
     (Allitemwiswpoint.length > 0 ? Allitemwiswpoint : resultData);
-    
+
   // Get only the current page items
   const currentItems = allDisplayData.slice(indexOfFirstItem, indexOfLastItem);
-  
+
   // Calculate total pages
   const totalPages = Math.ceil(allDisplayData.length / rowsPerPage);
 
@@ -426,7 +426,7 @@ const DItemwisePoint = () => {
     const pageNumbers = [];
     // Dynamically adjust number of page buttons based on screen size
     const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
-    
+
     if (totalPages <= maxPageNumbersToShow) {
       // Show all page numbers
       for (let i = 1; i <= totalPages; i++) {
@@ -461,11 +461,11 @@ const DItemwisePoint = () => {
         pageNumbers.push(totalPages);
       }
     }
-    
+
     return pageNumbers;
   };
 
-  // Ensure we set default data if API call hasn't returned
+ 
   useEffect(() => {
     if (Allitemwiswpoint.length === 0 && resultData.length > 0) {
       setItemwiswpoint(resultData);
@@ -478,76 +478,76 @@ const DItemwisePoint = () => {
       <div className="flex flex-col md:flex-row min-h-screen">
         <Dash />
         <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-hidden">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
-  <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%] mb-4">
-    Item Wise Point List
-  </h2>
-  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
-    <div className="flex flex-col w-full sm:w-auto relative ml-2">
-      <div className="flex items-center gap-2 w-full sm:w-auto ">
-        <label className="text-blue-700 whitespace-nowrap min-w-max">School Code</label>
-        <input
-          type="text"
-          className="rounded-full border border-blue-700 px-2 py-2 flex-grow"
-          placeholder="Search by school code..."
-          value={schoolCodeSearch}
-          onChange={handleSchoolSearchChange}
-        />
-      </div>
-      {/* School name display area - fixed height placeholder */}
-      <div className="h-6"> {/* This empty div maintains consistent height */}
-        {schoolCodeSearch && showSchoolName && schoolName && (
-          <div className="absolute ml-10 mt-1 text-sm text-blue-800 font-medium">
-            {schoolName} 
-            {currentItems[0]?.sub && `(${currentItems[0].sub} - Sub District)`} 
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
+            <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%] mb-8">
+              Item Wise Point List
+            </h2>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full sm:w-auto">
+              <div className="flex flex-col w-full sm:w-auto relative ml-2">
+                <div className="flex items-center gap-2 w-full sm:w-auto ">
+                  <label className="text-blue-700 whitespace-nowrap min-w-max">School Code</label>
+                  <input
+                    type="text"
+                    className="rounded-full border border-blue-700 px-2 py-2 flex-grow"
+                    placeholder="Search by school code..."
+                    value={schoolCodeSearch}
+                    onChange={handleSchoolSearchChange}
+                  />
+                </div>
+                {/* School name display area - fixed height placeholder */}
+                <div className="h-6 mb-1 sm:mb-3"> {/* This empty div maintains consistent height */}
+                  {schoolCodeSearch && showSchoolName && schoolName && (
+                    <div className="absolute ml-10 mt-1 text-sm text-blue-800 font-medium">
+                      {schoolName}
+                      {currentItems[0]?.sub && `(${currentItems[0].sub} - Sub District)`}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <button
+                className="border-blue-800 border text-blue-900 py-2 px-4 rounded-full  w-full whitespace-nowrap mb-8 sm:w-auto"
+                onClick={resetAllFilters}
+              >
+                All Schools
+              </button>
+
+              {/* UPDATED: Festival filter with floating label */}
+
+              <div className="relative w-full sm:w-40 mb-8">
+                <select
+                  className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                  id="festival-select"
+                  onChange={handleFestivalChange}
+                  value={selectedFestival}
+                >
+                  {festivalOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.display}
+                    </option>
+                  ))}
+                </select>
+                <label
+                  htmlFor="festival-select"
+                  className="absolute text-xs text-blue-800 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-blue-800 left-3"
+                >
+                  Festival
+                </label>
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                  <i className="fa-solid fa-chevron-down"></i>
+                </div>
+              </div>
+
+              <button
+                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto mb-8"
+                onClick={handlePrint}
+                aria-label="Print report"
+              >
+                Print
+              </button>
+            </div>
           </div>
-        )}
-      </div>
-    </div>
-    
-    <button
-      className="border-blue-800 border text-blue-900 py-2 px-4 rounded-full min-w-max whitespace-nowrap mb-5"
-      onClick={resetAllFilters}
-    >
-      All Schools
-    </button>
 
-     {/* UPDATED: Festival filter with floating label */}
-     
-     <div className="relative w-full sm:w-40 mb-5">
-      <select
-        className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-        id="festival-select"
-        onChange={handleFestivalChange}
-        value={selectedFestival}
-      >
-        {festivalOptions.map(option => (
-          <option key={option.value} value={option.value}>
-            {option.display}
-          </option>
-        ))}
-      </select>
-      <label
-        htmlFor="festival-select"
-        className="absolute text-xs text-blue-800 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-blue-800 left-3"
-      >
-        Festival
-      </label>
-      <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-        <i className="fa-solid fa-chevron-down"></i>
-      </div>
-    </div>
-
-    <button
-      className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 rounded-full w-full sm:w-auto mb-5"
-      onClick={handlePrint}
-      aria-label="Print report"
-    >
-      Print
-    </button>
-  </div>
-</div>
-          
           <div className="relative flex mt-2 items-center w-full sm:w-64 h-9 border border-blue-800 rounded-full px-4">
             <input
               type="text"
@@ -560,7 +560,7 @@ const DItemwisePoint = () => {
               <i className="fa-solid fa-magnifying-glass"></i>
             </button>
           </div>
-      
+
           <div className="w-full mt-6">
             <div className="overflow-x-auto">
               <div className="inline-block min-w-full align-middle">
@@ -632,7 +632,7 @@ const DItemwisePoint = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Pagination Controls */}
           {allDisplayData.length > 0 && (
             <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
@@ -640,7 +640,7 @@ const DItemwisePoint = () => {
               <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
                 {`${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, allDisplayData.length)} of ${allDisplayData.length} rows`}
               </div>
-              
+
               {/* Pagination Controls */}
               <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
                 {/* Previous Button with icon */}
@@ -652,22 +652,21 @@ const DItemwisePoint = () => {
                   <i className="fa-solid fa-angle-right transform rotate-180"></i>
                   <span className="hidden sm:inline p-1">Previous</span>
                 </button>
-                
+
                 {/* Page Numbers */}
                 <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
                   {renderPageNumbers().map((page, index) => (
                     <button
                       key={index}
                       onClick={() => page !== '...' && handlePageChange(page)}
-                      className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${
-                        currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
-                      } ${page === '...' ? 'pointer-events-none' : ''}`}
+                      className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                        } ${page === '...' ? 'pointer-events-none' : ''}`}
                     >
                       {page}
                     </button>
                   ))}
                 </div>
-                
+
                 {/* Next Button with icon */}
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}

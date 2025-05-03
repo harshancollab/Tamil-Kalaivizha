@@ -505,7 +505,7 @@ const ItemWisePoint = () => {
     </div>
     
     <button
-      className="border-blue-800 border text-blue-900 py-2 px-4 rounded-full min-w-max whitespace-nowrap mb-5"
+      className="border-blue-800 border text-blue-900 py-2 px-4 w-full rounded-full sm:w-auto whitespace-nowrap mb-5"
       onClick={resetAllFilters}
     >
       All Schools
