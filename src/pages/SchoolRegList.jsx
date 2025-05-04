@@ -436,7 +436,7 @@ const SchoolRegList = () => {
 
                             </div>
                             {selectedDistrict && selectedDistrict !== 'Select' && (
-                                <div className="relative w-full sm:w-32">
+                                <div className="relative w-full sm:w-32 animate-fadeIn transition-all duration-300 transform origin-top">
                                     <select
                                         id="floating_subdistrict"
                                         className="block px-2 pb-2.5 pt-3 w-full text-sm text-gray-900 bg-transparent rounded-full border border-blue-800 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
@@ -530,8 +530,8 @@ const SchoolRegList = () => {
                                         <thead className="bg-gray-50">
                                             <tr className="text-gray-700">
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code & Name</th>
+                                                {/* <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School </th> */}
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Type</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">District</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
@@ -544,8 +544,8 @@ const SchoolRegList = () => {
                                                 currentItems.map((result, index) => (
                                                     <tr key={result.slNo} className="hover:bg-gray-100">
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.code}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">School {result.code}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.code}-School</td>
+                                                        {/* <td className="p-2 md:p-3 whitespace-nowrap"> {result.code}</td> */}
                                                         <td className="p-2 md:p-3 whitespace-nowrap">High School</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.district}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.subDistrict}</td>

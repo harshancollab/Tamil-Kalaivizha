@@ -588,8 +588,7 @@ const DparticipateListMorethan = () => {
                       <th className="p-2 md:p-3">Reg No</th>
                       <th className="p-2 md:p-3">No of Items</th>
                       <th className="p-2 md:p-3">Name</th>
-                      <th className="p-2 md:p-3">School code</th>
-                      <th className="p-2 md:p-3">School Name</th>
+                      <th className="p-2 md:p-3">School code & Name</th>
                       <th className="p-2 md:p-3">Sub District</th>
                     </tr>
                   </thead>
@@ -623,8 +622,7 @@ const DparticipateListMorethan = () => {
                             </span>
                           </td>
                           <td className="p-2 md:p-3">{participant.name || "-"}</td>
-                          <td className="p-2 md:p-3">{participant.schoolCode || "-"}</td>
-                          <td className="p-2 md:p-3">{participant.schoolName || "-"}</td>
+                          <td className="p-2 md:p-3">{participant.schoolCode || "-"}-{participant.schoolName || "-"}</td>
                           <td className="p-2 md:p-3">{participant.Sub || "-"}</td>
                         </tr>
                       ))

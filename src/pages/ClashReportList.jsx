@@ -478,8 +478,7 @@ const ClashReportList = () => {
                           <th className="p-2 md:p-3">Sl No</th>
                           <th className="p-2 md:p-3">Reg No</th>
                           <th className="p-2 md:p-3">Name</th>
-                          <th className="p-2 md:p-3">School code</th>
-                          <th className="p-2 md:p-3">School Name</th>
+                          <th className="p-2 md:p-3">School Code & Name</th>
                           <th className="p-2 md:p-3">Clash Items</th>
                         </tr>
                       </thead>
@@ -489,8 +488,8 @@ const ClashReportList = () => {
                             <td className="p-2 md:p-3">{indexOfFirstItem + index + 1}</td>
                             <td className="p-2 md:p-3">{report.regNo}</td>
                             <td className="p-2 md:p-3">{report.studentName}</td>
-                            <td className="p-2 md:p-3">{report.schoolCode}</td>
-                            <td className="p-2 md:p-3">{report.schoolName}</td>
+                            
+                            <td className="p-2 md:p-3">{report.schoolCode}-{report.schoolName}</td>
                             <td className="p-2 md:p-3 relative">
                               <span 
                                 className="cursor-pointer px-2 py-1 rounded no-print"

@@ -1857,8 +1857,7 @@ const ParticipantsMorethan = () => {
                       <th className="p-2 md:p-3">Reg No</th>
                       <th className="p-2 md:p-3">No of Items</th>
                       <th className="p-2 md:p-3">Name</th>
-                      <th className="p-2 md:p-3">School code</th>
-                      <th className="p-2 md:p-3">School Name</th>
+                      <th className="p-2 md:p-3">School code & Name</th>
                     </tr>
                   </thead>
                   <tbody className="text-xs sm:text-sm">
@@ -1891,8 +1890,7 @@ const ParticipantsMorethan = () => {
                             </span>
                           </td>
                           <td className="p-2 md:p-3">{participant.name || "-"}</td>
-                          <td className="p-2 md:p-3">{participant.schoolCode || "-"}</td>
-                          <td className="p-2 md:p-3">{participant.schoolName || "-"}</td>
+                          <td className="p-2 md:p-3">{participant.schoolCode || "-"}-{participant.schoolName || "-"}</td>
                         </tr>
                       ))
                     ) : (

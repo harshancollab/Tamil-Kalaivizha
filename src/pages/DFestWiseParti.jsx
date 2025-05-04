@@ -11,8 +11,8 @@ import html2pdf from 'html2pdf.js';
 const DFestWiseParti = () => {
     // Dummy data for development and fallback
     const dummyData = [
-        { regNo: "301", name: "Arun Kumar", gender: "Boy", class: "5", schoolCode: "001", schoolName: "Government UP School Thiruvananthapuram", itemCode: "301", subDistrict: "Pattambi" },
-        { regNo: "002", name: "Priya Nair", gender: "girl", class: "4", schoolCode: "001", schoolName: "Government UP School Thiruvananthapuram", itemCode: "304", subDistrict: "Chittur" },
+        { regNo: "301", name: "Arun Kumar", gender: "Boy", class: "5", schoolCode: "001", schoolName: " UP School Thiruvananthapuram", itemCode: "301", subDistrict: "Pattambi" },
+        { regNo: "002", name: "Priya Nair", gender: "girl", class: "4", schoolCode: "001", schoolName: "Government UP School ", itemCode: "304", subDistrict: "Chittur" },
         { regNo: "401", name: "Rahul Menon", gender: "Boy", class: "3", schoolCode: "002", schoolName: "St. Mary's LP School Kochi", itemCode: "401", subDistrict: "Munnar" },
         { regNo: "50", name: "Dev Prakash", gender: "Boy", class: "7", schoolCode: "003", schoolName: "Model HS Kozhikode", itemCode: "503", subDistrict: "Adimali" },
         { regNo: "0101", name: "Meera Suresh", gender: "girl", class: "11", schoolCode: "004", schoolName: "Sacred Heart HSS Thrissur", itemCode: "601", subDistrict: "Kattappana" },
@@ -504,8 +504,7 @@ const DFestWiseParti = () => {
                                                 <th className="p-2 md:p-3">Name</th>
                                                 <th className="p-2 md:p-3">Gender</th>
                                                 <th className="p-2 md:p-3">Class</th>
-                                                <th className="p-2 md:p-3">School code</th>
-                                                <th className="p-2 md:p-3">School Name</th>
+                                                <th className="p-2 md:p-3">School code & Name</th>
                                             </tr>
                                         </thead>
                                         <tbody className="text-xs sm:text-sm">
@@ -517,8 +516,7 @@ const DFestWiseParti = () => {
                                                         <td className="p-2 md:p-3">{item.name || "-"}</td>
                                                         <td className="p-2 md:p-3">{item.gender || "-"}</td>
                                                         <td className="p-2 md:p-3">{item.class || "-"}</td>
-                                                        <td className="p-2 md:p-3">{item.schoolCode || "-"}</td>
-                                                        <td className="p-2 md:p-3">{item.schoolName || "-"}</td>
+                                                        <td className="p-2 md:p-3">{item.schoolCode || "-"}-{item.schoolName || "-"}</td>
                                                     </tr>
                                                 ))
                                             ) : (

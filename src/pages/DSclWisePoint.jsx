@@ -431,8 +431,7 @@ const DSclWisePoint = () => {
                                 <thead className="bg-gray-50">
                                     <tr className="text-gray-700">
                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
-                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code</th>
-                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code & Name</th>
                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
 
                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade A</th>
@@ -446,8 +445,7 @@ const DSclWisePoint = () => {
                                         currentItems.map((result, index) => (
                                             <tr key={index} className="hover:bg-gray-100">
                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.slNo}</td>
-                                                <td className="p-2 md:p-3 whitespace-nowrap">{result.regNo}</td>
-                                                <td className="p-2 md:p-3 whitespace-nowrap">{result.code}</td>
+                                                <td className="p-2 md:p-3 whitespace-nowrap">{result.regNo}-{result.code}</td>
                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.subDistrict}</td>
                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.mark1}</td>
                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.mark2}</td>

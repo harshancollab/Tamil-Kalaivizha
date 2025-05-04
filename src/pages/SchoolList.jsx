@@ -322,8 +322,7 @@ const SchoolList = () => {
                                             <thead className="bg-gray-50">
                                                 <tr className="text-gray-700">
                                                     <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
-                                                    <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code</th>
-                                                    <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                                                    <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code & Name</th>
                                                     <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Data Entered</th>
                                                     <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Confirmed</th>
                                                     <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Reset</th>
@@ -334,8 +333,7 @@ const SchoolList = () => {
                                                     currentItems.map((school, index) => (
                                                         <tr key={school.id} className="hover:bg-gray-100">
                                                             <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
-                                                            <td className="p-2 md:p-3 whitespace-nowrap">{school.name}</td>
-                                                            <td className="p-2 md:p-3 whitespace-nowrap">{school.address}</td>
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{school.name}-{school.address}</td>
                                                             <td className="p-2 md:p-3 whitespace-nowrap">{school.type}</td>
                                                             <td className="p-2 md:p-3 whitespace-nowrap">{school.students}</td>
                                                             <td className="p-2 md:p-3 text-blue-500 whitespace-nowrap">

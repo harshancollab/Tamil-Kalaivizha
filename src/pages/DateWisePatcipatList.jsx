@@ -690,8 +690,7 @@ const DateWiseParticipantList = () => {
                     {/* Category Headers */}
                     <tr>
                       <th rowSpan="2" className="p-2 align-bottom">Sl No</th>
-                      <th rowSpan="2" className="p-2 align-bottom">School code</th>
-                      <th rowSpan="2" className="p-2 align-bottom">School Name</th>
+                      <th rowSpan="2" className="p-2 align-bottom">School Code & Name</th>
                       {/* UP Category */}
                       <th colSpan="2" className="p-2">
                         <div className="relative font-normal text-xs flex items-center justify-center w-full">
@@ -746,8 +745,7 @@ const DateWiseParticipantList = () => {
                       currentItems.map((item, index) => (
                         <tr key={index} className="hover:bg-gray-100">
                           <td className="p-2">{index + 1}</td>
-                          <td className="p-2">{item.schoolCode || "-"}</td>
-                          <td className="p-2 ">{item.schoolName || "-"}</td>
+                          <td className="p-2">{item.schoolCode || "-"}-{item.schoolName || "-"}</td>
                           <td className="p-2">{item.upBoys || "0"}</td>
                           <td className="p-2">{item.upGirls || "0"}</td>
                           <td className="p-2">{item.lpBoys || "0"}</td>
@@ -786,8 +784,7 @@ const DateWiseParticipantList = () => {
                   {/* Category Headers */}
                   <tr>
                     <th rowSpan="2" className="p-2 lg:p-3 align-bottom">Sl No</th>
-                    <th rowSpan="2" className="p-2 lg:p-3 align-bottom">School code</th>
-                    <th rowSpan="2" className="p-2 lg:p-3 align-bottom">School Name</th>
+                    <th rowSpan="2" className="p-2 lg:p-3 align-bottom">School code & Name</th>
                     {/* UP Category */}
                     <th colSpan="2" className="p-2 lg:p-3">
                       <div className="relative font-normal text-xs flex items-center justify-center w-full">
@@ -842,8 +839,7 @@ const DateWiseParticipantList = () => {
                     currentItems.map((item, index) => (
                       <tr key={index} className="hover:bg-gray-100">
                         <td className="p-2 lg:p-3">{index + 1}</td>
-                        <td className="p-2 lg:p-3">{item.schoolCode || "-"}</td>
-                        <td className="p-2 lg:p-3 ">{item.schoolName || "-"}</td>
+                        <td className="p-2 lg:p-3">{item.schoolCode || "-"}-{item.schoolName || "-"}</td>
                         <td className="p-2 lg:p-3">{item.upBoys || "0"}</td>
                         <td className="p-2 lg:p-3">{item.upGirls || "0"}</td>
                         <td className="p-2 lg:p-3">{item.lpBoys || "0"}</td>
@@ -936,8 +932,7 @@ const DateWiseParticipantList = () => {
                     currentItems.map((item, index) => (
                       <tr key={index} className="hover:bg-gray-100">
                         <td className="p-3">{index + 1}</td>
-                        <td className="p-3">{item.schoolCode || "-"}</td>
-                        <td className="p-3 ">{item.schoolName || "-"}</td>
+                        <td className="p-3">{item.schoolCode || "-"}-{item.schoolName || "-"}</td>
                         <td className="p-3">{item.upBoys || "0"}</td>
                         <td className="p-3">{item.upGirls || "0"}</td>
                         <td className="p-3">{item.lpBoys || "0"}</td>

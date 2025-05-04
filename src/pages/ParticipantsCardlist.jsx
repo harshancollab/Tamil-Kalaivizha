@@ -1244,8 +1244,7 @@ const ParticipantsCardList = () => {
                         <th className="p-2 md:p-3">Name</th>
                         <th className="p-2 md:p-3">Item Name</th>
                         <th className="p-2 md:p-3">Class</th>
-                        <th className="p-2 md:p-3">School code</th>
-                        <th className="p-2 md:p-3">School Name</th>
+                        <th className="p-2 md:p-3">School Code & Name</th>
                       </tr>
                     </thead>
                     <tbody className="text-xs sm:text-sm">
@@ -1261,8 +1260,8 @@ const ParticipantsCardList = () => {
                           <td className="p-2 md:p-3">{participant.name}</td>
                           <td className="p-2 md:p-3">{participant.itemcode}-{participant.itemname}</td>
                           <td className="p-2 md:p-3">{participant.class}</td>
-                          <td className="p-2 md:p-3">{participant.schoolCode}</td>
-                          <td className="p-2 md:p-3">{participant.schoolName}</td>
+                          <td className="p-2 md:p-3">{participant.schoolCode}{participant.schoolName}</td>
+                          <td className="p-2 md:p-3"></td>
                         </tr>
                       ))}
                     </tbody>

@@ -765,7 +765,7 @@ const AdminUser = () => {
 
                         <div className="flex flex-col sm:flex-row gap-4 sm:gap-4 sm:justify-end">
                             {shouldShowSubDistrictSelect() && (
-                                <div className="relative w-full sm:w-auto">
+                                <div className="relative w-full sm:w-auto animate-fadeIn transition-all duration-300 transform origin-top">
                                     <select
                                         className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
                                         id="sub-district-select"
@@ -791,7 +791,7 @@ const AdminUser = () => {
                                 </div>
                             )}
                             {shouldShowDistrictSelect() && (
-                                <div className="relative w-full sm:w-auto">
+                                <div className="relative w-full sm:w-auto animate-fadeIn transition-all duration-300 transform origin-top">
                                     <select
                                         className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
                                         value={selectedDistrict}

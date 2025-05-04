@@ -325,8 +325,8 @@ const ClusterSchls = () => {
                   <thead>
                     <tr className="text-gray-700">
                       <th className="p-2 md:p-3">Sl No</th>
-                      <th className="p-2 md:p-3">School Code</th>
-                      <th className="p-2 md:p-3">School Name</th>
+                      
+                      <th className="p-2 md:p-3">School Code & Name</th>
                       <th className="p-2 md:p-3">Data Entered</th>
                       <th className="p-2 md:p-3">Confirmed</th>
                       {/* <th className="p-2 md:p-3">Status</th> */}
@@ -338,8 +338,7 @@ const ClusterSchls = () => {
                       currentItems.map((school) => (
                         <tr key={school.slno} className="hover:bg-gray-200">
                           <td className="p-2 md:p-3">{school.slno}</td>
-                          <td className="p-2 md:p-3">{school.code}</td>
-                          <td className="p-2 md:p-3">{school.name}</td>
+                          <td className="p-2 md:p-3">{school.code} - {school.name}</td>
                           <td className="p-2 md:p-3">{school.dataEntered}</td>
                           <td className="p-2 md:p-3">{school.confirmed}</td>
                           {/* <td className="p-2 text-blue-500 md:p-3">

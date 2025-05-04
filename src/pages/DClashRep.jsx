@@ -536,8 +536,7 @@ const DClashRep = () => {
                           <th className="p-2 md:p-3">Sl No</th>
                           <th className="p-2 md:p-3">Reg No</th>
                           <th className="p-2 md:p-3">Name</th>
-                          <th className="p-2 md:p-3">School code</th>
-                          <th className="p-2 md:p-3">School Name</th>
+                          <th className="p-2 md:p-3">School code & Name</th>
                           <th className="p-2 md:p-3">Sub District</th>
                           <th className="p-2 md:p-3">Clash Items</th>
                         </tr>
@@ -548,8 +547,7 @@ const DClashRep = () => {
                             <td className="p-2 md:p-3">{indexOfFirstItem + index + 1}</td>
                             <td className="p-2 md:p-3">{report.regNo}</td>
                             <td className="p-2 md:p-3">{report.studentName}</td>
-                            <td className="p-2 md:p-3">{report.schoolCode}</td>
-                            <td className="p-2 md:p-3">{report.schoolName}</td>
+                            <td className="p-2 md:p-3">{report.schoolCode}-{report.schoolName}</td>
                             <td className="p-2 md:p-3">{report.subDistrict}</td>
                             <td className="p-2 md:p-3 relative">
                               <span 

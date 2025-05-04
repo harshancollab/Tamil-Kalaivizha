@@ -1468,8 +1468,7 @@ const SPublishDeclarList = () => {
                                                 <thead className="bg-gray-50">
                                                     <tr className="text-gray-700">
                                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
-                                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code</th>
-                                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code & Name</th>
                                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
                                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm"> District</th>
                                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Points</th>
@@ -1479,8 +1478,7 @@ const SPublishDeclarList = () => {
                                                     {filteredSchoolPointsData.map((school, index) => (
                                                         <tr key={index} className="hover:bg-gray-100">
                                                             <td className="p-2 md:p-3 whitespace-nowrap">{school.slNo}</td>
-                                                            <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolCode}</td>
-                                                            <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolName}</td>
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolCode}-{school.schoolName}</td>
                                                             <td className="p-2 md:p-3 whitespace-nowrap">{school.subDistrict}</td>
                                                             <td className="p-2 md:p-3 whitespace-nowrap">{school.district}</td>
                                                             <td className="p-2 md:p-3 whitespace-nowrap">{school.points}</td>

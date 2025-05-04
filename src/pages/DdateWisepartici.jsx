@@ -680,8 +680,7 @@ const DateWiseParticipation = () => {
                     <thead className="text-sm">
                       <tr>
                         <th rowSpan="2" className="p-3 align-bottom">Sl No</th>
-                        <th rowSpan="2" className="p-3 align-bottom">School code</th>
-                        <th rowSpan="2" className="p-3 align-bottom">School Name</th>
+                        <th rowSpan="2" className="p-3 align-bottom">School code & Name</th>
                       
                         {['UP', 'LP', 'HS', 'HSS'].map(category => (
                           <th key={category} colSpan="2" className="p-3">
@@ -717,8 +716,7 @@ const DateWiseParticipation = () => {
                           return (
                             <tr key={index} className="hover:bg-gray-100">
                               <td className="p-3">{indexOfFirstItem + index + 1}</td>
-                              <td className="p-3">{item.schoolCode || "-"}</td>
-                              <td className="p-3">{item.schoolName || "-"}</td>
+                              <td className="p-3">{item.schoolCode || "-"}-{item.schoolName || "-"}</td>
                             
                               <td className="p-3">{item.upBoys || "0"}</td>
                               <td className="p-3">{item.upGirls || "0"}</td>
@@ -750,8 +748,7 @@ const DateWiseParticipation = () => {
                   <thead className="text-sm">
                     <tr>
                       <th rowSpan="2" className="p-3 align-bottom">Sl No</th>
-                      <th rowSpan="2" className="p-3 align-bottom">School code</th>
-                      <th rowSpan="2" className="p-3 align-bottom">School Name</th>
+                      <th rowSpan="2" className="p-3 align-bottom">School code & Name</th>
                      
                       {['UP', 'LP', 'HS', 'HSS'].map(category => (
                         <th key={category} colSpan="2" className="p-3">
@@ -787,8 +784,7 @@ const DateWiseParticipation = () => {
                         return (
                           <tr key={index} className="hover:bg-gray-100">
                             <td className="p-3">{indexOfFirstItem + index + 1}</td>
-                            <td className="p-3">{item.schoolCode || "-"}</td>
-                            <td className="p-3">{item.schoolName || "-"}</td>
+                            <td className="p-3">{item.schoolCode || "-"}-{item.schoolName || "-"}</td>
                            
                             <td className="p-3">{item.upBoys || "0"}</td>
                             <td className="p-3">{item.upGirls || "0"}</td>

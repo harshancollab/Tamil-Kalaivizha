@@ -583,8 +583,7 @@ const generatePDF = () => {
                     <thead className="min-h-screen">
                       <tr className="text-gray-700">
                         <th className="p-2 md:p-3 text-xs sm:text-sm">Sl No</th>
-                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code</th>
-                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code & Name</th>
                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Action</th>
                       </tr>
                     </thead>
@@ -593,8 +592,7 @@ const generatePDF = () => {
                         currentItems.map((school, index) => (
                           <tr key={index} className="hover:bg-gray-100">
                             <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
-                            <td className="p-2 md:p-3 whitespace-nowrap">{school.id}</td>
-                            <td className="p-2 md:p-3 whitespace-nowrap">{school.name}</td>
+                            <td className="p-2 md:p-3 whitespace-nowrap">{school.id}-{school.name}</td>
                             <td className="p-2 md:p-3 whitespace-nowrap">
                               <button
                                 onClick={() => openModal(school)}

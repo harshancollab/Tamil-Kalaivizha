@@ -569,8 +569,7 @@ const ParticipatingSclList = () => {
                     <thead className="text-xs sm:text-sm">
                       <tr className="text-gray-700 ">
                         <th className="p-2 md:p-3">Sl No</th>
-                        <th className="p-2 md:p-3">School Code</th>
-                        <th className="p-2 md:p-3">School Name</th>
+                        <th className="p-2 md:p-3">School Code & Name</th>
                       </tr>
                     </thead>
                     <tbody className="text-xs sm:text-sm">
@@ -578,8 +577,7 @@ const ParticipatingSclList = () => {
                         currentItems.map((item, index) => (
                           <tr key={index} className="hover:bg-gray-100">
                             <td className="p-2 md:p-3">{indexOfFirstItem + index + 1}</td>
-                            <td className="p-2 md:p-3">{item.schoolCode || "-"}</td>
-                            <td className="p-2 md:p-3">{item.schoolName || "-"}</td>
+                            <td className="p-2 md:p-3">{item.schoolCode || "-"}-{item.schoolName || "-"}</td>
                           </tr>
                         ))
                       ) : (

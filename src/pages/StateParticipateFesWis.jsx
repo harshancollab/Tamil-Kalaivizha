@@ -606,8 +606,7 @@ const StateParticipateFesWis = () => {
                                                 <th className="p-2 md:p-3">Name</th>
                                                 <th className="p-2 md:p-3">Gender</th>
                                                 <th className="p-2 md:p-3">Class</th>
-                                                <th className="p-2 md:p-3">School code</th>
-                                                <th className="p-2 md:p-3">School Name</th>
+                                                <th className="p-2 md:p-3">School code & Name</th>
                                             </tr>
                                         </thead>
                                         <tbody className="text-xs sm:text-sm">
@@ -619,8 +618,7 @@ const StateParticipateFesWis = () => {
                                                         <td className="p-2 md:p-3">{item.name || "-"}</td>
                                                         <td className="p-2 md:p-3">{item.gender || "-"}</td>
                                                         <td className="p-2 md:p-3">{item.class || "-"}</td>
-                                                        <td className="p-2 md:p-3">{item.schoolCode || "-"}</td>
-                                                        <td className="p-2 md:p-3">{item.schoolName || "-"}</td>
+                                                        <td className="p-2 md:p-3">{item.schoolCode || "-"}-{item.schoolName || "-"}</td>
                                                     </tr>
                                                 ))
                                             ) : (

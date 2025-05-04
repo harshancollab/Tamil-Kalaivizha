@@ -673,8 +673,7 @@ const DPublishdeclare = () => {
                                                     <thead className="bg-gray-50">
                                                         <tr className="text-gray-700">
                                                             <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
-                                                            <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code</th>
-                                                            <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                                                            <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code & Name</th>
                                                             <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub district</th>
                                                             <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Point</th>
                                                         </tr>
@@ -684,8 +683,7 @@ const DPublishdeclare = () => {
                                                             paginatedData.map((school, index) => (
                                                                 <tr key={index} className="hover:bg-gray-100">
                                                                     <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
-                                                                    <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolCode}</td>
-                                                                    <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolName}</td>
+                                                                    <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolCode}-{school.schoolName}</td>
                                                                     <td className="p-2 md:p-3 whitespace-nowrap">{school.sub}</td>
                                                                     <td className="p-2 md:p-3 whitespace-nowrap">{school.point.toFixed(1)}</td>
                                                                 </tr>

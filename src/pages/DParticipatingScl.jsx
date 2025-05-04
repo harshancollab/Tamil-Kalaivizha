@@ -9,8 +9,8 @@ import html2pdf from 'html2pdf.js';
 const DParticipatingScl = () => {
   // Dummy data for development and fallback - Added subDistrict field to all entries
   const dummyData = [
-    { itemCodeName: "301", schoolCode: "001", schoolName: "Government UP School Thiruvananthapuram", subDistrict: "Pattambi" },
-    { itemCodeName: "304", schoolCode: "002", schoolName: "St. Mary's LP School Kochi", subDistrict: "Chittur" },
+    { itemCodeName: "301", schoolCode: "001", schoolName: "GUP School Thiruvananthapuram", subDistrict: "Pattambi" },
+    { itemCodeName: "304", schoolCode: "002", schoolName: " Mary's LP School Kochi", subDistrict: "Chittur" },
     { itemCodeName: "401", schoolCode: "003", schoolName: "Model HS Kozhikode", subDistrict: "Munnar" },
     { itemCodeName: "501", schoolCode: "S004", schoolName: "Sacred Heart HSS Thrissur", subDistrict: "Adimali" },
     { itemCodeName: "503", schoolCode: "005", schoolName: "Govt. UP School Kollam", subDistrict: "Kattappana" },
@@ -411,8 +411,7 @@ const DParticipatingScl = () => {
                     <thead className="text-xs sm:text-sm">
                       <tr className="text-gray-700">
                         <th className="p-2 md:p-3">Sl No</th>
-                        <th className="p-2 md:p-3">School Code</th>
-                        <th className="p-2 md:p-3">School Name</th>
+                        <th className="p-2 md:p-3">School Code & Name</th>
                
                       </tr>
                     </thead>
@@ -421,8 +420,7 @@ const DParticipatingScl = () => {
                         currentItems.map((item, index) => (
                           <tr key={index} className="hover:bg-gray-100">
                             <td className="p-2 md:p-3">{indexOfFirstItem + index + 1}</td>
-                            <td className="p-2 md:p-3">{item.schoolCode || "-"}</td>
-                            <td className="p-2 md:p-3">{item.schoolName || "-"}</td>
+                            <td className="p-2 md:p-3">{item.schoolCode || "-"}-{item.schoolName || "-"}</td>
                           
                           </tr>
                         ))

@@ -515,6 +515,10 @@ const DPubl = () => {
         return pageNumbers;
     };
 
+    // Determine whether to show the search bar
+    // Modified to show search bar when allResultType is 'All Result'
+    const shouldShowSearchBar = !(selectedFestival === 'Status View' && allResultType !== 'All Result');
+
     return (
         <>
             <Header />
@@ -601,8 +605,8 @@ const DPubl = () => {
                         </div>
                     </div>
 
-                    {/* Search Bar */}
-                    {selectedFestival !== 'Status View' && (
+                    {/* Search Bar - Modified condition to show search bar when allResultType is 'All Result' */}
+                    {shouldShowSearchBar && (
                         <div className="relative flex mt-2 items-center w-full sm:w-64 h-9 border border-blue-800 rounded-full px-4">
                             <input
                                 type="text"
@@ -652,8 +656,7 @@ const DPubl = () => {
                                                 <thead className="bg-gray-50">
                                                     <tr className="text-gray-700">
                                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
-                                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code</th>
-                                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code & Name</th>
                                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
                                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Points</th>
                                                     </tr>
@@ -662,8 +665,7 @@ const DPubl = () => {
                                                     {filteredSchoolPointsData.map((school, index) => (
                                                         <tr key={index} className="hover:bg-gray-100">
                                                             <td className="p-2 md:p-3 whitespace-nowrap">{school.slNo}</td>
-                                                            <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolCode}</td>
-                                                            <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolName}</td>
+                                                            <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolCode}-{school.schoolName}</td>
                                                             <td className="p-2 md:p-3 whitespace-nowrap">{school.subDistrict}</td>
                                                             <td className="p-2 md:p-3 whitespace-nowrap">{school.points}</td>
                                                         </tr>
