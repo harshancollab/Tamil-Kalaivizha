@@ -474,7 +474,7 @@ const Higherlvlcomp = () => {
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Item Code & Item Name</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Name of Participant</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Class</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code & Name</th>
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
@@ -485,7 +485,7 @@ const Higherlvlcomp = () => {
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.itemCode} - {result.itemName}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.participantName}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.class}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.schoolName}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">3001-{result.schoolName}</td>
                                                     </tr>
                                                 ))
                                             ) : (

@@ -105,17 +105,7 @@ const Dash = () => {
 
         {/* Scrollable content area with hidden scrollbar */}
         <div className="flex-1 overflow-y-auto p-4 pt-0 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          <style jsx>{`
-            /* Hide scrollbar for Chrome, Safari and Opera */
-            .scrollbar-hide::-webkit-scrollbar {
-              display: none;
-            }
-            /* Hide scrollbar for IE, Edge and Firefox */
-            .scrollbar-hide {
-              -ms-overflow-style: none;  /* IE and Edge */
-              scrollbar-width: none;  /* Firefox */
-            }
-          `}</style>
+       
 
           {/* Only show admin options to sub district admin users */}
           {user?.role === 'sub district admin' && (
@@ -499,7 +489,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('resultsReport')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <i class="fas fa-paper-plane mr-4  "></i> Result Report
+                    <i className="fas fa-paper-plane mr-4  "></i> Result Report
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.resultsReport ? 'up' : 'down'} text-sm`}
@@ -571,7 +561,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('certificate')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <i class="fa-solid fa-file-circle-plus mr-4"></i>
+                    <i className="fa-solid fa-file-circle-plus mr-4"></i>
 
 
                     Certificate
@@ -637,7 +627,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('Export')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <i class="fas fa-arrow-up-right-from-square mr-4"></i>Export
+                    <i className="fas fa-arrow-up-right-from-square mr-4"></i>Export
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.Export ? 'up' : 'down'} text-sm`}
@@ -747,7 +737,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('stageSettings')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <i class="fa-solid fa-microphone mr-5"></i> Stage Settings
+                    <i className="fa-solid fa-microphone mr-5"></i> Stage Settings
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.stageSettings ? 'up' : 'down'} text-sm`}
@@ -1039,7 +1029,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('resultsReport')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <i class="fas fa-paper-plane mr-4  "></i> Result Report
+                    <i className="fas fa-paper-plane mr-4  "></i> Result Report
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.resultsReport ? 'up' : 'down'} text-sm`}
@@ -1111,7 +1101,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('certificate')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <i class="fa-solid fa-file-circle-plus mr-4"></i>
+                    <i className="fa-solid fa-file-circle-plus mr-4"></i>
 
 
                     Certificate
@@ -1177,7 +1167,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('Export')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <i class="fas fa-arrow-up-right-from-square mr-4"></i>Export
+                    <i className="fas fa-arrow-up-right-from-square mr-4"></i>Export
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.Export ? 'up' : 'down'} text-sm`}
@@ -1287,7 +1277,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('stageSettings')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <i class="fa-solid fa-microphone mr-5"></i> Stage Settings
+                    <i className="fa-solid fa-microphone mr-5"></i> Stage Settings
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.stageSettings ? 'up' : 'down'} text-sm`}
@@ -1579,7 +1569,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('resultsReport')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <i class="fas fa-paper-plane mr-4  "></i> Result Report
+                    <i className="fas fa-paper-plane mr-4  "></i> Result Report
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.resultsReport ? 'up' : 'down'} text-sm`}
@@ -1651,7 +1641,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('certificate')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <i class="fa-solid fa-file-circle-plus mr-4"></i>
+                    <i className="fa-solid fa-file-circle-plus mr-4"></i>
 
 
                     Certificate
@@ -1717,7 +1707,7 @@ const Dash = () => {
                   onClick={() => toggleMenu('Export')}
                 >
                   <h2 className="text-lg font-semibold flex items-center">
-                    <i class="fas fa-arrow-up-right-from-square mr-4"></i>Export
+                    <i className="fas fa-arrow-up-right-from-square mr-4"></i>Export
                   </h2>
                   <i
                     className={`fa-solid fa-chevron-${openMenus.Export ? 'up' : 'down'} text-sm`}

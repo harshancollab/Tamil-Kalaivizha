@@ -274,7 +274,7 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Code No</th>
                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Name</th>
                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Class</th>
-                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School code & Name</th>
                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade</th>
                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Point</th>
@@ -290,7 +290,7 @@ const DeclaredResult = ({ searchTerm, selectedFestival, printRef }) => {
                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.codeNo}</td>
                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.name}</td>
                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.className}</td>
-                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.schoolName}</td>
+                                        <td className="p-2 md:p-3 whitespace-nowrap">4003-{result.schoolName}</td>
                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.subDistrict}</td>
                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.point}</td>

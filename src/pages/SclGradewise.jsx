@@ -439,7 +439,7 @@ if (selectedGrade === "All Grade") {
                                             <tr className="text-gray-700">
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Name of Participants</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code & Name</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Item</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Points</th>
                                                
@@ -451,7 +451,7 @@ if (selectedGrade === "All Grade") {
                                                     <tr key={result.slNo} className="hover:bg-gray-100">
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.slNo}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.participantName}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.schoolName}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">4001-{result.schoolName}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.item}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.points}</td>
                                                         

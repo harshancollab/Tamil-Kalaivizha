@@ -582,7 +582,7 @@ const SItemwisePoint = () => {
                               <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">District</th>
                             </>
                           )}
-                          <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Student Name</th>
+                          <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Student Code & Name</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Point</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Total Point</th>
@@ -618,7 +618,7 @@ const SItemwisePoint = () => {
                               {/* Only show school and sub district columns when not filtering by school code */}
                               {showSchoolColumn && (
                                 <>
-                                  <td className="p-2 md:p-3 whitespace-nowrap">{result.school}</td>
+                                  <td className="p-2 md:p-3 whitespace-nowrap">{result.SchoolCode}-{result.school}</td>
                                   <td className="p-2 md:p-3 whitespace-nowrap">{result.sub || "-"}</td>
                                   <td className="p-2 md:p-3 whitespace-nowrap">{result.district|| "-"}</td>
                                 </>

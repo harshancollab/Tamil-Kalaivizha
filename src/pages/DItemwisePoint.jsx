@@ -574,7 +574,7 @@ const DItemwisePoint = () => {
                           {/* Only show school and sub district columns when not filtering by school code */}
                           {showSchoolColumn && (
                             <>
-                              <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School</th>
+                              <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code & Name</th>
                               <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
                             </>
                           )}
@@ -614,7 +614,7 @@ const DItemwisePoint = () => {
                               {/* Only show school and sub district columns when not filtering by school code */}
                               {showSchoolColumn && (
                                 <>
-                                  <td className="p-2 md:p-3 whitespace-nowrap">{result.school}</td>
+                                  <td className="p-2 md:p-3 whitespace-nowrap">3001-{result.school}</td>
                                   <td className="p-2 md:p-3 whitespace-nowrap">{result.sub || "-"}</td>
                                 </>
                               )}

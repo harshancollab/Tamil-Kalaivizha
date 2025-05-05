@@ -2,19 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 
-const CertificateGenerator = () => {
-
+const CertificateTempt = () => {
   const [design, setDesign] = useState({
     pageStyle: 'landscape',
-    width: 297,  // Default A4 landscape width in mm
-    height: 210, // Default A4 landscape height in mm
+    width: 297,  
+    height: 210,
     margins: {
       top: 20,
       right: 20,
       bottom: 20,
       left: 20
     },
-    certificateType: 'participation', // Default certificate type
+    certificateType: 'participation', 
     title: {
       text: 'Certificate for participate',
       x: 96,
@@ -58,9 +57,7 @@ const CertificateGenerator = () => {
       font: 'Times',
       size: 12
     },
-    festName: 'Tamil Kalaivizha',
-    background: null,
-    logo: null
+    festName: 'Tamil Kalaivizha'
   });
 
   // Certificate data for preview
@@ -74,6 +71,7 @@ const CertificateGenerator = () => {
   });
 
   const canvasRef = useRef(null);
+  const containerRef = useRef(null);
 
   // Function to update design element
   const updateDesignElement = (element, property, value) => {
@@ -105,9 +103,24 @@ const CertificateGenerator = () => {
     }));
   };
 
+  // Function to handle window resize
+  const handleResize = () => {
+    if (canvasRef.current && containerRef.current) {
+      renderPreview();
+    }
+  };
+
+  // Add resize event listener
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   // Generate PDF preview on canvas
   useEffect(() => {
-    if (canvasRef.current) {
+    if (canvasRef.current && containerRef.current) {
       renderPreview();
     }
   }, [design, certificateData]);
@@ -115,52 +128,46 @@ const CertificateGenerator = () => {
   // Preview rendering function
   const renderPreview = () => {
     const canvas = canvasRef.current;
+    const container = containerRef.current;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Set canvas size based on design width and height, while maintaining proportions
-    const maxPreviewWidth = 800;
-    const maxPreviewHeight = 600;
+    // Set canvas size based on container size and design aspect ratio
+    const containerWidth = container.clientWidth;
+    const containerHeight = container.clientHeight || 500; // Default height if not set by container
     
-    let previewWidth, previewHeight;
+    const designAspectRatio = design.width / design.height;
+    let canvasWidth, canvasHeight;
     
-    if (design.width / design.height > maxPreviewWidth / maxPreviewHeight) {
-      // Width limited
-      previewWidth = maxPreviewWidth;
-      previewHeight = (design.height / design.width) * maxPreviewWidth;
+    // Make canvas fit within container while maintaining aspect ratio
+    if (containerWidth / containerHeight > designAspectRatio) {
+      // Container is wider than needed
+      canvasHeight = Math.min(containerHeight, 600); // Cap at 600px height
+      canvasWidth = canvasHeight * designAspectRatio;
     } else {
-      // Height limited
-      previewHeight = maxPreviewHeight;
-      previewWidth = (design.width / design.height) * maxPreviewHeight;
+      // Container is taller than needed
+      canvasWidth = containerWidth;
+      canvasHeight = canvasWidth / designAspectRatio;
     }
     
-    canvas.width = previewWidth;
-    canvas.height = previewHeight;
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
     
-    // Draw background if exists
-    if (design.background) {
-      const img = new Image();
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        drawCertificateContent(ctx, canvas);
-      };
-      img.src = design.background;
-    } else {
-      // Draw border with margins
-      const scaleX = canvas.width / design.width;
-      const scaleY = canvas.height / design.height;
-      
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 5;
-      ctx.strokeRect(
-        design.margins.left * scaleX,
-        design.margins.top * scaleY,
-        canvas.width - (design.margins.left + design.margins.right) * scaleX,
-        canvas.height - (design.margins.top + design.margins.bottom) * scaleY
-      );
-      
-      drawCertificateContent(ctx, canvas);
-    }
+    // Draw certificate content
+    const scaleX = canvas.width / design.width;
+    const scaleY = canvas.height / design.height;
+    
+    // Draw border with margins
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 5;
+    ctx.strokeRect(
+      design.margins.left * scaleX,
+      design.margins.top * scaleY,
+      canvas.width - (design.margins.left + design.margins.right) * scaleX,
+      canvas.height - (design.margins.top + design.margins.bottom) * scaleY
+    );
+    
+    drawCertificateContent(ctx, canvas);
   };
 
   // Draw certificate content on canvas
@@ -171,7 +178,7 @@ const CertificateGenerator = () => {
     // Apply certificate type-specific styling
     let titleText = design.title.text;
     if (design.certificateType === 'Allparticipation') {
-      titleText = 'Certificate of Allparticipation';
+      titleText = 'Certificate of Participation';
     } else if (design.certificateType === 'A Grade') {
       titleText = 'Certificate of A Grade';
     } else if (design.certificateType === 'A Grade & B Grade') {
@@ -205,15 +212,24 @@ const CertificateGenerator = () => {
     ctx.fillText(`Class: ${certificateData.class}`, canvas.width / 2, design.class.y * scaleY);
     ctx.fillText(`School: ${certificateData.school}`, canvas.width / 2, design.school.y * scaleY);
     
-    // Draw logo if exists
-    if (design.logo) {
-      const img = new Image();
-      img.onload = () => {
-        const logoSize = 60 * scaleY;
-        ctx.drawImage(img, 40 * scaleX, 40 * scaleY, logoSize, logoSize);
-      };
-      img.src = design.logo;
-    }
+    // Draw signature lines
+    const signatureY = canvas.height - (design.margins.bottom * scaleY) - (20 * scaleY);
+    const leftSigX = design.margins.left * scaleX + (30 * scaleX);
+    const rightSigX = canvas.width - (design.margins.right * scaleX) - (30 * scaleX);
+    
+    ctx.beginPath();
+    ctx.moveTo(leftSigX, signatureY);
+    ctx.lineTo(leftSigX + (50 * scaleX), signatureY);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(rightSigX - (50 * scaleX), signatureY);
+    ctx.lineTo(rightSigX, signatureY);
+    ctx.stroke();
+    
+    ctx.font = `${10 * scaleY}px ${design.item.font}`;
+    ctx.fillText('Principal', leftSigX + (25 * scaleX), signatureY + (10 * scaleY));
+    ctx.fillText('Director', rightSigX - (25 * scaleX), signatureY + (10 * scaleY));
   };
 
   // Generate PDF function
@@ -225,29 +241,19 @@ const CertificateGenerator = () => {
       format: [design.width, design.height]
     });
 
-    // Add background if exists
-    if (design.background) {
-      doc.addImage(design.background, 'JPEG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
-    } else {
-      // Add border with margins
-      doc.setLineWidth(0.5);
-      doc.rect(
-        design.margins.left,
-        design.margins.top,
-        doc.internal.pageSize.getWidth() - (design.margins.left + design.margins.right),
-        doc.internal.pageSize.getHeight() - (design.margins.top + design.margins.bottom)
-      );
-    }
-    
-    // Add logo if exists
-    if (design.logo) {
-      doc.addImage(design.logo, 'PNG', design.margins.left + 10, design.margins.top + 10, 25, 25);
-    }
+    // Add border with margins
+    doc.setLineWidth(0.5);
+    doc.rect(
+      design.margins.left,
+      design.margins.top,
+      doc.internal.pageSize.getWidth() - (design.margins.left + design.margins.right),
+      doc.internal.pageSize.getHeight() - (design.margins.top + design.margins.bottom)
+    );
     
     // Get certificate title based on type
     let titleText = design.title.text;
     if (design.certificateType === 'Allparticipation') {
-      titleText = 'Certificate of Allparticipation';
+      titleText = 'Certificate of Participation';
     } else if (design.certificateType === 'A Grade') {
       titleText = 'Certificate of A Grade';
     } else if (design.certificateType === 'A Grade & B Grade') {
@@ -276,7 +282,6 @@ const CertificateGenerator = () => {
     doc.setFont(design.item.font, 'normal');
     
     doc.text(`Event: ${certificateData.item}`, doc.internal.pageSize.getWidth() / 2, design.item.y, { align: 'center' });
-   
     doc.text(`Grade: ${certificateData.grade}`, doc.internal.pageSize.getWidth() / 2, design.grade.y, { align: 'center' });
     doc.text(`Class: ${certificateData.class}`, doc.internal.pageSize.getWidth() / 2, design.class.y, { align: 'center' });
     doc.text(`School: ${certificateData.school}`, doc.internal.pageSize.getWidth() / 2, design.school.y, { align: 'center' });
@@ -291,30 +296,6 @@ const CertificateGenerator = () => {
     
     // Save the PDF
     doc.save(`${certificateData.studentName}-certificate.pdf`);
-  };
-
-  // Handle file upload for background image
-  const handleBackgroundUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        updateBasicDesign('background', event.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // Handle file upload for logo
-  const handleLogoUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        updateBasicDesign('logo', event.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   // Generate bulk certificates
@@ -332,7 +313,7 @@ const CertificateGenerator = () => {
     // Get certificate title based on type
     let titleText = design.title.text;
     if (design.certificateType === 'Allparticipation') {
-      titleText = 'Certificate of Allparticipation';
+      titleText = 'Certificate of Participation';
     } else if (design.certificateType === 'A Grade') {
       titleText = 'Certificate of A Grade';
     } else if (design.certificateType === 'A Grade & B Grade') {
@@ -343,30 +324,19 @@ const CertificateGenerator = () => {
       titleText = 'Certificate of Excellence';
     }
    
-    
     students.forEach((student, index) => {
       if (index > 0) {
         doc.addPage();
       }
       
-      // Add background if exists
-      if (design.background) {
-        doc.addImage(design.background, 'JPEG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
-      } else {
-        // Add border with margins
-        doc.setLineWidth(0.5);
-        doc.rect(
-          design.margins.left,
-          design.margins.top,
-          doc.internal.pageSize.getWidth() - (design.margins.left + design.margins.right),
-          doc.internal.pageSize.getHeight() - (design.margins.top + design.margins.bottom)
-        );
-      }
-      
-      // Add logo if exists
-      if (design.logo) {
-        doc.addImage(design.logo, 'PNG', design.margins.left + 10, design.margins.top + 10, 25, 25);
-      }
+      // Add border with margins
+      doc.setLineWidth(0.5);
+      doc.rect(
+        design.margins.left,
+        design.margins.top,
+        doc.internal.pageSize.getWidth() - (design.margins.left + design.margins.right),
+        doc.internal.pageSize.getHeight() - (design.margins.top + design.margins.bottom)
+      );
       
       // Add fest name
       doc.setFont(design.title.font, 'bold');
@@ -386,7 +356,6 @@ const CertificateGenerator = () => {
       doc.setFont(design.item.font, 'normal');
       
       doc.text(`Event: ${student.item}`, doc.internal.pageSize.getWidth() / 2, design.item.y, { align: 'center' });
-     
       doc.text(`Grade: ${student.grade}`, doc.internal.pageSize.getWidth() / 2, design.grade.y, { align: 'center' });
       doc.text(`Class: ${student.class}`, doc.internal.pageSize.getWidth() / 2, design.class.y, { align: 'center' });
       doc.text(`School: ${student.school}`, doc.internal.pageSize.getWidth() / 2, design.school.y, { align: 'center' });
@@ -409,11 +378,6 @@ const CertificateGenerator = () => {
     // Here you would make an API call to save the design
     console.log('Saving template:', design);
     alert('Template saved successfully!');
-    
-    // Example API call
-    // axios.post('/api/certificate-templates', design)
-    //   .then(response => alert('Template saved successfully!'))
-    //   .catch(error => console.error('Error saving template:', error));
   };
 
   // Handle preset paper sizes
@@ -470,11 +434,11 @@ const CertificateGenerator = () => {
   };
 
   return (
-    <div className="certificate-generator">
-      <h2>Certificate Template Designer</h2>
+    <div className="certificate-generator max-w-7xl mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-6 text-center">Certificate Template Designer</h2>
       
-      <div className="flex flex-row gap-4">
-        <div className="design-panel w-1/3 bg-gray-100 p-4 rounded">
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="design-panel w-full lg:w-1/3 bg-gray-100 p-4 rounded shadow-md">
           <h3 className="text-lg font-bold mb-4">Design Settings</h3>
           
           <div className="mb-4">
@@ -495,11 +459,10 @@ const CertificateGenerator = () => {
               className="w-full p-2 border rounded"
             >
               <option value="Allparticipation">All Participation</option>
-              <option value="A Grade">A Grade </option>
+              <option value="A Grade">A Grade</option>
               <option value="A Grade & B Grade">A Grade & B Grade</option>
               <option value="appreciation">Appreciation</option>
               <option value="excellence">Excellence</option>
-              
             </select>
           </div>
           
@@ -516,7 +479,7 @@ const CertificateGenerator = () => {
             </select>
             
             <div className="flex gap-2 mt-2">
-              <div>
+              <div className="w-1/2">
                 <label className="block text-sm">Width (mm):</label>
                 <input 
                   type="number" 
@@ -525,7 +488,7 @@ const CertificateGenerator = () => {
                   className="w-full p-2 border rounded"
                 />
               </div>
-              <div>
+              <div className="w-1/2">
                 <label className="block text-sm">Height (mm):</label>
                 <input 
                   type="number" 
@@ -601,7 +564,7 @@ const CertificateGenerator = () => {
                 className="w-full p-2 border rounded mb-2"
               />
             )}
-            <div className="flex gap-2">
+            <div className="grid grid-cols-3 gap-2">
               <div>
                 <label className="block text-sm">X Position:</label>
                 <input 
@@ -634,7 +597,7 @@ const CertificateGenerator = () => {
           
           <div className="mb-4">
             <label className="block mb-2">Name Position:</label>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-3 gap-2">
               <div>
                 <label className="block text-sm">X Position:</label>
                 <input 
@@ -665,26 +628,6 @@ const CertificateGenerator = () => {
             </div>
           </div>
           
-          <div className="mb-4">
-            <label className="block mb-2">Background Image:</label>
-            <input 
-              type="file" 
-              accept="image/*" 
-              onChange={handleBackgroundUpload}
-              className="w-full p-2 border rounded"
-            />
-          </div>
-          
-          <div className="mb-4">
-            <label className="block mb-2">Logo:</label>
-            <input 
-              type="file" 
-              accept="image/*" 
-              onChange={handleLogoUpload}
-              className="w-full p-2 border rounded"
-            />
-          </div>
-          
           <div className="flex gap-2 mt-4">
             <button 
               onClick={saveTemplate}
@@ -699,21 +642,23 @@ const CertificateGenerator = () => {
               Generate PDF
             </button>
           </div>
-      
         </div>
         
-        <div className="preview-panel w-2/3">
+        <div className="preview-panel w-full lg:w-2/3">
           <h3 className="text-lg font-bold mb-4">Certificate Preview</h3>
-          <div className="canvas-container border rounded p-2 bg-white">
+          <div 
+            ref={containerRef} 
+            className="canvas-container border rounded p-2 bg-white h-96 flex items-center justify-center shadow-md"
+          >
             <canvas 
               ref={canvasRef} 
-              className="w-full"
+              className="max-w-full max-h-full"
             />
           </div>
           
           <div className="mt-4">
             <h3 className="text-lg font-bold mb-2">Test Certificate Data</h3>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block mb-1">Student Name:</label>
                 <input 
@@ -732,7 +677,6 @@ const CertificateGenerator = () => {
                   className="w-full p-2 border rounded"
                 />
               </div>
-            
               <div>
                 <label className="block mb-1">Grade:</label>
                 <input 
@@ -751,7 +695,7 @@ const CertificateGenerator = () => {
                   className="w-full p-2 border rounded"
                 />
               </div>
-              <div>
+              <div className="md:col-span-2">
                 <label className="block mb-1">School:</label>
                 <input 
                   type="text" 
@@ -768,4 +712,6 @@ const CertificateGenerator = () => {
   );
 };
 
-export default CertificateGenerator;
+export default CertificateTempt;
+
+

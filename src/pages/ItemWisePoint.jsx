@@ -572,7 +572,7 @@ const ItemWisePoint = () => {
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Item Code & Item Name</th>
                           {/* Only show school column when not filtering by school code */}
                           {showSchoolColumn && (
-                            <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School</th>
+                            <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code & Name</th>
                           )}
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Student Name</th>
                           <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade</th>
@@ -609,7 +609,7 @@ const ItemWisePoint = () => {
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.itemCode}</td>
                               {/* Only show school column when not filtering by school code */}
                               {showSchoolColumn && (
-                                <td className="p-2 md:p-3 whitespace-nowrap">{result.school}</td>
+                                <td className="p-2 md:p-3 whitespace-nowrap">{result.SchoolCode}-{result.school}</td>
                               )}
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.studentName}</td>
                               <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>

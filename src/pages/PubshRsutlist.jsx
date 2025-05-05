@@ -1337,8 +1337,7 @@ const PublishResultList = () => {
                                                     <thead className="bg-gray-50">
                                                         <tr className="text-gray-700">
                                                             <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
-                                                            <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code</th>
-                                                            <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                                                            <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Code & Name</th>
                                                             <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Point</th>
                                                         </tr>
                                                     </thead>
@@ -1347,8 +1346,7 @@ const PublishResultList = () => {
                                                             paginatedData.map((school, index) => (
                                                                 <tr key={index} className="hover:bg-gray-100">
                                                                     <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
-                                                                    <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolCode}</td>
-                                                                    <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolName}</td>
+                                                                    <td className="p-2 md:p-3 whitespace-nowrap">{school.schoolCode}-{school.schoolName}</td>
                                                                     <td className="p-2 md:p-3 whitespace-nowrap">{school.point.toFixed(1)}</td>
                                                                 </tr>
                                                             ))
@@ -1378,7 +1376,7 @@ const PublishResultList = () => {
                                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Code No</th>
                                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Name</th>
                                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">No of partcipate</th>
-                                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School name</th>
+                                                        <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School code & name</th>
                                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Grade</th>
                                                         <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Point</th>
                                                     </tr>
@@ -1393,7 +1391,7 @@ const PublishResultList = () => {
                                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.codeNo}</td>
                                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.name}</td>
                                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.noOfParticipate}</td>
-                                                                <td className="p-2 md:p-3 whitespace-nowrap">{result.schoolName}</td>
+                                                                <td className="p-2 md:p-3 whitespace-nowrap">6002-{result.schoolName}</td>
                                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.grade}</td>
                                                                 <td className="p-2 md:p-3 whitespace-nowrap">{result.point}</td>
                                                             </tr>

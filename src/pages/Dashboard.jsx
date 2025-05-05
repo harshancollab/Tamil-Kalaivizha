@@ -164,6 +164,36 @@ const Dashboard = () => {
               </div>
             </div>
 
+{/* 
+<div className="flex flex-col space-y-4 w-full md:w-auto">
+  <div className="text-gray-700">
+    <p className="font-semibold flex items-center">
+      <i className="fa-solid fa-user mr-2"></i> SHINTO MON
+      <a
+        href="tel:YOUR_CHAIRMAN_PHONE_NUMBER" // Replace with the actual phone number
+        className="ml-2 text-blue-500"
+        onClick={(e) => e.stopPropagation()} // Prevent potential parent click handlers
+      >
+        <i className="fa-solid fa-phone"></i>
+      </a>
+    </p>
+    <p className="text-sm ml-5">Chairman</p>
+  </div>
+  <div className="text-gray-700">
+    <p className="font-semibold flex items-center">
+      <i className="fa-solid fa-user mr-2"></i> SELVIN R
+      <a
+        href="tel:87781156177" // Replace with the actual phone number
+        className="ml-2 text-blue-500"
+        onClick={(e) => e.stopPropagation()} // Prevent potential parent click handlers
+      >
+        <i className="fa-solid fa-phone"></i>
+      </a>
+    </p>
+    <p className="text-sm ml-5">Headmaster</p>
+  </div>
+</div> */}
+
             <div className="w-full md:w-auto">
               {/* New section for Boys and Girls count */}
               <div className="flex items-center gap-4 mb-3">

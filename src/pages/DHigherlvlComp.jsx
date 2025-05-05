@@ -522,7 +522,7 @@ const DHigherlvlComp = () => {
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Item Code & Item Name</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Name of Participant</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Class</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">School Name</th>
+                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">SchoolCode & Name</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sub District</th>
                                             </tr>
                                         </thead>
@@ -534,7 +534,7 @@ const DHigherlvlComp = () => {
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.itemCode} - {result.itemName}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.participantName}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.class}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.schoolName}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.itemCode}-{result.schoolName}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{result.subDistrict}</td>
                                                     </tr>
                                                 ))
