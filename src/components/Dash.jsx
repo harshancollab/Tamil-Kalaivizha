@@ -87,7 +87,7 @@ const Dash = () => {
         {/* Sidebar header - fixed at top */}
         <div className="p-4 ml-2">
           {/* Show dashboard link only for non-IT Admin users */}
-          {user?.role !== 'It Admin' && (
+          {user?.role !== 'admin' && (
             <div className={`flex justify-between items-center w-full mb-2  ${isActive('/') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-1 rounded' : ''}`}>
               <Link to="/" className="text-lg font-semibold flex items-center cursor-pointer">
                 <i className="fa-solid fa-table mr-3" aria-hidden="true"></i> Dashboard
@@ -108,7 +108,7 @@ const Dash = () => {
        
 
           {/* Only show admin options to sub district admin users */}
-          {user?.role === 'sub district admin' && (
+          {user?.role === 'subadmin' && (
             <>
               {/* Settings Menu */}
               <div className="mb-4">
@@ -665,7 +665,7 @@ const Dash = () => {
               </div>
             </>
           )}
-          {user?.role === 'district admin' && (
+          {user?.role === 'districtAdmin' && (
             <>
               {/* Settings Menu */}
               <div className="mb-4">
@@ -1205,7 +1205,7 @@ const Dash = () => {
               </div>
             </>
           )}
-          {user?.role === 'state admin' && (
+          {user?.role === 'stateAdmin' && (
             <>
               {/* Settings Menu */}
               <div className="mb-4">
@@ -1747,7 +1747,7 @@ const Dash = () => {
           )}
 
           {/* IT Admin Panel - Completely separate UI */}
-          {user?.role === 'It Admin' && (
+          {user?.role === 'admin' && (
             <div className="p-2">
               {/* IT Admin Dashboard */}
               <div className={`flex justify-between items-center w-full mb-6 ${isActive('/DistrictList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>

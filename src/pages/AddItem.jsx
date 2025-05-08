@@ -24,8 +24,8 @@ const AddItem = () => {
 
 
     const [formData, setFormData] = useState({
-        festivalName: '',      
-        fromClass: '',         
+        itemCode: '',           // Changed from festivalName for clarity
+        itemName: '',          // Changed from fromClass for clarity
         festival: '',          
         itemType: '',          
         maxStudents: '',    
@@ -35,8 +35,8 @@ const AddItem = () => {
     });
 
     const [errors, setErrors] = useState({
-        festivalName: '',
-        fromClass: '',
+        itemCode: '',           // Changed from festivalName
+        itemName: '',           // Changed from fromClass
         festival: '',
         itemType: '',
         maxStudents: '',
@@ -110,12 +110,12 @@ const AddItem = () => {
 
     const validateField = (name, value) => {
         switch (name) {
-            case 'festivalName':
+            case 'itemCode':  // Changed from festivalName
                 if (!value.trim()) return 'Item code is required';
                 if (value.trim().length < 3) return 'Item code must be at least 3 characters long';
                 return '';
 
-            case 'fromClass':
+            case 'itemName':  // Changed from fromClass
                 if (!value.trim()) return 'Item name is required';
                 return '';
 
@@ -149,7 +149,7 @@ const AddItem = () => {
         const newErrors = {};
         let isValid = true;
         
-        const fieldsToValidate = ['festivalName', 'fromClass', 'festival', 'itemType', 'maxStudents', 'duration', 'stageType'];
+        const fieldsToValidate = ['itemCode', 'itemName', 'festival', 'itemType', 'maxStudents', 'duration', 'stageType'];
         
         fieldsToValidate.forEach(key => {
             const error = validateField(key, formData[key]);
@@ -235,8 +235,8 @@ const AddItem = () => {
                         alert('Item added successfully!');
 
                         setFormData({
-                            festivalName: '',
-                            fromClass: '',
+                            itemCode: '',
+                            itemName: '',
                             festival: '',
                             itemType: '',
                             maxStudents: '',
@@ -274,7 +274,7 @@ const AddItem = () => {
                     <Dash />
                     <div className="flex-1 p-2 sm:p-4 bg-gray-300">
                         <div className="bg-gray-50 p-3 sm:p-6 pt-4 min-h-screen mx-auto">
-                            <h2 className="text-lg font-bold mb-5 sm:mb-10 text-gray-800">Add Item</h2>
+                            <h2 className="text-xl font-bold mb-5 sm:mb-10 text-gray-800">Add Item</h2>
 
                             <form className="space-y-3 sm:space-y-4 max-w-2xl mx-auto">
                                 <div className="flex flex-col sm:flex-row sm:items-center">
@@ -282,26 +282,26 @@ const AddItem = () => {
                                     <div className="w-full sm:w-2/3">
                                         <input
                                             type="text"
-                                            name="festivalName"
+                                            name="itemCode"
                                             placeholder="Enter Item Code"
-                                            value={formData.festivalName}
+                                            value={formData.itemCode}
                                             onChange={handleChange}
-                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.festivalName ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
+                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.itemCode ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
                                         />
-                                        {errors.festivalName && <p className="text-red-500 text-xs mt-1 ml-2">{errors.festivalName}</p>}
+                                        {errors.itemCode && <p className="text-red-500 text-xs mt-1 ml-2">{errors.itemCode}</p>}
                                     </div>
                                 </div>
                                 <div className="flex flex-col sm:flex-row sm:items-center">
                                     <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Item Name</label>
                                     <div className="w-full sm:w-2/3">
                                         <input
-                                            name="fromClass"
+                                            name="itemName"
                                             placeholder="Enter Item Name"
-                                            value={formData.fromClass}
+                                            value={formData.itemName}
                                             onChange={handleChange}
-                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.fromClass ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
+                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.itemName ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
                                         />
-                                        {errors.fromClass && <p className="text-red-500 text-xs mt-1 ml-2">{errors.fromClass}</p>}
+                                        {errors.itemName && <p className="text-red-500 text-xs mt-1 ml-2">{errors.itemName}</p>}
                                     </div>
                                 </div>
                                 <div className="flex flex-col sm:flex-row sm:items-center">
@@ -370,6 +370,7 @@ const AddItem = () => {
                                         <input
                                             name="maxStudents"
                                             type="number"
+                                            min="1"
                                             placeholder="Enter Maximum Students"
                                             value={formData.maxStudents}
                                             onChange={handleChange}
@@ -384,6 +385,7 @@ const AddItem = () => {
                                         <input
                                             name="pinnany"
                                             type="number"
+                                            min="0"
                                             placeholder="Enter Pinnany (optional)"
                                             value={formData.pinnany}
                                             onChange={handleChange}
@@ -397,7 +399,7 @@ const AddItem = () => {
                                     <div className="w-full sm:w-2/3">
                                         <input
                                             name="duration"
-                                            placeholder="Enter Duration"
+                                            placeholder="Enter Duration (e.g., 5 minutes)"
                                             value={formData.duration}
                                             onChange={handleChange}
                                             className={`w-full px-3 sm:px-4 py-2 border ${errors.duration ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
@@ -453,7 +455,7 @@ const AddItem = () => {
                                     </div>
                                 </div>
                             </form>
-                            <div className="flex flex-col sm:flex-row justify-center sm:justify-end mt-16 sm:mt-32 sm:mr-10 md:mr-18 lg:mr-40 space-y-4 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">
+                            <div className="flex flex-col sm:flex-row justify-center sm:justify-end mt-10 sm:mt-16 sm:mr-10 md:mr-18 lg:mr-40 space-y-4 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">
                                 <button
                                     type="button"
                                     onClick={handleCancel}
@@ -477,4 +479,4 @@ const AddItem = () => {
     );
 };
 
-export default AddItem;
+export default AddItem

@@ -467,7 +467,7 @@ const EligibleSclList = () => {
                         currentItems.map((item, index) => (
                           <tr key={index} className="hover:bg-gray-100">
                             <td className="p-2 md:p-3">{indexOfFirstItem + index + 1}</td>
-                            <td className="p-2 md:p-3">{item.schoolCode || "-"}-{item.schoolName || "-"}</td>
+                            <td className="p-2 md:p-3">{item.schoolName || "-"}</td>
                           </tr>
                         ))
                       ) : (

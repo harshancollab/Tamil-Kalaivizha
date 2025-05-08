@@ -842,7 +842,7 @@ const SPublishDeclarList = () => {
 
     // Dummy data for School Points
     const [allSchoolPointsData, setAllSchoolPointsData] = useState([
-        { slNo: 1, schoolCode: 'SCH001', schoolName: 'Example School 1', subDistrict: 'District A', district: "Thiruvananthapuram", points: 85, Itemcode: 302 },
+        { slNo: 1, schoolCode: 'SCH001', schoolName: 'Example School 1', subDistrict: 'District A', district: "Palakkad", points: 85, Itemcode: 302 },
         { slNo: 2, schoolCode: 'SCH002', schoolName: 'Another School', subDistrict: 'District B', district: "Palakkad", points: 92, Itemcode: 456 },
         { slNo: 3, schoolCode: 'SCH003', schoolName: 'Test School 3', subDistrict: 'District C', district: "Kozhikode", points: 78, Itemcode: 325 },
         { slNo: 4, schoolCode: 'SCH004', schoolName: 'Sample Academy', subDistrict: 'District A', district: "Kannur", points: 90, Itemcode: 510 },

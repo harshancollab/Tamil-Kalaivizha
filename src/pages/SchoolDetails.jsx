@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import Header from "../components/Header"
 import Dash from "../components/Dash"
 
@@ -24,6 +24,30 @@ const SchoolDetails = () => {
     totalStudents: "",
   });
   const [errors, setErrors] = useState({});
+
+  // Calculate total students whenever student count fields change
+  useEffect(() => {
+    const calculateTotal = () => {
+      const upperPrimary = parseInt(schoolDetails.upperPrimaryStudents) || 0;
+      const hs = parseInt(schoolDetails.hsStudents) || 0;
+      const hss = parseInt(schoolDetails.hssStudents) || 0;
+      const vhse = parseInt(schoolDetails.vhseStudents) || 0;
+      
+      const total = upperPrimary + hs + hss + vhse;
+      
+      setSchoolDetails(prev => ({
+        ...prev,
+        totalStudents: total > 0 ? total.toString() : ""
+      }));
+    };
+    
+    calculateTotal();
+  }, [
+    schoolDetails.upperPrimaryStudents,
+    schoolDetails.hsStudents,
+    schoolDetails.hssStudents,
+    schoolDetails.vhseStudents
+  ]);
 
   const handleAddEscortingTeacher = () => {
     setEscortingTeachers([...escortingTeachers, { name: "", phone: "" }]);
@@ -408,8 +432,8 @@ const SchoolDetails = () => {
                     type="text"
                     name="totalStudents"
                     value={schoolDetails.totalStudents}
-                    onChange={handleInputChange}
-                    className="border-blue-700 border rounded-full w-16 md:w-20 ml-2 px-2 py-1"
+                    readOnly
+                    className="border-blue-700 border rounded-full w-16 md:w-20 ml-2 px-2 py-1 bg-gray-100"
                   />
                 </h3>
               </div>

@@ -13,7 +13,7 @@ const SDeclared = ({ searchTerm, selectedFestival, printRef }) => {
             className: 'V',
             schoolName: ' Secondary School',
             subDistrict: 'Neyyattinkara',
-            district: 'Thiruvananthapuram',
+            district: 'Kollam',
             grade: 'A',
             point: 85,
             festival: 'UP Tamil Kalaivizha'
@@ -194,7 +194,7 @@ const SDeclared = ({ searchTerm, selectedFestival, printRef }) => {
             className: 'V',
             schoolName: 'Mount Carmel School',
             subDistrict: 'Varkala',
-            district: 'Thiruvananthapuram',
+            district: 'TVM',
             grade: 'A',
             point: 89,
             festival: 'UP Tamil Kalaivizha'

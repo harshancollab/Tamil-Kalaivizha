@@ -1,11 +1,18 @@
+// allAPI.js
 import commonAPI from "./commonAPI"
 import SERVER_URL from "./serverurl"
 
-// login 
-export const loginAPI = async (reqBody)=>{
-    return await commonAPI("POST",`${SERVER_URL}/login`,reqBody)
-
+// Add admin API
+export const addAdminAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/add-admin`, reqBody, reqHeader)
 }
+
+// login
+export const loginAPI = async (reqBody) => {
+  return await commonAPI("POST", `${SERVER_URL}/login-admin`, reqBody)
+}
+
+
 // reset
 export const resetPasswordAPI = async (data) => {
     return await commonAPI("POST", `${SERVER_URL}/reset-password`, data, "");

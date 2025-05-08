@@ -3,13 +3,19 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
-import { addStageAPI } from '../services/allAPI'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { addAdminAPI } from '../services/allAPI'
 
 const AddUser = () => {
     const navigate = useNavigate();
     const location = useLocation();
     
+    // Add API status tracking
+    const [apiStatus, setApiStatus] = useState({
+        isLoading: false,
+        error: null,
+        success: false
+    });
     
     const params = new URLSearchParams(location.search);
     const redirectUrl = params.get('redirect') || '/admin-panel';
@@ -411,62 +417,107 @@ const AddUser = () => {
         if (validateForm()) {
             console.log("Form is valid, proceeding with submission");
             
+            // Set loading state
+            setApiStatus({
+                isLoading: true,
+                error: null,
+                success: false
+            });
+            
+            // Create a properly formatted request body
             const reqBody = {
                 username: formData.username,
                 password: formData.password,
-                userType: formData.userType,
-                district: formData.district,
-                subDistrict: formData.subDistrict
+                userType: formData.userType
             };
+            
+            // Only include district and subDistrict if they are relevant
+            if (formData.userType === "District Admin" || formData.userType === "Sub-district Admin") {
+                reqBody.district = formData.district;
+            }
+            
+            if (formData.userType === "Sub-district Admin") {
+                reqBody.subDistrict = formData.subDistrict;
+            }
 
             const token = sessionStorage.getItem("token");
-            if (token) {
-                const reqHeader = {
-                   "Content-Type": "multipart/form-data",
-                    "Authorization": `Bearer ${token}`
-                };
-
-                try {
-                    const result = await addStageAPI(reqBody, reqHeader);
-                    if (result.status === 200) {
-                        alert("User added successfully");
-                        
-                        // Reset form
-                        setFormData({
-                            username: "",
-                            password: "",
-                            userType: "",
-                            district: "",
-                            subDistrict: ""
-                        });
-                        setTouched({
-                            username: false,
-                            password: false,
-                            userType: false,
-                            district: false,
-                            subDistrict: false
-                        });
-                        
-                        // Clear URL parameters as well
-                        window.history.pushState({}, '', window.location.pathname);
-                        
-                        // After successful submission, redirect to the admin page
-                        // You can pass additional parameters if needed
-                        const successParam = new URLSearchParams();
-                        successParam.append('success', 'true');
-                        successParam.append('username', reqBody.username);
-                        
-                        // Navigate to redirect URL with success parameters
-                        navigate(`${redirectUrl}?${successParam.toString()}`);
-                    } else {
-                        alert(result.response.data);
-                    }
-                } catch (err) {
-                    console.log(err);
-                    alert("Error adding user. Please try again.");
-                }
-            } else {
+            if (!token) {
+                setApiStatus({
+                    isLoading: false,
+                    error: "Authentication token missing. Please log in again.",
+                    success: false
+                });
                 alert("Authentication token missing. Please log in again.");
+                return;
+            }
+            
+            const reqHeader = {
+                "Authorization": `Bearer ${token}`,
+            };
+
+            try {
+                // Debug logging
+                console.log("API Request:", {
+                    body: reqBody,
+                    headers: reqHeader
+                });
+                
+                const result = await addAdminAPI(reqBody, reqHeader);
+                console.log("API Response:", result);
+                
+                if (result.status === 200) {
+                    console.log("User added successfully");
+                    setApiStatus({
+                        isLoading: false,
+                        error: null,
+                        success: true
+                    });
+                    alert("User added successfully");
+                    
+                    // Reset form
+                    setFormData({
+                        username: "",
+                        password: "",
+                        userType: "",
+                        district: "",
+                        subDistrict: ""
+                    });
+                    setTouched({
+                        username: false,
+                        password: false,
+                        userType: false,
+                        district: false,
+                        subDistrict: false
+                    });
+                    
+                    // Clear URL parameters as well
+                    window.history.pushState({}, '', window.location.pathname);
+                    
+                    // After successful submission, redirect to the admin page
+                    // You can pass additional parameters if needed
+                    const successParam = new URLSearchParams();
+                    successParam.append('success', 'true');
+                    successParam.append('username', reqBody.username);
+                    
+                    navigate('/admin-panel');
+                } else {
+                    const errorMsg = result.response?.data || "Error adding user. Please try again.";
+                    setApiStatus({
+                        isLoading: false,
+                        error: errorMsg,
+                        success: false
+                    });
+                    alert(errorMsg);
+                }
+            } catch (err) {
+                console.error("API Error:", err);
+                const errorMsg = err.response?.data || "Error adding user. Please try again.";
+                setApiStatus({
+                    isLoading: false,
+                    error: errorMsg,
+                    success: false
+                });
+                alert(errorMsg);
             }
         } else {
             console.log("Form has errors");
@@ -489,6 +540,18 @@ const AddUser = () => {
                             </h2>
                         </div>
                     
+                        {apiStatus.error && (
+                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                                <p>{apiStatus.error}</p>
+                            </div>
+                        )}
+                        
+                        {apiStatus.success && (
+                            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                                <p>User added successfully!</p>
+                            </div>
+                        )}
+                    
                         <div className="mt-10 flex flex-col items-center">
                             <div className="flex flex-col md:flex-row w-full max-w-md mb-6">
                                 <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">User Name</label>
@@ -501,6 +564,7 @@ const AddUser = () => {
                                         onBlur={() => handleBlur("username")}
                                         placeholder='Enter Name' 
                                         className='border px-2 py-1 rounded-full w-full border-blue-700' 
+                                        disabled={apiStatus.isLoading}
                                     />
                                 
                                     {touched.username && errors.username && (
@@ -519,6 +583,7 @@ const AddUser = () => {
                                         onBlur={() => handleBlur("password")}
                                         placeholder='Enter Password' 
                                         className='border px-2 py-1 rounded-full w-full border-blue-700' 
+                                        disabled={apiStatus.isLoading}
                                     />
                                   
                                     {touched.password && errors.password && (
@@ -535,6 +600,7 @@ const AddUser = () => {
                                         onChange={handleInputChange}
                                         onBlur={() => handleBlur("userType")}
                                         className="border px-2 py-1 rounded-full w-full border-blue-600 focus:outline-blue-900"
+                                        disabled={apiStatus.isLoading}
                                     >
                                         {allUserTypes.map((type, index) => (
                                             <option key={index} value={type}>{type}</option>
@@ -554,15 +620,15 @@ const AddUser = () => {
                                         <div className="relative" ref={districtDropdownRef}>
                                             {/* Custom district dropdown button */}
                                             <div
-                                                onClick={() => toggleDropdown('district')}
-                                                className="border px-2 py-1 rounded-full w-full border-blue-600 flex justify-between items-center cursor-pointer bg-white"
+                                                onClick={() => !apiStatus.isLoading && toggleDropdown('district')}
+                                                className={`border px-2 py-1 rounded-full w-full border-blue-600 flex justify-between items-center ${!apiStatus.isLoading ? 'cursor-pointer' : 'cursor-not-allowed'} bg-white`}
                                             >
                                                 <span>{formData.district || 'Select District'}</span>
                                                 <span className="text-xs">▼</span>
                                             </div>
                                             
                                             {/* Dropdown menu */}
-                                            {dropdownOpen.district && (
+                                            {dropdownOpen.district && !apiStatus.isLoading && (
                                                 <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
                                                     {/* Search input */}
                                                     <div className="p-2 border-b">
@@ -612,14 +678,14 @@ const AddUser = () => {
                                     <div className="w-full md:w-80">
                                         <div className="relative" ref={subDistrictDropdownRef}>
                                             <div
-                                                onClick={() => toggleDropdown('subDistrict')}
-                                                className="border px-2 py-1 rounded-full w-full border-blue-600 flex justify-between items-center cursor-pointer bg-white"
+                                                onClick={() => !apiStatus.isLoading && toggleDropdown('subDistrict')}
+                                                className={`border px-2 py-1 rounded-full w-full border-blue-600 flex justify-between items-center ${!apiStatus.isLoading ? 'cursor-pointer' : 'cursor-not-allowed'} bg-white`}
                                             >
                                                 <span>{formData.subDistrict || 'Select Sub District'}</span>
                                                 <span className="text-xs">▼</span>
                                             </div>
                                             
-                                            {dropdownOpen.subDistrict && (
+                                            {dropdownOpen.subDistrict && !apiStatus.isLoading && (
                                                 <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
                                                     <div className="p-2 border-b">
                                                         <input
@@ -663,15 +729,17 @@ const AddUser = () => {
                             <button
                                 type="button"
                                 onClick={handleCancel}
-                                className="mr-6 bg-gradient-to-r from-[#003566] to-[#05B9F4] bg-clip-text text-transparent border border-blue-600 px-14 py-2 rounded-full"
+                                disabled={apiStatus.isLoading}
+                                className={`mr-6 bg-gradient-to-r from-[#003566] to-[#05B9F4] bg-clip-text text-transparent border border-blue-600 px-14 py-2 rounded-full ${apiStatus.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                Cancel
                             </button>
                             <button
                                 type="submit"
-                                className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-14 py-2 rounded-full"
+                                disabled={apiStatus.isLoading}
+                                className={`bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-14 py-2 rounded-full ${apiStatus.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
-                                Add
+                                {apiStatus.isLoading ? 'Adding...' : 'Add'}
                             </button>
                         </div>
                     </form>
@@ -681,4 +749,4 @@ const AddUser = () => {
     )
 }
 
-export default AddUser 
+export default AddUser

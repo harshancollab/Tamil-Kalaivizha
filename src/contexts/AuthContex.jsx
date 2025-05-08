@@ -1,44 +1,3 @@
-// import { createContext, useContext, useState, useEffect } from 'react';
-// import { useNavigate } from 'react-router-dom';
-
-// // Create Auth Context
-// const AuthContext = createContext();
-
-// export const AuthProvider = ({ children }) => {
-//   const [user, setUser] = useState(null);
-//   const navigate = useNavigate();
-
-//   // Simulate user login (Replace with API call)
-//   const login = (userData) => {
-//     setUser(userData); 
-//     localStorage.setItem('user', JSON.stringify(userData)); // Store user
-//   };
-
-//   // Logout Function
-//   const logout = () => {
-//     setUser(null);
-//     localStorage.removeItem('user');
-//     navigate('/login');
-//   };
-
-//   // Load User from Local Storage on Refresh
-//   useEffect(() => {
-//     const storedUser = JSON.parse(localStorage.getItem('user'));
-//     if (storedUser) {
-//       setUser(storedUser);
-//     }
-//   }, []);
-
-//   return (
-//     <AuthContext.Provider value={{ user, login, logout }}>
-//       {children}
-//     </AuthContext.Provider>
-//   );
-// };
-
-// // Custom Hook to Use Auth Context
-// export const useAuth = () => useContext(AuthContext);
-
 
 // import { createContext, useState, useContext } from 'react';
 
@@ -46,7 +5,7 @@
 
 // export const AuthProvider = ({ children }) => {
 //   // Simulating a logged-in school admin user
-//   const [user, setUser] = useState({ role: 'state admin', isAuthenticated: true });
+//   const [user, setUser] = useState({ role: 'admin', isAuthenticated: true });
 
 //   return (
 //     <AuthContext.Provider value={{ user, setUser }}>
@@ -57,44 +16,107 @@
 
 // export const useAuth = () => useContext(AuthContext);
 
-// sub district admin
-// It Admin   
-// state admin   
-//  district admin   
 
-import { createContext, useState, useContext, useEffect } from 'react';
 
+import React, { createContext, useState, useContext, useEffect } from 'react';
+
+// Create the context
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState({ role: null, isAuthenticated: false });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const storedRole = localStorage.getItem("isAdmin");
-    if (storedRole) {
-      setUser({ role: storedRole, isAuthenticated: true });
+  // Initialize user state, checking sessionStorage first
+  const [user, setUser] = useState(() => {
+    const storedUser = sessionStorage.getItem("admin");
+    const token = sessionStorage.getItem("token");
+    
+    if (storedUser && token) {
+      return { ...JSON.parse(storedUser), isAuthenticated: true };
     }
-    setLoading(false);
-  }, []);
+    
+    return { role: '', isAuthenticated: false };
+  });
 
-  const login = (role) => {
-    localStorage.setItem("isAdmin", role);
-    setUser({ role, isAuthenticated: true });
+  // Function to handle logout
+  const logout = () => {
+    // Clear session storage
+    sessionStorage.removeItem("admin");
+    sessionStorage.removeItem("token");
+    
+    // Reset user state
+    setUser({ role: '', isAuthenticated: false });
   };
 
-  const logout = () => {
-    localStorage.removeItem("isAdmin");
-    setUser({ role: null, isAuthenticated: false });
+  // Value object to be provided to consumers
+  const authContextValue = {
+    user,
+    setUser,
+    logout,
+    isAuthenticated: user.isAuthenticated,
+    role: user.role
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {!loading && children}
+    <AuthContext.Provider value={authContextValue}>
+      {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+// Custom hook for using the auth context
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+
+
+
+// sub district admin
+// It Admin   
+// state admin   
+//  district admin  
+
+
+
+
+
+
+// import { createContext, useState, useContext, useEffect } from 'react';
+
+// const AuthContext = createContext();
+
+// export const AuthProvider = ({ children }) => {
+//   const [user, setUser] = useState({ role: null, isAuthenticated: false });
+//   const [loading, setLoading] = useState(true);
+
+//   useEffect(() => {
+//     const storedRole = localStorage.getItem("isAdmin");
+//     if (storedRole) {
+//       setUser({ role: storedRole, isAuthenticated: true });
+//     }
+//     setLoading(false);
+//   }, []);
+
+//   const login = (role) => {
+//     localStorage.setItem("isAdmin", role);
+//     setUser({ role, isAuthenticated: true });
+//   };
+
+//   const logout = () => {
+//     localStorage.removeItem("isAdmin");
+//     setUser({ role: null, isAuthenticated: false });
+//   };
+
+//   return (
+//     <AuthContext.Provider value={{ user, login, logout }}>
+//       {!loading && children}
+//     </AuthContext.Provider>
+//   );
+// };
+
+// export const useAuth = () => useContext(AuthContext);
 
 

@@ -1,162 +1,232 @@
 // It Admin user - edit user
 
-import React, { useState, useEffect, useRef } from 'react';
-import Header from '../components/Header';
-import Dash from '../components/Dash';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
-// import { updateUserAPI } from '../services/allAPI';
+import React, { useState, useEffect, useRef } from 'react'
+import Header from '../components/Header'
+import Dash from '../components/Dash'
+// import { updateUserAPI, getUserByIdAPI } from '../services/allAPI'
+import { useNavigate, useLocation, useParams } from 'react-router-dom'
 
 const EditUser = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { userId } = useParams();
+    const { userId } = useParams(); // Get userId from URL params
     
-    
-    const queryParams = new URLSearchParams(location.search);
-    const redirectUrl = queryParams.get('redirect') || '/admin-panel';
+    const params = new URLSearchParams(location.search);
+    const redirectUrl = params.get('redirect') || '/admin-panel';
 
     const allUserTypes = [
         'Select User Type',
         'State Admin',
         'District Admin',
-        'Sub-district Admin',
-        'All Admin'
+        'Sub-district Admin'
     ];
     
-    const allDistricts = [
-        'Select District',
-        'Idukki',
-        'Ernakulam',
-        'Palakkad',
-        'Kozhikode',
-        'Wayanad',
-        'Thrissur',
-        'Ottapalam'
+    const allKalolsavams = [
+        'Select Kalolsavam',
+        'Idukki District Kalolsavam',
+        'Ernakulam District Kalolsavam',
+        'Palakkad District Kalolsavam',
+        'Kozhikode District Kalolsavam',
+        'Wayanad District Kalolsavam',
+        'Thrissur District Kalolsavam',
+        'Ottapalam District Kalolsavam'
     ];
     
-    const districtToSubDistrict = {
-        'Idukki': ['Munnar', 'Adimali', 'Kattappana', 'Nedumkandam', 'Devikulam'],
-        'Palakkad': ['Chittur', 'Pattambi', 'Kuzhalmannam', 'Nemmara', 'Mannarkkad', 'Ottapalam'],
-        'Ernakulam': [],
-        'Kozhikode': ['vatakara'],
-        'Wayanad': [],
-        'Thrissur': []
-    };
-
-    // Mock user data for testing
-    const mockUserData = {
-        username: "testuser",
-        userType: "District Admin",
-        district: "Palakkad",
-        subDistrict: ""
+    const kalolsavamToSubKalolsavam = {
+        'Idukki District Kalolsavam': ['Munnar  Kalolsavam', 'Adimali  Kalolsavam', 'Kattappana  Kalolsavam', 'Nedumkandam', 'Devikulam'],
+        'Palakkad District Kalolsavam': ['Chittur   Kalolsavam', 'Pattambi  Kalolsavam', 'Kuzhalmannam  Kalolsavam' , 'Nemmara', 'Mannarkkad', 'Ottapalam'],
+        'Ernakulam District Kalolsavam': [],
+        'Kozhikode District Kalolsavam': ['vatakara'],
+        'Wayanad District Kalolsavam': [],
+        'Thrissur District Kalolsavam': []
     };
 
     const [formData, setFormData] = useState({
         username: "",
-        password: "",
+        password: "", // For edit, password might be optional
         userType: "",
-        district: "",
-        subDistrict: ""
+        kalolsavam: "", 
+        subKalolsavam: ""
     });
 
     const [errors, setErrors] = useState({
         username: "",
         password: "",
         userType: "",
-        district: "",
-        subDistrict: ""
+        kalolsavam: "", 
+        subKalolsavam: ""
     });
 
     const [touched, setTouched] = useState({
         username: false,
         password: false,
         userType: false,
-        district: false,
-        subDistrict: false
+        kalolsavam: false,
+        subKalolsavam: false
     });
 
-    const [filteredDistricts, setFilteredDistricts] = useState(allDistricts);
-    const [filteredSubDistricts, setFilteredSubDistricts] = useState([]);
+    const [filteredKalolsavams, setFilteredKalolsavams] = useState(allKalolsavams);
+    const [filteredSubKalolsavams, setFilteredSubKalolsavams] = useState([]);
     const [searchText, setSearchText] = useState({
-        district: "",
-        subDistrict: ""
+        kalolsavam: "",
+        subKalolsavam: ""
     });
     
-    // Add state for managing dropdown visibility
     const [dropdownOpen, setDropdownOpen] = useState({
-        district: false,
-        subDistrict: false
+        kalolsavam: false,
+        subKalolsavam: false
     });
     
-    // State for loading indicator
     const [isLoading, setIsLoading] = useState(true);
+    const [loadError, setLoadError] = useState("");
     
     // References to detect clicks outside dropdowns
-    const districtDropdownRef = useRef(null);
-    const subDistrictDropdownRef = useRef(null);
+    const kalolsavamDropdownRef = useRef(null);
+    const subKalolsavamDropdownRef = useRef(null);
 
-    // Simulate fetching user data
+    // Fetch user data when component mounts
     useEffect(() => {
-        // Simulate API delay
-        const timer = setTimeout(() => {
-            // Set form data with mock user data
-            setFormData({
-                username: mockUserData.username,
-                password: "", // Leave password empty for security
-                userType: mockUserData.userType,
-                district: mockUserData.district,
-                subDistrict: mockUserData.subDistrict
-            });
+        fetchUserData();
+    }, [userId]);
+
+    const fetchUserData = async () => {
+        if (!userId) {
+            setLoadError("User ID is missing");
             setIsLoading(false);
-        }, 1000);
+            return;
+        }
+
+        const token = sessionStorage.getItem("token");
+        if (!token) {
+            setLoadError("Authentication token missing. Please log in again.");
+            setIsLoading(false);
+            return;
+        }
+
+        try {
+            const reqHeader = {
+                "Authorization": `Bearer ${token}`
+            };
+
+            const result = await getUserByIdAPI(userId, reqHeader);
+            if (result.status === 200) {
+                const userData = result.data;
+                
+                // Update form with user data
+                setFormData({
+                    username: userData.username || "",
+                    password: "", // Usually don't pre-fill password for security
+                    userType: userData.userType || "",
+                    kalolsavam: userData.kalolsavam || "",
+                    subKalolsavam: userData.subKalolsavam || ""
+                });
+
+                // Make sure available sub-kalolsavams are updated based on the kalolsavam
+                if (userData.kalolsavam && userData.kalolsavam !== 'Select Kalolsavam') {
+                    const subKalolsavams = kalolsavamToSubKalolsavam[userData.kalolsavam] || [];
+                    setFilteredSubKalolsavams(['Select Sub Kalolsavam', ...subKalolsavams]);
+                }
+
+                // Update URL parameters
+                updateUrlParams({
+                    userType: userData.userType,
+                    kalolsavam: userData.kalolsavam,
+                    subKalolsavam: userData.subKalolsavam
+                });
+                
+                setIsLoading(false);
+            } else {
+                setLoadError("Failed to load user data");
+                setIsLoading(false);
+            }
+        } catch (err) {
+            console.error("Error fetching user data:", err);
+            setLoadError("Error fetching user data. Please try again.");
+            setIsLoading(false);
+        }
+    };
+
+    // Function to update URL parameters when form values change
+    const updateUrlParams = (newFormData) => {
+        const params = new URLSearchParams();
         
-        return () => clearTimeout(timer);
-    }, []);
+        // Update URL parameters based on form data
+        if (newFormData.userType && newFormData.userType !== 'Select User Type') {
+            params.set('userType', newFormData.userType);
+        }
+        
+        if (newFormData.kalolsavam && newFormData.kalolsavam !== 'Select Kalolsavam') {
+            params.set('kalolsavam', newFormData.kalolsavam);
+        }
+        
+        if (newFormData.subKalolsavam && newFormData.subKalolsavam !== 'Select Sub Kalolsavam') {
+            params.set('subKalolsavam', newFormData.subKalolsavam);
+        }
+        
+        // Preserve the redirect parameter if it exists
+        if (redirectUrl && redirectUrl !== '/admin-panel') {
+            params.set('redirect', redirectUrl);
+        }
+        
+        // Update the URL without reloading the page
+        const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+        window.history.pushState({path: newUrl}, '', newUrl);
+    };
 
-    // Update available sub-districts when district changes
+    // Update available sub-kalolsavams when kalolsavam changes
     useEffect(() => {
-        if (formData.district && formData.district !== 'Select District') {
-            const subDistricts = districtToSubDistrict[formData.district] || [];
-            setFilteredSubDistricts(['Select Sub District', ...subDistricts]);
+        if (formData.kalolsavam && formData.kalolsavam !== 'Select Kalolsavam') {
+            const subKalolsavams = kalolsavamToSubKalolsavam[formData.kalolsavam] || [];
+            setFilteredSubKalolsavams(['Select Sub Kalolsavam', ...subKalolsavams]);
+            
+            // If current subKalolsavam isn't valid for the new kalolsavam, reset it
+            if (formData.subKalolsavam && 
+                formData.subKalolsavam !== 'Select Sub Kalolsavam' && 
+                !subKalolsavams.includes(formData.subKalolsavam)) {
+                setFormData(prev => ({
+                    ...prev,
+                    subKalolsavam: ''
+                }));
+            }
         } else {
-            setFilteredSubDistricts(['Select Sub District']);
+            setFilteredSubKalolsavams(['Select Sub Kalolsavam']);
         }
-    }, [formData.district]);
+    }, [formData.kalolsavam]);
 
-    // Filter districts based on search text
+    // Filter kalolsavams based on search text
     useEffect(() => {
-        if (searchText.district) {
-            const filtered = allDistricts.filter(district => 
-                district.toLowerCase().includes(searchText.district.toLowerCase())
+        if (searchText.kalolsavam) {
+            const filtered = allKalolsavams.filter(kalolsavam =>
+                kalolsavam.toLowerCase().includes(searchText.kalolsavam.toLowerCase())
             );
-            setFilteredDistricts(filtered.length > 0 ? filtered : ['No results found']);
+            setFilteredKalolsavams(filtered.length > 0 ? filtered : ['No results found']);
         } else {
-            setFilteredDistricts(allDistricts);
+            setFilteredKalolsavams(allKalolsavams);
         }
-    }, [searchText.district]);
+    }, [searchText.kalolsavam]);
 
-    // Filter sub-districts based on search text
+    // Filter sub-kalolsavams based on search text
     useEffect(() => {
-        if (searchText.subDistrict && formData.district && formData.district !== 'Select District') {
-            const subDistricts = districtToSubDistrict[formData.district] || [];
-            const filtered = ['Select Sub District', ...subDistricts].filter(subDistrict => 
-                subDistrict.toLowerCase().includes(searchText.subDistrict.toLowerCase())
+        if (searchText.subKalolsavam && formData.kalolsavam && formData.kalolsavam !== 'Select Kalolsavam') {
+            const subKalolsavams = kalolsavamToSubKalolsavam[formData.kalolsavam] || [];
+            const filtered = ['Select Sub Kalolsavam', ...subKalolsavams].filter(subKalolsavam =>
+                subKalolsavam.toLowerCase().includes(searchText.subKalolsavam.toLowerCase())
             );
-            setFilteredSubDistricts(filtered.length > 0 ? filtered : ['No results found']);
-        } else if (formData.district && formData.district !== 'Select District') {
-            const subDistricts = districtToSubDistrict[formData.district] || [];
-            setFilteredSubDistricts(['Select Sub District', ...subDistricts]);
+            setFilteredSubKalolsavams(filtered.length > 0 ? filtered : ['No results found']);
+        } else if (formData.kalolsavam && formData.kalolsavam !== 'Select Kalolsavam') {
+            const subKalolsavams = kalolsavamToSubKalolsavam[formData.kalolsavam] || [];
+            setFilteredSubKalolsavams(['Select Sub Kalolsavam', ...subKalolsavams]);
         }
-    }, [searchText.subDistrict, formData.district]);
+    }, [searchText.subKalolsavam, formData.kalolsavam]);
 
     // Handle clicks outside the dropdowns
     useEffect(() => {
         function handleClickOutside(event) {
-            if (districtDropdownRef.current && !districtDropdownRef.current.contains(event.target)) {
-                setDropdownOpen(prev => ({...prev, district: false}));
+            if (kalolsavamDropdownRef.current && !kalolsavamDropdownRef.current.contains(event.target)) {
+                setDropdownOpen(prev => ({...prev, kalolsavam: false}));
             }
-            if (subDistrictDropdownRef.current && !subDistrictDropdownRef.current.contains(event.target)) {
-                setDropdownOpen(prev => ({...prev, subDistrict: false}));
+            if (subKalolsavamDropdownRef.current && !subKalolsavamDropdownRef.current.contains(event.target)) {
+                setDropdownOpen(prev => ({...prev, subKalolsavam: false}));
             }
         }
         
@@ -170,41 +240,50 @@ const EditUser = () => {
         const { name, value } = e.target;
         console.log(`Input changed: ${name} = ${value}`);
         
+        let newFormData;
+        
         if (name === "userType" && value !== "District Admin" && value !== "Sub-district Admin") {
-            setFormData(prevState => ({
-                ...prevState,
+            newFormData = {
+                ...formData,
                 [name]: value,
-                district: "",
-                subDistrict: ""
-            }));
+                kalolsavam: "",
+                subKalolsavam: ""
+            };
         } else if (name === "userType" && value === "District Admin") {
-            setFormData(prevState => ({
-                ...prevState,
+            newFormData = {
+                ...formData,
                 [name]: value,
-                subDistrict: ""
-            }));
-        } else if (name === "district") {
-            setFormData(prevState => ({
-                ...prevState,
+                subKalolsavam: ""
+            };
+        } else if (name === "kalolsavam") {
+            newFormData = {
+                ...formData,
                 [name]: value,
-                subDistrict: ""  // Reset sub-district when district changes
-            }));
-            // Close district dropdown after selection
-            setDropdownOpen(prev => ({...prev, district: false}));
-            setSearchText(prev => ({...prev, district: ""}));
-        } else if (name === "subDistrict") {
-            setFormData(prevState => ({
-                ...prevState,
+                subKalolsavam: ""
+            };
+            // Close kalolsavam dropdown after selection
+            setDropdownOpen(prev => ({...prev, kalolsavam: false}));
+            setSearchText(prev => ({...prev, kalolsavam: ""}));
+        } else if (name === "subKalolsavam") {
+            newFormData = {
+                ...formData,
                 [name]: value,
-            }));
-            // Close sub-district dropdown after selection
-            setDropdownOpen(prev => ({...prev, subDistrict: false}));
-            setSearchText(prev => ({...prev, subDistrict: ""}));
+            };
+            // Close sub-kalolsavam dropdown after selection
+            setDropdownOpen(prev => ({...prev, subKalolsavam: false}));
+            setSearchText(prev => ({...prev, subKalolsavam: ""}));
         } else {
-            setFormData(prevState => ({
-                ...prevState,
+            newFormData = {
+                ...formData,
                 [name]: value,
-            }));
+            };
+        }
+        
+        setFormData(newFormData);
+        
+        // Update URL parameters
+        if (name === "userType" || name === "kalolsavam" || name === "subKalolsavam") {
+            updateUrlParams(newFormData);
         }
         
         validateField(name, value);
@@ -241,22 +320,22 @@ const EditUser = () => {
                 if (!value) errorMessage = "Username is required";
                 break;
             case "password":
-                // Only validate password if it's being changed (not empty)
+                // For edit, password might be optional (only validate if entered)
                 if (value && value.length < 6) errorMessage = "Password should be at least 6 characters";
                 break;
             case "userType":
                 if (!value || value === "Select User Type") errorMessage = "User type selection is required";
                 break;
-            case "district":
+            case "kalolsavam":
                 if ((formData.userType === "District Admin" || formData.userType === "Sub-district Admin") && 
-                    (!value || value === "Select District")) {
-                    errorMessage = "District selection is required";
+                    (!value || value === "Select Kalolsavam")) {
+                    errorMessage = "Kalolsavam selection is required";
                 }
                 break;
-            case "subDistrict":
+            case "subKalolsavam":
                 if (formData.userType === "Sub-district Admin" && 
-                    (!value || value === "Select Sub District")) {
-                    errorMessage = "Sub-district selection is required";
+                    (!value || value === "Select Sub Kalolsavam")) {
+                    errorMessage = "Sub Kalolsavam selection is required";
                 }
                 break;
             default:
@@ -274,87 +353,109 @@ const EditUser = () => {
     const validateForm = () => {
         const fieldValidations = {
             username: validateField("username", formData.username),
-            // Skip password validation if it's empty (not being updated)
-            password: formData.password ? validateField("password", formData.password) : true,
             userType: validateField("userType", formData.userType)
         };
 
-        // Only validate district and subDistrict if needed based on userType
+        // For edit form, password is optional - only validate if entered
+        if (formData.password) {
+            fieldValidations.password = validateField("password", formData.password);
+        } else {
+            fieldValidations.password = true; // Skip password validation if empty (no change)
+        }
+
+        // Only validate kalolsavam and subKalolsavam if needed based on userType
         if (formData.userType === "District Admin" || formData.userType === "Sub-district Admin") {
-            fieldValidations.district = validateField("district", formData.district);
+            fieldValidations.kalolsavam = validateField("kalolsavam", formData.kalolsavam);
         }
         
         if (formData.userType === "Sub-district Admin") {
-            fieldValidations.subDistrict = validateField("subDistrict", formData.subDistrict);
+            fieldValidations.subKalolsavam = validateField("subKalolsavam", formData.subKalolsavam);
         }
 
         setTouched({
             username: true,
-            password: !!formData.password, // Only mark as touched if a new password is being set
+            password: formData.password ? true : false, // Only mark as touched if entered
             userType: true,
-            district: formData.userType === "District Admin" || formData.userType === "Sub-district Admin",
-            subDistrict: formData.userType === "Sub-district Admin"
+            kalolsavam: formData.userType === "District Admin" || formData.userType === "Sub-district Admin",
+            subKalolsavam: formData.userType === "Sub-district Admin"
         });
 
         return Object.values(fieldValidations).every(Boolean);
     };
 
     const handleCancel = () => {
-        // Redirect to admin page or specified redirect URL on cancel
-      
-        // Uncomment when ready to use with react-router:
-        navigate(redirectUrl);
+        // Preserve filter parameters when redirecting back
+        const filterParams = new URLSearchParams();
+        
+        // Add the filter parameters that were passed to this page
+        if (formData.userType && formData.userType !== "Select User Type") {
+            filterParams.append('p', formData.userType);
+        } else if (formData.kalolsavam && formData.kalolsavam !== "Select Kalolsavam") {
+            filterParams.append('p', formData.kalolsavam);
+        } else if (formData.subKalolsavam && formData.subKalolsavam !== "Select Sub Kalolsavam") {
+            filterParams.append('p', formData.subKalolsavam);
+        }
+        
+        // Build the URL with filters
+        const redirectWithFilters = filterParams.toString() 
+            ? `${redirectUrl}?${filterParams.toString()}` 
+            : redirectUrl;
+        
+        navigate(redirectWithFilters);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log("Form submitted with data:", formData);
         
-        if (!validateForm()) {
-            return;
-        }
-        
-        // Create request body, omitting password if it wasn't changed
-        const reqBody = new FormData();
-        reqBody.append('username', formData.username);
-        reqBody.append('userType', formData.userType);
-        
-        if (formData.userType === "District Admin" || formData.userType === "Sub-district Admin") {
-            reqBody.append('district', formData.district);
-        }
-        
-        if (formData.userType === "Sub-district Admin") {
-            reqBody.append('subDistrict', formData.subDistrict);
-        }
-        
-        // Only include password if it was changed
-        if (formData.password) {
-            reqBody.append('password', formData.password);
-        }
-    
-    
-        const token = sessionStorage.getItem("token");
-        
-        if (token) {
-            const reqHeader = {
-                "Content-Type": "multipart/form-data",
-                "Authorization": `Bearer ${token}`
-            };
+        if (validateForm()) {
+            console.log("Form is valid, proceeding with submission");
             
-            try {
-               
-                const result = await updateUserAPI(userId, reqBody, reqHeader);
-                
-                if (result.status === 200) {
-                    alert("User updated successfully!");
-                    navigate(redirectUrl);
+            const reqBody = {
+                username: formData.username,
+                userType: formData.userType,
+                kalolsavam: formData.kalolsavam,
+                subKalolsavam: formData.subKalolsavam
+            };
+
+            // Only include password if it was changed
+            if (formData.password) {
+                reqBody.password = formData.password;
+            }
+
+            const token = sessionStorage.getItem("token");
+            if (token) {
+                const reqHeader = {
+                   "Content-Type": "multipart/form-data",
+                    "Authorization": `Bearer ${token}`
+                };
+
+                try {
+                    const result = await updateUserAPI(userId, reqBody, reqHeader);
+                    if (result.status === 200) {
+                        alert("User updated successfully");
+                        
+                        // After successful submission, redirect to the admin page
+                        // You can pass additional parameters if needed
+                        const successParam = new URLSearchParams();
+                        successParam.append('success', 'true');
+                        successParam.append('username', reqBody.username);
+                        successParam.append('action', 'updated');
+                        
+                        // Navigate to redirect URL with success parameters
+                        navigate(`${redirectUrl}?${successParam.toString()}`);
+                    } else {
+                        alert(result.response.data || "Failed to update user");
+                    }
+                } catch (err) {
+                    console.log(err);
+                    alert("Error updating user. Please try again.");
                 }
-            } catch (err) {
-                console.log(err);
-                alert("Failed to update user. Please try again.");
+            } else {
+                alert("Authentication token missing. Please log in again.");
             }
         } else {
-            alert("You're not authorized. Please login again.");
+            console.log("Form has errors");
         }
     };
 
@@ -363,10 +464,14 @@ const EditUser = () => {
             <Header />
             <div className="flex flex-col md:flex-row min-h-screen">
                 <Dash />
-                <div className="flex-1 p-4 bg-gray-300">
+                <div className="flex-1 p-4 bg-gray-300 ">
                     {isLoading ? (
-                        <div className="flex justify-center items-center h-screen">
-                            <div className="text-blue-600 font-semibold">Loading user data...</div>
+                        <div className="flex justify-center items-center h-full">
+                            <p>Loading user data...</p>
+                        </div>
+                    ) : loadError ? (
+                        <div className="flex justify-center items-center h-full">
+                            <p className="text-red-500">{loadError}</p>
                         </div>
                     ) : (
                         <form 
@@ -377,7 +482,6 @@ const EditUser = () => {
                                 <h2 className="text-[20px] font-[600] leading-[100%] tracking-[2%]">
                                     Edit User
                                 </h2>
-                               
                             </div>
                         
                             <div className="mt-10 flex flex-col items-center">
@@ -387,7 +491,7 @@ const EditUser = () => {
                                         <input 
                                             type="text" 
                                             name="username"
-                                           
+                                            value={formData.username}
                                             onChange={handleInputChange}
                                             onBlur={() => handleBlur("username")}
                                             placeholder='Enter Name' 
@@ -400,24 +504,23 @@ const EditUser = () => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col md:flex-row w-full max-w-md mb-6">
-                                    <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">User Name</label>
+                                    <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Password</label>
                                     <div className="w-full md:w-80">
                                         <input 
-                                            type="text" 
-                                            name="Password"
-                                           
+                                            type="password"  
+                                            name="password"
+                                            value={formData.password}
                                             onChange={handleInputChange}
-                                            onBlur={() => handleBlur("username")}
-                                            placeholder='Enter Password' 
+                                            onBlur={() => handleBlur("password")}
+                                            placeholder='Enter new password (leave empty to keep current)' 
                                             className='border px-2 py-1 rounded-full w-full border-blue-700' 
                                         />
-                                    
-                                        {touched.username && errors.username && (
-                                            <p className="text-sm text-red-500 mt-1">{errors.username}</p>
+                                      
+                                        {touched.password && errors.password && (
+                                            <p className="text-sm text-red-500 mt-1">{errors.password}</p>
                                         )}
                                     </div>
                                 </div>
-                              
                                 <div className="flex flex-col md:flex-row w-full max-w-md mb-6">
                                     <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">User Type</label>
                                     <div className="w-full md:w-80">
@@ -441,28 +544,28 @@ const EditUser = () => {
                                 
                                 {(formData.userType === "District Admin" || formData.userType === "Sub-district Admin") && (
                                     <div className="flex flex-col md:flex-row w-full max-w-md mb-6">
-                                        <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">District</label>
+                                        <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Kalolsavam</label>
                                         <div className="w-full md:w-80">
-                                            <div className="relative" ref={districtDropdownRef}>
-                                                {/* Custom district dropdown button */}
+                                            <div className="relative" ref={kalolsavamDropdownRef}>
+                                                {/* Custom kalolsavam dropdown button */}
                                                 <div
-                                                    onClick={() => toggleDropdown('district')}
+                                                    onClick={() => toggleDropdown('kalolsavam')}
                                                     className="border px-2 py-1 rounded-full w-full border-blue-600 flex justify-between items-center cursor-pointer bg-white"
                                                 >
-                                                    <span>{formData.district || 'Select District'}</span>
+                                                    <span>{formData.kalolsavam || 'Select Kalolsavam'}</span>
                                                     <span className="text-xs">▼</span>
                                                 </div>
                                                 
                                                 {/* Dropdown menu */}
-                                                {dropdownOpen.district && (
+                                                {dropdownOpen.kalolsavam && (
                                                     <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
                                                         {/* Search input */}
                                                         <div className="p-2 border-b">
                                                             <input
                                                                 type="text"
-                                                                placeholder="Search district..."
-                                                                value={searchText.district}
-                                                                onChange={(e) => handleSearchChange(e, 'district')}
+                                                                placeholder="Search kalolsavam..."
+                                                                value={searchText.kalolsavam}
+                                                                onChange={(e) => handleSearchChange(e, 'kalolsavam')}
                                                                 className="w-full px-2 py-1 border border-gray-300 rounded"
                                                                 onClick={(e) => e.stopPropagation()}
                                                             />
@@ -470,103 +573,98 @@ const EditUser = () => {
                                                         
                                                         {/* Options list */}
                                                         <div className="max-h-48 overflow-y-auto">
-                                                            {filteredDistricts.map((district, index) => (
+                                                            {filteredKalolsavams.map((kalolsavam, index) => (
                                                                 <div
                                                                     key={index}
-                                                                    className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.district === district ? 'bg-blue-200' : ''}`}
+                                                                    className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.kalolsavam === kalolsavam ? 'bg-blue-200' : ''}`}
                                                                     onClick={() => {
-                                                                        if (district !== 'No results found') {
+                                                                        if (kalolsavam !== 'No results found') {
                                                                             handleInputChange({
-                                                                                target: { name: 'district', value: district }
+                                                                                target: { name: 'kalolsavam', value: kalolsavam }
                                                                             });
                                                                         }
                                                                     }}
                                                                 >
-                                                                    {district}
+                                                                    {kalolsavam}
                                                                 </div>
                                                             ))}
                                                         </div>
                                                     </div>
                                                 )}
                                             </div>
-                                            {touched.district && errors.district && (
-                                                <p className="text-sm text-red-500 mt-1">{errors.district}</p>
+                                            {touched.kalolsavam && errors.kalolsavam && (
+                                                <p className="text-sm text-red-500 mt-1">{errors.kalolsavam}</p>
                                             )}
                                         </div>
                                     </div>
                                 )}
                                 
-                                {/* Only show Sub-district dropdown for Sub-district Admin AND when a valid district is selected */}
                                 {formData.userType === "Sub-district Admin" && 
-                                 formData.district && 
-                                 formData.district !== "Select District" && (
+                                 formData.kalolsavam && 
+                                 formData.kalolsavam !== "Select Kalolsavam" && (
                                     <div className="flex flex-col md:flex-row w-full max-w-md mb-6">
-                                        <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Sub District</label>
+                                        <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Sub Kalolsavam</label>
                                         <div className="w-full md:w-80">
-                                            <div className="relative" ref={subDistrictDropdownRef}>
-                                                {/* Custom sub-district dropdown button */}
+                                            <div className="relative" ref={subKalolsavamDropdownRef}> 
                                                 <div
-                                                    onClick={() => toggleDropdown('subDistrict')}
+                                                    onClick={() => toggleDropdown('subKalolsavam')}
                                                     className="border px-2 py-1 rounded-full w-full border-blue-600 flex justify-between items-center cursor-pointer bg-white"
                                                 >
-                                                    <span>{formData.subDistrict || 'Select Sub District'}</span>
+                                                    <span>{formData.subKalolsavam || 'Select Sub Kalolsavam'}</span>
                                                     <span className="text-xs">▼</span>
                                                 </div>
                                                 
-                                                {/* Dropdown menu */}
-                                                {dropdownOpen.subDistrict && (
+                                                {dropdownOpen.subKalolsavam && (
                                                     <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
-                                                        {/* Search input */}
                                                         <div className="p-2 border-b">
                                                             <input
                                                                 type="text"
-                                                                placeholder="Search sub-district..."
-                                                                value={searchText.subDistrict}
-                                                                onChange={(e) => handleSearchChange(e, 'subDistrict')}
+                                                                placeholder="Search sub-kalolsavam..."
+                                                                value={searchText.subKalolsavam}
+                                                                onChange={(e) => handleSearchChange(e, 'subKalolsavam')}
                                                                 className="w-full px-2 py-1 border border-gray-300 rounded"
                                                                 onClick={(e) => e.stopPropagation()}
                                                             />
                                                         </div>
                                                         
-                                                        {/* Options list */}
                                                         <div className="max-h-48 overflow-y-auto">
-                                                            {filteredSubDistricts.map((subDistrict, index) => (
+                                                            {filteredSubKalolsavams.map((subKalolsavam, index) => (
                                                                 <div
                                                                     key={index}
-                                                                    className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.subDistrict === subDistrict ? 'bg-blue-200' : ''}`}
+                                                                    className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.subKalolsavam === subKalolsavam ? 'bg-blue-200' : ''}`}
                                                                     onClick={() => {
-                                                                        if (subDistrict !== 'No results found' && subDistrict !== 'Select Sub District') {
+                                                                        if (subKalolsavam !== 'No results found' && subKalolsavam !== 'Select Sub Kalolsavam') {
                                                                             handleInputChange({
-                                                                                target: { name: 'subDistrict', value: subDistrict }
+                                                                                target: { name: 'subKalolsavam', value: subKalolsavam }
                                                                             });
                                                                         }
                                                                     }}
                                                                 >
-                                                                    {subDistrict}
+                                                                    {subKalolsavam}
                                                                 </div>
                                                             ))}
                                                         </div>
                                                     </div>
                                                 )}
                                             </div>
-                                            {touched.subDistrict && errors.subDistrict && (
-                                                <p className="text-sm text-red-500 mt-1">{errors.subDistrict}</p>
+                                            {touched.subKalolsavam && errors.subKalolsavam && (
+                                                <p className="text-sm text-red-500 mt-1">{errors.subKalolsavam}</p>
                                             )}
                                         </div>
                                     </div>
                                 )}
                             </div>
-                            <div className="text-center mt-16">
+                            <div className="text-right mt-40 mr-40">
                                 <button
                                     type="button"
                                     onClick={handleCancel}
-                                    className="mr-6 bg-gradient-to-r from-[#003566] to-[#05B9F4] bg-clip-text text-transparent border border-blue-600 px-6 py-2 rounded-full"
+                                    className="mr-6 bg-gradient-to-r from-[#003566] to-[#05B9F4] bg-clip-text text-transparent border border-blue-600 px-14 py-2 rounded-full"
                                 >
                                    Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-10 py-2 rounded-full"
+                                    className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-14 py-2 rounded-full"
                                 >
                                     Update
                                 </button>

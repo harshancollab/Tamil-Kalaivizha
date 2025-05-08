@@ -215,8 +215,8 @@ function App() {
         <Route path="/reset-password" element={<Newpass />} />
         <Route path="/not-authorized" element={<h1>Not Authorized</h1>} />
 
-        {/* Protected Routes for All Authenticated Users */}
-        <Route element={<ProtectedRoute allowedRoles={['district admin','state admin', 'school admin', 'sub district admin']} />}>
+
+        <Route element={<ProtectedRoute allowedRoles={['districtAdmin', 'stateAdmin', 'Schooladmin', 'subadmin']} />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/result" element={<Result />} />
           <Route path="/form" element={<MultiStep />} />
@@ -231,13 +231,34 @@ function App() {
         </Route>
 
         {/* Routes ONLY for "school admin" */}
-        <Route element={<ProtectedRoute allowedRoles={['school admin', 'sub district admin']} />}>
+        <Route element={<ProtectedRoute allowedRoles={['Schooladmin', 'subadmin','districtAdmin']} />}>
           <Route path="/Schooldetails" element={<SchoolDetails />} />
           <Route path="/participatelist" element={<ParticipateList />} />
         </Route>
 
-       {/* Routes ONLY for "sub district admin" */}
-        <Route element={<ProtectedRoute allowedRoles={['sub district admin']} />}>
+        {/* Protected Routes for All Authenticated Users */}
+        <Route element={<ProtectedRoute allowedRoles={['districtAdmin', 'stateAdmin', 'Schooladmin', 'subadmin']} />}>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/result" element={<Result />} />
+          <Route path="/form" element={<MultiStep />} />
+          <Route path="/resetpwd" element={<Resetpwd />} />
+          <Route path="/otp" element={<Otp />} />
+          <Route path="/conformpwd" element={<ChangePassword />} />
+          <Route path="/b-grade-list" element={<Bgrade />} />
+          <Route path="/c-grade-list" element={<Cgrade />} />
+          <Route path="/report" element={<Report />} />
+          <Route path="/item" element={<ItemWise />} />
+          <Route path="/top" element={<TopSchool />} />
+          {/* </Route> */}
+
+          {/* Routes ONLY for "school admin" */}
+          {/* <Route element={<ProtectedRoute allowedRoles={['school admin', 'sub district admin']} />}> */}
+          <Route path="/Schooldetails" element={<SchoolDetails />} />
+          <Route path="/participatelist" element={<ParticipateList />} />
+        </Route>
+
+        {/* Routes ONLY for "sub district admin" */}
+        <Route element={<ProtectedRoute allowedRoles={['subadmin']} />}>
           <Route path="/AllKalolsavam" element={<AllKalolsavam />} />
           <Route path="/edit-kalolsavam/:id" element={<EditKalsvmDetails />} />
           <Route path="/schlentry" element={<SchlEntry />} />
@@ -290,10 +311,10 @@ function App() {
           <Route path="/ai" element={<Publish />} />
 
 
-        </Route> 
+        </Route>
 
         {/* Routes ONLY for "admin" */}
-        <Route element={<ProtectedRoute allowedRoles={['It Admin']} />}>
+        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
           <Route path="/DistrictList" element={<DistrictList />} />
           <Route path="/AddDistrict" element={<AddDistrict />} />
           <Route path="/SubDistrictlist" element={<SubDistrictlist />} />
@@ -335,8 +356,8 @@ function App() {
 
           {/* sub reg */}
 
-        
-          
+
+
           <Route path="/AdResult" element={<AdResult />} />
 
           <Route path="/SchoolList/:subDistrictId" element={<SclDisSub />} />
@@ -346,7 +367,7 @@ function App() {
         </Route>
 
         {/* Routes ONLY for " district admin" */}
-        <Route element={<ProtectedRoute allowedRoles={['district admin']} />}>
+        <Route element={<ProtectedRoute allowedRoles={['districtAdmin']} />}>
         <Route path="/DDefnKalolsavam" element={<DDefnKalolsavam />} />
         <Route path="/DEditKalolsavam/:id" element={<DEditKalolsavam />} />
         <Route path="/DSclEntry" element={<DSclEntry />} />
@@ -388,22 +409,22 @@ function App() {
         <Route path="/DClusterReport" element={<DClusterReport />} />
         <Route path="/DAddStageallotitmwise" element={<DAddStageallotitmwise />} />
         <Route path="/DEditstgAllotitmwise/:id" element={<DEditstgAllotitmwise />} />
-        
-        
+
+
         <Route path="/DCertificate" element={<DCertificate />} />
 
         <Route path="/DPublishdeclare" element={<DPubl />} />
         <Route path="/festival-status" element={<DPublishSTatusfest />} />
         {/* <Route path="/DPublishdeclare" element={<DPublishdeclare />} /> */}
-        
+
         <Route path="/DParticipatingScl" element={<DParticipatingScl />} />
         <Route path="/DFestWiseParti" element={<DFestWiseParti />} />
         <Route path="/DdateWisepartici" element={<DdateWisepartici />} />
         <Route path="/DParticipateCardlist" element={<DParticipateCardlist />} />
 
         </Route> 
-        <Route element={<ProtectedRoute allowedRoles={['state admin']} />}>
-        
+        <Route element={<ProtectedRoute allowedRoles={['stateAdmin']} />}>
+
         <Route path="/SDefineKalolsavm" element={<SDefineKalolsavm />} />
         <Route path="/SEditKallosvm/:id" element={<SEditKallosvm />} />
         <Route path="/SSClEntry" element={<SSClEntry />} />
@@ -453,20 +474,11 @@ function App() {
         <Route path="/SCertificatetemp" element={<SCertificatetemp />} />
 
 
-
-
-
-
-
-
-
-
-
         <Route path="/StateParticipatesclList" element={<StateParticipatesclList />} />
         <Route path="/StateParticipateFesWis" element={<StateParticipateFesWis />} />
         <Route path="/StateDatewisepaticipat" element={<StateDatewisepaticipat />} />
         <Route path="/StateParticipateCardLis" element={<StateParticipateCardLis />} />
-        
+
 
         </Route> 
 
