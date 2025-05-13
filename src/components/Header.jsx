@@ -7,13 +7,22 @@ const Header = ({ insideHome }) => {
   const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
-  const [name, setName] = useState("Username");
-  const [tempName, setTempName] = useState("Username");
+  const [username, setUsername] = useState("");
+  const [tempName, setTempName] = useState("");
   const nameInputRef = useRef(null);
   const mobileDropdownRef = useRef(null);
   const fileInputRef = useRef(null);
 
-
+  useEffect(() => {
+    if(sessionStorage.getItem("admin")) {
+      const userData = JSON.parse(sessionStorage.getItem("admin"));
+      setUsername(userData.username);
+      setTempName(userData.username);
+    } else {
+      setUsername("Username");
+      setTempName("Username");
+    }
+  }, []);
 
   const handleUploadClick = () => {
     fileInputRef.current.click();
@@ -22,17 +31,15 @@ const Header = ({ insideHome }) => {
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-
       console.log("File selected:", file);
-
-
     }
   };
-  const navigate = useNavigate()
+  
+  const navigate = useNavigate();
   
   const logout = () => {
-    sessionStorage.clear()
-    navigate("/login")
+    sessionStorage.clear();
+    navigate("/login");
   }
 
   const toggleDropdown = () => {
@@ -48,7 +55,9 @@ const Header = ({ insideHome }) => {
     setDropdownOpen(false);
     setMobileDropdownOpen(false);
     setIsEditingName(false);
-    setTempName(name);
+    
+    // Refresh the temp name from the current username
+    setTempName(username);
   };
 
   const handleEditName = () => {
@@ -60,15 +69,22 @@ const Header = ({ insideHome }) => {
   };
 
   const handleSaveName = () => {
-    setName(tempName);
+    setUsername(tempName);
+    
+    // Update username in session storage
+    if(sessionStorage.getItem("user")) {
+      const userData = JSON.parse(sessionStorage.getItem("user"));
+      userData.username = tempName;
+      sessionStorage.setItem("user", JSON.stringify(userData));
+    }
+    
     setIsEditingName(false);
   };
 
   const handleCancelEditName = () => {
-    setTempName(name);
+    setTempName(username);
     setIsEditingName(false);
   };
-
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -91,8 +107,8 @@ const Header = ({ insideHome }) => {
 
   return (
     <>
-      <div className="relative  w-full">
-        <nav className=" bg-[#46A2FF] text-white px-4   sm:px-6 py-3 flex items-center justify-between">
+      <div className="relative w-full">
+        <nav className="bg-[#46A2FF] text-white px-4 sm:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center space-x-3 ml-2 sm:ml-10 ml-8">
             <img
               src={logo}
@@ -131,13 +147,13 @@ const Header = ({ insideHome }) => {
                 >
                   <i className="fas fa-user mr-2"></i> Profile
                 </button>
-                <Link to={'/conformpwd'}  className="block px-4 py-2 hover:bg-gray-200 flex items-center">
+                <Link to={'/conformpwd'} className="block px-4 py-2 hover:bg-gray-200 flex items-center">
                   <i className="fas fa-key mr-2"></i> Change Password
                 </Link>
                 <div className="block px-4 py-2 hover:bg-gray-200 flex items-center">
                   <i className="fas fa-bell mr-2"></i> Notifications
                 </div>
-                <a href="#" className="block px-4 py-2 hover:bg-gray-200 flex items-center">
+                <a href="#" onClick={logout} className="block px-4 py-2 hover:bg-gray-200 flex items-center">
                   <i className="fas fa-sign-out-alt mr-2"></i> Log out
                 </a>
               </div>
@@ -159,7 +175,7 @@ const Header = ({ insideHome }) => {
                   className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border"
                 />
                 <span className="hidden sm:block text-sm md:text-base truncate max-w-[120px] md:max-w-[200px]">
-                  {name}
+                  {username}
                 </span>
                 <i
                   className={`fas ${dropdownOpen ? "fa-chevron-up" : "fa-chevron-down"} text-lg`}
@@ -173,7 +189,7 @@ const Header = ({ insideHome }) => {
                   >
                     <i className="fas fa-user mr-2"></i> Profile
                   </button>
-                  <Link to={'/conformpwd'}   className="block px-4 py-2 hover:bg-gray-200 flex items-center">
+                  <Link to={'/conformpwd'} className="block px-4 py-2 hover:bg-gray-200 flex items-center">
                     <i className="fas fa-key mr-2"></i> Change Password
                   </Link>
                   <button onClick={logout} className="block px-4 py-2 hover:bg-gray-200 flex items-center">
@@ -212,7 +228,6 @@ const Header = ({ insideHome }) => {
 
                 <div className="flex flex-col sm:flex-row items-center mb-6 gap-4 ml-5 ">
                   <div className="w-16 h-16 bg-gray-200 rounded-full flex justify-center items-center">
-                  
                   <img className="w-10" src="https://static.vecteezy.com/system/resources/previews/042/332/098/non_2x/default-avatar-profile-icon-grey-photo-placeholder-female-no-photo-images-for-unfilled-user-profile-greyscale-illustration-for-socail-media-web-vector.jpg" alt="" />
                   </div>
                   <button
@@ -246,7 +261,7 @@ const Header = ({ insideHome }) => {
                           <input
                             type="text"
                             className="w-full sm:w-80 border-blue-900 px-4 py-2 border rounded-full"
-                            value={name}
+                            value={username}
                             readOnly
                           />
                           <button
@@ -262,8 +277,13 @@ const Header = ({ insideHome }) => {
                 </div>
                 <div className="mb-6 ml-6">
                   <div>
-                    <label className="block text-sm font-medium text-blue-900 mb-1">User name</label>
-                    <input disabled type="text" className="w-full sm:w-80 border-blue-900 px-4 py-2 border rounded-full" />
+                    <label className="block text-sm font-medium text-blue-900 mb-1">Username</label>
+                    <input 
+                      disabled 
+                      type="text" 
+                      value={username}
+                      className="w-full sm:w-80 border-blue-900 px-4 py-2 border rounded-full" 
+                    />
                   </div>
                 </div>
               </div>
@@ -293,4 +313,3 @@ const Header = ({ insideHome }) => {
 };
 
 export default Header
-

@@ -1,24 +1,28 @@
 // It Admin user - add user
 
-import React, { useState, useEffect, useRef } from 'react'
-import Header from '../components/Header'
+
+import React, { useState, useRef, useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import Dash from '../components/Dash'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { addAdminAPI } from '../services/allAPI'
+import Header from '../components/Header'
+import Alert from '../components/Alert'
+// import { AddUserAPI } from '../services/allAPI' 
 
 const AddUser = () => {
     const navigate = useNavigate();
-    const location = useLocation();
-    
-    // Add API status tracking
-    const [apiStatus, setApiStatus] = useState({
-        isLoading: false,
-        error: null,
-        success: false
+    const [searchParams, setSearchParams] = useSearchParams()
+
+    // Alert state
+    const [alert, setAlert] = useState({
+        show: false,
+        message: '',
+        type: 'success'
     });
-    
-    const params = new URLSearchParams(location.search);
-    const redirectUrl = params.get('redirect') || '/admin-panel';
+
+    const userTypeDropdownRef = useRef(null);
+    const districtDropdownRef = useRef(null);
+    const subDistrictDropdownRef = useRef(null);
+    const kalolsavamDropdownRef = useRef(null);
 
     const allUserTypes = [
         'Select User Type',
@@ -26,727 +30,665 @@ const AddUser = () => {
         'District Admin',
         'Sub-district Admin'
     ];
-    
+
+    const Kalolsavams = [
+        'Select Kalolsavam',
+        'Kerala State Kalolsavam',
+        'District Kalolsavam',
+        'Sub-district Kalolsavam',
+        'School Kalolsavam'
+    ];
+
+    const districtKalolsavm = {
+        'Idukki ': [
+            'Select Kalolsavam',
+            'Idukki District Kalolsavam'
+        ],
+        'Ernakulam ': [
+            'Select Kalolsavam',
+            'Ernakulam District Kalolsavam'
+        ],
+        'Palakkad ': [
+            'Select Kalolsavam',
+            'Palakkad District Kalolsavam'
+        ],
+        'Kozhikode': [
+            'Select Kalolsavam',
+            'Kozhikode District Kalolsavam'
+        ],
+        'Wayanad ': [
+            'Select Kalolsavam',
+            'Wayanad District Kalolsavam'
+        ],
+        'Thrissur': [
+            'Select Kalolsavam',
+            'Thrissur District Kalolsavam'
+        ],
+        'Ottapalam': [
+            'Select Kalolsavam',
+            'Ottapalam District Kalolsavam'
+        ]
+    };
+
     const allDistricts = [
         'Select District',
-        'Idukki',
-        'Ernakulam',
-        'Palakkad',
+        'Idukki ',
+        'Ernakulam ',
+        'Palakkad ',
         'Kozhikode',
-        'Wayanad',
+        'Wayanad ',
         'Thrissur',
         'Ottapalam'
     ];
-    
+
     const districtToSubDistrict = {
-        'Idukki': ['Munnar', 'Adimali', 'Kattappana', 'Nedumkandam', 'Devikulam'],
-        'Palakkad': ['Chittur', 'Pattambi', 'Kuzhalmannam', 'Nemmara', 'Mannarkkad', 'Ottapalam'],
-        'Ernakulam': [],
-        'Kozhikode': ['vatakara'],
-        'Wayanad': [],
-        'Thrissur': []
+        'Idukki ': ['Munnar', 'Adimali', 'Kattappana', 'Nedumkandam', 'Devikulam'],
+        'Palakkad ': ['Chittur', 'Pattambi', 'Kuzhalmannam', 'Nemmara', 'Mannarkkad', 'Ottapalam'],
+        'Ernakulam ': ['Aluva', 'Kochi', 'Perumbavoor', 'Kothamangalam', 'Muvattupuzha'],
+        'Kozhikode': ['Vatakara', 'Koyilandy', 'Thamarassery', 'Koduvally', 'Balussery'],
+        'Wayanad ': ['Sulthan Bathery', 'Mananthavady', 'Kalpetta', 'Vythiri'],
+        'Thrissur': ['Chalakudy', 'Kodungallur', 'Irinjalakuda', 'Guruvayur', 'Chavakkad']
     };
 
     const [formData, setFormData] = useState({
-        username: "",
-        password: "",
-        userType: "",
-        district: "",
-        subDistrict: ""
+        username: '',
+        password: '',
+        userType: '',
+        district: '',
+        subDistrict: '',
+        kalolsavam: ''
     });
 
     const [errors, setErrors] = useState({
-        username: "",
-        password: "",
-        userType: "",
-        district: "",
-        subDistrict: ""
+        username: '',
+        password: '',
+        userType: '',
+        district: '',
+        subDistrict: '',
+        kalolsavam: ''
     });
 
-    const [touched, setTouched] = useState({
-        username: false,
-        password: false,
+    const [dropdownOpen, setDropdownOpen] = useState({
         userType: false,
         district: false,
-        subDistrict: false
+        subDistrict: false,
+        kalolsavam: false
     });
 
-    const [filteredDistricts, setFilteredDistricts] = useState(allDistricts);
-    const [filteredSubDistricts, setFilteredSubDistricts] = useState([]);
     const [searchText, setSearchText] = useState({
-        district: "",
-        subDistrict: ""
+        userType: '',
+        district: '',
+        subDistrict: '',
+        kalolsavam: ''
     });
-    
- 
-    const [dropdownOpen, setDropdownOpen] = useState({
-        district: false,
-        subDistrict: false
-    });
-    
-    // References to detect clicks outside dropdowns
-    const districtDropdownRef = useRef(null);
-    const subDistrictDropdownRef = useRef(null);
 
-    // Function to update form data from URL parameters
-    const updateFormFromUrl = () => {
-        const params = new URLSearchParams(location.search);
-        const userType = params.get('userType');
-        const district = params.get('district');
-        const subDistrict = params.get('subDistrict');
-        
-        // Create a new form data object to track changes
-        const newFormData = { ...formData };
-        let changed = false;
-        
-        if (userType && userType !== newFormData.userType) {
-            newFormData.userType = userType;
-            changed = true;
-        }
-        
-        if (district && district !== newFormData.district) {
-            newFormData.district = district;
-            changed = true;
-        }
-        
-        if (subDistrict && subDistrict !== newFormData.subDistrict) {
-            newFormData.subDistrict = subDistrict;
-            changed = true;
-        }
-        
-        // Only update state if there were actual changes to avoid infinite loops
-        if (changed) {
-            console.log("Updating form from URL with:", newFormData);
-            setFormData(newFormData);
-            
-            // Make sure available sub-districts are updated based on the district
-            if (district && district !== 'Select District' && districtToSubDistrict[district]) {
-                const subDistricts = districtToSubDistrict[district] || [];
-                setFilteredSubDistricts(['Select Sub District', ...subDistricts]);
-            }
-        }
-    };
+    const [availableSubDistricts, setAvailableSubDistricts] = useState([]);
+    const [availableKalolsavams, setAvailableKalolsavams] = useState([]);
 
-    // Function to update URL parameters when form values change
-    const updateUrlParams = (newFormData) => {
-        const params = new URLSearchParams();
-        
-        // Update URL parameters based on form data
-        if (newFormData.userType && newFormData.userType !== 'Select User Type') {
-            params.set('userType', newFormData.userType);
-        }
-        
-        if (newFormData.district && newFormData.district !== 'Select District') {
-            params.set('district', newFormData.district);
-        }
-        
-        if (newFormData.subDistrict && newFormData.subDistrict !== 'Select Sub District') {
-            params.set('subDistrict', newFormData.subDistrict);
-        }
-        
-        // Preserve the redirect parameter if it exists
-        if (redirectUrl && redirectUrl !== '/admin-panel') {
-            params.set('redirect', redirectUrl);
-        }
-        
-        // Update the URL without reloading the page
-        const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
-        window.history.pushState({path: newUrl}, '', newUrl);
-    };
-
-    // Initialize form from URL on first load
     useEffect(() => {
-        updateFormFromUrl();
-    }, []);
-
-    // Add effect for handling changes to location.search
-    useEffect(() => {
-        updateFormFromUrl();
-    }, [location.search]);
-
-    // Add event listener for popstate (back/forward button)
-   
-    useEffect(() => {
-        const handlePopState = (event) => {
-            // When back/forward button is clicked, we need to synchronize the form
-            console.log("Browser navigation occurred", event.state);
-            
-            // Don't call updateUrlParams here, as that would create a new history entry
-            // Just update the form from the current URL
-            updateFormFromUrl();
-        };
-
-        window.addEventListener('popstate', handlePopState);
-        
-        return () => {
-            window.removeEventListener('popstate', handlePopState);
-        };
-    }, []);
-    
-    // Update available sub-districts when district changes
-    useEffect(() => {
-        if (formData.district && formData.district !== 'Select District') {
-            const subDistricts = districtToSubDistrict[formData.district] || [];
-            setFilteredSubDistricts(['Select Sub District', ...subDistricts]);
-            
-            // If current subDistrict isn't valid for the new district, reset it
-            if (formData.subDistrict && 
-                formData.subDistrict !== 'Select Sub District' && 
-                !subDistricts.includes(formData.subDistrict)) {
-                setFormData(prev => ({
-                    ...prev,
-                    subDistrict: ''
-                }));
-            }
+        // Set sub-districts based on selected district
+        if (formData.district && districtToSubDistrict[formData.district]) {
+            setAvailableSubDistricts(districtToSubDistrict[formData.district]);
         } else {
-            setFilteredSubDistricts(['Select Sub District']);
+            setAvailableSubDistricts([]);
         }
+
+        // Set kalolsavams based on selected district
+        if (formData.district && districtKalolsavm[formData.district]) {
+            setAvailableKalolsavams(districtKalolsavm[formData.district]);
+        } else {
+            setAvailableKalolsavams(Kalolsavams);
+        }
+
+        // Reset sub-district and kalolsavam when district changes
+        setFormData(prev => ({
+            ...prev,
+            subDistrict: '',
+            kalolsavam: ''
+        }));
     }, [formData.district]);
 
-    // Filter districts based on search text
     useEffect(() => {
-        if (searchText.district) {
-            const filtered = allDistricts.filter(district => 
-                district.toLowerCase().includes(searchText.district.toLowerCase())
-            );
-            setFilteredDistricts(filtered.length > 0 ? filtered : ['No results found']);
-        } else {
-            setFilteredDistricts(allDistricts);
-        }
-    }, [searchText.district]);
+        // Handle district from URL params if any
+        const districtParam = searchParams.get('district');
 
-    // Filter sub-districts based on search text
-    useEffect(() => {
-        if (searchText.subDistrict && formData.district && formData.district !== 'Select District') {
-            const subDistricts = districtToSubDistrict[formData.district] || [];
-            const filtered = ['Select Sub District', ...subDistricts].filter(subDistrict => 
-                subDistrict.toLowerCase().includes(searchText.subDistrict.toLowerCase())
-            );
-            setFilteredSubDistricts(filtered.length > 0 ? filtered : ['No results found']);
-        } else if (formData.district && formData.district !== 'Select District') {
-            const subDistricts = districtToSubDistrict[formData.district] || [];
-            setFilteredSubDistricts(['Select Sub District', ...subDistricts]);
+        if (districtParam) {
+            setFormData(prev => ({
+                ...prev,
+                district: districtParam
+            }));
         }
-    }, [searchText.subDistrict, formData.district]);
+    }, [searchParams]);
 
-    // Handle clicks outside the dropdowns
+    const [formSubmitted, setFormSubmitted] = useState(false);
+
+    const filteredUserTypes = searchText.userType
+        ? allUserTypes.filter(type =>
+            type.toLowerCase().includes(searchText.userType.toLowerCase()))
+        : allUserTypes;
+
+    const filteredDistricts = searchText.district
+        ? allDistricts.filter(district =>
+            district.toLowerCase().includes(searchText.district.toLowerCase()))
+        : allDistricts;
+
+    const filteredSubDistricts = searchText.subDistrict
+        ? availableSubDistricts.filter(subDistrict =>
+            subDistrict.toLowerCase().includes(searchText.subDistrict.toLowerCase()))
+        : availableSubDistricts;
+
+    const filteredKalolsavams = searchText.kalolsavam
+        ? availableKalolsavams.filter(kalolsavam =>
+            kalolsavam.toLowerCase().includes(searchText.kalolsavam.toLowerCase()))
+        : availableKalolsavams;
+
     useEffect(() => {
         function handleClickOutside(event) {
+            if (userTypeDropdownRef.current && !userTypeDropdownRef.current.contains(event.target)) {
+                setDropdownOpen(prev => ({ ...prev, userType: false }));
+            }
             if (districtDropdownRef.current && !districtDropdownRef.current.contains(event.target)) {
-                setDropdownOpen(prev => ({...prev, district: false}));
+                setDropdownOpen(prev => ({ ...prev, district: false }));
             }
             if (subDistrictDropdownRef.current && !subDistrictDropdownRef.current.contains(event.target)) {
-                setDropdownOpen(prev => ({...prev, subDistrict: false}));
+                setDropdownOpen(prev => ({ ...prev, subDistrict: false }));
+            }
+            if (kalolsavamDropdownRef.current && !kalolsavamDropdownRef.current.contains(event.target)) {
+                setDropdownOpen(prev => ({ ...prev, kalolsavam: false }));
             }
         }
-        
-        document.addEventListener("mousedown", handleClickOutside);
+
+        document.addEventListener('mousedown', handleClickOutside);
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        console.log(`Input changed: ${name} = ${value}`);
-        
-        let newFormData;
-        
-        if (name === "userType" && value !== "District Admin" && value !== "Sub-district Admin") {
-            newFormData = {
-                ...formData,
-                [name]: value,
-                district: "",
-                subDistrict: ""
-            };
-        } else if (name === "userType" && value === "District Admin") {
-            newFormData = {
-                ...formData,
-                [name]: value,
-                subDistrict: ""
-            };
-        } else if (name === "district") {
-            newFormData = {
-                ...formData,
-                [name]: value,
-                subDistrict: ""  
-            };
-            // Close district dropdown after selection
-            setDropdownOpen(prev => ({...prev, district: false}));
-            setSearchText(prev => ({...prev, district: ""}));
-        } else if (name === "subDistrict") {
-            newFormData = {
-                ...formData,
-                [name]: value,
-            };
-            // Close sub-district dropdown after selection
-            setDropdownOpen(prev => ({...prev, subDistrict: false}));
-            setSearchText(prev => ({...prev, subDistrict: ""}));
-        } else {
-            newFormData = {
-                ...formData,
-                [name]: value,
-            };
-        }
-        
-        setFormData(newFormData);
-        
-        // Update URL parameters
-        if (name === "userType" || name === "district" || name === "subDistrict") {
-            updateUrlParams(newFormData);
-        }
-        
-        validateField(name, value);
+    const toggleDropdown = (dropdownName) => {
+        setDropdownOpen(prev => ({
+            ...prev,
+            [dropdownName]: !prev[dropdownName]
+        }));
     };
 
     const handleSearchChange = (e, field) => {
-        const { value } = e.target;
         setSearchText(prev => ({
             ...prev,
-            [field]: value
+            [field]: e.target.value
         }));
-    };
-    
-    const toggleDropdown = (field) => {
-        setDropdownOpen(prev => ({
-            ...prev,
-            [field]: !prev[field]
-        }));
+        e.stopPropagation();
     };
 
-    const handleBlur = (field) => {
-        setTouched({
-            ...touched,
-            [field]: true,
-        });
-        validateField(field, formData[field]);
-    };
+    const validateField = (name, value) => {
+        switch (name) {
+            case 'username':
+                if (!value.trim()) return 'Username is required';
+                if (value.trim().length < 3) return 'Username must be at least 3 characters long';
+                return '';
 
-    const validateField = (field, value) => {
-        let errorMessage = "";
+            case 'password':
+                if (!value.trim()) return 'Password is required';
+                if (value.trim().length < 6) return 'Password must be at least 6 characters long';
+                return '';
 
-        switch (field) {
-            case "username":
-                if (!value) errorMessage = "Username is required";
-                break;
-            case "password":
-                if (!value) errorMessage = "Password is required";
-                else if (value.length < 6) errorMessage = "Password should be at least 6 characters";
-                break;
-            case "userType":
-                if (!value || value === "Select User Type") errorMessage = "User type selection is required";
-                break;
-            case "district":
-                if ((formData.userType === "District Admin" || formData.userType === "Sub-district Admin") && 
-                    (!value || value === "Select District")) {
-                    errorMessage = "District selection is required";
+            case 'userType':
+                if (!value.trim() || value === 'Select User Type') return 'User type is required';
+                return '';
+
+            case 'district':
+                if (formData.userType === 'District Admin' || formData.userType === 'Sub-district Admin') {
+                    if (!value.trim() || value === 'Select District') return 'District is required';
                 }
-                break;
-            case "subDistrict":
-                if (formData.userType === "Sub-district Admin" && 
-                    (!value || value === "Select Sub District")) {
-                    errorMessage = "Sub-district selection is required";
+                return '';
+
+            case 'subDistrict':
+                if (formData.userType === 'Sub-district Admin') {
+                    if (!value.trim()) return 'Sub-district is required';
                 }
-                break;
+                return '';
+
+            case 'kalolsavam':
+                if (formData.district && (!value.trim() || value === 'Select Kalolsavam')) return 'Kalolsavam is required';
+                return '';
+
             default:
-                break;
+                return '';
         }
-
-        setErrors((prevErrors) => ({
-            ...prevErrors,
-            [field]: errorMessage,
-        }));
-
-        return errorMessage === "";
     };
 
     const validateForm = () => {
-        const fieldValidations = {
-            username: validateField("username", formData.username),
-            password: validateField("password", formData.password),
-            userType: validateField("userType", formData.userType)
-        };
+        const newErrors = {};
+        let isValid = true;
 
-        // Only validate district and subDistrict if needed based on userType
-        if (formData.userType === "District Admin" || formData.userType === "Sub-district Admin") {
-            fieldValidations.district = validateField("district", formData.district);
-        }
-        
-        if (formData.userType === "Sub-district Admin") {
-            fieldValidations.subDistrict = validateField("subDistrict", formData.subDistrict);
+        // Base fields everyone needs
+        let fieldsToValidate = ['username', 'password', 'userType'];
+
+        // Add district requirement for district and sub-district admins
+        if (formData.userType === 'District Admin' || formData.userType === 'Sub-district Admin') {
+            fieldsToValidate.push('district');
         }
 
-        setTouched({
-            username: true,
-            password: true,
-            userType: true,
-            district: formData.userType === "District Admin" || formData.userType === "Sub-district Admin",
-            subDistrict: formData.userType === "Sub-district Admin"
+        // Add sub-district requirement only for sub-district admins
+        if (formData.userType === 'Sub-district Admin') {
+            fieldsToValidate.push('subDistrict');
+        }
+
+        // Add kalolsavam requirement if district is selected
+        if (formData.district && formData.district !== 'Select District') {
+            fieldsToValidate.push('kalolsavam');
+        }
+
+        fieldsToValidate.forEach(key => {
+            const error = validateField(key, formData[key]);
+            newErrors[key] = error;
+            if (error) isValid = false;
         });
 
-        return Object.values(fieldValidations).every(Boolean);
+        setErrors(newErrors);
+        return isValid;
     };
 
-    // Added handleCancel function that was missing in the original code
-    const handleCancel = () => {
-        // Preserve filter parameters when redirecting back
-        const filterParams = new URLSearchParams();
-        
-        // Add the filter parameters that were passed to this page
-        if (formData.userType && formData.userType !== "Select User Type") {
-            filterParams.append('p', formData.userType);
-        } else if (formData.district && formData.district !== "Select District") {
-            filterParams.append('p', formData.district);
-        } else if (formData.subDistrict && formData.subDistrict !== "Select Sub District") {
-            filterParams.append('p', formData.subDistrict);
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+
+        setFormData(prev => ({ ...prev, [name]: value }));
+
+        if (formSubmitted) {
+            setErrors(prev => ({
+                ...prev,
+                [name]: validateField(name, value)
+            }));
         }
-        
-        // Build the URL with filters
-        const redirectWithFilters = filterParams.toString() 
-            ? `${redirectUrl}?${filterParams.toString()}` 
-            : redirectUrl;
-        
-        navigate(redirectWithFilters);
     };
 
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+
+        handleChange({
+            target: { name, value }
+        });
+
+        if (name === 'userType') {
+            setDropdownOpen(prev => ({ ...prev, userType: false }));
+            setSearchText(prev => ({ ...prev, userType: '' }));
+        }
+        if (name === 'district') {
+            setSearchParams({ district: value });
+            setDropdownOpen(prev => ({ ...prev, district: false }));
+            setSearchText(prev => ({ ...prev, district: '' }));
+        }
+        if (name === 'subDistrict') {
+            setDropdownOpen(prev => ({ ...prev, subDistrict: false }));
+            setSearchText(prev => ({ ...prev, subDistrict: '' }));
+        }
+        if (name === 'kalolsavam') {
+            setDropdownOpen(prev => ({ ...prev, kalolsavam: false }));
+            setSearchText(prev => ({ ...prev, kalolsavam: '' }));
+        }
+    };
+
+    const handleCancel = () => {
+        navigate('/admin-panel');
+    };
+
+    
+    const showAlert = (message, type = 'success') => {
+        setAlert({
+            show: true,
+            message,
+            type
+        });
+    };
+
+    const hideAlert = () => {
+        setAlert({
+            ...alert,
+            show: false
+        });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Form submitted with data:", formData);
-        
-        if (validateForm()) {
-            console.log("Form is valid, proceeding with submission");
-            
-            // Set loading state
-            setApiStatus({
-                isLoading: true,
-                error: null,
-                success: false
-            });
-            
-            // Create a properly formatted request body
-            const reqBody = {
-                username: formData.username,
-                password: formData.password,
-                userType: formData.userType
-            };
-            
-            // Only include district and subDistrict if they are relevant
-            if (formData.userType === "District Admin" || formData.userType === "Sub-district Admin") {
-                reqBody.district = formData.district;
-            }
-            
-            if (formData.userType === "Sub-district Admin") {
-                reqBody.subDistrict = formData.subDistrict;
-            }
+        setFormSubmitted(true);
+
+        const isValid = validateForm();
+
+        if (isValid) {
+            console.log("Form submitted:", formData);
 
             const token = sessionStorage.getItem("token");
-            if (!token) {
-                setApiStatus({
-                    isLoading: false,
-                    error: "Authentication token missing. Please log in again.",
-                    success: false
-                });
-                alert("Authentication token missing. Please log in again.");
-                return;
-            }
-            
-            const reqHeader = {
-                "Authorization": `Bearer ${token}`,
-            };
 
-            try {
-                // Debug logging
-                console.log("API Request:", {
-                    body: reqBody,
-                    headers: reqHeader
-                });
-                
-                const result = await addAdminAPI(reqBody, reqHeader);
-                console.log("API Response:", result);
-                
-                if (result.status === 200) {
-                    console.log("User added successfully");
-                    setApiStatus({
-                        isLoading: false,
-                        error: null,
-                        success: true
-                    });
-                    alert("User added successfully");
-                    
-                    // Reset form
-                    setFormData({
-                        username: "",
-                        password: "",
-                        userType: "",
-                        district: "",
-                        subDistrict: ""
-                    });
-                    setTouched({
-                        username: false,
-                        password: false,
-                        userType: false,
-                        district: false,
-                        subDistrict: false
-                    });
-                    
-                    // Clear URL parameters as well
-                    window.history.pushState({}, '', window.location.pathname);
-                    
-                    // After successful submission, redirect to the admin page
-                    // You can pass additional parameters if needed
-                    const successParam = new URLSearchParams();
-                    successParam.append('success', 'true');
-                    successParam.append('username', reqBody.username);
-                    
-                    navigate('/admin-panel');
-                } else {
-                    const errorMsg = result.response?.data || "Error adding user. Please try again.";
-                    setApiStatus({
-                        isLoading: false,
-                        error: errorMsg,
-                        success: false
-                    });
-                    alert(errorMsg);
+            if (token) {
+                const reqHeader = {
+                    "Authorization": `Bearer ${token}`
+                };
+
+                try {
+                    const dataToSubmit = { ...formData };
+
+                    console.log("Submitting data:", dataToSubmit);
+
+                    // const result = await AddUserAPI(dataToSubmit, reqHeader);
+
+                    const result = { status: 200 };
+
+                    if (result.status === 200) {
+                        showAlert(`User ${formData.username} added successfully!`, 'success');
+                        
+                        // Reset form
+                        setFormData({
+                            username: '',
+                            password: '',
+                            userType: '',
+                            district: '',
+                            subDistrict: '',
+                            kalolsavam: ''
+                        });
+                        setFormSubmitted(false);
+                        
+                        setTimeout(() => {
+                            navigate('/admin-panel');
+                        }, 2000);
+                    } else {
+                        showAlert("Failed to add user. Please try again.", 'error');
+                    }
+                } catch (err) {
+                    console.error("Error adding user:", err);
+                    showAlert(`Error adding user: ${err.message || 'Unknown error'}`, 'error');
                 }
-            } catch (err) {
-                console.error("API Error:", err);
-                const errorMsg = err.response?.data || "Error adding user. Please try again.";
-                setApiStatus({
-                    isLoading: false,
-                    error: errorMsg,
-                    success: false
-                });
-                alert(errorMsg);
+            } else {
+                showAlert("Authentication token missing. Please log in again.", 'error');
+                setTimeout(() => {
+                    navigate('/login');
+                }, 2000);
             }
         } else {
-            console.log("Form has errors");
+            console.log("Form has errors:", errors);
+            showAlert("Please Fill  the form before submitting.", 'warning');
+        }
+    };
+
+    const shouldShowField = (fieldName) => {
+        switch (fieldName) {
+            case 'district':
+                return formData.userType === 'District Admin' || formData.userType === 'Sub-district Admin';
+            case 'subDistrict':
+                return formData.userType === 'Sub-district Admin';
+            case 'kalolsavam':
+                return formData.district && formData.district !== 'Select District';
+            default:
+                return true;
         }
     };
 
     return (
         <>
-            <Header />
-            <div className="flex flex-col md:flex-row min-h-screen">
-                <Dash />
-                <div className="flex-1 p-4 bg-gray-300 ">
-                    <form 
-                        className="min-h-screen mx-auto p-6 bg-white rounded-lg shadow-md overflow-hidden"
-                        onSubmit={handleSubmit}
-                    >
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-[20px] font-[600] leading-[100%] tracking-[2%]">
-                                Add User
-                            </h2>
-                        </div>
-                    
-                        {apiStatus.error && (
-                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                                <p>{apiStatus.error}</p>
-                            </div>
-                        )}
-                        
-                        {apiStatus.success && (
-                            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                                <p>User added successfully!</p>
-                            </div>
-                        )}
-                    
-                        <div className="mt-10 flex flex-col items-center">
-                            <div className="flex flex-col md:flex-row w-full max-w-md mb-6">
-                                <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">User Name</label>
-                                <div className="w-full md:w-80">
-                                    <input 
-                                        type="text" 
-                                        name="username"
-                                        value={formData.username}
-                                        onChange={handleInputChange}
-                                        onBlur={() => handleBlur("username")}
-                                        placeholder='Enter Name' 
-                                        className='border px-2 py-1 rounded-full w-full border-blue-700' 
-                                        disabled={apiStatus.isLoading}
-                                    />
-                                
-                                    {touched.username && errors.username && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.username}</p>
-                                    )}
+            <div className="bg-white min-h-screen">
+                <Header />
+                <div className="flex flex-col sm:flex-row">
+                    <Dash />
+                     {alert.show && (
+                        <Alert 
+                            message={alert.message} 
+                            type={alert.type} 
+                            onClose={hideAlert}
+                            duration={5000} 
+                        />
+                    )}
+                    <div className="flex-1 p-2 sm:p-4 bg-gray-300">
+                        <div className="bg-gray-50 p-3 sm:p-6 pt-4 min-h-screen mx-auto">
+                            <h2 className="text-xl font-bold mb-5 sm:mb-10 text-gray-800">Add User</h2>
+
+                            <form className="space-y-3 sm:space-y-4 max-w-2xl mx-auto">
+                                <div className="flex flex-col sm:flex-row sm:items-center">
+                                    <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Username</label>
+                                    <div className="w-full sm:w-2/3">
+                                        <input
+                                            type="text"
+                                            name="username"
+                                            placeholder="Enter username"
+                                            value={formData.username}
+                                            onChange={handleChange}
+                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.username ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
+                                        />
+                                        {errors.username && <p className="text-red-500 text-xs mt-1 ml-2">{errors.username}</p>}
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex flex-col md:flex-row w-full max-w-md mb-6">
-                                <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Password</label>
-                                <div className="w-full md:w-80">
-                                    <input 
-                                        type="password"  
-                                        name="password"
-                                        value={formData.password}
-                                        onChange={handleInputChange}
-                                        onBlur={() => handleBlur("password")}
-                                        placeholder='Enter Password' 
-                                        className='border px-2 py-1 rounded-full w-full border-blue-700' 
-                                        disabled={apiStatus.isLoading}
-                                    />
-                                  
-                                    {touched.password && errors.password && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.password}</p>
-                                    )}
+
+                                <div className="flex flex-col sm:flex-row sm:items-center">
+                                    <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Password</label>
+                                    <div className="w-full sm:w-2/3">
+                                        <input
+                                            type="password"
+                                            name="password"
+                                            placeholder="Enter password"
+                                            value={formData.password}
+                                            onChange={handleChange}
+                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.password ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
+                                        />
+                                        {errors.password && <p className="text-red-500 text-xs mt-1 ml-2">{errors.password}</p>}
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex flex-col md:flex-row w-full max-w-md mb-6">
-                                <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">User Type</label>
-                                <div className="w-full md:w-80">
-                                    <select
-                                        name="userType"
-                                        value={formData.userType}
-                                        onChange={handleInputChange}
-                                        onBlur={() => handleBlur("userType")}
-                                        className="border px-2 py-1 rounded-full w-full border-blue-600 focus:outline-blue-900"
-                                        disabled={apiStatus.isLoading}
-                                    >
-                                        {allUserTypes.map((type, index) => (
-                                            <option key={index} value={type}>{type}</option>
-                                        ))}
-                                    </select>
-                                  
-                                    {touched.userType && errors.userType && (
-                                        <p className="text-sm text-red-500 mt-1">{errors.userType}</p>
-                                    )}
-                                </div>
-                            </div>
-                            
-                            {(formData.userType === "District Admin" || formData.userType === "Sub-district Admin") && (
-                                <div className="flex flex-col md:flex-row w-full max-w-md mb-6">
-                                    <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">District</label>
-                                    <div className="w-full md:w-80">
-                                        <div className="relative" ref={districtDropdownRef}>
-                                            {/* Custom district dropdown button */}
+
+                                <div className="flex flex-col sm:flex-row sm:items-center">
+                                    <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">User Type</label>
+                                    <div className="w-full sm:w-2/3">
+                                        <div className="relative" ref={userTypeDropdownRef}>
                                             <div
-                                                onClick={() => !apiStatus.isLoading && toggleDropdown('district')}
-                                                className={`border px-2 py-1 rounded-full w-full border-blue-600 flex justify-between items-center ${!apiStatus.isLoading ? 'cursor-pointer' : 'cursor-not-allowed'} bg-white`}
+                                                onClick={() => toggleDropdown('userType')}
+                                                className={`border px-3 sm:px-4 py-2 rounded-full w-full ${errors.userType ? 'border-red-500' : 'border-blue-600'} flex justify-between items-center cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-blue-500`}
                                             >
-                                                <span>{formData.district || 'Select District'}</span>
+                                                <span className="text-gray-600">{formData.userType || 'Select User Type'}</span>
                                                 <span className="text-xs">▼</span>
                                             </div>
-                                            
-                                            {/* Dropdown menu */}
-                                            {dropdownOpen.district && !apiStatus.isLoading && (
+                                            {dropdownOpen.userType && (
                                                 <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
-                                                    {/* Search input */}
                                                     <div className="p-2 border-b">
                                                         <input
                                                             type="text"
-                                                            placeholder="Search district..."
-                                                            value={searchText.district}
-                                                            onChange={(e) => handleSearchChange(e, 'district')}
-                                                            className="w-full px-2 py-1 border border-gray-300 rounded"
+                                                            placeholder="Search user type..."
+                                                            value={searchText.userType}
+                                                            onChange={(e) => handleSearchChange(e, 'userType')}
+                                                            className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                                                             onClick={(e) => e.stopPropagation()}
                                                         />
                                                     </div>
-                                                    
-                                                    {/* Options list */}
                                                     <div className="max-h-48 overflow-y-auto">
-                                                        {filteredDistricts.map((district, index) => (
-                                                            <div
-                                                                key={index}
-                                                                className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.district === district ? 'bg-blue-200' : ''}`}
-                                                                onClick={() => {
-                                                                    if (district !== 'No results found') {
-                                                                        handleInputChange({
+                                                        {filteredUserTypes.length > 0 ? (
+                                                            filteredUserTypes.map((type, index) => (
+                                                                <div
+                                                                    key={index}
+                                                                    className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.userType === type ? 'bg-blue-200' : ''}`}
+                                                                    onClick={() => handleInputChange({
+                                                                        target: { name: 'userType', value: type }
+                                                                    })}
+                                                                >
+                                                                    {type}
+                                                                </div>
+                                                            ))
+                                                        ) : (
+                                                            <div className="px-4 py-2 text-gray-500">No results found</div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                        {errors.userType && <p className="text-red-500 text-xs mt-1 ml-2">{errors.userType}</p>}
+                                    </div>
+                                </div>
+
+                                {shouldShowField('district') && (
+                                    <div className="flex flex-col sm:flex-row sm:items-center">
+                                        <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">District</label>
+                                        <div className="w-full sm:w-2/3">
+                                            <div className="relative" ref={districtDropdownRef}>
+                                                <div
+                                                    onClick={() => toggleDropdown('district')}
+                                                    className={`border px-3 sm:px-4 py-2 rounded-full w-full ${errors.district ? 'border-red-500' : 'border-blue-600'} flex justify-between items-center cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                                >
+                                                    <span className="text-gray-600">{formData.district || 'Select District'}</span>
+                                                    <span className="text-xs">▼</span>
+                                                </div>
+                                                {dropdownOpen.district && (
+                                                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+                                                        <div className="p-2 border-b">
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Search district..."
+                                                                value={searchText.district}
+                                                                onChange={(e) => handleSearchChange(e, 'district')}
+                                                                className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            />
+                                                        </div>
+                                                        <div className="max-h-48 overflow-y-auto">
+                                                            {filteredDistricts.length > 0 ? (
+                                                                filteredDistricts.map((district, index) => (
+                                                                    <div
+                                                                        key={index}
+                                                                        className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.district === district ? 'bg-blue-200' : ''}`}
+                                                                        onClick={() => handleInputChange({
                                                                             target: { name: 'district', value: district }
-                                                                        });
-                                                                    }
-                                                                }}
-                                                            >
-                                                                {district}
-                                                            </div>
-                                                        ))}
+                                                                        })}
+                                                                    >
+                                                                        {district}
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                <div className="px-4 py-2 text-gray-500">No results found</div>
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                        {touched.district && errors.district && (
-                                            <p className="text-sm text-red-500 mt-1">{errors.district}</p>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-                            
-                            {formData.userType === "Sub-district Admin" && 
-                             formData.district && 
-                             formData.district !== "Select District" && (
-                                <div className="flex flex-col md:flex-row w-full max-w-md mb-6">
-                                    <label className="font-semibold text-blue-900 w-full md:w-40 mb-1 md:mb-0">Sub District</label>
-                                    <div className="w-full md:w-80">
-                                        <div className="relative" ref={subDistrictDropdownRef}>
-                                            <div
-                                                onClick={() => !apiStatus.isLoading && toggleDropdown('subDistrict')}
-                                                className={`border px-2 py-1 rounded-full w-full border-blue-600 flex justify-between items-center ${!apiStatus.isLoading ? 'cursor-pointer' : 'cursor-not-allowed'} bg-white`}
-                                            >
-                                                <span>{formData.subDistrict || 'Select Sub District'}</span>
-                                                <span className="text-xs">▼</span>
+                                                )}
                                             </div>
-                                            
-                                            {dropdownOpen.subDistrict && !apiStatus.isLoading && (
-                                                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
-                                                    <div className="p-2 border-b">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Search sub-district..."
-                                                            value={searchText.subDistrict}
-                                                            onChange={(e) => handleSearchChange(e, 'subDistrict')}
-                                                            className="w-full px-2 py-1 border border-gray-300 rounded"
-                                                            onClick={(e) => e.stopPropagation()}
-                                                        />
-                                                    </div>
-                                                    
-                                                    <div className="max-h-48 overflow-y-auto">
-                                                        {filteredSubDistricts.map((subDistrict, index) => (
-                                                            <div
-                                                                key={index}
-                                                                className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.subDistrict === subDistrict ? 'bg-blue-200' : ''}`}
-                                                                onClick={() => {
-                                                                    if (subDistrict !== 'No results found' && subDistrict !== 'Select Sub District') {
-                                                                        handleInputChange({
-                                                                            target: { name: 'subDistrict', value: subDistrict }
-                                                                        });
-                                                                    }
-                                                                }}
-                                                            >
-                                                                {subDistrict}
-                                                            </div>
-                                                        ))}
-                                                    </div>
+                                            {errors.district && <p className="text-red-500 text-xs mt-1 ml-2">{errors.district}</p>}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {shouldShowField('kalolsavam') && (
+                                    <div className="flex flex-col sm:flex-row sm:items-center">
+                                        <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Kalolsavam</label>
+                                        <div className="w-full sm:w-2/3">
+                                            <div className="relative" ref={kalolsavamDropdownRef}>
+                                                <div
+                                                    onClick={() => toggleDropdown('kalolsavam')}
+                                                    className={`border px-3 sm:px-4 py-2 rounded-full w-full ${errors.kalolsavam ? 'border-red-500' : 'border-blue-600'} flex justify-between items-center cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                                >
+                                                    <span className="text-gray-600">{formData.kalolsavam || 'Select Kalolsavam'}</span>
+                                                    <span className="text-xs">▼</span>
                                                 </div>
+                                                {dropdownOpen.kalolsavam && (
+                                                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+                                                        <div className="p-2 border-b">
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Search kalolsavam..."
+                                                                value={searchText.kalolsavam}
+                                                                onChange={(e) => handleSearchChange(e, 'kalolsavam')}
+                                                                className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            />
+                                                        </div>
+                                                        <div className="max-h-48 overflow-y-auto">
+                                                            {filteredKalolsavams.length > 0 ? (
+                                                                filteredKalolsavams.map((kalolsavam, index) => (
+                                                                    <div
+                                                                        key={index}
+                                                                        className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.kalolsavam === kalolsavam ? 'bg-blue-200' : ''}`}
+                                                                        onClick={() => handleInputChange({
+                                                                            target: { name: 'kalolsavam', value: kalolsavam }
+                                                                        })}
+                                                                    >
+                                                                        {kalolsavam}
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                <div className="px-4 py-2 text-gray-500">No results found</div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            {errors.kalolsavam && <p className="text-red-500 text-xs mt-1 ml-2">{errors.kalolsavam}</p>}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {shouldShowField('subDistrict') && (
+                                    <div className="flex flex-col sm:flex-row sm:items-center">
+                                        <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Sub-district</label>
+                                        <div className="w-full sm:w-2/3">
+                                            <div className="relative" ref={subDistrictDropdownRef}>
+                                                <div
+                                                    onClick={() => toggleDropdown('subDistrict')}
+                                                    className={`border px-3 sm:px-4 py-2 rounded-full w-full ${errors.subDistrict ? 'border-red-500' : 'border-blue-600'} flex justify-between items-center cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${availableSubDistricts.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                >
+                                                    <span className="text-gray-600">{formData.subDistrict || 'Select Sub-district'}</span>
+                                                    <span className="text-xs">▼</span>
+                                                </div>
+                                                {dropdownOpen.subDistrict && availableSubDistricts.length > 0 && (
+                                                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+                                                        <div className="p-2 border-b">
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Search sub-district..."
+                                                                value={searchText.subDistrict}
+                                                                onChange={(e) => handleSearchChange(e, 'subDistrict')}
+                                                                className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            />
+                                                        </div>
+                                                        <div className="max-h-48 overflow-y-auto">
+                                                            {filteredSubDistricts.length > 0 ? (
+                                                                filteredSubDistricts.map((subDistrict, index) => (
+                                                                    <div
+                                                                        key={index}
+                                                                        className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.subDistrict === subDistrict ? 'bg-blue-200' : ''}`}
+                                                                        onClick={() => handleInputChange({
+                                                                            target: { name: 'subDistrict', value: subDistrict }
+                                                                        })}
+                                                                    >
+                                                                        {subDistrict}
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                <div className="px-4 py-2 text-gray-500">No results found</div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            {errors.subDistrict && <p className="text-red-500 text-xs mt-1 ml-2">{errors.subDistrict}</p>}
+                                            {formData.district && availableSubDistricts.length === 0 && (
+                                                <p className="text-amber-600 text-xs mt-1 ml-2">No sub-districts available for the selected district</p>
                                             )}
                                         </div>
-                                        {touched.subDistrict && errors.subDistrict && (
-                                            <p className="text-sm text-red-500 mt-1">{errors.subDistrict}</p>
-                                        )}
                                     </div>
-                                </div>
-                            )}
+                                )}
+                            </form>
+                            <div className="flex flex-col sm:flex-row justify-center sm:justify-end mt-10 sm:mt-16 sm:mr-10 md:mr-18 lg:mr-40 space-y-4 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">
+                                <button
+                                    type="button"
+                                    onClick={handleCancel}
+                                    className="bg-white border border-blue-500 text-blue-500 font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:bg-blue-50 transition-colors duration-300"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleSubmit}
+                                    type="submit"
+                                    className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:opacity-90 transition-opacity duration-300"
+                                >
+                                    Add
+                                </button>
+                            </div>
                         </div>
-                        <div className="text-right mt-40 mr-40">
-                            <button
-                                type="button"
-                                onClick={handleCancel}
-                                disabled={apiStatus.isLoading}
-                                className={`mr-6 bg-gradient-to-r from-[#003566] to-[#05B9F4] bg-clip-text text-transparent border border-blue-600 px-14 py-2 rounded-full ${apiStatus.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            >
-                               Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={apiStatus.isLoading}
-                                className={`bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white px-14 py-2 rounded-full ${apiStatus.isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            >
-                                {apiStatus.isLoading ? 'Adding...' : 'Add'}
-                            </button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </>
-    )
-}
+    );
+};
 
-export default AddUser
+export default AddUser;

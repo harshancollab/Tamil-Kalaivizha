@@ -199,6 +199,7 @@ import DPubl from './pages/DPubl';
 import DPublishSTatusfest from './pages/DPublishSTatusfest';
 import SDeclared from './components/SDeclared';
 import SPubStatus from './pages/SPubStatus';
+import Pnf from './pages/Pnf';
 
 
 
@@ -213,7 +214,7 @@ function App() {
         <Route path="/reset" element={<ResetPassword />} />
         <Route path="/otp-verification" element={<OTPVerification />} />
         <Route path="/reset-password" element={<Newpass />} />
-        <Route path="/not-authorized" element={<h1>Not Authorized</h1>} />
+        <Route path="/not-authorized" element={<Pnf />} />
 
 
         <Route element={<ProtectedRoute allowedRoles={['districtAdmin', 'stateAdmin', 'Schooladmin', 'subadmin']} />}>
