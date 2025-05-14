@@ -1,16 +1,27 @@
 // It admin add District Regtration
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Dash from '../components/Dash';
+import Alert from '../components/Alert'
+import Splashscreen from '../components/Splashscreen'
 // import { AddDistrictAPI } from '../services/allAPI';
 
 const AddDistrict = () => {
   const navigate = useNavigate();
   const [districtName, setDistrictName] = useState('');
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(true);
+
   const [formSubmitted, setFormSubmitted] = useState(false);
+  // Alert state
+  const [alert, setAlert] = useState({
+    show: false,
+    message: '',
+    type: 'success'
+  });
+
 
   const handleCancel = () => {
     navigate('/DistrictList');
@@ -18,64 +29,94 @@ const AddDistrict = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!districtName.trim()) {
       newErrors.districtName = 'District name is required';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+
+
+useEffect(() => {
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+  
+      return () => clearTimeout(timer);
+    }, []);
+  
+    if (loading) {
+      return <Splashscreen />;}
 
   // Handle form submission
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
     setFormSubmitted(true);
-    
+
     // Validate all fields
     const isValid = validateForm();
-    
+
     if (isValid) {
       console.log("Form submitted:", { districtName });
-      
+
       // Get token from session storage
       const token = sessionStorage.getItem("token");
-      
+
       if (token) {
         // Set up request header with token
         const reqHeader = {
           "Authorization": `Bearer ${token}`
         };
-        
+
         try {
           // Uncomment this when API is ready
           // const result = await AddDistrictAPI({ districtName }, reqHeader);
-          
+
           // For now, simulating successful API call
           const result = { status: 200 };
-          
+
           if (result.status === 200) {
-            alert('District added successfully!');
-            
+            showAlert('District added successfully!');
+
             // Reset form after successful submission
             setDistrictName('');
             setFormSubmitted(false);
-            
+
             // Navigate back to the list page
             navigate('/DistrictList');
           } else {
-            alert("Failed to add district");
+            showAlert("Failed to add district");
           }
         } catch (err) {
           console.error("Error adding district:", err);
-          alert("Error adding district. Please try again.");
+          showAlert("Error adding district. Please try again.");
         }
       } else {
-        alert("Authentication token missing. Please log in again.");
+        showAlert("Authentication token missing. Please log in again.");
       }
     } else {
       console.log("Form has errors:", errors);
     }
+  };
+
+  
+
+  const showAlert = (message, type = 'success') => {
+    setAlert({
+      show: true,
+      message,
+      type
+    });
+  };
+
+  const hideAlert = () => {
+    setAlert({
+      ...alert,
+      show: false
+    });
   };
 
   return (
@@ -84,10 +125,18 @@ const AddDistrict = () => {
         <Header />
         <div className="flex flex-col sm:flex-row">
           <Dash />
+          {alert.show && (
+            <Alert
+              message={alert.message}
+              type={alert.type}
+              onClose={hideAlert}
+              duration={5000}
+            />
+          )}
           <div className="flex-1 p-2 sm:p-4 bg-gray-300">
             <div className="bg-gray-50 p-3 sm:p-6 pt-4 min-h-screen mx-auto relative">
               <h2 className="text-lg font-bold mb-5 sm:mb-10 text-gray-800">Add District</h2>
-              
+
               <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 max-w-2xl mx-auto">
                 <div className="flex flex-col sm:flex-row sm:items-center">
                   <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">District</label>
@@ -104,7 +153,7 @@ const AddDistrict = () => {
                   </div>
                 </div>
               </form>
-              
+
               <div className="absolute bottom-40 right-28 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                 <button
                   type="button"

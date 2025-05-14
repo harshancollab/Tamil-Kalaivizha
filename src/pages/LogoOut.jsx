@@ -1,8 +1,23 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
+import Splashscreen from '../components/Splashscreen'
 
 const LogoOut = () => {
+    const [loading, setLoading] = useState(true);
+  
+ useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <Splashscreen />;
+  }
+
   return (
     <>
       <Header />

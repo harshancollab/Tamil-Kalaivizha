@@ -5,6 +5,8 @@ import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import html2pdf from 'html2pdf.js';
+import Alert from '../components/Alert'
+import Splashscreen from '../components/Splashscreen'
 // import { getAllAdminuserAPI, deleteAdminuserAPI } from '../services/allAPI';
 
 const AdminUser = () => {
@@ -12,10 +14,18 @@ const AdminUser = () => {
     const navigate = useNavigate();
     const printRef = useRef();
     const [searchParams, setSearchParams] = useSearchParams();
+    
 
     // Add missing state variables
     const [searchCode, setSearchCode] = useState('');
     const [filterParam, setFilterParam] = useState('');
+    
+    // Alert state
+    const [alert, setAlert] = useState({
+        show: false,
+        message: '',
+        type: 'success'
+    });
 
     const [loading, setLoading] = useState(false);
 
@@ -84,6 +94,16 @@ const AdminUser = () => {
         'All Admin': allDistricts.filter(d => d !== 'Select')
     };
 
+    // Set loading initially and show splash screen
+    useEffect(() => {
+        setLoading(true);
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, []);
+ 
     // Initialize available options
     useEffect(() => {
         setAvailableSubDistricts(allSubDistricts);
@@ -178,7 +198,6 @@ const AdminUser = () => {
         }
     };
 
-  
     const getAllAdminuser = async () => {
         const token = sessionStorage.getItem("token");
         if (token) {
@@ -199,12 +218,12 @@ const AdminUser = () => {
         }
     }
 
-   
+
     const handleEditRedirect = (resultEntry) => {
-      
+
         const params = new URLSearchParams();
 
-    
+
         if (selectedUserType !== 'Select') {
             params.append('usertype', selectedUserType);
         }
@@ -217,18 +236,18 @@ const AdminUser = () => {
             params.append('subdistrict', selectedSubDistrict);
         }
 
- 
+
         if (searchCode) {
             params.append('code', searchCode);
         }
 
- 
+
         params.append('returnUrl', `/AdminUser?${searchParams.toString()}`);
 
         navigate(`/EditUser/${resultEntry.slNo}`, {
             state: {
                 resultEntry,
-                filterParams: params.toString() 
+                filterParams: params.toString()
             }
         });
     };
@@ -240,7 +259,7 @@ const AdminUser = () => {
             // Handle case when token is not available
             console.error("Authentication token not found");
             // You could use a toast notification or alert here
-            alert("You need to be logged in to perform this action");
+            showAlert("Authentication token not found");
             return;
         }
 
@@ -260,10 +279,10 @@ const AdminUser = () => {
 
             // const result = await deleteAdminuserAPI(id, reqHeader);
 
-            
+
             // if (result.status === 200) {
-            
-            //     alert("User deleted successfully");
+
+            //     showAlert("User deleted successfully");
             //     getAllAdminuser(); 
             // } else {
             //      Error("Failed to delete user");
@@ -271,7 +290,7 @@ const AdminUser = () => {
 
             console.log("Delete clicked for ID:", id);
 
-            alert("User would be deleted if API was connected");
+            showAlert("User would be deleted if API was connected");
             getAllAdminuser();
 
         } catch (err) {
@@ -279,20 +298,20 @@ const AdminUser = () => {
 
             if (err.response) {
                 if (err.response.status === 401) {
-                    alert("Session expired. Please login again.");
+                    showAlert("Session expired. Please login again.");
                     // navigate('/login');
                 } else if (err.response.status === 403) {
-                    alert("You don't have permission to delete this user");
+                    showAlert("You don't have permission to delete this user");
                 } else if (err.response.status === 404) {
-                    alert("User not found. It may have been already deleted.");
-                    getAllAdminuser(); 
+                    showAlert("User not found. It may have been already deleted.");
+                    getAllAdminuser();
                 } else {
-                    alert(`Error: ${err.response.data.message || "Failed to delete user"}`);
+                    showAlert(`Error: ${err.response.data.message || "Failed to delete user"}`);
                 }
             } else if (err.request) {
-                alert("Server is not responding. Please try again later.");
+                showAlert("Server is not responding. Please try again later.");
             } else {
-                alert("An error occurred while trying to delete the user");
+                showAlert("An error occurred while trying to delete the user");
             }
         } finally {
             setLoading(false);
@@ -413,7 +432,7 @@ const AdminUser = () => {
             const row = document.createElement('tr');
 
             const cellData = [
-                index + 1, 
+                index + 1,
                 result.regNo || '-',
                 result.code || '-'
 
@@ -459,135 +478,22 @@ const AdminUser = () => {
         html2pdf().from(pdfContent).set(options).save();
     };
 
-    const handlePrintTable = () => {
-        const printWindow = window.open('', '_blank');
 
-        printWindow.document.write(`
-            <html>
-                <head>
-                    <title>Admin User List</title>
-                    <style>
-                        body {
-                            font-family: Arial, sans-serif;
-                            margin: 20px;
-                        }
-                        h2 {
-                            text-align: center;
-                            margin-bottom: 20px;
-                        }
-                        .filter-info {
-                            text-align: center;
-                            margin-bottom: 15px;
-                            font-size: 12px;
-                            color: #666;
-                        }
-                        table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            margin-bottom: 20px;
-                        }
-                        th, td {
-                            border: 1px solid #ddd;
-                            padding: 8px;
-                            text-align: center;
-                        }
-                        th {
-                            background-color: #f2f2f2;
-                            font-weight: bold;
-                        }
-                        .footer {
-                            margin-top: 30px;
-                            font-size: 10px;
-                            text-align: right;
-                            color: #666;
-                        }
-                        @media print {
-                            .no-print {
-                                display: none;
-                            }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <h2>Admin User List</h2>
-        `);
-
-        if (selectedDistrict !== 'Select' || selectedSubDistrict !== 'Select' || selectedUserType !== 'Select') {
-            const filterDetails = [];
-            if (selectedDistrict !== 'Select') filterDetails.push(`District: ${selectedDistrict}`);
-            if (selectedSubDistrict !== 'Select') filterDetails.push(`Sub District: ${selectedSubDistrict}`);
-            if (selectedUserType !== 'Select') filterDetails.push(`User Type: ${selectedUserType}`);
-
-            printWindow.document.write(`
-                <div class="filter-info">
-                    ${filterDetails.join(' | ')}
-                </div>
-            `);
-        }
-
-        printWindow.document.write('<table>');
-        printWindow.document.write(`
-            <thead>
-                <tr>
-                    <th>Sl No</th>
-                    <th>User Name</th>
-                    <th>User Type</th>
-                  
-                </tr>
-            </thead>
-        `);
-
-        printWindow.document.write('<tbody>');
-
-        const filteredData = filteredResultData();
-
-        if (filteredData.length === 0) {
-            printWindow.document.write(`
-                <tr>
-                    <td colspan="5" style="text-align: center; padding: 20px;">
-                        No data available
-                    </td>
-                </tr>
-            `);
-        } else {
-            filteredData.forEach((result, index) => {
-                printWindow.document.write(`
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${result.regNo || '-'}</td>
-                        <td>${result.code || '-'}</td>
-                      
-                    </tr>
-                `);
-            });
-        }
-
-        printWindow.document.write('</tbody>');
-        printWindow.document.write('</table>');
-
-        const currentDate = new Date();
-        const dateTimeStr = currentDate.toLocaleString();
-        printWindow.document.write(`
-            <div class="footer">
-                Generated on: ${dateTimeStr}
-            </div>
-        `);
-
-        printWindow.document.write(`
-            <div class="no-print" style="text-align: center; margin-top: 20px;">
-                <button onclick="window.print();" style="padding: 8px 16px; background-color: #4285f4; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    Print
-                </button>
-                <button onclick="window.close();" style="padding: 8px 16px; background-color: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">
-                    Close
-                </button>
-            </div>
-        `);
-
-        printWindow.document.write('</body></html>');
-        printWindow.document.close();
-        printWindow.focus();
+     const showAlert = (message, type = 'success') => {
+        setAlert({
+            show: true,
+            message,
+            type
+        });
     };
+
+    const hideAlert = () => {
+        setAlert({
+            ...alert,
+            show: false
+        });
+    };
+
 
 
     const renderPageNumbers = () => {
@@ -735,11 +641,24 @@ const AdminUser = () => {
     };
 
 
+    // Show splash screen if loading
+    if (loading) {
+        return <Splashscreen />;
+    }
+
     return (
         <>
             <Header />
             <div className="flex flex-col md:flex-row min-h-screen">
                 <Dash />
+                 {alert.show && (
+                        <Alert 
+                            message={alert.message} 
+                            type={alert.type} 
+                            onClose={hideAlert}
+                            duration={5000} 
+                        />
+                    )}
                 <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-hidden">
 
                     <div className="flex flex-col mb-4">
@@ -838,8 +757,6 @@ const AdminUser = () => {
                                     <i className="fa-solid fa-chevron-down"></i>
                                 </div>
                             </div>
-
-
 
 
                         </div>

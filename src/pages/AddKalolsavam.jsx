@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import Dash from '../components/Dash'
 import Header from '../components/Header'
+import Alert from '../components/Alert'
 // import { AddKalolsavamAPI } from '../services/allAPI';
 
 const AddKalolsavam = () => {
@@ -10,6 +11,13 @@ const AddKalolsavam = () => {
   const location = useLocation();
   const [availableSubDistricts, setAvailableSubDistricts] = useState(['Select']);
   const [searchParams] = useSearchParams();
+    // Alert state
+      const [alert, setAlert] = useState({
+          show: false,
+          message: '',
+          type: 'success'
+      });
+  
 
   const [formData, setFormData] = useState({
     logo: '',
@@ -201,7 +209,21 @@ const AddKalolsavam = () => {
     
     return Object.keys(newErrors).length === 0;
   };
+ 
+    const showAlert = (message, type = 'success') => {
+        setAlert({
+            show: true,
+            message,
+            type
+        });
+    };
 
+    const hideAlert = () => {
+        setAlert({
+            ...alert,
+            show: false
+        });
+    };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
@@ -377,7 +399,7 @@ const AddKalolsavam = () => {
       const token = sessionStorage.getItem("token");
       
       if (!token) {
-        setError("Authentication token not found");
+        showAlert("Authentication token not found");
         navigate('/login');
         return;
       }
@@ -402,25 +424,26 @@ const AddKalolsavam = () => {
       }
 
       // Uncomment this when API is ready
-      // const result = await AddKalolsavamAPI(formDataToSubmit, reqHeader);
+      const result = await AddKalolsavamAPI(formDataToSubmit, reqHeader);
       
       // If API call is successful, navigate to the list page
-      // if (result.status === 201) {
-      //   navigate('/allkalolsavam');
-      // } else {
-      //   setError("Failed to add Kalolsavam details");
-      // }
+      if (result.status === 201) {
+        showAlert(` added successfully!`, 'success');
+        navigate('/allkalolsavam');
+      } else {
+        setError("Failed to add Kalolsavam details");
+      }
       
       // For testing purposes:
-      console.log("Form data submitted:", formData);
-      setTimeout(() => {
-        setLoading(false);
-        navigate('/allkalolsavam');
-      }, 1000);
+      // console.log("Form data submitted:", formData);
+      // setTimeout(() => {
+      //   setLoading(false);
+      //   navigate('/allkalolsavam');
+      // }, 1000);
       
     } catch (err) {
       console.error("Error adding Kalolsavam details:", err);
-      setError(err.response?.data?.message || "An error occurred while adding Kalolsavam details");
+      showAlert(err.response?.data?.message || "An error occurred while adding Kalolsavam details");
       setLoading(false);
     }
   };
@@ -435,6 +458,14 @@ const AddKalolsavam = () => {
         <Header />
         <div className="flex flex-col sm:flex-row">
           <Dash />
+             {alert.show && (
+                        <Alert 
+                            message={alert.message} 
+                            type={alert.type} 
+                            onClose={hideAlert}
+                            duration={5000} 
+                        />
+                    )}
           <div className="flex-1 p-4 sm:p-6 md:p-8 w-full">
             {error && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">

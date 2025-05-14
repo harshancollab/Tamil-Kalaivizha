@@ -4,6 +4,9 @@ import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { deleteresultentryAPI, getAllResultentryListAPI } from '../services/allAPI';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import Splashscreen from '../components/Splashscreen'
+import Alert from '../components/Alert'
+
 import html2pdf from 'html2pdf.js';
 
 const SchoolRegList = () => {
@@ -24,6 +27,13 @@ const SchoolRegList = () => {
 
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+       const [loading, setLoading] = useState(true);
+        // Alert state
+        const [alert, setAlert] = useState({
+            show: false,
+            message: '',
+            type: 'success'
+        });
     const allSubDistricts = [
         'Select',
         'Munnar',
@@ -177,6 +187,22 @@ const SchoolRegList = () => {
             }
         }
     }
+ 
+
+    const showAlert = (message, type = 'success') => {
+        setAlert({
+            show: true,
+            message,
+            type
+        });
+    };
+
+    const hideAlert = () => {
+        setAlert({
+            ...alert,
+            show: false
+        });
+    };
 
     const handleAddClick = () => {
         if (selectedDistrict && selectedSubDistrict) {
@@ -421,11 +447,31 @@ const SchoolRegList = () => {
         updateURLParams({ subDistrict: subDistrict });
     };
 
+      useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) {
+        return <Splashscreen />;
+    }
+
     return (
         <>
             <Header />
             <div className="flex flex-col md:flex-row min-h-screen">
                 <Dash />
+                 {alert.show && (
+                        <Alert
+                            message={alert.message}
+                            type={alert.type}
+                            onClose={hideAlert}
+                            duration={5000}
+                        />
+                    )}
                 <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-hidden">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
                         <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">

@@ -5,6 +5,7 @@ import Dash from '../components/Dash'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { getAllitemtentryListAPI } from '../services/allAPI'
 import html2pdf from 'html2pdf.js';
+import Splashscreen from '../components/Splashscreen'
 
 const AdResult = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -15,6 +16,7 @@ const AdResult = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || "");
+       
 
     // Get festival from URL query params, default to "ALL Festival" if not present
     const [selectedFestival, setSelectedFestival] = useState(searchParams.get('festival') || "ALL Festival");
@@ -58,7 +60,7 @@ const AdResult = () => {
         'Wayanad',
         'Thrissur',
     ];
-  
+
 
     const districtToSubDistrict = {
         'Idukki': ['Munnar', 'Adimali', 'Kattappana', 'Nedumkandam', 'Devikulam'],
@@ -85,6 +87,9 @@ const AdResult = () => {
         { slNo: 4, regNo: "415 - Folk Dance", code: "415", itemName: "Folk Dance", itemType: "Group", studentsCount: 15, resultEntered: 15, resultNotEntered: 0, confirmed: "Yes", status: "Completed", district: "Idukki", subDistrict: "Munnar" }
 
     ];
+
+
+
 
     useEffect(() => {
         getAllItemResult();
@@ -168,6 +173,7 @@ const AdResult = () => {
 
     const getAllItemResult = async () => {
         setLoading(true);
+        
         const token = sessionStorage.getItem("token");
 
         try {
@@ -213,7 +219,10 @@ const AdResult = () => {
             setItemresult(resultData);
             setFilteredResults(resultData);
         } finally {
-            setLoading(false);
+            
+             setTimeout(() => {
+                setLoading(false);
+            }, 1000);
         }
     };
 
@@ -270,6 +279,9 @@ const AdResult = () => {
         // Navigate to AllResultEntry page with code query parameter
         navigate(`/All-resultentry?code=${code}`);
     };
+
+
+
 
     const applyFilters = (festival, search, district = 'Select', subDistrict = 'Select') => {
         if (!Allitemresult.length) return;
@@ -580,10 +592,19 @@ const AdResult = () => {
         html2pdf().from(pdfContent).set(options).save();
     };
 
+
+
     // Updated to open modal
     const handleReset = (item) => {
         openResetModal(item);
     };
+
+
+    if (loading) {
+        return <Splashscreen />;
+    }
+
+
 
     return (
         <>
@@ -591,13 +612,13 @@ const AdResult = () => {
             <div className="flex flex-col md:flex-row min-h-screen">
                 <Dash />
                 <div className="flex-1 p-3 sm:p-4 lg:p-6 w-full overflow-hidden">
-               
+
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                         <h2 className="text-lg md:text-xl font-semibold tracking-wide">
                             Result List
                         </h2>
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-                            
+
 
                             {/* Reorder District and SubDistrict for correct display order */}
                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 ">
@@ -652,28 +673,28 @@ const AdResult = () => {
                                     </div>
                                 </div>
                                 <div className="relative w-full sm:w-auto">
-                                <select
-                                    className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
-                                    id="festival-select"
-                                    onChange={handleFestivalChange}
-                                    value={selectedFestival}
-                                >
-                                    {Festivel.map((option, index) => (
-                                        <option key={`festival-${index}`} value={option}>
-                                            {option}
-                                        </option>
-                                    ))}
-                                </select>
-                                <label
-                                    htmlFor="festival-select"
-                                    className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
-                                >
-                                    Festival
-                                </label>
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
-                                    <i className="fa-solid fa-chevron-down"></i>
+                                    <select
+                                        className="border-blue-800 border text-blue-700 px-3 py-2 pt-2 text-sm rounded-full w-full bg-white cursor-pointer appearance-none pr-10 peer"
+                                        id="festival-select"
+                                        onChange={handleFestivalChange}
+                                        value={selectedFestival}
+                                    >
+                                        {Festivel.map((option, index) => (
+                                            <option key={`festival-${index}`} value={option}>
+                                                {option}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <label
+                                        htmlFor="festival-select"
+                                        className="absolute text-sm text-blue-800 duration-300 transform -translate-y-4 scale-75 top-1 z-10 origin-[0] bg-white px-4 peer-focus:text-blue-800 left-3"
+                                    >
+                                        Festival
+                                    </label>
+                                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                                        <i className="fa-solid fa-chevron-down"></i>
+                                    </div>
                                 </div>
-                            </div>
                             </div>
                             <button
                                 onClick={generatePDF}

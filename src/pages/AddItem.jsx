@@ -2,11 +2,20 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Dash from '../components/Dash';
 import Header from '../components/Header';
+import Splashscreen from '../components/Splashscreen';
+import Alert from '../components/Alert'
 // import { AddItemAPI } from '../services/allAPI'; 
 
 const AddItem = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
+       const [loading, setLoading] = useState(true);
+        // Alert state
+        const [alert, setAlert] = useState({
+            show: false,
+            message: '',
+            type: 'success'
+        });
 
     const festivalDropdownRef = useRef(null);
     const stageDropdownRef = useRef(null);
@@ -201,6 +210,36 @@ const AddItem = () => {
         }
     };
 
+    
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) {
+        return <Splashscreen />;
+    }
+
+    const showAlert = (message, type = 'success') => {
+        setAlert({
+            show: true,
+            message,
+            type
+        });
+    };
+
+    const hideAlert = () => {
+        setAlert({
+            ...alert,
+            show: false
+        });
+    };
+
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setFormSubmitted(true);
@@ -232,7 +271,7 @@ const AddItem = () => {
                     const result = { status: 200 };
                     
                     if (result.status === 200) {
-                        alert('Item added successfully!');
+                        showAlert('Item added successfully!');
 
                         setFormData({
                             itemCode: '',
@@ -252,14 +291,14 @@ const AddItem = () => {
                             navigate('/ItemRegistrationList');
                         }
                     } else {
-                        alert("Failed to add item");
+                        showAlert("Failed to add item");
                     }
                 } catch (err) {
                     console.error("Error adding item:", err);
-                    alert("Error adding item. Please try again.");
+                    showAlert("Error adding item. Please try again.");
                 }
             } else {
-                alert("Authentication token missing. Please log in again.");
+                showAlert("Authentication token missing. Please log in again.");
             }
         } else {
             console.log("Form has errors:", errors);
@@ -272,6 +311,14 @@ const AddItem = () => {
                 <Header />
                 <div className="flex flex-col sm:flex-row">
                     <Dash />
+                     {alert.show && (
+                        <Alert
+                            message={alert.message}
+                            type={alert.type}
+                            onClose={hideAlert}
+                            duration={5000}
+                        />
+                    )}
                     <div className="flex-1 p-2 sm:p-4 bg-gray-300">
                         <div className="bg-gray-50 p-3 sm:p-6 pt-4 min-h-screen mx-auto">
                             <h2 className="text-xl font-bold mb-5 sm:mb-10 text-gray-800">Add Item</h2>

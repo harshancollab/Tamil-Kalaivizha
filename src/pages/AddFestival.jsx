@@ -1,15 +1,24 @@
 // IT Admin  Festival REG List - Add Festivel
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Dash from '../components/Dash';
-import Header from '../components/Header';
-// import { AddFestivalAPI } from '../services/allAPI';
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Dash from '../components/Dash'
+import Header from '../components/Header'
+import Splashscreen from '../components/Splashscreen'
+import Alert from '../components/Alert'
 
+// import { AddFestivalAPI } from '../services/allAPI';
 const AddFestival = () => {
     const navigate = useNavigate();
 
-    
+    const [loading, setLoading] = useState(true);
+    // Alert state
+    const [alert, setAlert] = useState({
+        show: false,
+        message: '',
+        type: 'success'
+    });
+
     const [formData, setFormData] = useState({
         festivalName: '',
         fromClass: '',
@@ -26,31 +35,31 @@ const AddFestival = () => {
 
     const [formSubmitted, setFormSubmitted] = useState(false);
 
-    
+
     const validateField = (name, value, allValues = formData) => {
         switch (name) {
             case 'festivalName':
                 if (!value.trim()) return 'Festival name is required';
                 if (value.trim().length < 3) return 'Festival name must be at least 3 characters long';
                 return '';
-                
+
             case 'fromClass':
                 if (!value.trim()) return 'From class is required';
                 if (isNaN(value)) return 'Class must be a number';
                 return '';
-                
+
             case 'toClass':
                 if (!value.trim()) return 'To class is required';
                 if (isNaN(value)) return 'Class must be a number';
-                
+
                 const fromClassNum = parseInt(allValues.fromClass);
                 const toClassNum = parseInt(value);
-                
+
                 if (!isNaN(fromClassNum) && !isNaN(toClassNum) && toClassNum <= fromClassNum) {
                     return 'To Class must be greater than From Class';
                 }
                 return '';
-                
+
             default:
                 return '';
         }
@@ -72,7 +81,7 @@ const AddFestival = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        
+
         const updatedFormData = { ...formData, [name]: value };
         setFormData(updatedFormData);
 
@@ -81,7 +90,7 @@ const AddFestival = () => {
                 ...prev,
                 [name]: validateField(name, value, updatedFormData)
             }));
-            
+
             if (name === 'fromClass' && updatedFormData.toClass) {
                 setErrors(prev => ({
                     ...prev,
@@ -91,51 +100,83 @@ const AddFestival = () => {
         }
     };
 
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) {
+        return <Splashscreen />;
+    }
+
+    const showAlert = (message, type = 'success') => {
+        setAlert({
+            show: true,
+            message,
+            type
+        });
+    };
+
+    const hideAlert = () => {
+        setAlert({
+            ...alert,
+            show: false
+        });
+    };
+
+
+
     const handleCancel = () => {
         navigate('/FestivalRegiList');
     };
 
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setFormSubmitted(true);
-        
+
         const isValid = validateForm();
-        
+
         if (isValid) {
             console.log("Form submitted:", formData);
-            
+
             const token = sessionStorage.getItem("token");
-            
+
             if (token) {
                 const reqHeader = {
                     "Authorization": `Bearer ${token}`
                 };
-                
+
                 try {
                     // const result = await AddFestivalAPI(formData, reqHeader);
-                    
+
                     const result = { status: 200 };
-                    
+
                     if (result.status === 200) {
-                        alert('Festival added successfully!');
-                        
+                        showAlert('Festival added successfully!');
+
                         setFormData({
                             festivalName: '',
                             fromClass: '',
                             toClass: ''
                         });
                         setFormSubmitted(false);
-                        
+
                         navigate('/FestivalList');
                     } else {
-                        alert("Failed to add festival");
+                        showAlert("Failed to add festival");
                     }
                 } catch (err) {
                     console.error("Error adding festival:", err);
-                    alert("Error adding festival. Please try again.");
+                    showAlert("Error adding festival. Please try again.");
                 }
             } else {
-                alert("Authentication token missing. Please log in again.");
+                showAlert("Authentication token missing. Please log in again.");
             }
         } else {
             console.log("Form has errors:", errors);
@@ -148,11 +189,19 @@ const AddFestival = () => {
                 <Header />
                 <div className="flex flex-col sm:flex-row">
                     <Dash />
+                    {alert.show && (
+                        <Alert
+                            message={alert.message}
+                            type={alert.type}
+                            onClose={hideAlert}
+                            duration={5000}
+                        />
+                    )}
                     <div className="flex-1 p-2 sm:p-4 bg-gray-300">
                         <div className="bg-gray-50 p-3 sm:p-6 pt-4 min-h-screen mx-auto">
                             <h2 className="text-lg font-bold mb-5 sm:mb-10 text-gray-800">Add Festival</h2>
 
-                            <form  className="space-y-3 sm:space-y-4 max-w-2xl mx-auto">
+                            <form className="space-y-3 sm:space-y-4 max-w-2xl mx-auto">
                                 <div className="flex flex-col sm:flex-row sm:items-center">
                                     <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Festival</label>
                                     <div className="w-full sm:w-2/3">
@@ -201,20 +250,20 @@ const AddFestival = () => {
 
                             </form>
                             <div className="flex flex-col sm:flex-row justify-center sm:justify-end mt-16 sm:mt-32 sm:mr-10 md:mr-18 lg:mr-40 space-y-4 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">
-                                    <button
-                                        type="button"
-                                        onClick={handleCancel}
-                                        className="bg-white border border-blue-500 text-blue-500 font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:bg-blue-50 transition-colors duration-300"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button onClick={handleSubmit}
-                                        type="submit"
-                                        className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:opacity-90 transition-opacity duration-300"
-                                    >
-                                        Add
-                                    </button>
-                                </div>
+                                <button
+                                    type="button"
+                                    onClick={handleCancel}
+                                    className="bg-white border border-blue-500 text-blue-500 font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:bg-blue-50 transition-colors duration-300"
+                                >
+                                    Cancel
+                                </button>
+                                <button onClick={handleSubmit}
+                                    type="submit"
+                                    className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:opacity-90 transition-opacity duration-300"
+                                >
+                                    Add
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

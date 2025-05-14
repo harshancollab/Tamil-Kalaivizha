@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Dash from '../components/Dash';
 import Header from '../components/Header';
+import Splashscreen from '../components/Splashscreen'
+import Alert from '../components/Alert'
 // import { AddKalolsavamAPI } from '../services/allAPI';
 
 const AddSclsub = () => {
@@ -14,6 +16,13 @@ const AddSclsub = () => {
     const location = useLocation();
     const [searchTerm, setSearchTerm] = useState('');
     const [availableSubDistricts, setAvailableSubDistricts] = useState([]);
+        const [loading, setLoading] = useState(true);
+        // Alert state
+        const [alert, setAlert] = useState({
+            show: false,
+            message: '',
+            type: 'success'
+        });
     const [dropdownOpen, setDropdownOpen] = useState({
         schoolType: false,
         district: false,
@@ -283,6 +292,36 @@ const AddSclsub = () => {
         };
     }, []);
 
+
+    
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) {
+        return <Splashscreen />;
+    }
+
+    const showAlert = (message, type = 'success') => {
+        setAlert({
+            show: true,
+            message,
+            type
+        });
+    };
+
+    const hideAlert = () => {
+        setAlert({
+            ...alert,
+            show: false
+        });
+    };
+
+
     // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -312,7 +351,7 @@ const AddSclsub = () => {
                     const result = { status: 200 };
                     
                     if (result.status === 200) {
-                        alert('School added successfully!');
+                        showAlert('School added successfully!');
                         
                         // Reset form after successful submission
                         setFormData({
@@ -327,14 +366,14 @@ const AddSclsub = () => {
                         // Navigate back to the previous page
                         navigate('/CreateKalolsavam');
                     } else {
-                        alert(result.response.data);
+                        showAlert(result.response.data);
                     }
                 } catch (err) {
                     console.error("Error adding school:", err);
-                    alert("Error adding school. Please try again.");
+                    showAlert("Error adding school. Please try again.");
                 }
             } else {
-                alert("Authentication token missing. Please log in again.");
+                showAlert("Authentication token missing. Please log in again.");
             }
         } else {
             console.log("Form has errors:", errors);
@@ -410,6 +449,14 @@ const AddSclsub = () => {
                 <Header />
                 <div className="flex flex-col sm:flex-row">
                     <Dash />
+                    {alert.show && (
+                        <Alert
+                            message={alert.message}
+                            type={alert.type}
+                            onClose={hideAlert}
+                            duration={5000}
+                        />
+                    )}
                     <div className="flex-1 p-2 sm:p-4 bg-gray-300">
                         <div className="bg-gray-50 p-3 sm:p-6 pt-4 min-h-screen mx-auto">
                             <h2 className="text-lg font-bold mb-5 sm:mb-10 text-gray-800">Add School</h2>

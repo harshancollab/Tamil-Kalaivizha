@@ -6,11 +6,14 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import Dash from '../components/Dash'
 import Header from '../components/Header'
 import Alert from '../components/Alert'
+import Splashscreen from '../components/Splashscreen'
 // import { AddUserAPI } from '../services/allAPI' 
 
 const AddUser = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams()
+    const [loading, setLoading] = useState(true);
+    
 
     // Alert state
     const [alert, setAlert] = useState({
@@ -20,8 +23,6 @@ const AddUser = () => {
     });
 
     const userTypeDropdownRef = useRef(null);
-    const districtDropdownRef = useRef(null);
-    const subDistrictDropdownRef = useRef(null);
     const kalolsavamDropdownRef = useRef(null);
 
     const allUserTypes = [
@@ -31,71 +32,19 @@ const AddUser = () => {
         'Sub-district Admin'
     ];
 
-    const Kalolsavams = [
-        'Select Kalolsavam',
-        'Kerala State Kalolsavam',
-        'District Kalolsavam',
-        'Sub-district Kalolsavam',
-        'School Kalolsavam'
-    ];
-
-    const districtKalolsavm = {
-        'Idukki ': [
-            'Select Kalolsavam',
-            'Idukki District Kalolsavam'
-        ],
-        'Ernakulam ': [
-            'Select Kalolsavam',
-            'Ernakulam District Kalolsavam'
-        ],
-        'Palakkad ': [
-            'Select Kalolsavam',
-            'Palakkad District Kalolsavam'
-        ],
-        'Kozhikode': [
-            'Select Kalolsavam',
-            'Kozhikode District Kalolsavam'
-        ],
-        'Wayanad ': [
-            'Select Kalolsavam',
-            'Wayanad District Kalolsavam'
-        ],
-        'Thrissur': [
-            'Select Kalolsavam',
-            'Thrissur District Kalolsavam'
-        ],
-        'Ottapalam': [
-            'Select Kalolsavam',
-            'Ottapalam District Kalolsavam'
-        ]
-    };
-
-    const allDistricts = [
-        'Select District',
-        'Idukki ',
-        'Ernakulam ',
-        'Palakkad ',
-        'Kozhikode',
-        'Wayanad ',
-        'Thrissur',
-        'Ottapalam'
-    ];
-
-    const districtToSubDistrict = {
-        'Idukki ': ['Munnar', 'Adimali', 'Kattappana', 'Nedumkandam', 'Devikulam'],
-        'Palakkad ': ['Chittur', 'Pattambi', 'Kuzhalmannam', 'Nemmara', 'Mannarkkad', 'Ottapalam'],
-        'Ernakulam ': ['Aluva', 'Kochi', 'Perumbavoor', 'Kothamangalam', 'Muvattupuzha'],
-        'Kozhikode': ['Vatakara', 'Koyilandy', 'Thamarassery', 'Koduvally', 'Balussery'],
-        'Wayanad ': ['Sulthan Bathery', 'Mananthavady', 'Kalpetta', 'Vythiri'],
-        'Thrissur': ['Chalakudy', 'Kodungallur', 'Irinjalakuda', 'Guruvayur', 'Chavakkad']
+  
+    // Define all Kalolsavams based on user type
+    const kalolsavamsByType = {
+        'Select User Type': ['Select Kalolsavam'],
+        'State Admin': ['Select Kalolsavam', 'Kerala State Kalolsavam'],
+        'District Admin': ['Select Kalolsavam', 'District Kalolsavam','Palakkad District Kalolsavam '],
+        'Sub-district Admin': ['Select Kalolsavam', 'Sub-district Kalolsavam', 'School Kalolsavam']
     };
 
     const [formData, setFormData] = useState({
         username: '',
         password: '',
         userType: '',
-        district: '',
-        subDistrict: '',
         kalolsavam: ''
     });
 
@@ -103,62 +52,21 @@ const AddUser = () => {
         username: '',
         password: '',
         userType: '',
-        district: '',
-        subDistrict: '',
         kalolsavam: ''
     });
 
     const [dropdownOpen, setDropdownOpen] = useState({
         userType: false,
-        district: false,
-        subDistrict: false,
         kalolsavam: false
     });
 
     const [searchText, setSearchText] = useState({
         userType: '',
-        district: '',
-        subDistrict: '',
         kalolsavam: ''
     });
 
-    const [availableSubDistricts, setAvailableSubDistricts] = useState([]);
-    const [availableKalolsavams, setAvailableKalolsavams] = useState([]);
-
-    useEffect(() => {
-        // Set sub-districts based on selected district
-        if (formData.district && districtToSubDistrict[formData.district]) {
-            setAvailableSubDistricts(districtToSubDistrict[formData.district]);
-        } else {
-            setAvailableSubDistricts([]);
-        }
-
-        // Set kalolsavams based on selected district
-        if (formData.district && districtKalolsavm[formData.district]) {
-            setAvailableKalolsavams(districtKalolsavm[formData.district]);
-        } else {
-            setAvailableKalolsavams(Kalolsavams);
-        }
-
-        // Reset sub-district and kalolsavam when district changes
-        setFormData(prev => ({
-            ...prev,
-            subDistrict: '',
-            kalolsavam: ''
-        }));
-    }, [formData.district]);
-
-    useEffect(() => {
-        // Handle district from URL params if any
-        const districtParam = searchParams.get('district');
-
-        if (districtParam) {
-            setFormData(prev => ({
-                ...prev,
-                district: districtParam
-            }));
-        }
-    }, [searchParams]);
+    // Initialize available Kalolsavams based on current user type
+    const [availableKalolsavams, setAvailableKalolsavams] = useState(kalolsavamsByType['Select User Type']);
 
     const [formSubmitted, setFormSubmitted] = useState(false);
 
@@ -166,16 +74,6 @@ const AddUser = () => {
         ? allUserTypes.filter(type =>
             type.toLowerCase().includes(searchText.userType.toLowerCase()))
         : allUserTypes;
-
-    const filteredDistricts = searchText.district
-        ? allDistricts.filter(district =>
-            district.toLowerCase().includes(searchText.district.toLowerCase()))
-        : allDistricts;
-
-    const filteredSubDistricts = searchText.subDistrict
-        ? availableSubDistricts.filter(subDistrict =>
-            subDistrict.toLowerCase().includes(searchText.subDistrict.toLowerCase()))
-        : availableSubDistricts;
 
     const filteredKalolsavams = searchText.kalolsavam
         ? availableKalolsavams.filter(kalolsavam =>
@@ -187,12 +85,6 @@ const AddUser = () => {
             if (userTypeDropdownRef.current && !userTypeDropdownRef.current.contains(event.target)) {
                 setDropdownOpen(prev => ({ ...prev, userType: false }));
             }
-            if (districtDropdownRef.current && !districtDropdownRef.current.contains(event.target)) {
-                setDropdownOpen(prev => ({ ...prev, district: false }));
-            }
-            if (subDistrictDropdownRef.current && !subDistrictDropdownRef.current.contains(event.target)) {
-                setDropdownOpen(prev => ({ ...prev, subDistrict: false }));
-            }
             if (kalolsavamDropdownRef.current && !kalolsavamDropdownRef.current.contains(event.target)) {
                 setDropdownOpen(prev => ({ ...prev, kalolsavam: false }));
             }
@@ -203,6 +95,20 @@ const AddUser = () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
+
+    // Update available Kalolsavams when user type changes
+    useEffect(() => {
+        const userType = formData.userType || 'Select User Type';
+        setAvailableKalolsavams(kalolsavamsByType[userType] || kalolsavamsByType['Select User Type']);
+        
+        // Reset kalolsavam selection when user type changes
+        if (formData.kalolsavam && !kalolsavamsByType[userType]?.includes(formData.kalolsavam)) {
+            setFormData(prev => ({
+                ...prev,
+                kalolsavam: ''
+            }));
+        }
+    }, [formData.userType]);
 
     const toggleDropdown = (dropdownName) => {
         setDropdownOpen(prev => ({
@@ -235,20 +141,8 @@ const AddUser = () => {
                 if (!value.trim() || value === 'Select User Type') return 'User type is required';
                 return '';
 
-            case 'district':
-                if (formData.userType === 'District Admin' || formData.userType === 'Sub-district Admin') {
-                    if (!value.trim() || value === 'Select District') return 'District is required';
-                }
-                return '';
-
-            case 'subDistrict':
-                if (formData.userType === 'Sub-district Admin') {
-                    if (!value.trim()) return 'Sub-district is required';
-                }
-                return '';
-
             case 'kalolsavam':
-                if (formData.district && (!value.trim() || value === 'Select Kalolsavam')) return 'Kalolsavam is required';
+                if (!value.trim() || value === 'Select Kalolsavam') return 'Kalolsavam is required';
                 return '';
 
             default:
@@ -256,27 +150,23 @@ const AddUser = () => {
         }
     };
 
+    useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <Splashscreen />;}
+
     const validateForm = () => {
         const newErrors = {};
         let isValid = true;
 
         // Base fields everyone needs
-        let fieldsToValidate = ['username', 'password', 'userType'];
-
-        // Add district requirement for district and sub-district admins
-        if (formData.userType === 'District Admin' || formData.userType === 'Sub-district Admin') {
-            fieldsToValidate.push('district');
-        }
-
-        // Add sub-district requirement only for sub-district admins
-        if (formData.userType === 'Sub-district Admin') {
-            fieldsToValidate.push('subDistrict');
-        }
-
-        // Add kalolsavam requirement if district is selected
-        if (formData.district && formData.district !== 'Select District') {
-            fieldsToValidate.push('kalolsavam');
-        }
+        let fieldsToValidate = ['username', 'password', 'userType', 'kalolsavam'];
 
         fieldsToValidate.forEach(key => {
             const error = validateField(key, formData[key]);
@@ -311,15 +201,6 @@ const AddUser = () => {
         if (name === 'userType') {
             setDropdownOpen(prev => ({ ...prev, userType: false }));
             setSearchText(prev => ({ ...prev, userType: '' }));
-        }
-        if (name === 'district') {
-            setSearchParams({ district: value });
-            setDropdownOpen(prev => ({ ...prev, district: false }));
-            setSearchText(prev => ({ ...prev, district: '' }));
-        }
-        if (name === 'subDistrict') {
-            setDropdownOpen(prev => ({ ...prev, subDistrict: false }));
-            setSearchText(prev => ({ ...prev, subDistrict: '' }));
         }
         if (name === 'kalolsavam') {
             setDropdownOpen(prev => ({ ...prev, kalolsavam: false }));
@@ -380,8 +261,6 @@ const AddUser = () => {
                             username: '',
                             password: '',
                             userType: '',
-                            district: '',
-                            subDistrict: '',
                             kalolsavam: ''
                         });
                         setFormSubmitted(false);
@@ -404,20 +283,7 @@ const AddUser = () => {
             }
         } else {
             console.log("Form has errors:", errors);
-            showAlert("Please Fill  the form before submitting.", 'warning');
-        }
-    };
-
-    const shouldShowField = (fieldName) => {
-        switch (fieldName) {
-            case 'district':
-                return formData.userType === 'District Admin' || formData.userType === 'Sub-district Admin';
-            case 'subDistrict':
-                return formData.userType === 'Sub-district Admin';
-            case 'kalolsavam':
-                return formData.district && formData.district !== 'Select District';
-            default:
-                return true;
+            
         }
     };
 
@@ -517,155 +383,52 @@ const AddUser = () => {
                                     </div>
                                 </div>
 
-                                {shouldShowField('district') && (
-                                    <div className="flex flex-col sm:flex-row sm:items-center">
-                                        <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">District</label>
-                                        <div className="w-full sm:w-2/3">
-                                            <div className="relative" ref={districtDropdownRef}>
-                                                <div
-                                                    onClick={() => toggleDropdown('district')}
-                                                    className={`border px-3 sm:px-4 py-2 rounded-full w-full ${errors.district ? 'border-red-500' : 'border-blue-600'} flex justify-between items-center cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                                                >
-                                                    <span className="text-gray-600">{formData.district || 'Select District'}</span>
-                                                    <span className="text-xs">▼</span>
-                                                </div>
-                                                {dropdownOpen.district && (
-                                                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
-                                                        <div className="p-2 border-b">
-                                                            <input
-                                                                type="text"
-                                                                placeholder="Search district..."
-                                                                value={searchText.district}
-                                                                onChange={(e) => handleSearchChange(e, 'district')}
-                                                                className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                                                onClick={(e) => e.stopPropagation()}
-                                                            />
-                                                        </div>
-                                                        <div className="max-h-48 overflow-y-auto">
-                                                            {filteredDistricts.length > 0 ? (
-                                                                filteredDistricts.map((district, index) => (
-                                                                    <div
-                                                                        key={index}
-                                                                        className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.district === district ? 'bg-blue-200' : ''}`}
-                                                                        onClick={() => handleInputChange({
-                                                                            target: { name: 'district', value: district }
-                                                                        })}
-                                                                    >
-                                                                        {district}
-                                                                    </div>
-                                                                ))
-                                                            ) : (
-                                                                <div className="px-4 py-2 text-gray-500">No results found</div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                )}
+                                <div className="flex flex-col sm:flex-row sm:items-center">
+                                    <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Kalolsavam</label>
+                                    <div className="w-full sm:w-2/3">
+                                        <div className="relative" ref={kalolsavamDropdownRef}>
+                                            <div
+                                                onClick={() => toggleDropdown('kalolsavam')}
+                                                className={`border px-3 sm:px-4 py-2 rounded-full w-full ${errors.kalolsavam ? 'border-red-500' : 'border-blue-600'} flex justify-between items-center cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                            >
+                                                <span className="text-gray-600">{formData.kalolsavam || 'Select Kalolsavam'}</span>
+                                                <span className="text-xs">▼</span>
                                             </div>
-                                            {errors.district && <p className="text-red-500 text-xs mt-1 ml-2">{errors.district}</p>}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {shouldShowField('kalolsavam') && (
-                                    <div className="flex flex-col sm:flex-row sm:items-center">
-                                        <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Kalolsavam</label>
-                                        <div className="w-full sm:w-2/3">
-                                            <div className="relative" ref={kalolsavamDropdownRef}>
-                                                <div
-                                                    onClick={() => toggleDropdown('kalolsavam')}
-                                                    className={`border px-3 sm:px-4 py-2 rounded-full w-full ${errors.kalolsavam ? 'border-red-500' : 'border-blue-600'} flex justify-between items-center cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                                                >
-                                                    <span className="text-gray-600">{formData.kalolsavam || 'Select Kalolsavam'}</span>
-                                                    <span className="text-xs">▼</span>
-                                                </div>
-                                                {dropdownOpen.kalolsavam && (
-                                                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
-                                                        <div className="p-2 border-b">
-                                                            <input
-                                                                type="text"
-                                                                placeholder="Search kalolsavam..."
-                                                                value={searchText.kalolsavam}
-                                                                onChange={(e) => handleSearchChange(e, 'kalolsavam')}
-                                                                className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                                                onClick={(e) => e.stopPropagation()}
-                                                            />
-                                                        </div>
-                                                        <div className="max-h-48 overflow-y-auto">
-                                                            {filteredKalolsavams.length > 0 ? (
-                                                                filteredKalolsavams.map((kalolsavam, index) => (
-                                                                    <div
-                                                                        key={index}
-                                                                        className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.kalolsavam === kalolsavam ? 'bg-blue-200' : ''}`}
-                                                                        onClick={() => handleInputChange({
-                                                                            target: { name: 'kalolsavam', value: kalolsavam }
-                                                                        })}
-                                                                    >
-                                                                        {kalolsavam}
-                                                                    </div>
-                                                                ))
-                                                            ) : (
-                                                                <div className="px-4 py-2 text-gray-500">No results found</div>
-                                                            )}
-                                                        </div>
+                                            {dropdownOpen.kalolsavam && (
+                                                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+                                                    <div className="p-2 border-b">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Search kalolsavam..."
+                                                            value={searchText.kalolsavam}
+                                                            onChange={(e) => handleSearchChange(e, 'kalolsavam')}
+                                                            className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        />
                                                     </div>
-                                                )}
-                                            </div>
-                                            {errors.kalolsavam && <p className="text-red-500 text-xs mt-1 ml-2">{errors.kalolsavam}</p>}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {shouldShowField('subDistrict') && (
-                                    <div className="flex flex-col sm:flex-row sm:items-center">
-                                        <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Sub-district</label>
-                                        <div className="w-full sm:w-2/3">
-                                            <div className="relative" ref={subDistrictDropdownRef}>
-                                                <div
-                                                    onClick={() => toggleDropdown('subDistrict')}
-                                                    className={`border px-3 sm:px-4 py-2 rounded-full w-full ${errors.subDistrict ? 'border-red-500' : 'border-blue-600'} flex justify-between items-center cursor-pointer bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${availableSubDistricts.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                >
-                                                    <span className="text-gray-600">{formData.subDistrict || 'Select Sub-district'}</span>
-                                                    <span className="text-xs">▼</span>
-                                                </div>
-                                                {dropdownOpen.subDistrict && availableSubDistricts.length > 0 && (
-                                                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
-                                                        <div className="p-2 border-b">
-                                                            <input
-                                                                type="text"
-                                                                placeholder="Search sub-district..."
-                                                                value={searchText.subDistrict}
-                                                                onChange={(e) => handleSearchChange(e, 'subDistrict')}
-                                                                className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                                                onClick={(e) => e.stopPropagation()}
-                                                            />
-                                                        </div>
-                                                        <div className="max-h-48 overflow-y-auto">
-                                                            {filteredSubDistricts.length > 0 ? (
-                                                                filteredSubDistricts.map((subDistrict, index) => (
-                                                                    <div
-                                                                        key={index}
-                                                                        className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.subDistrict === subDistrict ? 'bg-blue-200' : ''}`}
-                                                                        onClick={() => handleInputChange({
-                                                                            target: { name: 'subDistrict', value: subDistrict }
-                                                                        })}
-                                                                    >
-                                                                        {subDistrict}
-                                                                    </div>
-                                                                ))
-                                                            ) : (
-                                                                <div className="px-4 py-2 text-gray-500">No results found</div>
-                                                            )}
-                                                        </div>
+                                                    <div className="max-h-48 overflow-y-auto">
+                                                        {filteredKalolsavams.length > 0 ? (
+                                                            filteredKalolsavams.map((kalolsavam, index) => (
+                                                                <div
+                                                                    key={index}
+                                                                    className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.kalolsavam === kalolsavam ? 'bg-blue-200' : ''}`}
+                                                                    onClick={() => handleInputChange({
+                                                                        target: { name: 'kalolsavam', value: kalolsavam }
+                                                                    })}
+                                                                >
+                                                                    {kalolsavam}
+                                                                </div>
+                                                            ))
+                                                        ) : (
+                                                            <div className="px-4 py-2 text-gray-500">No results found</div>
+                                                        )}
                                                     </div>
-                                                )}
-                                            </div>
-                                            {errors.subDistrict && <p className="text-red-500 text-xs mt-1 ml-2">{errors.subDistrict}</p>}
-                                            {formData.district && availableSubDistricts.length === 0 && (
-                                                <p className="text-amber-600 text-xs mt-1 ml-2">No sub-districts available for the selected district</p>
+                                                </div>
                                             )}
                                         </div>
+                                        {errors.kalolsavam && <p className="text-red-500 text-xs mt-1 ml-2">{errors.kalolsavam}</p>}
                                     </div>
-                                )}
+                                </div>
                             </form>
                             <div className="flex flex-col sm:flex-row justify-center sm:justify-end mt-10 sm:mt-16 sm:mr-10 md:mr-18 lg:mr-40 space-y-4 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">
                                 <button

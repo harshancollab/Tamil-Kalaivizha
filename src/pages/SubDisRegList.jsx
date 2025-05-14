@@ -4,12 +4,14 @@ import Header from '../components/Header';
 import Dash from '../components/Dash';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getAllResultentryListAPI } from '../services/allAPI'; 
+import Splashscreen from '../components/Splashscreen'
 import html2pdf from 'html2pdf.js'; // Add this import for html2pdf
 
 const SubDisRegList = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchCode, setSearchCode] = useState(searchParams.get('code') || '');
     const [selectedDistrict, setSelectedDistrict] = useState(searchParams.get('district') || 'Select');
+     const [loading, setLoading] = useState(true);
  
     const [resultentry, setResultentry] = useState([]);
     const navigate = useNavigate();
@@ -30,7 +32,10 @@ const SubDisRegList = () => {
     
     useEffect(() => {
         setCurrentPage(1);
+         setLoading(true);
     }, [searchCode, selectedDistrict]);
+
+    
 
     const districtToSubDistrict = {
         'Idukki': ['Munnar', 'Adimali', 'Kattappana', 'Nedumkandam', 'Devikulam'],
@@ -114,6 +119,16 @@ const SubDisRegList = () => {
         }
     };
 
+        useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <Splashscreen />;}
     
     const updateURLParams = (params) => {
         const newParams = new URLSearchParams(searchParams);

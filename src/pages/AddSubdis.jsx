@@ -3,12 +3,21 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Dash from '../components/Dash';
+import Splashscreen from '../components/Splashscreen'
+import Alert from '../components/Alert'
 // import { AddSubDistrictAPI, fetchDistrictsAPI } from '../services/allAPI'; // Import API functions
 
 const AddSubdis = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
+    const [loading, setLoading] = useState(true);
+      // Alert state
+      const [alert, setAlert] = useState({
+          show: false,
+          message: '',
+          type: 'success'
+      });
   
   const [availableDistricts, setAvailableDistricts] = useState([]);
   
@@ -176,6 +185,36 @@ const AddSubdis = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) {
+        return <Splashscreen />;
+    }
+
+    const showAlert = (message, type = 'success') => {
+        setAlert({
+            show: true,
+            message,
+            type
+        });
+    };
+
+    const hideAlert = () => {
+        setAlert({
+            ...alert,
+            show: false
+        });
+    };
+
+
+
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
     setFormSubmitted(true);
@@ -202,21 +241,21 @@ const AddSubdis = () => {
           const result = await AddSubDistrictAPI(formData, reqHeader);
           
           if (result.status === 200) {
-            alert('Sub-District added successfully!');
+            showAlert('Sub-District added successfully!');
             
             setFormData(prev => ({...prev, subDistrictName: ''}));
             setFormSubmitted(false);
             
             navigate(`/SubDisRegList?district=${encodeURIComponent(formData.district)}`);
           } else {
-            alert(result.response?.data || "Error adding sub-district");
+            showAlert(result.response?.data || "Error adding sub-district");
           }
         } else {
-          alert("Authentication token missing. Please log in again.");
+          showAlert("Authentication token missing. Please log in again.");
         }
       } catch (err) {
         console.error("Error adding sub-district:", err);
-        alert("Error adding sub-district. Please try again.");
+        showAlert("Error adding sub-district. Please try again.");
       } finally {
         setIsLoading(false);
       }
@@ -306,6 +345,14 @@ const AddSubdis = () => {
         <Header />
         <div className="flex flex-col sm:flex-row">
           <Dash />
+          {alert.show && (
+                        <Alert
+                            message={alert.message}
+                            type={alert.type}
+                            onClose={hideAlert}
+                            duration={5000}
+                        />
+                    )}
           <div className="flex-1 p-2 sm:p-4 bg-gray-300">
             <div className="bg-gray-50 p-3 sm:p-6 pt-4 min-h-screen mx-auto relative">
               <h2 className="text-lg font-bold mb-5 sm:mb-10 text-gray-800">Add Sub District</h2>

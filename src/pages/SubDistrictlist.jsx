@@ -5,7 +5,9 @@ import Header from '../components/Header';
 import Dash from '../components/Dash';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getAllResultentryListAPI } from '../services/allAPI';
-import html2pdf from 'html2pdf.js'; 
+import html2pdf from 'html2pdf.js';
+import Splashscreen from '../components/Splashscreen'
+
 
 const SubDistrictList = () => {
     const [loading, setLoading] = useState(false);
@@ -16,7 +18,7 @@ const SubDistrictList = () => {
     const [selectedDistrict, setSelectedDistrict] = useState(searchParams.get('district') || 'Select');
     const navigate = useNavigate();
     const printRef = useRef();
-    
+
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -92,7 +94,7 @@ const SubDistrictList = () => {
 
     const updateURLParams = (params) => {
         const newParams = new URLSearchParams(searchParams);
-        
+
         Object.entries(params).forEach(([key, value]) => {
             if (value && value !== 'Select') {
                 newParams.set(key, value);
@@ -100,21 +102,23 @@ const SubDistrictList = () => {
                 newParams.delete(key);
             }
         });
-        
+
         setSearchParams(newParams);
     };
 
     const handleSearchChange = (e) => {
         const value = e.target.value;
         setSearchCode(value);
-        
+
         updateURLParams({ code: value });
     };
+
+
 
     const handleDistrictChange = (e) => {
         const value = e.target.value;
         setSelectedDistrict(value);
-        
+
         updateURLParams({ district: value });
     };
 
@@ -128,26 +132,26 @@ const SubDistrictList = () => {
 
     const generatePDF = () => {
         const pdfContent = document.createElement('div');
-        
+
         const titleElement = document.createElement('h2');
-        titleElement.textContent = selectedDistrict !== 'Select' ? 
-            `${selectedDistrict} - Sub District List Report` : 
+        titleElement.textContent = selectedDistrict !== 'Select' ?
+            `${selectedDistrict} - Sub District List Report` :
             "Sub District List Report";
         titleElement.style.textAlign = 'center';
         titleElement.style.margin = '20px 0';
         titleElement.style.fontWeight = 'bold';
         pdfContent.appendChild(titleElement);
-        
-       
+
+
         const table = document.createElement('table');
         table.style.width = '100%';
         table.style.borderCollapse = 'collapse';
         table.style.marginTop = '20px';
-        
-       
+
+
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
-        
+
         const headers = ['Sl No', 'Sub District Name', 'Total Schools', 'Data Entered', 'Data Not Entered', 'Confirmed', 'Not Confirmed'];
         headers.forEach(headerText => {
             const th = document.createElement('th');
@@ -158,17 +162,17 @@ const SubDistrictList = () => {
             th.style.fontWeight = 'bold';
             headerRow.appendChild(th);
         });
-        
+
         thead.appendChild(headerRow);
         table.appendChild(thead);
-        
-      
+
+
         const tbody = document.createElement('tbody');
-        
+
         filteredData.forEach((item, index) => {
             const row = document.createElement('tr');
-            
-            
+
+
             const cellData = [
                 indexOfFirstItem + index + 1,
                 item.name || "-",
@@ -178,7 +182,7 @@ const SubDistrictList = () => {
                 item.confirmed || "-",
                 item.notConfirmed || "-"
             ];
-            
+
             cellData.forEach(text => {
                 const td = document.createElement('td');
                 td.textContent = text;
@@ -187,19 +191,19 @@ const SubDistrictList = () => {
                 td.style.textAlign = 'center';
                 row.appendChild(td);
             });
-            
+
             tbody.appendChild(row);
         });
-        
+
         table.appendChild(tbody);
         pdfContent.appendChild(table);
-        
-        
-        const fileName = selectedDistrict !== 'Select' ? 
-            `${selectedDistrict}_Sub_District_List_Report.pdf` : 
+
+
+        const fileName = selectedDistrict !== 'Select' ?
+            `${selectedDistrict}_Sub_District_List_Report.pdf` :
             `Sub_District_List_Report.pdf`;
-        
-        
+
+
         const options = {
             margin: 10,
             filename: fileName,
@@ -207,30 +211,33 @@ const SubDistrictList = () => {
             html2canvas: { scale: 2, useCORS: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
-        
+
         html2pdf().from(pdfContent).set(options).save();
     };
 
-    
+
     useEffect(() => {
         getAllDistricts();
     }, []);
 
+
+
+
     const getAllDistricts = async () => {
         setLoading(true);
         setError(null);
-        
+
         const token = sessionStorage.getItem("token");
         if (!token) {
             setError("Authentication token not found. Please login again.");
             setLoading(false);
             return;
         }
-        
+
         const reqHeader = {
             "Authorization": `Bearer ${token}`
         };
-        
+
         try {
             const result = await getAllResultentryListAPI(reqHeader);
             if (result.status === 200) {
@@ -245,6 +252,7 @@ const SubDistrictList = () => {
             setLoading(false);
         }
     };
+
 
     const renderPageNumbers = () => {
         const pageNumbers = [];
@@ -283,6 +291,18 @@ const SubDistrictList = () => {
         return pageNumbers;
     };
 
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) {
+        return <Splashscreen />;
+    }
     return (
         <>
             <Header />
@@ -312,7 +332,7 @@ const SubDistrictList = () => {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div className="relative flex mb-5 w-full sm:w-32 md:w-60">
                         <div className="relative flex-grow flex items-center h-10 border border-blue-800 rounded-full px-4">
                             <input
@@ -327,7 +347,7 @@ const SubDistrictList = () => {
                             </button>
                         </div>
                     </div>
-                    
+
                     <div className="w-full">
                         <div id="print-container" className="overflow-x-auto -mx-4 sm:mx-0">
                             <div className="inline-block min-w-full align-middle px-4 sm:px-0">
@@ -350,7 +370,7 @@ const SubDistrictList = () => {
                                                     <tr key={item.slNo} className="hover:bg-gray-100">
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
                                                         <td className="p-2 md:p-3 text-blue-500 whitespace-nowrap">
-                                                            <button 
+                                                            <button
                                                                 className="text-blue-500 hover:text-blue-700 hover:underline focus:outline-none"
                                                                 onClick={() => handleSubDistrictClick(item.name, item.district)}
                                                             >
@@ -399,9 +419,8 @@ const SubDistrictList = () => {
                                     <button
                                         key={index}
                                         onClick={() => page !== '...' && handlePageChange(page)}
-                                        className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${
-                                            currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
-                                        } ${page === '...' ? 'pointer-events-none' : ''}`}
+                                        className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                                            } ${page === '...' ? 'pointer-events-none' : ''}`}
                                     >
                                         {page}
                                     </button>

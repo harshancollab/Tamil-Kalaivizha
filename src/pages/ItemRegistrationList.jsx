@@ -6,6 +6,8 @@ import Dash from '../components/Dash'
 // import { deleteItemAPI, getAllItemsListAPI } from '../services/allAPI';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import html2pdf from 'html2pdf.js';
+import Splashscreen from '../components/Splashscreen'
+import Alert from '../components/Alert'
 
 const ItemRegistrationList = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -13,6 +15,13 @@ const ItemRegistrationList = () => {
     const [items, setItems] = useState([]);
     const navigate = useNavigate();
     const printRef = useRef();
+      const [loading, setLoading] = useState(true);
+        // Alert state
+        const [alert, setAlert] = useState({
+            show: false,
+            message: '',
+            type: 'success'
+        });
 
     const [selectedFestival, setSelectedFestival] = useState(searchParams.get('festival') || '');
     const festivalOptions = [
@@ -342,11 +351,49 @@ const ItemRegistrationList = () => {
         return pageNumbers;
     };
 
+
+       useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) {
+        return <Splashscreen />;
+    }
+
+    const showAlert = (message, type = 'success') => {
+        setAlert({
+            show: true,
+            message,
+            type
+        });
+    };
+
+    const hideAlert = () => {
+        setAlert({
+            ...alert,
+            show: false
+        });
+    };
+
+
+
     return (
         <>
             <Header />
             <div className="flex flex-col md:flex-row min-h-screen">
                 <Dash />
+                {alert.show && (
+                        <Alert
+                            message={alert.message}
+                            type={alert.type}
+                            onClose={hideAlert}
+                            duration={5000}
+                        />
+                    )}
                 <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-hidden">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
                         <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">

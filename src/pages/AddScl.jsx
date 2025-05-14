@@ -3,16 +3,27 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Dash from '../components/Dash';
 import Header from '../components/Header';
+import Alert from '../components/Alert'
+import Splashscreen from '../components/Splashscreen'
+
 // import { AddKalolsavamAPI } from '../services/allAPI';
 
 const AddScl = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const districtParam = searchParams.get('district');
+    const [loading, setLoading] = useState(true);
     const subDistrictParam = searchParams.get('subDistrict');
     const navigate = useNavigate();
     const location = useLocation();
     const [searchTerm, setSearchTerm] = useState('');
     const [availableSubDistricts, setAvailableSubDistricts] = useState([]);
+    // Alert state
+    const [alert, setAlert] = useState({
+        show: false,
+        message: '',
+        type: 'success'
+    });
+
     const [dropdownOpen, setDropdownOpen] = useState({
         schoolType: false,
         district: false,
@@ -28,7 +39,7 @@ const AddScl = () => {
         educationDistrict: '',
         subDistrict: subDistrictParam || ''
     });
-    
+
     const [errors, setErrors] = useState({
         schoolCode: '',
         schoolName: '',
@@ -37,7 +48,7 @@ const AddScl = () => {
         educationDistrict: '',
         subDistrict: ''
     });
-    
+
     useEffect(() => {
         if (formData.district && formData.district !== 'Select') {
             setAvailableSubDistricts(districtToSubDistrict[formData.district] || []);
@@ -46,22 +57,24 @@ const AddScl = () => {
 
     useEffect(() => {
         const params = new URLSearchParams(searchParams);
-        
+
         if (formData.district) {
             params.set('district', formData.district);
         } else {
             params.delete('district');
         }
-        
+
         if (formData.subDistrict) {
             params.set('subDistrict', formData.subDistrict);
         } else {
             params.delete('subDistrict');
         }
-        
+
         setSearchParams(params);
     }, [formData.district, formData.subDistrict, setSearchParams]);
 
+
+  
     const [formSubmitted, setFormSubmitted] = useState(false);
 
     const schoolTypes = [
@@ -160,6 +173,8 @@ const AddScl = () => {
         return isValid;
     };
 
+   
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -191,7 +206,7 @@ const AddScl = () => {
         if (field === 'district') {
             setFormData(prev => ({ ...prev, subDistrict: '' }));
             setErrors(prev => ({ ...prev, subDistrict: '' }));
-            
+
             setTimeout(() => {
                 setDropdownOpen(prev => ({ ...prev, subDistrict: true }));
             }, 100);
@@ -213,15 +228,15 @@ const AddScl = () => {
 
     const handleCancel = () => {
         const params = new URLSearchParams();
-        
+
         if (formData.district) {
             params.set('district', formData.district);
         }
-        
+
         if (formData.subDistrict) {
             params.set('subDistrict', formData.subDistrict);
         }
-        
+
         navigate({
             pathname: '/SchoolRegList',
             search: params.toString()
@@ -255,33 +270,60 @@ const AddScl = () => {
         };
     }, []);
 
+
+      useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <Splashscreen />;}
+
+    const showAlert = (message, type = 'success') => {
+        setAlert({
+            show: true,
+            message,
+            type
+        });
+    };
+
+    const hideAlert = () => {
+        setAlert({
+            ...alert,
+            show: false
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setFormSubmitted(true);
-        
+
         const isValid = validateForm();
-        
+
         if (isValid) {
             console.log("Form submitted:", formData);
-            
+
             const token = sessionStorage.getItem("token");
-            
+
             if (token) {
                 const reqHeader = {
                     "Authorization": `Bearer ${token}`
                 };
-                
+
                 try {
-                  
+
                     // const result = await AddSchoolAPI(formData, reqHeader);
-                    
-                  
+
+
                     const result = { status: 200 };
-                    
+
                     if (result.status === 200) {
-                        alert('School added successfully!');
-                        
-                       
+                        showAlert('School added successfully!');
+
+
                         setFormData({
                             schoolCode: '',
                             schoolName: '',
@@ -290,18 +332,18 @@ const AddScl = () => {
                             educationDistrict: '',
                             subDistrict: ''
                         });
-                        
-                       
+
+
                         navigate('/SchoolRegList');
                     } else {
-                        alert(result.response.data);
+                        showAlert(result.response.data);
                     }
                 } catch (err) {
                     console.error("Error adding school:", err);
-                    alert("Error adding school. Please try again.");
+                    showAlert("Error adding school. Please try again.");
                 }
             } else {
-                alert("Authentication token missing. Please log in again.");
+                showAlert("Authentication token missing. Please log in again.");
             }
         } else {
             console.log("Form has errors:", errors);
@@ -314,6 +356,14 @@ const AddScl = () => {
                 <Header />
                 <div className="flex flex-col sm:flex-row">
                     <Dash />
+                    {alert.show && (
+                        <Alert
+                            message={alert.message}
+                            type={alert.type}
+                            onClose={hideAlert}
+                            duration={5000}
+                        />
+                    )}
                     <div className="flex-1 p-2 sm:p-4 bg-gray-300">
                         <div className="bg-gray-50 p-3 sm:p-6 pt-4 min-h-screen mx-auto">
                             <h2 className="text-lg font-bold mb-5 sm:mb-10 text-gray-800">Add School</h2>
@@ -525,7 +575,7 @@ const AddScl = () => {
                                     </div>
                                 </div>
                             </form>
-                            
+
                             {/* Buttons */}
                             <div className="flex flex-col sm:flex-row justify-center sm:justify-end mt-16 sm:mt-32 sm:mr-10 md:mr-20 lg:mr-40 space-y-4 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">
                                 <button

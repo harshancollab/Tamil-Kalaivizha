@@ -5,11 +5,14 @@ import Header from '../components/Header';
 import Dash from '../components/Dash';
 import { getAllResultentryListAPI } from '../services/allAPI';
 import html2pdf from 'html2pdf.js';
+import Splashscreen from '../components/Splashscreen'
+
 
 const SchoolList = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
     const printRef = useRef();
+    
     
     const subDistrict = searchParams.get('subDistrict') || '';
     const district = searchParams.get('district') || '';
@@ -92,6 +95,19 @@ const SchoolList = () => {
         }
     };
 
+     useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, []);
+   
+    if (loading) {
+        return <Splashscreen />;
+    }
+   
+
     const handleAddSchool = () => {
         const params = new URLSearchParams();
         
@@ -110,7 +126,7 @@ const SchoolList = () => {
         });
     };
 
-   
+
     const generatePDF = () => {
         const pdfContent = document.createElement('div');
         
@@ -264,6 +280,9 @@ const SchoolList = () => {
 
         return pageNumbers;
     };
+
+    
+
 
     return (
         <>

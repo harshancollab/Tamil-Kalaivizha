@@ -4,15 +4,19 @@ import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { deleteresultentryAPI, getAllResultentryListAPI } from '../services/allAPI';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import Splashscreen from '../components/Splashscreen'
+
 
 const FestivalRegiList = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [searchCode, setSearchCode] = useState(searchParams.get('code') || '');
     const [resultentry, setResultentry] = useState([]);
+    const [loading, setLoading] = useState(true);
+
     const navigate = useNavigate();
     const printRef = useRef();
-    
-    
+
+
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -25,7 +29,7 @@ const FestivalRegiList = () => {
         setCurrentPage(1);
     }, [searchCode]);
 
-    
+
     useEffect(() => {
         getAllresultentry();
     }, []);
@@ -47,6 +51,20 @@ const FestivalRegiList = () => {
         }
     }
 
+
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) {
+        return <Splashscreen />;
+    }
+
     const handleEditRedirect = (festival) => {
         navigate(`/EditFestival/${festival.slNo}`, {
             state: { festival }
@@ -62,7 +80,7 @@ const FestivalRegiList = () => {
             try {
                 const result = await deleteresultentryAPI(id, reqHeader)
                 if (result.status === 200) {
-                   
+
                     getAllresultentry();
                 }
             } catch (err) {
@@ -71,7 +89,7 @@ const FestivalRegiList = () => {
         }
     }
 
-    
+
     const festivalData = resultentry.length > 0 ? resultentry : [
         { slNo: 1, code: "UP Tamilkalaivizha" },
         { slNo: 2, code: "HS Tamilkalaivizha" },
@@ -82,14 +100,14 @@ const FestivalRegiList = () => {
         { slNo: 7, code: "UP Tamilkalaivizha" },
     ];
 
-    
-    const filteredData = searchCode 
-        ? festivalData.filter(festival => 
+
+    const filteredData = searchCode
+        ? festivalData.filter(festival =>
             festival.code.toLowerCase().includes(searchCode.toLowerCase())
-          )
+        )
         : festivalData;
 
-   
+
     const indexOfLastItem = currentPage * rowsPerPage;
     const indexOfFirstItem = indexOfLastItem - rowsPerPage;
     const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
@@ -101,10 +119,10 @@ const FestivalRegiList = () => {
         }
     };
 
-  
+
     const updateURLParams = (params) => {
         const newParams = new URLSearchParams(searchParams);
-        
+
         Object.entries(params).forEach(([key, value]) => {
             if (value) {
                 newParams.set(key, value);
@@ -112,16 +130,16 @@ const FestivalRegiList = () => {
                 newParams.delete(key);
             }
         });
-        
+
         setSearchParams(newParams);
     };
 
-    
+
     const handleSearchChange = (e) => {
         const value = e.target.value;
         setSearchCode(value);
-        
-        
+
+
         updateURLParams({ code: value });
     };
 
@@ -131,18 +149,18 @@ const FestivalRegiList = () => {
 
     const renderPageNumbers = () => {
         const pageNumbers = [];
-      
+
         const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
 
         if (totalPages <= maxPageNumbersToShow) {
-          
+
             for (let i = 1; i <= totalPages; i++) {
                 pageNumbers.push(i);
             }
         } else {
-           
+
             if (currentPage <= 2) {
-                
+
                 for (let i = 1; i <= 3; i++) {
                     if (i <= totalPages) pageNumbers.push(i);
                 }
@@ -151,14 +169,14 @@ const FestivalRegiList = () => {
                     pageNumbers.push(totalPages);
                 }
             } else if (currentPage >= totalPages - 1) {
-                
+
                 pageNumbers.push(1);
                 pageNumbers.push('...');
                 for (let i = totalPages - 2; i <= totalPages; i++) {
                     if (i > 0) pageNumbers.push(i);
                 }
             } else {
-               
+
                 pageNumbers.push(1);
                 if (currentPage > 3) pageNumbers.push('...');
                 pageNumbers.push(currentPage - 1);
@@ -193,7 +211,7 @@ const FestivalRegiList = () => {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div className="relative flex mb-5 w-full sm:w-32 md:w-60">
                         <div className="relative flex-grow flex items-center h-10  border border-blue-800 rounded-full px-4">
                             <input
@@ -208,7 +226,7 @@ const FestivalRegiList = () => {
                             </button>
                         </div>
                     </div>
-                    
+
                     <div className="w-full">
                         <div id="print-container" className="overflow-x-auto -mx-4 sm:mx-0">
                             <div className="inline-block min-w-full align-middle px-4 sm:px-0">
@@ -237,8 +255,8 @@ const FestivalRegiList = () => {
                                                             </button>
                                                         </td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">
-                                                            <button 
-                                                                onClick={() => handleDeleteClick(festival.slNo)} 
+                                                            <button
+                                                                onClick={() => handleDeleteClick(festival.slNo)}
                                                                 className="text-red-600 hover:text-red-800 focus:outline-none"
                                                             >
                                                                 <i className="fa-solid fa-trash cursor-pointer"></i>
@@ -279,9 +297,8 @@ const FestivalRegiList = () => {
                                     <button
                                         key={index}
                                         onClick={() => page !== '...' && handlePageChange(page)}
-                                        className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${
-                                            currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
-                                        } ${page === '...' ? 'pointer-events-none' : ''}`}
+                                        className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
+                                            } ${page === '...' ? 'pointer-events-none' : ''}`}
                                     >
                                         {page}
                                     </button>
