@@ -4,8 +4,7 @@ import Header from '../components/Header';
 import Dash from '../components/Dash';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { getAllResultentryListAPI } from '../services/allAPI'; 
-import Splashscreen from '../components/Splashscreen'
-import html2pdf from 'html2pdf.js'; // Add this import for html2pdf
+import html2pdf from 'html2pdf.js'; 
 
 const SubDisRegList = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -128,7 +127,21 @@ const SubDisRegList = () => {
   }, []);
 
   if (loading) {
-    return <Splashscreen />;}
+        return (
+            <>
+                <Header />
+                <div className="flex flex-col md:flex-row min-h-screen">
+                    <Dash />
+                    <div className="flex-1 p-4 md:p-6 lg:p-8 flex items-center justify-center">
+                        <div className="text-center">
+                            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-500 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+                            <p className="mt-2 text-gray-600">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </>
+        )
+    }
     
     const updateURLParams = (params) => {
         const newParams = new URLSearchParams(searchParams);

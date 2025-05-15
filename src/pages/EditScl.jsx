@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Dash from '../components/Dash';
 import Header from '../components/Header';
-// These will be uncommented when backend is ready
 // import { GetSchoolByIdAPI, UpdateSchoolAPI } from '../services/allAPI';
 
 const EditScl = () => {

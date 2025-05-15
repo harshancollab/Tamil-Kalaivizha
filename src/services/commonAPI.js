@@ -15,3 +15,5 @@ const commonAPI = async (httpMethod,url,reqBody,reqHeader)=>{
 }
 
 export default commonAPI
+
+

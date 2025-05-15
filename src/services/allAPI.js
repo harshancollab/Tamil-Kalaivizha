@@ -2,44 +2,68 @@
 import commonAPI from "./commonAPI"
 import SERVER_URL from "./serverurl"
 
-// Add admin API
-export const addAdminAPI = async (reqBody, reqHeader) => {
-  return await commonAPI("POST", `${SERVER_URL}/add-admin`, reqBody, reqHeader)
-}
+
+
 
 // login
 export const loginAPI = async (reqBody) => {
-  return await commonAPI("POST", `${SERVER_URL}/login-admin`, reqBody)
+  return await commonAPI("POST", `${SERVER_URL}/api/user/login`, reqBody)
 }
+
+// Add admin API
+export const addAdminAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/api/user/create`, reqBody, reqHeader)
+}
+
+
+// get  all Users
+export const getAllAdminuserAPI = async (reqHeader) => {
+  return await commonAPI("GET",`${SERVER_URL}/api/user/get-all?page=1&limit=10`,{}, reqHeader);
+};
+
+
+// get  single  Users
+export const getsingleAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/api/user/${userId}/get`,{}, reqHeader);
+};
 
 
 // reset
-export const resetPasswordAPI = async (data) => {
-    return await commonAPI("POST", `${SERVER_URL}/reset-password`, data, "");
-  }
-  // otp
-export const verifyOtpAPI = async (data) => {
-    return await commonAPI("POST", `${SERVER_URL}/verify-otp`, data, "");
-  }
-//   resnd
-  export const resendOtpAPI = async (data) => {
-    return await commonAPI("POST", `${SERVER_URL}/resend-otp`, data, "");
-  }
+export const resetPasswordAPI = async (reqBody) => {
+  return await commonAPI("POST", `${SERVER_URL}/api/user/email-verification`, reqBody, "");
+}
+
+
+// otp
+export const verifyOtpAPI = async (reqBody) => {
+  return await commonAPI("POST", `${SERVER_URL}//api/user/harshanh60@gmail.com/otp-verification`, reqBody, "");
+}
+
+
+// resend OTP code
+export const resendOtpAPI = async (reqBody) => {
+  return await commonAPI("POST", `${SERVER_URL}/api/user/resend-otp`, reqBody, "");
+}
+
+
+
+
+
 //   new password 
 export const newPasswordAPI = async (data) => {
-    
-      return await commonAPI("POST" `${SERVER_URL}/new-password`, data,"");
-  
-  }
-  
+
+  return await commonAPI("POST" `${SERVER_URL}/new-password`, data, "");
+
+}
+
 // add schooll details 
-export const addSchooldetailsAPI = async (reqBody)=>{
-    return await commonAPI("POST",`${SERVER_URL}/add-schooldetails`,reqBody,reqHeader)
+export const addSchooldetailsAPI = async (reqBody) => {
+  return await commonAPI("POST", `${SERVER_URL}/add-schooldetails`, reqBody, reqHeader)
 
 }
 // user schooll details 
-export const userSchooldetailsAPI = async (reqHeader)=>{
-    return await commonAPI("GET",`${SERVER_URL}/user-schooldetails`,{},reqHeader)
+export const userSchooldetailsAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/user-schooldetails`, {}, reqHeader)
 
 }
 // update school details
@@ -48,36 +72,36 @@ export const userSchooldetailsAPI = async (reqHeader)=>{
 //   };
 
 // add participate
-export const addparticipateAPI = async (reqBody,reqHeader)=>{
-    return await commonAPI("POST",`${SERVER_URL}/add-partcipate`,reqBody,reqHeader)
+export const addparticipateAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/add-partcipate`, reqBody, reqHeader)
 }
 
 // all  participate
-export const allparticipateAPI = async (reqHeader)=>{
-    return await commonAPI("GET",`${SERVER_URL}/all-partcipate`,{},reqHeader)
+export const allparticipateAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/all-partcipate`, {}, reqHeader)
 }
 
 
 // add participate
-export const updateparticipateAPI = async (id,reqBody,reqHeader)=>{
-    return await commonAPI("PUT",`${SERVER_URL}/partcipate${id}edit`,reqBody,reqHeader)
+export const updateparticipateAPI = async (id, reqBody, reqHeader) => {
+  return await commonAPI("PUT", `${SERVER_URL}/partcipate${id}edit`, reqBody, reqHeader)
 }
 
 // item wise 
 export const allItemWiseAPI = async (reqHeader) => {
-    return await commonAPI("GET",`${SERVER_URL}/all-itemwise`, reqHeader);
-  };
+  return await commonAPI("GET", `${SERVER_URL}/all-itemwise`, reqHeader);
+};
 //   a grade
 export const getAGradeResultsAPI = async (reqHeader) => {
-    return await commonAPI("GET", `${SERVER_URL}/results-agrade`, "", reqHeader);
-  }
+  return await commonAPI("GET", `${SERVER_URL}/results-agrade`, "", reqHeader);
+}
 
 
 
 
-  //  AllKalolsavam
-  export const getAllKalolsavamAPI = async (reqHeader) => {
-    return await commonAPI("GET", `${SERVER_URL}/kalolsavam/all`, {}, reqHeader);
+//  AllKalolsavam
+export const getAllKalolsavamAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/kalolsavam/all`, {}, reqHeader);
 };
 
 //  edit a Kalolsavam
@@ -100,13 +124,13 @@ export const allClusterSchoolsAPI = async (reqHeader) => {
 
 
 // add spl entry
-export const addSpecialOrderAPI = async (reqBody,reqHeader)=>{
-  return await commonAPI("POST",`${SERVER_URL}/add-splentry`,reqBody,reqHeader)
+export const addSpecialOrderAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/add-splentry`, reqBody, reqHeader)
 }
 
 // addstatge duration
-export const addStageDurationAPI = async (reqBody,reqHeader)=>{
-  return await commonAPI("POST",`${SERVER_URL}/add-stage`,reqBody,reqHeader)
+export const addStageDurationAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/add-stage`, reqBody, reqHeader)
 }
 
 
@@ -118,7 +142,7 @@ export const getAllStageDurationsAPI = async (reqHeader) => {
 
 // Add Stage API
 export const addStageAPI = async (reqBody, reqHeader) => {
-  return await commonAPI("POST", `${SERVER_URL}/stages/add`,reqBody, reqHeader);
+  return await commonAPI("POST", `${SERVER_URL}/stages/add`, reqBody, reqHeader);
 };
 
 
@@ -128,25 +152,27 @@ export const getAllStageListAPI = async (reqHeader) => {
 };
 // edit stage 
 
-
+export const deleteAdminUserAPI = async (id, reqHeader) => {
+  return await commonAPI("DELETE", `${SERVER_URL}/stages/${id}`, {}, reqHeader)
+};
 // Delete a stage
 export const deleteStageAPI = async (id, reqHeader) => {
-  return await commonAPI("DELETE", `${SERVER_URL}/stages/${id}`,{},reqHeader)
+  return await commonAPI("DELETE", `${SERVER_URL}/stages/${id}`, {}, reqHeader)
 };
 
 // Update a stage
 export const updateStageAPI = async (stageId, reqBody, reqHeader) => {
-  return await commonAPI("PUT", `${{SERVER_URL}}/stages/${stageId}`, reqBody, reqHeader);
+  return await commonAPI("PUT", `${{ SERVER_URL }}/stages/${stageId}`, reqBody, reqHeader);
 };
 // delete stage 
 
 // Add ItemwiseStage API
-export const  addStageItemwiseAPI  = async (reqBody, reqHeader) => {
-  return await commonAPI("POST", `${SERVER_URL}/itemwisestages/add`,reqBody, reqHeader);
+export const addStageItemwiseAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/itemwisestages/add`, reqBody, reqHeader);
 };
 // updateItemwiseStage API
-export const  updateStageItemwiseAPI  = async (id,reqBody, reqHeader) => {
-  return await commonAPI("PUT", `${SERVER_URL}/itemwisestages-edit/${id}`,reqBody, reqHeader);
+export const updateStageItemwiseAPI = async (id, reqBody, reqHeader) => {
+  return await commonAPI("PUT", `${SERVER_URL}/itemwisestages-edit/${id}`, reqBody, reqHeader);
 };
 
 // Get stage item by ID
@@ -161,8 +187,8 @@ export const getAllItemStageListAPI = async (reqHeader) => {
 
 // 
 // Add festStage API
-export const  addStagefestAPI  = async (reqBody, reqHeader) => {
-  return await commonAPI("POST", `${SERVER_URL}/festvelwisestages/add`,reqBody, reqHeader);
+export const addStagefestAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/festvelwisestages/add`, reqBody, reqHeader);
 };
 
 // all festwise
@@ -213,8 +239,8 @@ export const getAllStageReportAPI = async (reqHeader) => {
 // };
 
 // add result entry 
-export const  addResultentryAPI  = async (reqBody, reqHeader) => {
-  return await commonAPI("POST", `${SERVER_URL}/add-resultentry`,reqBody, reqHeader);
+export const addResultentryAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/add-resultentry`, reqBody, reqHeader);
 };
 
 // all result entry api
@@ -222,13 +248,13 @@ export const getAllResultentryListAPI = async (reqHeader) => {
   return await commonAPI("GET", `${SERVER_URL}/all-resultentry`, {}, reqHeader);
 };
 // update result entry api API
-export const  updateResultentryAPI  = async (id,reqBody, reqHeader) => {
-  return await commonAPI("PUT", `${SERVER_URL}/Resultentry-edit/${id}`,reqBody, reqHeader);
+export const updateResultentryAPI = async (id, reqBody, reqHeader) => {
+  return await commonAPI("PUT", `${SERVER_URL}/Resultentry-edit/${id}`, reqBody, reqHeader);
 };
 
 // delete result entry
 export const deleteresultentryAPI = async (id, reqHeader) => {
-  return await commonAPI("DELETE", `${SERVER_URL}/stages/${id}`,{},reqHeader)
+  return await commonAPI("DELETE", `${SERVER_URL}/stages/${id}`, {}, reqHeader)
 };
 // all result entry api
 export const getAllitemtentryListAPI = async (reqHeader) => {

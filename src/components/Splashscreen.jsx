@@ -8,7 +8,7 @@ const Splashscreen = () => {
       <img
        src={logo}
         alt="Logo"
-        className="w-32 h-32 animate-bounce animate-spin-slow"
+        className="w-32 h-32 "
       />
       {/* <h1>loading...</h1> */}
     </div>

@@ -200,13 +200,35 @@ import DPublishSTatusfest from './pages/DPublishSTatusfest';
 import SDeclared from './components/SDeclared';
 import SPubStatus from './pages/SPubStatus';
 import Pnf from './pages/Pnf';
-
-
+import Splashscreen from './components/Splashscreen';
+import { useEffect, useState, } from 'react';
 
 
 
 function App() {
+
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <Splashscreen />;
+  }
+
+
+
   return (
+
+
+
+
     <AuthProvider>
       <Routes>
         {/* Public Routes */}
@@ -217,7 +239,7 @@ function App() {
         <Route path="/not-authorized" element={<Pnf />} />
 
 
-        <Route element={<ProtectedRoute allowedRoles={['districtAdmin', 'stateAdmin', 'Schooladmin', 'subadmin']} />}>
+        <Route element={<ProtectedRoute userType={['District Admin', 'stateAdmin', 'School admin', 'subadmin']} />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/result" element={<Result />} />
           <Route path="/form" element={<MultiStep />} />
@@ -232,13 +254,13 @@ function App() {
         </Route>
 
         {/* Routes ONLY for "school admin" */}
-        <Route element={<ProtectedRoute allowedRoles={['Schooladmin', 'subadmin','districtAdmin']} />}>
+        <Route element={<ProtectedRoute userType={['School admin', 'subadmin', 'District Admin']} />}>
           <Route path="/Schooldetails" element={<SchoolDetails />} />
           <Route path="/participatelist" element={<ParticipateList />} />
         </Route>
 
         {/* Protected Routes for All Authenticated Users */}
-        <Route element={<ProtectedRoute allowedRoles={['districtAdmin', 'stateAdmin', 'Schooladmin', 'subadmin']} />}>
+        <Route element={<ProtectedRoute userType={['District Admin', 'stateAdmin', 'School admin', 'subadmin']} />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/result" element={<Result />} />
           <Route path="/form" element={<MultiStep />} />
@@ -259,7 +281,7 @@ function App() {
         </Route>
 
         {/* Routes ONLY for "sub district admin" */}
-        <Route element={<ProtectedRoute allowedRoles={['subadmin']} />}>
+        <Route element={<ProtectedRoute userType={['subadmin']} />}>
           <Route path="/AllKalolsavam" element={<AllKalolsavam />} />
           <Route path="/edit-kalolsavam/:id" element={<EditKalsvmDetails />} />
           <Route path="/schlentry" element={<SchlEntry />} />
@@ -315,7 +337,7 @@ function App() {
         </Route>
 
         {/* Routes ONLY for "admin" */}
-        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+        <Route element={<ProtectedRoute userType={['It Admin']} />}>
           <Route path="/DistrictList" element={<DistrictList />} />
           <Route path="/AddDistrict" element={<AddDistrict />} />
           <Route path="/SubDistrictlist" element={<SubDistrictlist />} />
@@ -368,120 +390,120 @@ function App() {
         </Route>
 
         {/* Routes ONLY for " district admin" */}
-        <Route element={<ProtectedRoute allowedRoles={['districtAdmin']} />}>
-        <Route path="/DDefnKalolsavam" element={<DDefnKalolsavam />} />
-        <Route path="/DEditKalolsavam/:id" element={<DEditKalolsavam />} />
-        <Route path="/DSclEntry" element={<DSclEntry />} />
-        <Route path="/DClusterSclList" element={<DClusterSclList />} />
-        <Route path="/DSplOrderEntry" element={<DSplOrderEntry />} />
-        <Route path="/DAddStagedurat" element={<DAddStagedurat />} />
-        <Route path="/DStageDurationList" element={<DStageDurationList />} />
-        <Route path="/DAddStage" element={<DAddStage />} />
-        <Route path="/DDefineStageList" element={<DDefineStageList />} />
-        <Route path="/DEditStage" element={<DEditStage />} />
-        <Route path="/DStageAllotmtFest" element={<DStageAllotmtFest />} />
-        <Route path="/DAddStageAllotfest" element={<DAddStageAllotfest />} />
-        <Route path="/DEditStageAllotFest/:id" element={<DEditStageAllotFest />} />
-        <Route path="/DStageAllotItem" element={<DStageAllotItem />} />
-        <Route path="/DClashRep" element={<DClashRep />} />
-        <Route path="/DparticipateListMorethan" element={<DparticipateListMorethan />} />
-        <Route path="/DStageReport" element={<DStageReport />} />
-        <Route path="/DConfidentialResult" element={<DConfidentialResult />} />
-        <Route path="/DItemwisePoint" element={<DItemwisePoint />} />
-        <Route path="/DItemCodewise" element={<DItemCodewise />} />
-        <Route path="/DSclWisePoint" element={<DSclWisePoint />} />
-        <Route path="/DSclGradeWise" element={<DSclGradeWise />} />
-        <Route path="/DCertificateItmWise" element={<DCertificateItmWise />} />
-        <Route path="/DCertificateParti" element={<DCertificateParti />} />
-        <Route path="/DCertificateScl" element={<DCertificateScl />} />
-        <Route path="/DCertificateRegno" element={<DCertificateRegno />} />
-        <Route path="/DCertificatedetails" element={<DCertificatedetails />} />
-        <Route path="/DHigherlvlComp" element={<DHigherlvlComp />} />
-        <Route path="/DExport" element={<DExport />} />
-        <Route path="/DAllresultentry" element={<DAllresultentry />} />
-        <Route path="/DCallSheet" element={<DCallSheet />} />
-        <Route path="/DTimesheet" element={<DTimesheet />} />
-        <Route path="/DScoreSheet" element={<DScoreSheet />} />
-        <Route path="/DTabulationSheet" element={<DTabulationSheet />} />
-        <Route path="/DAllReport" element={<DAllReport />} />
-        <Route path="/DEditResultentry/:id" element={<DEditResultentry />} />
-        <Route path="/DAddresultentry" element={<DAddresultentry />} />
-        <Route path="/DItemresultList" element={<DItemresultList />} />
-        <Route path="/DClusterReport" element={<DClusterReport />} />
-        <Route path="/DAddStageallotitmwise" element={<DAddStageallotitmwise />} />
-        <Route path="/DEditstgAllotitmwise/:id" element={<DEditstgAllotitmwise />} />
+        <Route element={<ProtectedRoute userType={['District Admin']} />}>
+          <Route path="/DDefnKalolsavam" element={<DDefnKalolsavam />} />
+          <Route path="/DEditKalolsavam/:id" element={<DEditKalolsavam />} />
+          <Route path="/DSclEntry" element={<DSclEntry />} />
+          <Route path="/DClusterSclList" element={<DClusterSclList />} />
+          <Route path="/DSplOrderEntry" element={<DSplOrderEntry />} />
+          <Route path="/DAddStagedurat" element={<DAddStagedurat />} />
+          <Route path="/DStageDurationList" element={<DStageDurationList />} />
+          <Route path="/DAddStage" element={<DAddStage />} />
+          <Route path="/DDefineStageList" element={<DDefineStageList />} />
+          <Route path="/DEditStage" element={<DEditStage />} />
+          <Route path="/DStageAllotmtFest" element={<DStageAllotmtFest />} />
+          <Route path="/DAddStageAllotfest" element={<DAddStageAllotfest />} />
+          <Route path="/DEditStageAllotFest/:id" element={<DEditStageAllotFest />} />
+          <Route path="/DStageAllotItem" element={<DStageAllotItem />} />
+          <Route path="/DClashRep" element={<DClashRep />} />
+          <Route path="/DparticipateListMorethan" element={<DparticipateListMorethan />} />
+          <Route path="/DStageReport" element={<DStageReport />} />
+          <Route path="/DConfidentialResult" element={<DConfidentialResult />} />
+          <Route path="/DItemwisePoint" element={<DItemwisePoint />} />
+          <Route path="/DItemCodewise" element={<DItemCodewise />} />
+          <Route path="/DSclWisePoint" element={<DSclWisePoint />} />
+          <Route path="/DSclGradeWise" element={<DSclGradeWise />} />
+          <Route path="/DCertificateItmWise" element={<DCertificateItmWise />} />
+          <Route path="/DCertificateParti" element={<DCertificateParti />} />
+          <Route path="/DCertificateScl" element={<DCertificateScl />} />
+          <Route path="/DCertificateRegno" element={<DCertificateRegno />} />
+          <Route path="/DCertificatedetails" element={<DCertificatedetails />} />
+          <Route path="/DHigherlvlComp" element={<DHigherlvlComp />} />
+          <Route path="/DExport" element={<DExport />} />
+          <Route path="/DAllresultentry" element={<DAllresultentry />} />
+          <Route path="/DCallSheet" element={<DCallSheet />} />
+          <Route path="/DTimesheet" element={<DTimesheet />} />
+          <Route path="/DScoreSheet" element={<DScoreSheet />} />
+          <Route path="/DTabulationSheet" element={<DTabulationSheet />} />
+          <Route path="/DAllReport" element={<DAllReport />} />
+          <Route path="/DEditResultentry/:id" element={<DEditResultentry />} />
+          <Route path="/DAddresultentry" element={<DAddresultentry />} />
+          <Route path="/DItemresultList" element={<DItemresultList />} />
+          <Route path="/DClusterReport" element={<DClusterReport />} />
+          <Route path="/DAddStageallotitmwise" element={<DAddStageallotitmwise />} />
+          <Route path="/DEditstgAllotitmwise/:id" element={<DEditstgAllotitmwise />} />
 
 
-        <Route path="/DCertificate" element={<DCertificate />} />
+          <Route path="/DCertificate" element={<DCertificate />} />
 
-        <Route path="/DPublishdeclare" element={<DPubl />} />
-        <Route path="/festival-status" element={<DPublishSTatusfest />} />
-        {/* <Route path="/DPublishdeclare" element={<DPublishdeclare />} /> */}
+          <Route path="/DPublishdeclare" element={<DPubl />} />
+          <Route path="/festival-status" element={<DPublishSTatusfest />} />
+          {/* <Route path="/DPublishdeclare" element={<DPublishdeclare />} /> */}
 
-        <Route path="/DParticipatingScl" element={<DParticipatingScl />} />
-        <Route path="/DFestWiseParti" element={<DFestWiseParti />} />
-        <Route path="/DdateWisepartici" element={<DdateWisepartici />} />
-        <Route path="/DParticipateCardlist" element={<DParticipateCardlist />} />
+          <Route path="/DParticipatingScl" element={<DParticipatingScl />} />
+          <Route path="/DFestWiseParti" element={<DFestWiseParti />} />
+          <Route path="/DdateWisepartici" element={<DdateWisepartici />} />
+          <Route path="/DParticipateCardlist" element={<DParticipateCardlist />} />
 
-        </Route> 
-        <Route element={<ProtectedRoute allowedRoles={['stateAdmin']} />}>
+        </Route>
+        <Route element={<ProtectedRoute userType={['stateAdmin']} />}>
 
-        <Route path="/SDefineKalolsavm" element={<SDefineKalolsavm />} />
-        <Route path="/SEditKallosvm/:id" element={<SEditKallosvm />} />
-        <Route path="/SSClEntry" element={<SSClEntry />} />
-        <Route path="/SClusterScl" element={<SClusterScl />} />
-        <Route path="/SsplOrderEntry" element={<SsplOrderEntry />} />
-        <Route path="/SstageDurationList" element={<SstageDurationList />} />
-        <Route path="/SAddstagduratn" element={<SAddstagduratn />} />
-        <Route path="/SdefineStagelist" element={<SdefineStagelist />} />
-        <Route path="/SAddStage" element={<SAddStage />} />
-        <Route path="/SeditStage" element={<SeditStage />} />
-        <Route path="/SStageAlloteFestwise" element={<SStageAlloteFestwise />} />
-        <Route path="/SAddStgAllotFest" element={<SAddStgAllotFest />} />
-        <Route path="/SEditStgAllotFest/:id" element={<SEditStgAllotFest />} />
-        <Route path="/SstageAllotItemwi" element={<SstageAllotItemwi />} />
-        <Route path="/SAddStgAlloteItmWis" element={<SAddStgAlloteItmWis />} />
-        <Route path="/SEditstgeAllotItemwis/:id" element={<SEditstgeAllotItemwis />} />
-        <Route path="/SClashReport" element={<SClashReport />} />
-        <Route path="/SClusterReport" element={<SClusterReport />} />
-        <Route path="/SStageReport" element={<SStageReport />} />
-        <Route path="/SResultentryList" element={<SResultentryList />} />
-        <Route path="/SAddResultentry" element={<SAddResultentry />} />
-        <Route path="/SEditResultentry/:id" element={<SEditResultentry />} />
-        <Route path="/SitemResultList" element={<SitemResultList />} />
-        <Route path="/SConfidenal" element={<SConfidenal />} />
-        <Route path="/SItemwisePoint" element={<SItemwisePoint />} />
-        <Route path="/SItemCodewise" element={<SItemCodewise />} />
-        <Route path="/SsclwisePoint" element={<SsclwisePoint />} />
-        <Route path="/SsclGradewise" element={<SsclGradewise />} />
-        <Route path="/SCertificateRegNo" element={<SCertificateRegNo />} />
-        <Route path="/SCertificateItemwise" element={<SCertificateItemwise />} />
-        <Route path="/ScertificateParticipate" element={<ScertificateParticipate />} />
-        <Route path="/SCertificatesclwise" element={<SCertificatesclwise />} />
-        <Route path="/SCertificateDetails" element={<SCertificateDetails />} />
-        <Route path="/SParticipateMorethan" element={<SParticipateMorethan />} />
-        <Route path="/SPublishDeclarList" element={<SPublishDeclarList />} />
-        <Route path="/festival-statu" element={<SPubStatus />} />
-
-
-        <Route path="/SExport" element={<SExport />} />
-        <Route path="/ShigherLevel" element={<ShigherLevel />} />
-        <Route path="/SCallSheet" element={<SCallSheet />} />
-        <Route path="/STimesheet" element={<STimesheet />} />
-        <Route path="/SScoresheet" element={<SScoresheet />} />
-        <Route path="/STablulation" element={<STablulation />} />
-        <Route path="/SAllReport" element={<SAllReport />} />
-        <Route path="/festival-details" element={<SFestivalItemtotal />} />
-        <Route path="/SCertificatetemp" element={<SCertificatetemp />} />
+          <Route path="/SDefineKalolsavm" element={<SDefineKalolsavm />} />
+          <Route path="/SEditKallosvm/:id" element={<SEditKallosvm />} />
+          <Route path="/SSClEntry" element={<SSClEntry />} />
+          <Route path="/SClusterScl" element={<SClusterScl />} />
+          <Route path="/SsplOrderEntry" element={<SsplOrderEntry />} />
+          <Route path="/SstageDurationList" element={<SstageDurationList />} />
+          <Route path="/SAddstagduratn" element={<SAddstagduratn />} />
+          <Route path="/SdefineStagelist" element={<SdefineStagelist />} />
+          <Route path="/SAddStage" element={<SAddStage />} />
+          <Route path="/SeditStage" element={<SeditStage />} />
+          <Route path="/SStageAlloteFestwise" element={<SStageAlloteFestwise />} />
+          <Route path="/SAddStgAllotFest" element={<SAddStgAllotFest />} />
+          <Route path="/SEditStgAllotFest/:id" element={<SEditStgAllotFest />} />
+          <Route path="/SstageAllotItemwi" element={<SstageAllotItemwi />} />
+          <Route path="/SAddStgAlloteItmWis" element={<SAddStgAlloteItmWis />} />
+          <Route path="/SEditstgeAllotItemwis/:id" element={<SEditstgeAllotItemwis />} />
+          <Route path="/SClashReport" element={<SClashReport />} />
+          <Route path="/SClusterReport" element={<SClusterReport />} />
+          <Route path="/SStageReport" element={<SStageReport />} />
+          <Route path="/SResultentryList" element={<SResultentryList />} />
+          <Route path="/SAddResultentry" element={<SAddResultentry />} />
+          <Route path="/SEditResultentry/:id" element={<SEditResultentry />} />
+          <Route path="/SitemResultList" element={<SitemResultList />} />
+          <Route path="/SConfidenal" element={<SConfidenal />} />
+          <Route path="/SItemwisePoint" element={<SItemwisePoint />} />
+          <Route path="/SItemCodewise" element={<SItemCodewise />} />
+          <Route path="/SsclwisePoint" element={<SsclwisePoint />} />
+          <Route path="/SsclGradewise" element={<SsclGradewise />} />
+          <Route path="/SCertificateRegNo" element={<SCertificateRegNo />} />
+          <Route path="/SCertificateItemwise" element={<SCertificateItemwise />} />
+          <Route path="/ScertificateParticipate" element={<ScertificateParticipate />} />
+          <Route path="/SCertificatesclwise" element={<SCertificatesclwise />} />
+          <Route path="/SCertificateDetails" element={<SCertificateDetails />} />
+          <Route path="/SParticipateMorethan" element={<SParticipateMorethan />} />
+          <Route path="/SPublishDeclarList" element={<SPublishDeclarList />} />
+          <Route path="/festival-statu" element={<SPubStatus />} />
 
 
-        <Route path="/StateParticipatesclList" element={<StateParticipatesclList />} />
-        <Route path="/StateParticipateFesWis" element={<StateParticipateFesWis />} />
-        <Route path="/StateDatewisepaticipat" element={<StateDatewisepaticipat />} />
-        <Route path="/StateParticipateCardLis" element={<StateParticipateCardLis />} />
+          <Route path="/SExport" element={<SExport />} />
+          <Route path="/ShigherLevel" element={<ShigherLevel />} />
+          <Route path="/SCallSheet" element={<SCallSheet />} />
+          <Route path="/STimesheet" element={<STimesheet />} />
+          <Route path="/SScoresheet" element={<SScoresheet />} />
+          <Route path="/STablulation" element={<STablulation />} />
+          <Route path="/SAllReport" element={<SAllReport />} />
+          <Route path="/festival-details" element={<SFestivalItemtotal />} />
+          <Route path="/SCertificatetemp" element={<SCertificatetemp />} />
 
 
-        </Route> 
+          <Route path="/StateParticipatesclList" element={<StateParticipatesclList />} />
+          <Route path="/StateParticipateFesWis" element={<StateParticipateFesWis />} />
+          <Route path="/StateDatewisepaticipat" element={<StateDatewisepaticipat />} />
+          <Route path="/StateParticipateCardLis" element={<StateParticipateCardLis />} />
+
+
+        </Route>
 
 
 

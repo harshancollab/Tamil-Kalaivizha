@@ -87,7 +87,7 @@ const Dash = () => {
         {/* Sidebar header - fixed at top */}
         <div className="p-4 ml-2">
           {/* Show dashboard link only for non-IT Admin users */}
-          {user?.role !== 'admin' && (
+          {user?.user_type !== 'It Admin' && (
             <div className={`flex justify-between items-center w-full mb-2  ${isActive('/') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] p-1 rounded' : ''}`}>
               <Link to="/" className="text-lg font-semibold flex items-center cursor-pointer">
                 <i className="fa-solid fa-table mr-3" aria-hidden="true"></i> Dashboard
@@ -105,10 +105,10 @@ const Dash = () => {
 
         {/* Scrollable content area with hidden scrollbar */}
         <div className="flex-1 overflow-y-auto p-4 pt-0 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-       
+
 
           {/* Only show admin options to sub district admin users */}
-          {user?.role === 'subadmin' && (
+          {user?.user_type === 'subadmin' && (
             <>
               {/* Settings Menu */}
               <div className="mb-4">
@@ -665,7 +665,7 @@ const Dash = () => {
               </div>
             </>
           )}
-          {user?.role === 'districtAdmin' && (
+          {user?.user_type === 'District Admin' && (
             <>
               {/* Settings Menu */}
               <div className="mb-4">
@@ -1205,7 +1205,7 @@ const Dash = () => {
               </div>
             </>
           )}
-          {user?.role === 'stateAdmin' && (
+          {user?.user_type === 'stateAdmin' && (
             <>
               {/* Settings Menu */}
               <div className="mb-4">
@@ -1747,163 +1747,164 @@ const Dash = () => {
           )}
 
           {/* IT Admin Panel - Completely separate UI */}
-          {user?.role === 'admin' && (
-            <div className="p-2">
-              {/* IT Admin Dashboard */}
-              <div className={`flex justify-between items-center w-full mb-6 ${isActive('/DistrictList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
-                <Link to="/DistrictList" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i className="fa-solid fa-table mr-3"></i> Dashboard
-                </Link>
-                <button
-                  className="lg:hidden text-white"
-                  onClick={() => setIsSidebarOpen(false)}
-                  aria-label="Close sidebar"
-                >
-                  <i className="fa-solid fa-xmark" aria-hidden="true"></i>
-                </button>
-              </div>
+          {user?.
+            user_type === 'It Admin' && (
+              <div className="p-2">
+                {/* IT Admin Dashboard */}
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/DistrictList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
+                  <Link to="/DistrictList" className="text-lg font-semibold flex items-center cursor-pointer">
+                    <i className="fa-solid fa-table mr-3"></i> Dashboard
+                  </Link>
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
 
-              {/* District List */}
-              <div className={`flex justify-between items-center w-full mb-6 ${isActive('/DistrictList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
-                <Link to="/DistrictList" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i className="fa-solid fa-map mr-3"></i> District List
-                </Link>
-                <button
-                  className="lg:hidden text-white"
-                  onClick={() => setIsSidebarOpen(false)}
-                  aria-label="Close sidebar"
-                >
-                  <i className="fa-solid fa-xmark" aria-hidden="true"></i>
-                </button>
-              </div>
+                {/* District List */}
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/DistrictList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
+                  <Link to="/DistrictList" className="text-lg font-semibold flex items-center cursor-pointer">
+                    <i className="fa-solid fa-map mr-3"></i> District List
+                  </Link>
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
 
-              {/* Sub District List */}
-              <div className={`flex justify-between items-center w-full mb-6 ${isActive('/SubDisRegList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
-                <Link to="/SubDisRegList" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i className="fa-solid fa-vector-square mr-3"></i> Sub District List
-                </Link>
-                <button
-                  className="lg:hidden text-white"
-                  onClick={() => setIsSidebarOpen(false)}
-                  aria-label="Close sidebar"
-                >
-                  <i className="fa-solid fa-xmark" aria-hidden="true"></i>
-                </button>
-              </div>
+                {/* Sub District List */}
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/SubDisRegList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
+                  <Link to="/SubDisRegList" className="text-lg font-semibold flex items-center cursor-pointer">
+                    <i className="fa-solid fa-vector-square mr-3"></i> Sub District List
+                  </Link>
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
 
-              {/* School List */}
-              <div className={`flex justify-between items-center w-full mb-6 ${isActive('/SchoolRegList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
-                <Link to="/SchoolRegList" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i className="fa-solid fa-building mr-3"></i> School List
-                </Link>
-                <button
-                  className="lg:hidden text-white"
-                  onClick={() => setIsSidebarOpen(false)}
-                  aria-label="Close sidebar"
-                >
-                  <i className="fa-solid fa-xmark" aria-hidden="true"></i>
-                </button>
-              </div>
+                {/* School List */}
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/SchoolRegList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
+                  <Link to="/SchoolRegList" className="text-lg font-semibold flex items-center cursor-pointer">
+                    <i className="fa-solid fa-building mr-3"></i> School List
+                  </Link>
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
 
-              {/* Festival List */}
-              <div className={`flex justify-between items-center w-full mb-6 ${isActive('/FestivalRegiList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
-                <Link to="/FestivalRegiList" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i className="fa-solid fa-calendar-days mr-3"></i> Festival List
-                </Link>
-                <button
-                  className="lg:hidden text-white"
-                  onClick={() => setIsSidebarOpen(false)}
-                  aria-label="Close sidebar"
-                >
-                  <i className="fa-solid fa-xmark" aria-hidden="true"></i>
-                </button>
-              </div>
+                {/* Festival List */}
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/FestivalRegiList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
+                  <Link to="/FestivalRegiList" className="text-lg font-semibold flex items-center cursor-pointer">
+                    <i className="fa-solid fa-calendar-days mr-3"></i> Festival List
+                  </Link>
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
 
-              {/* Item List */}
-              <div className={`flex justify-between items-center w-full mb-6 ${isActive('/ItemRegistrationList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
-                <Link to="/ItemRegistrationList" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i className="fa-solid fa-diagram-project mr-3"></i> Item List
-                </Link>
-                <button
-                  className="lg:hidden text-white"
-                  onClick={() => setIsSidebarOpen(false)}
-                  aria-label="Close sidebar"
-                >
-                  <i className="fa-solid fa-xmark" aria-hidden="true"></i>
-                </button>
-              </div>
+                {/* Item List */}
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/ItemRegistrationList') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
+                  <Link to="/ItemRegistrationList" className="text-lg font-semibold flex items-center cursor-pointer">
+                    <i className="fa-solid fa-diagram-project mr-3"></i> Item List
+                  </Link>
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
 
-              {/* Create Kalolsavam */}
-              <div className={`flex justify-between items-center w-full mb-6 ${isActive('/CreateKalolsavam') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
-                <Link to="/CreateKalolsavam" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i className="fas fa-pen-to-square mr-3"></i> Create Kalolsavam
-                </Link>
-                <button
-                  className="lg:hidden text-white"
-                  onClick={() => setIsSidebarOpen(false)}
-                  aria-label="Close sidebar"
-                >
-                  <i className="fa-solid fa-xmark" aria-hidden="true"></i>
-                </button>
-              </div>
+                {/* Create Kalolsavam */}
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/CreateKalolsavam') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
+                  <Link to="/CreateKalolsavam" className="text-lg font-semibold flex items-center cursor-pointer">
+                    <i className="fas fa-pen-to-square mr-3"></i> Create Kalolsavam
+                  </Link>
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
 
-              {/* Admin User */}
-              <div className={`flex justify-between items-center w-full mb-6 ${isActive('/admin-panel') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
-                <Link to="/admin-panel" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i className="fa-solid fa-user mr-3"></i> Admin User
-                </Link>
-                <button
-                  className="lg:hidden text-white"
-                  onClick={() => setIsSidebarOpen(false)}
-                  aria-label="Close sidebar"
-                >
-                  <i className="fa-solid fa-xmark" aria-hidden="true"></i>
-                </button>
-              </div>
+                {/* Admin User */}
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/admin-panel') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
+                  <Link to="/admin-panel" className="text-lg font-semibold flex items-center cursor-pointer">
+                    <i className="fa-solid fa-user mr-3"></i> Admin User
+                  </Link>
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
 
-              {/* Result List */}
-              <div className={`flex justify-between items-center w-full mb-6 ${isActive('/AdResult') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
-                <Link to="/AdResult" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i className="fa-solid fa-file mr-3"></i> Result List
-                </Link>
-                <button
-                  className="lg:hidden text-white"
-                  onClick={() => setIsSidebarOpen(false)}
-                  aria-label="Close sidebar"
-                >
-                  <i className="fa-solid fa-xmark" aria-hidden="true"></i>
-                </button>
-              </div>
+                {/* Result List */}
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/AdResult') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
+                  <Link to="/AdResult" className="text-lg font-semibold flex items-center cursor-pointer">
+                    <i className="fa-solid fa-file mr-3"></i> Result List
+                  </Link>
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
 
-              {/* Export */}
-              <div className={`flex justify-between items-center w-full mb-6 ${isActive('/ExportIT') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
-                <Link to="/ExportIT" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i className="fa-solid fa-arrow-up-right-from-square mr-3"></i> Export
-                </Link>
-                <button
-                  className="lg:hidden text-white"
-                  onClick={() => setIsSidebarOpen(false)}
-                  aria-label="Close sidebar"
-                >
-                  <i className="fa-solid fa-xmark" aria-hidden="true"></i>
-                </button>
-              </div>
+                {/* Export */}
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/ExportIT') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
+                  <Link to="/ExportIT" className="text-lg font-semibold flex items-center cursor-pointer">
+                    <i className="fa-solid fa-arrow-up-right-from-square mr-3"></i> Export
+                  </Link>
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
 
-              {/* Logout */}
-              <div className={`flex justify-between items-center w-full mb-6 ${isActive('/LogOut') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
-                <Link to="/LogOut" className="text-lg font-semibold flex items-center cursor-pointer">
-                  <i className="fa-solid fa-right-from-bracket mr-3"></i> Log Out
-                </Link>
-                <button
-                  className="lg:hidden text-white"
-                  onClick={() => setIsSidebarOpen(false)}
-                  aria-label="Close sidebar"
-                >
-                  <i className="fa-solid fa-xmark" aria-hidden="true"></i>
-                </button>
+                {/* Logout */}
+                <div className={`flex justify-between items-center w-full mb-6 ${isActive('/LogOut') ? 'bg-gradient-to-r from-[#003566] to-[#05B9F4] py-2 rounded' : ''}`}>
+                  <Link to="/LogOut" className="text-lg font-semibold flex items-center cursor-pointer">
+                    <i className="fa-solid fa-right-from-bracket mr-3"></i> Log Out
+                  </Link>
+                  <button
+                    className="lg:hidden text-white"
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                  >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
       </aside>
     </>

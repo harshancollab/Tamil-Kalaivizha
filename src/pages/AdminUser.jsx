@@ -1,25 +1,22 @@
 // It Admin user
-
 import React, { useEffect, useState, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import html2pdf from 'html2pdf.js';
 import Alert from '../components/Alert'
-import Splashscreen from '../components/Splashscreen'
-// import { getAllAdminuserAPI, deleteAdminuserAPI } from '../services/allAPI';
+import { getAllAdminuserAPI, deleteAdminUserAPI } from '../services/allAPI';
 
 const AdminUser = () => {
-    const [Allresultentry, setResultentry] = useState([]);
+    const [adminUsers, setAdminUsers] = useState([]);
     const navigate = useNavigate();
     const printRef = useRef();
     const [searchParams, setSearchParams] = useSearchParams();
-    
 
     // Add missing state variables
     const [searchCode, setSearchCode] = useState('');
     const [filterParam, setFilterParam] = useState('');
-    
+
     // Alert state
     const [alert, setAlert] = useState({
         show: false,
@@ -42,6 +39,11 @@ const AdminUser = () => {
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
+
+    // Calculate indices for pagination
+    const indexOfLastItem = currentPage * rowsPerPage;
+    const indexOfFirstItem = indexOfLastItem - rowsPerPage;
 
     // Data for dropdowns - full lists
     const allSubDistricts = [
@@ -75,7 +77,8 @@ const AdminUser = () => {
         'State Admin',
         'District Admin',
         'Sub-district Admin',
-        'All Admin'
+        'All Admin',
+        'It Admin'  // Added "It Admin" to match the user data
     ];
 
     const districtToSubDistrict = {
@@ -91,6 +94,7 @@ const AdminUser = () => {
         'State Admin': allDistricts.filter(d => d !== 'Select'),
         'District Admin': allDistricts.filter(d => d !== 'Select'),
         'Sub-district Admin': allDistricts.filter(d => d !== 'Select'),
+        'It Admin': allDistricts.filter(d => d !== 'Select'),
         'All Admin': allDistricts.filter(d => d !== 'Select')
     };
 
@@ -103,7 +107,7 @@ const AdminUser = () => {
 
         return () => clearTimeout(timer);
     }, []);
- 
+
     // Initialize available options
     useEffect(() => {
         setAvailableSubDistricts(allSubDistricts);
@@ -114,7 +118,7 @@ const AdminUser = () => {
         getAllAdminuser();
     }, []);
 
-    // Initialize from URL params - FIXED
+    // Initialize from URL params
     useEffect(() => {
         // Get all params
         const codeParam = searchParams.get('code');
@@ -172,6 +176,9 @@ const AdminUser = () => {
         if (pParam) {
             setFilterParam(pParam);
         }
+
+        // Call the API with the filter params
+        getAllAdminuser();
     }, [searchParams]);
 
     // Function to update available sub-districts based on selected district
@@ -206,23 +213,57 @@ const AdminUser = () => {
             }
             try {
                 setLoading(true);
-                const result = await getAllAdminuserAPI(reqHeader);
+
+                // Build query params for filters
+                let queryParams = new URLSearchParams();
+                queryParams.append('page', currentPage);
+                queryParams.append('limit', rowsPerPage);
+
+                if (selectedUserType !== 'Select') {
+                    queryParams.append('userType', selectedUserType);
+                }
+
+                if (selectedDistrict !== 'Select') {
+                    queryParams.append('district', selectedDistrict);
+                }
+
+                if (selectedSubDistrict !== 'Select') {
+                    queryParams.append('subDistrict', selectedSubDistrict);
+                }
+
+                if (searchCode) {
+                    queryParams.append('code', searchCode);
+                }
+
+                const result = await getAllAdminuserAPI(reqHeader, queryParams.toString());
+
                 if (result.status === 200) {
-                    setResultentry(result.data);
+                    
+                    const userData = result.data.users || result.data || [];
+                    setAdminUsers(userData);
+                    setTotalCount(result.data.totalCount || userData.length || 0);
+                } else {
+                    showAlert("Failed to fetch admin users", "error");
                 }
             } catch (err) {
                 console.log(err);
+                showAlert("Error fetching admin users", "error");
             } finally {
                 setLoading(false);
             }
+        } else {
+            showAlert("Authentication required", "error");
+            navigate('/login');
         }
     }
 
+    // Re-fetch data when filters or pagination changes
+    useEffect(() => {
+        getAllAdminuser();
+    }, [currentPage, rowsPerPage]);
 
-    const handleEditRedirect = (resultEntry) => {
-
+    const handleEditRedirect = (user) => {
         const params = new URLSearchParams();
-
 
         if (selectedUserType !== 'Select') {
             params.append('usertype', selectedUserType);
@@ -236,17 +277,18 @@ const AdminUser = () => {
             params.append('subdistrict', selectedSubDistrict);
         }
 
-
         if (searchCode) {
             params.append('code', searchCode);
         }
 
-
         params.append('returnUrl', `/AdminUser?${searchParams.toString()}`);
 
-        navigate(`/EditUser/${resultEntry.slNo}`, {
+        // Make sure user has the correct ID property
+        const userId = user._id || user.id;
+
+        navigate(`/EditUser/${userId}`, {
             state: {
-                resultEntry,
+                resultEntry: user,
                 filterParams: params.toString()
             }
         });
@@ -256,10 +298,7 @@ const AdminUser = () => {
     const handleDeleteClick = async (id) => {
         const token = sessionStorage.getItem("token");
         if (!token) {
-            // Handle case when token is not available
-            console.error("Authentication token not found");
-            // You could use a toast notification or alert here
-            showAlert("Authentication token not found");
+            showAlert("Authentication token not found", "error");
             return;
         }
 
@@ -270,106 +309,59 @@ const AdminUser = () => {
         try {
             setLoading(true);
 
-            // First, you might want to show a confirmation dialog
             const confirmDelete = window.confirm("Are you sure you want to delete this user?");
             if (!confirmDelete) {
                 setLoading(false);
                 return;
             }
 
-            // const result = await deleteAdminuserAPI(id, reqHeader);
+            // Add the API function call for delete
+            const result = await deleteAdminUserAPI(id, reqHeader);
 
-
-            // if (result.status === 200) {
-
-            //     showAlert("User deleted successfully");
-            //     getAllAdminuser(); 
-            // } else {
-            //      Error("Failed to delete user");
-            // }
-
-            console.log("Delete clicked for ID:", id);
-
-            showAlert("User would be deleted if API was connected");
-            getAllAdminuser();
+            if (result.status === 200) {
+                showAlert("User deleted successfully");
+                getAllAdminuser();
+            } else {
+                showAlert("Failed to delete user", "error");
+            }
 
         } catch (err) {
             console.error("Error deleting user:", err);
 
             if (err.response) {
                 if (err.response.status === 401) {
-                    showAlert("Session expired. Please login again.");
-                    // navigate('/login');
+                    showAlert("Session expired. Please login again.", "error");
+                    navigate('/login');
                 } else if (err.response.status === 403) {
-                    showAlert("You don't have permission to delete this user");
+                    showAlert("You don't have permission to delete this user", "error");
                 } else if (err.response.status === 404) {
                     showAlert("User not found. It may have been already deleted.");
                     getAllAdminuser();
                 } else {
-                    showAlert(`Error: ${err.response.data.message || "Failed to delete user"}`);
+                    showAlert(`Error: ${err.response.data.message || "Failed to delete user"}`, "error");
                 }
             } else if (err.request) {
-                showAlert("Server is not responding. Please try again later.");
+                showAlert("Server is not responding. Please try again later.", "error");
             } else {
-                showAlert("An error occurred while trying to delete the user");
+                showAlert("An error occurred while trying to delete the user", "error");
             }
         } finally {
             setLoading(false);
         }
     };
-    const resultData = [
-        { slNo: 1, regNo: "Idukii", code: "District Admin", district: "Idukki", subDistrict: "Munnar", mark2: 78, mark3: 92, total: 255, markPercentage: 85, rank: 2, grade: "A", point: 9.5 },
-        { slNo: 2, regNo: "Palakkad", code: "District Admin", district: "Palakkad", subDistrict: "Chittur", mark2: 88, mark3: 95, total: 273, markPercentage: 91, rank: 1, grade: "A+", point: 10.0 },
-        { slNo: 3, regNo: "Kozhikode", code: "District Admin", mark1: 75, district: "Kozhikode", subDistrict: "vatakara", mark3: 88, total: 245, markPercentage: 82, rank: 3, grade: "A-", point: 9.0 },
-        { slNo: 4, regNo: "Munnar", code: "Sub-district Admin", district: "Idukki", subDistrict: "Munnar", mark2: 72, mark3: 76, total: 216, markPercentage: 72, rank: 7, grade: "B+", point: 8.0 },
-        { slNo: 5, regNo: "Kattapana", code: "Sub-district Admin", district: "Idukki", subDistrict: "Kattappana", mark2: 80, mark3: 88, total: 260, markPercentage: 87, rank: 4, grade: "A", point: 9.5 },
-        { slNo: 6, regNo: "Chittur", code: "Sub-district Admin", mark1: 78, mark2: 75, district: "Palakkad", subDistrict: "Chittur", total: 235, markPercentage: 78, rank: 5, grade: "B+", point: 8.5 },
-        { slNo: 7, regNo: "Kochi", code: "District Admin", district: "Ernakulam", subDistrict: "Edapally" },
-        { slNo: 8, regNo: "Pattambi", code: "Sub-district Admin", mark1: 78, mark2: 75, district: "Palakkad", subDistrict: "Pattambi", total: 235, markPercentage: 78, rank: 5, grade: "B+", point: 8.5 },
-        { slNo: 9, regNo: "Kuzhalmannam", code: "Sub-district Admin", district: "Palakkad", subDistrict: "Kuzhalmannam" },
-        { slNo: 10, regNo: "Nemmara", code: "Sub-district Admin", district: "Palakkad", subDistrict: "Nemmara" },
-        { slNo: 11, regNo: "Mannarkkad", code: "Sub-district Admin", district: "Palakkad", subDistrict: "Mannarkkad" },
-    ];
 
-    const filteredResultData = () => {
-        let filtered = [...resultData];
-
-        if (searchCode) {
-            filtered = filtered.filter(result =>
-                result.code && result.code.toLowerCase().includes(searchCode.toLowerCase())
-            );
-        }
-
-        if (selectedDistrict !== 'Select') {
-            filtered = filtered.filter(result =>
-                result.district === selectedDistrict
-            );
-        }
-
-        if (selectedSubDistrict !== 'Select') {
-            filtered = filtered.filter(result =>
-                result.subDistrict === selectedSubDistrict
-            );
-        }
-
-        if (selectedUserType !== 'Select') {
-            filtered = filtered.filter(result =>
-                result.code === selectedUserType
-            );
-        }
-
-        return filtered;
+    // Get filtered users based on all filters
+    const filteredAdminUsers = () => {
+        return adminUsers;
     };
 
+    // Reset to page 1 when filters change
     useEffect(() => {
         setCurrentPage(1);
     }, [searchCode, selectedDistrict, selectedSubDistrict, selectedUserType]);
 
-    const filteredData = filteredResultData();
-    const indexOfLastItem = currentPage * rowsPerPage;
-    const indexOfFirstItem = indexOfLastItem - rowsPerPage;
-    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+    const currentItems = filteredAdminUsers();
+    const totalPages = Math.ceil(totalCount / rowsPerPage);
 
     const handlePageChange = (pageNumber) => {
         if (pageNumber > 0 && pageNumber <= totalPages) {
@@ -426,16 +418,15 @@ const AdminUser = () => {
 
         const tbody = document.createElement('tbody');
 
-        const filteredData = filteredResultData();
+        const users = filteredAdminUsers();
 
-        filteredData.forEach((result, index) => {
+        users.forEach((user, index) => {
             const row = document.createElement('tr');
 
             const cellData = [
                 index + 1,
-                result.regNo || '-',
-                result.code || '-'
-
+                user.username || user.name || '-',  // Use user.name as fallback
+                user.userType || user.user_type || '-'  // Use user.user_type as fallback
             ];
 
             cellData.forEach(text => {
@@ -478,8 +469,7 @@ const AdminUser = () => {
         html2pdf().from(pdfContent).set(options).save();
     };
 
-
-     const showAlert = (message, type = 'success') => {
+    const showAlert = (message, type = 'success') => {
         setAlert({
             show: true,
             message,
@@ -493,8 +483,6 @@ const AdminUser = () => {
             show: false
         });
     };
-
-
 
     const renderPageNumbers = () => {
         const pageNumbers = [];
@@ -532,7 +520,6 @@ const AdminUser = () => {
 
         return pageNumbers;
     };
-
 
     const handleAddClick = () => {
         const params = new URLSearchParams();
@@ -640,10 +627,22 @@ const AdminUser = () => {
         setSearchParams(updatedParams);
     };
 
-
     // Show splash screen if loading
     if (loading) {
-        return <Splashscreen />;
+        return (
+            <>
+                <Header />
+                <div className="flex flex-col md:flex-row min-h-screen">
+                    <Dash />
+                    <div className="flex-1 p-4 md:p-6 lg:p-8 flex items-center justify-center">
+                        <div className="text-center">
+                            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-500 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+                            <p className="mt-2 text-gray-600">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
     }
 
     return (
@@ -651,16 +650,15 @@ const AdminUser = () => {
             <Header />
             <div className="flex flex-col md:flex-row min-h-screen">
                 <Dash />
-                 {alert.show && (
-                        <Alert 
-                            message={alert.message} 
-                            type={alert.type} 
-                            onClose={hideAlert}
-                            duration={5000} 
-                        />
-                    )}
+                {alert.show && (
+                    <Alert
+                        message={alert.message}
+                        type={alert.type}
+                        onClose={hideAlert}
+                        duration={5000}
+                    />
+                )}
                 <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-hidden">
-
                     <div className="flex flex-col mb-4">
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4">
                             <h2 className="text-[20px] font-[700] leading-[100%] tracking-[2%]">
@@ -757,11 +755,8 @@ const AdminUser = () => {
                                     <i className="fa-solid fa-chevron-down"></i>
                                 </div>
                             </div>
-
-
                         </div>
                     </div>
-
 
                     <div className="w-full">
                         <div ref={printRef} className="overflow-x-auto -mx-4 sm:mx-0">
@@ -780,16 +775,16 @@ const AdminUser = () => {
                                         <tbody className="bg-white divide-y divide-gray-200 text-xs sm:text-sm">
                                             {loading ? (
                                                 <tr>
-                                                    <td colSpan="7" className="p-4 text-center text-gray-500">
+                                                    <td colSpan="5" className="p-4 text-center text-gray-500">
                                                         Loading...
                                                     </td>
                                                 </tr>
                                             ) : currentItems.length > 0 ? (
-                                                currentItems.map((result, index) => (
-                                                    <tr key={result.slNo} className="hover:bg-gray-100">
+                                                currentItems.map((user, index) => (
+                                                    <tr key={user._id || user.slNo} className="hover:bg-gray-100">
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.regNo}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{result.code}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{user.username || user.regNo}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{user.userType || user.code}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">
                                                             <button
                                                                 className="text-blue-500 hover:text-blue-700 focus:outline-none"
@@ -816,42 +811,7 @@ const AdminUser = () => {
                                             )}
                                         </tbody>
                                     </table>
-                                    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
-                                        <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
-                                            {filteredData.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} of ${filteredData.length} rows` : '0 rows'}
-                                        </div>
-                                        <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
-                                            <button
-                                                onClick={() => handlePageChange(currentPage - 1)}
-                                                disabled={currentPage === 1}
-                                                className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
-                                            >
-                                                <i className="fa-solid fa-angle-right transform rotate-180"></i>
-                                                <span className="hidden sm:inline p-1">Previous</span>
-                                            </button>
 
-                                            <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
-                                                {renderPageNumbers().map((page, index) => (
-                                                    <button
-                                                        key={index}
-                                                        onClick={() => page !== '...' && handlePageChange(page)}
-                                                        className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
-                                                            } ${page === '...' ? 'pointer-events-none' : ''}`}
-                                                    >
-                                                        {page}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                            <button
-                                                onClick={() => handlePageChange(currentPage + 1)}
-                                                disabled={currentPage === totalPages || totalPages === 0}
-                                                className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
-                                            >
-                                                <span className="hidden sm:inline p-1">Next</span>
-                                                <i className="fa-solid fa-angle-right"></i>
-                                            </button>
-                                        </div>
-                                    </div>
                                 </div>
 
                             </div>
@@ -867,5 +827,44 @@ const AdminUser = () => {
 
 export default AdminUser
 
+
+
+
+//  <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
+//                                         <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
+//                                             {filteredData.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} of ${filteredData.length} rows` : '0 rows'}
+//                                         </div>
+//                                         <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+//                                             <button
+//                                                 onClick={() => handlePageChange(currentPage - 1)}
+//                                                 disabled={currentPage === 1}
+//                                                 className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
+//                                             >
+//                                                 <i className="fa-solid fa-angle-right transform rotate-180"></i>
+//                                                 <span className="hidden sm:inline p-1">Previous</span>
+//                                             </button>
+
+//                                             <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+//                                                 {renderPageNumbers().map((page, index) => (
+//                                                     <button
+//                                                         key={index}
+//                                                         onClick={() => page !== '...' && handlePageChange(page)}
+//                                                         className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
+//                                                             } ${page === '...' ? 'pointer-events-none' : ''}`}
+//                                                     >
+//                                                         {page}
+//                                                     </button>
+//                                                 ))}
+//                                             </div>
+//                                             <button
+//                                                 onClick={() => handlePageChange(currentPage + 1)}
+//                                                 disabled={currentPage === totalPages || totalPages === 0}
+//                                                 className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
+//                                             >
+//                                                 <span className="hidden sm:inline p-1">Next</span>
+//                                                 <i className="fa-solid fa-angle-right"></i>
+//                                             </button>
+//                                         </div>
+//                                     </div>
 
 

@@ -14,10 +14,10 @@ const Header = ({ insideHome }) => {
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    if(sessionStorage.getItem("admin")) {
-      const userData = JSON.parse(sessionStorage.getItem("admin"));
+    if (sessionStorage.getItem("users")) {
+      const userData = JSON.parse(sessionStorage.getItem("users"));
       setUsername(userData.username);
-      setTempName(userData.username);
+      setTempName(userData.name);
     } else {
       setUsername("Username");
       setTempName("Username");
@@ -34,9 +34,9 @@ const Header = ({ insideHome }) => {
       console.log("File selected:", file);
     }
   };
-  
+
   const navigate = useNavigate();
-  
+
   const logout = () => {
     sessionStorage.clear();
     navigate("/login");
@@ -55,7 +55,7 @@ const Header = ({ insideHome }) => {
     setDropdownOpen(false);
     setMobileDropdownOpen(false);
     setIsEditingName(false);
-    
+
     // Refresh the temp name from the current username
     setTempName(username);
   };
@@ -70,14 +70,14 @@ const Header = ({ insideHome }) => {
 
   const handleSaveName = () => {
     setUsername(tempName);
-    
+
     // Update username in session storage
-    if(sessionStorage.getItem("user")) {
-      const userData = JSON.parse(sessionStorage.getItem("user"));
+    if (sessionStorage.getItem("users")) {
+      const userData = JSON.parse(sessionStorage.getItem("users"));
       userData.username = tempName;
-      sessionStorage.setItem("user", JSON.stringify(userData));
+      sessionStorage.setItem("users", JSON.stringify(userData));
     }
-    
+
     setIsEditingName(false);
   };
 
@@ -228,7 +228,7 @@ const Header = ({ insideHome }) => {
 
                 <div className="flex flex-col sm:flex-row items-center mb-6 gap-4 ml-5 ">
                   <div className="w-16 h-16 bg-gray-200 rounded-full flex justify-center items-center">
-                  <img className="w-10" src="https://static.vecteezy.com/system/resources/previews/042/332/098/non_2x/default-avatar-profile-icon-grey-photo-placeholder-female-no-photo-images-for-unfilled-user-profile-greyscale-illustration-for-socail-media-web-vector.jpg" alt="" />
+                    <img className="w-10" src="https://static.vecteezy.com/system/resources/previews/042/332/098/non_2x/default-avatar-profile-icon-grey-photo-placeholder-female-no-photo-images-for-unfilled-user-profile-greyscale-illustration-for-socail-media-web-vector.jpg" alt="" />
                   </div>
                   <button
                     className="px-4 py-2 bg-blue-900 text-white rounded-full shadow-md text-sm focus:outline-none"
@@ -278,11 +278,11 @@ const Header = ({ insideHome }) => {
                 <div className="mb-6 ml-6">
                   <div>
                     <label className="block text-sm font-medium text-blue-900 mb-1">Username</label>
-                    <input 
-                      disabled 
-                      type="text" 
+                    <input
+                      disabled
+                      type="text"
                       value={username}
-                      className="w-full sm:w-80 border-blue-900 px-4 py-2 border rounded-full" 
+                      className="w-full sm:w-80 border-blue-900 px-4 py-2 border rounded-full"
                     />
                   </div>
                 </div>
