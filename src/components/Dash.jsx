@@ -108,7 +108,7 @@ const Dash = () => {
 
 
           {/* Only show admin options to sub district admin users */}
-          {user?.user_type === 'subadmin' && (
+          {user?.user_type === 'Sub-District Admin' && (
             <>
               {/* Settings Menu */}
               <div className="mb-4">
@@ -1205,7 +1205,7 @@ const Dash = () => {
               </div>
             </>
           )}
-          {user?.user_type === 'stateAdmin' && (
+          {user?.user_type === 'State Admin' && (
             <>
               {/* Settings Menu */}
               <div className="mb-4">

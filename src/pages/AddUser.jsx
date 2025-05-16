@@ -484,7 +484,6 @@
 //     const [searchParams, setSearchParams] = useSearchParams()
 //     const [loading, setLoading] = useState(true);
 
-
 //     // Alert state
 //     const [alert, setAlert] = useState({
 //         show: false,
@@ -497,25 +496,30 @@
 
 //     const allUserTypes = [
 //         'Select User Type',
-//         'State Admin',
-//         'District Admin',
-//         'Sub-district Admin'
+//         "State Admin",
+//         "District Admin",
+//         "Sub-District Admin",
+//         "School Admin",
 //     ];
+
+
 
 
 //     // Define all Kalolsavams based on user type
 //     const kalolsavamsByType = {
 //         'Select User Type': ['Select Kalolsavam'],
 //         'State Admin': ['Select Kalolsavam', 'Kerala State Kalolsavam'],
-//         'District Admin': ['Select Kalolsavam', 'District Kalolsavam', 'Palakkad District Kalolsavam '],
-//         'Sub-district Admin': ['Select Kalolsavam', 'Sub-district Kalolsavam', 'School Kalolsavam']
+//         'District Admin': ['Select Kalolsavam', 'District Kalolsavam', 'Palakkad District Kalolsavam'],
+//         'Sub-District Admin': ['Select Kalolsavam', 'Sub-district Kalolsavam', 'School Kalolsavam'],
+//         'School Admin': ['Select Kalolsavam', 'Sub-district Kalolsavam', 'School Kalolsavam']
+
 //     };
 
 //     const [formData, setFormData] = useState({
 //         username: '',
 //         password: '',
-//         name: '', 
-//         email: '', 
+//         name: '',
+//         email: '',
 //         userType: '',
 //         kalolsavam: ''
 //     });
@@ -524,7 +528,7 @@
 //         username: '',
 //         password: '',
 //         name: '',
-//         email: '', 
+//         email: '',
 //         userType: '',
 //         kalolsavam: ''
 //     });
@@ -543,6 +547,8 @@
 //     const [availableKalolsavams, setAvailableKalolsavams] = useState(kalolsavamsByType['Select User Type']);
 
 //     const [formSubmitted, setFormSubmitted] = useState(false);
+//     // Add a flag to track submission status
+//     const [isSubmitting, setIsSubmitting] = useState(false);
 
 //     const filteredUserTypes = searchText.userType
 //         ? allUserTypes.filter(type =>
@@ -710,7 +716,6 @@
 //         navigate('/admin-panel');
 //     };
 
-
 //     const showAlert = (message, type = 'success') => {
 //         setAlert({
 //             show: true,
@@ -730,9 +735,13 @@
 //         e.preventDefault();
 //         setFormSubmitted(true);
 
+//         // Prevent multiple submissions
+//         if (isSubmitting) return;
+
 //         const isValid = validateForm();
 
 //         if (isValid) {
+//             setIsSubmitting(true);
 //             console.log("Form submitted:", formData);
 
 //             const token = sessionStorage.getItem("token");
@@ -743,9 +752,11 @@
 //                 };
 
 //                 try {
+//                     // Fixed: Proper formatting of user_type for API
+//                     // Especially important for "Sub district Admin" value
 //                     const dataToSubmit = {
 //                         name: formData.name,
-//                         email_address: formData.email, 
+//                         email_address: formData.email,
 //                         username: formData.username,
 //                         password: formData.password,
 //                         user_type: formData.userType, 
@@ -756,7 +767,10 @@
 
 //                     const result = await addAdminAPI(dataToSubmit, reqHeader);
 
-//                     if (result.status === 200) {
+//                     console.log("API Response:", result);
+
+//                     // Improved response handling
+//                     if (result && result.status >= 200 && result.status < 300) {
 //                         showAlert(`User ${formData.username} added successfully!`, 'success');
 
 //                         // Reset form
@@ -770,24 +784,51 @@
 //                         });
 //                         setFormSubmitted(false);
 
+//                         // Allow user to see success message before redirecting
 //                         setTimeout(() => {
 //                             navigate('/admin-panel');
 //                         }, 2000);
 //                     } else {
-//                         showAlert(`Failed to add user: ${result.message || 'Please try again.'}`, 'error');
+//                         // Handle API error response
+//                         const errorMsg = result?.response?.data?.message ||
+//                             result?.response?.message ||
+//                             result?.message ||
+//                             'Server error. Please try again.';
+//                         showAlert(`Failed to add user: ${errorMsg}`, 'error');
 //                     }
 //                 } catch (err) {
 //                     console.error("Error adding user:", err);
-//                     showAlert(`Error adding user: ${err.message || 'Unknown error'}`, 'error');
+
+//                     // More descriptive error handling
+//                     let errorMessage = "Unknown error occurred";
+
+//                     if (err.response) {
+//                         // Server responded with error
+//                         errorMessage = err.response.data?.message || `Error: ${err.response.status}`;
+//                         console.log("Error response data:", err.response.data);
+//                     } else if (err.request) {
+//                         // No response received
+//                         errorMessage = "No response from server. Please check your connection.";
+//                     } else {
+//                         // Error in request setup
+//                         errorMessage = err.message || "Failed to process request";
+//                     }
+
+//                     showAlert(`Error adding user: ${errorMessage}`, 'error');
+//                 } finally {
+//                     // Reset submission state
+//                     setIsSubmitting(false);
 //                 }
 //             } else {
 //                 showAlert("Authentication token missing. Please log in again.", 'error');
 //                 setTimeout(() => {
 //                     navigate('/login');
 //                 }, 2000);
+//                 setIsSubmitting(false);
 //             }
 //         } else {
 //             console.log("Form has errors:", errors);
+//             showAlert("Please fix the errors in the form before submitting.", 'error');
 //         }
 //     };
 
@@ -797,20 +838,25 @@
 //                 <Header />
 //                 <div className="flex flex-col sm:flex-row">
 //                     <Dash />
-//                     {alert.show && (
-//                         <Alert
-//                             message={alert.message}
-//                             type={alert.type}
-//                             onClose={hideAlert}
-//                             duration={5000}
-//                         />
-//                     )}
+
+//                     {/* Fixed position for alert so it's always visible */}
+//                     <div className="fixed top-5 right-5 z-50">
+//                         {alert.show && (
+//                             <Alert
+//                                 message={alert.message}
+//                                 type={alert.type}
+//                                 onClose={hideAlert}
+//                                 duration={5000}
+//                             />
+//                         )}
+//                     </div>
+
 //                     <div className="flex-1 p-2 sm:p-4 bg-gray-300">
 //                         <div className="bg-gray-50 p-3 sm:p-6 pt-4 min-h-screen mx-auto">
 //                             <h2 className="text-xl font-bold mb-5 sm:mb-10 text-gray-800">Add User</h2>
 
 //                             <form className="space-y-3 sm:space-y-4 max-w-2xl mx-auto">
-//                                 {/* Name field - ADDED */}
+//                                 {/* Name field */}
 //                                 <div className="flex flex-col sm:flex-row sm:items-center">
 //                                     <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Full Name</label>
 //                                     <div className="w-full sm:w-2/3">
@@ -826,7 +872,7 @@
 //                                     </div>
 //                                 </div>
 
-//                                 {/* Email field - ADDED */}
+//                                 {/* Email field */}
 //                                 <div className="flex flex-col sm:flex-row sm:items-center">
 //                                     <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Email</label>
 //                                     <div className="w-full sm:w-2/3">
@@ -977,9 +1023,10 @@
 //                                 <button
 //                                     onClick={handleSubmit}
 //                                     type="submit"
-//                                     className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:opacity-90 transition-opacity duration-300"
+//                                     disabled={isSubmitting}
+//                                     className={`bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:opacity-90 transition-opacity duration-300 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
 //                                 >
-//                                     Add
+//                                     {isSubmitting ? 'Adding...' : 'Add'}
 //                                 </button>
 //                             </div>
 //                         </div>
@@ -991,6 +1038,8 @@
 // };
 
 // export default AddUser;
+
+
 import React, { useState, useRef, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import Dash from '../components/Dash'
@@ -1015,17 +1064,34 @@ const AddUser = () => {
 
     const allUserTypes = [
         'Select User Type',
-        'State Admin',
-        'District Admin',
-        'Sub district Admin'
+        "State Admin",
+        "District Admin",
+        "Sub-District Admin",
+        "School Admin",
     ];
 
-    // Define all Kalolsavams based on user type
+    // Define all Kalolsavams based on user type with ID mappings
     const kalolsavamsByType = {
-        'Select User Type': ['Select Kalolsavam'],
-        'State Admin': ['Select Kalolsavam', 'Kerala State Kalolsavam'],
-        'District Admin': ['Select Kalolsavam', 'District Kalolsavam', 'Palakkad District Kalolsavam'],
-        'Sub district Admin': ['Select Kalolsavam', 'Sub-district Kalolsavam', 'School Kalolsavam']
+        'Select User Type': [{ id: '', name: 'Select Kalolsavam' }],
+        'State Admin': [
+            { id: '', name: 'Select Kalolsavam' },
+            { id: '1', name: 'Kerala State Kalolsavam' }
+        ],
+        'District Admin': [
+            { id: '', name: 'Select Kalolsavam' },
+            { id: '2', name: 'District Kalolsavam' },
+            { id: '3', name: 'Palakkad District Kalolsavam' }
+        ],
+        'Sub-District Admin': [
+            { id: '', name: 'Select Kalolsavam' },
+            { id: '4', name: 'Sub-district Kalolsavam' },
+            { id: '5', name: 'School Kalolsavam' }
+        ],
+        'School Admin': [
+            { id: '', name: 'Select Kalolsavam' },
+            { id: '4', name: 'Sub-district Kalolsavam' },
+            { id: '5', name: 'School Kalolsavam' }
+        ]
     };
 
     const [formData, setFormData] = useState({
@@ -1034,7 +1100,8 @@ const AddUser = () => {
         name: '',
         email: '',
         userType: '',
-        kalolsavam: ''
+        kalolsavam: '',
+        kalolsavamId: ''
     });
 
     const [errors, setErrors] = useState({
@@ -1070,7 +1137,7 @@ const AddUser = () => {
 
     const filteredKalolsavams = searchText.kalolsavam
         ? availableKalolsavams.filter(kalolsavam =>
-            kalolsavam.toLowerCase().includes(searchText.kalolsavam.toLowerCase()))
+            kalolsavam.name.toLowerCase().includes(searchText.kalolsavam.toLowerCase()))
         : availableKalolsavams;
 
     useEffect(() => {
@@ -1095,11 +1162,15 @@ const AddUser = () => {
         setAvailableKalolsavams(kalolsavamsByType[userType] || kalolsavamsByType['Select User Type']);
 
         // Reset kalolsavam selection when user type changes
-        if (formData.kalolsavam && !kalolsavamsByType[userType]?.includes(formData.kalolsavam)) {
-            setFormData(prev => ({
-                ...prev,
-                kalolsavam: ''
-            }));
+        if (formData.kalolsavam) {
+            const kalolsavamExists = kalolsavamsByType[userType]?.some(k => k.name === formData.kalolsavam);
+            if (!kalolsavamExists) {
+                setFormData(prev => ({
+                    ...prev,
+                    kalolsavam: '',
+                    kalolsavamId: ''
+                }));
+            }
         }
     }, [formData.userType]);
 
@@ -1211,9 +1282,27 @@ const AddUser = () => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
 
-        handleChange({
-            target: { name, value }
-        });
+        
+        if (name === 'kalolsavam') {
+            const selectedKalolsavam = availableKalolsavams.find(k => k.name === value);
+            if (selectedKalolsavam) {
+                setFormData(prev => ({
+                    ...prev,
+                    kalolsavam: value,
+                    kalolsavamId: selectedKalolsavam.id
+                }));
+            } else {
+                setFormData(prev => ({
+                    ...prev,
+                    kalolsavam: value,
+                    kalolsavamId: ''
+                }));
+            }
+        } else {
+            handleChange({
+                target: { name, value }
+            });
+        }
 
         if (name === 'userType') {
             setDropdownOpen(prev => ({ ...prev, userType: false }));
@@ -1265,15 +1354,15 @@ const AddUser = () => {
                 };
 
                 try {
-                    // Fixed: Proper formatting of user_type for API
-                    // Especially important for "Sub district Admin" value
+                    // Include kalolsavamId in the API request
                     const dataToSubmit = {
                         name: formData.name,
                         email_address: formData.email,
                         username: formData.username,
                         password: formData.password,
-                        user_type: formData.userType, // Don't trim - keep exact value
-                        kalolsavam: formData.kalolsavam
+                        user_type: formData.userType,
+                        kalolsavam: formData.kalolsavam,
+                        kalolsavam_id: formData.kalolsavamId  // Add the ID to be passed to backend
                     };
 
                     console.log("Submitting data:", dataToSubmit);
@@ -1293,7 +1382,8 @@ const AddUser = () => {
                             name: '',
                             email: '',
                             userType: '',
-                            kalolsavam: ''
+                            kalolsavam: '',
+                            kalolsavamId: ''
                         });
                         setFormSubmitted(false);
 
@@ -1506,12 +1596,12 @@ const AddUser = () => {
                                                             filteredKalolsavams.map((kalolsavam, index) => (
                                                                 <div
                                                                     key={index}
-                                                                    className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.kalolsavam === kalolsavam ? 'bg-blue-200' : ''}`}
+                                                                    className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.kalolsavam === kalolsavam.name ? 'bg-blue-200' : ''}`}
                                                                     onClick={() => handleInputChange({
-                                                                        target: { name: 'kalolsavam', value: kalolsavam }
+                                                                        target: { name: 'kalolsavam', value: kalolsavam.name }
                                                                     })}
                                                                 >
-                                                                    {kalolsavam}
+                                                                    {kalolsavam.name}
                                                                 </div>
                                                             ))
                                                         ) : (

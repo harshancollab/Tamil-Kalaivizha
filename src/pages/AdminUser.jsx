@@ -1,11 +1,10 @@
-// It Admin user
 import React, { useEffect, useState, useRef } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import html2pdf from 'html2pdf.js';
 import Alert from '../components/Alert'
-import { getAllAdminuserAPI, deleteAdminUserAPI } from '../services/allAPI';
+import { deleteUserAPI, getAllAdminuserAPI } from '../services/allAPI';
 
 const AdminUser = () => {
     const [adminUsers, setAdminUsers] = useState([]);
@@ -74,11 +73,11 @@ const AdminUser = () => {
 
     const allUserTypes = [
         'Select',
-        'State Admin',
-        'District Admin',
-        'Sub-district Admin',
-        'All Admin',
-        'It Admin'  // Added "It Admin" to match the user data
+        "State Admin",
+        "District Admin",
+        "Sub-District Admin",
+        "School Admin",
+        'It Admin'
     ];
 
     const districtToSubDistrict = {
@@ -95,6 +94,7 @@ const AdminUser = () => {
         'District Admin': allDistricts.filter(d => d !== 'Select'),
         'Sub-district Admin': allDistricts.filter(d => d !== 'Select'),
         'It Admin': allDistricts.filter(d => d !== 'Select'),
+        'School Admin': allDistricts.filter(d => d !== 'Select'),
         'All Admin': allDistricts.filter(d => d !== 'Select')
     };
 
@@ -205,62 +205,38 @@ const AdminUser = () => {
         }
     };
 
+    useEffect(() => {
+        getAllAdminuser()
+    }, []);
+
     const getAllAdminuser = async () => {
+
         const token = sessionStorage.getItem("token");
         if (token) {
             const reqHeader = {
-                "Authorization": `Bearer ${token}`
-            }
+                "Authorization": token
+            };
             try {
-                setLoading(true);
-
-                // Build query params for filters
-                let queryParams = new URLSearchParams();
-                queryParams.append('page', currentPage);
-                queryParams.append('limit', rowsPerPage);
-
-                if (selectedUserType !== 'Select') {
-                    queryParams.append('userType', selectedUserType);
-                }
-
-                if (selectedDistrict !== 'Select') {
-                    queryParams.append('district', selectedDistrict);
-                }
-
-                if (selectedSubDistrict !== 'Select') {
-                    queryParams.append('subDistrict', selectedSubDistrict);
-                }
-
-                if (searchCode) {
-                    queryParams.append('code', searchCode);
-                }
-
-                const result = await getAllAdminuserAPI(reqHeader, queryParams.toString());
-
+                const result = await getAllAdminuserAPI(reqHeader);
                 if (result.status === 200) {
-                    
-                    const userData = result.data.users || result.data || [];
-                    setAdminUsers(userData);
-                    setTotalCount(result.data.totalCount || userData.length || 0);
-                } else {
-                    showAlert("Failed to fetch admin users", "error");
+
+                    setAdminUsers(result.data.users || result.data);
+                    setTotalCount(result.data.totalItems || (result.data.users ? result.data.users.length : result.data.length));
                 }
             } catch (err) {
                 console.log(err);
-                showAlert("Error fetching admin users", "error");
+                showAlert("Error fetching user data", "error");
             } finally {
                 setLoading(false);
             }
         } else {
-            showAlert("Authentication required", "error");
-            navigate('/login');
+            setLoading(false);
+            showAlert("Authentication token not found", "error");
         }
-    }
+    };
 
-    // Re-fetch data when filters or pagination changes
-    useEffect(() => {
-        getAllAdminuser();
-    }, [currentPage, rowsPerPage]);
+
+    console.log(getAllAdminuser);
 
     const handleEditRedirect = (user) => {
         const params = new URLSearchParams();
@@ -281,78 +257,111 @@ const AdminUser = () => {
             params.append('code', searchCode);
         }
 
-        params.append('returnUrl', `/AdminUser?${searchParams.toString()}`);
-
         // Make sure user has the correct ID property
         const userId = user._id || user.id;
 
-        navigate(`/EditUser/${userId}`, {
-            state: {
-                resultEntry: user,
-                filterParams: params.toString()
-            }
-        });
+        if (!userId) {
+            showAlert("User ID is missing", "error");
+            return;
+        }
+
+        navigate(`/EditUser/${userId}?${params.toString()}`);
     };
 
-    // Handle delete user
-    const handleDeleteClick = async (id) => {
+
+    // const handleDeleteClick = async (userId) => {
+    //     const token = sessionStorage.getItem("token")
+    //     if (token) {
+    //         // apicall
+    //         const reqHeader = {
+    //             "Authorization": token
+    //         }
+    //         try {
+    //             await deleteUserAPI(userId,reqHeader)
+    //             getAllAdminuser()
+
+    //         } catch (err) {
+    //             console.log(err);
+
+    //         }
+    //     }
+    // }
+
+
+
+
+    // Get filtered users based on all filters
+
+
+
+    // Updated handleDeleteClick function with better error handling
+    const handleDeleteClick = async (userId) => {
+        if (!userId) {
+            showAlert("User ID is missing", "error");
+            return;
+        }
+
         const token = sessionStorage.getItem("token");
         if (!token) {
             showAlert("Authentication token not found", "error");
             return;
         }
 
+        // API call
         const reqHeader = {
-            "Authorization": `Bearer ${token}`
+            "Authorization": token
         };
 
         try {
-            setLoading(true);
+            console.log("Attempting to delete user with ID:", userId);
+            const response = await deleteUserAPI(userId, reqHeader);
+            console.log("Delete API response:", response);
 
-            const confirmDelete = window.confirm("Are you sure you want to delete this user?");
-            if (!confirmDelete) {
-                setLoading(false);
-                return;
-            }
-
-            // Add the API function call for delete
-            const result = await deleteAdminUserAPI(id, reqHeader);
-
-            if (result.status === 200) {
-                showAlert("User deleted successfully");
+            if (response.status === 200) {
+                showAlert("User deleted successfully", "success");
                 getAllAdminuser();
             } else {
-                showAlert("Failed to delete user", "error");
+                showAlert(`Failed to delete user: ${response.data?.message || 'Unknown error'}`, "error");
             }
-
         } catch (err) {
             console.error("Error deleting user:", err);
-
-            if (err.response) {
-                if (err.response.status === 401) {
-                    showAlert("Session expired. Please login again.", "error");
-                    navigate('/login');
-                } else if (err.response.status === 403) {
-                    showAlert("You don't have permission to delete this user", "error");
-                } else if (err.response.status === 404) {
-                    showAlert("User not found. It may have been already deleted.");
-                    getAllAdminuser();
-                } else {
-                    showAlert(`Error: ${err.response.data.message || "Failed to delete user"}`, "error");
-                }
-            } else if (err.request) {
-                showAlert("Server is not responding. Please try again later.", "error");
-            } else {
-                showAlert("An error occurred while trying to delete the user", "error");
-            }
-        } finally {
-            setLoading(false);
+            const errorMessage = err.response?.data?.message || err.message || "An error occurred while deleting the user";
+            showAlert(`Delete failed: ${errorMessage}`, "error");
         }
     };
 
-    // Get filtered users based on all filters
     const filteredAdminUsers = () => {
-        return adminUsers;
+        if (!adminUsers || adminUsers.length === 0) return [];
+
+        let filtered = [...adminUsers];
+
+        // Apply filters
+        if (searchCode) {
+            filtered = filtered.filter(user =>
+                (user.username && user.username.toLowerCase().includes(searchCode.toLowerCase())) ||
+                (user.name && user.name.toLowerCase().includes(searchCode.toLowerCase()))
+            );
+        }
+
+        if (selectedUserType !== 'Select') {
+            filtered = filtered.filter(user =>
+                (user.userType === selectedUserType) || (user.user_type === selectedUserType)
+            );
+        }
+
+        if (selectedDistrict !== 'Select') {
+            filtered = filtered.filter(user =>
+                user.districtDetails && user.districtDetails.district === selectedDistrict
+            );
+        }
+
+        if (selectedSubDistrict !== 'Select') {
+            filtered = filtered.filter(user =>
+                user.districtDetails && user.districtDetails.subDistrict === selectedSubDistrict
+            );
+        }
+
+        return filtered;
     };
 
     // Reset to page 1 when filters change
@@ -361,7 +370,11 @@ const AdminUser = () => {
     }, [searchCode, selectedDistrict, selectedSubDistrict, selectedUserType]);
 
     const currentItems = filteredAdminUsers();
-    const totalPages = Math.ceil(totalCount / rowsPerPage);
+    const totalItems = currentItems.length;
+    const totalPages = Math.ceil(totalItems / rowsPerPage);
+
+    // Get paginated items
+    const paginatedItems = currentItems.slice(indexOfFirstItem, indexOfLastItem);
 
     const handlePageChange = (pageNumber) => {
         if (pageNumber > 0 && pageNumber <= totalPages) {
@@ -486,41 +499,53 @@ const AdminUser = () => {
 
     const renderPageNumbers = () => {
         const pageNumbers = [];
-        const maxPageNumbersToShow = window.innerWidth < 640 ? 3 : 5;
+        const maxVisiblePages = 5; // Adjust this number as needed
 
-        if (totalPages <= maxPageNumbersToShow) {
+        if (totalPages <= maxVisiblePages) {
+            // Show all pages if total pages is less than max visible
             for (let i = 1; i <= totalPages; i++) {
                 pageNumbers.push(i);
             }
         } else {
-            if (currentPage <= 2) {
-                for (let i = 1; i <= 3; i++) {
-                    if (i <= totalPages) pageNumbers.push(i);
-                }
-                if (totalPages > 3) {
-                    pageNumbers.push('...');
-                    pageNumbers.push(totalPages);
-                }
-            } else if (currentPage >= totalPages - 1) {
-                pageNumbers.push(1);
+            // Always show first page
+            pageNumbers.push(1);
+
+            // Calculate start and end pages
+            let startPage = Math.max(2, currentPage - 1);
+            let endPage = Math.min(totalPages - 1, currentPage + 1);
+
+            // Adjust if we're at the beginning
+            if (currentPage <= 3) {
+                endPage = Math.min(4, totalPages - 1);
+            }
+            // Adjust if we're at the end
+            else if (currentPage >= totalPages - 2) {
+                startPage = Math.max(totalPages - 3, 2);
+            }
+
+            // Add ellipsis if needed after first page
+            if (startPage > 2) {
                 pageNumbers.push('...');
-                for (let i = totalPages - 2; i <= totalPages; i++) {
-                    if (i > 0) pageNumbers.push(i);
-                }
-            } else {
-                pageNumbers.push(1);
-                if (currentPage > 3) pageNumbers.push('...');
-                pageNumbers.push(currentPage - 1);
-                pageNumbers.push(currentPage);
-                pageNumbers.push(currentPage + 1);
-                if (currentPage < totalPages - 2) pageNumbers.push('...');
+            }
+
+            // Add middle pages
+            for (let i = startPage; i <= endPage; i++) {
+                pageNumbers.push(i);
+            }
+
+            // Add ellipsis if needed before last page
+            if (endPage < totalPages - 1) {
+                pageNumbers.push('...');
+            }
+
+            // Always show last page
+            if (totalPages > 1) {
                 pageNumbers.push(totalPages);
             }
         }
 
         return pageNumbers;
     };
-
     const handleAddClick = () => {
         const params = new URLSearchParams();
 
@@ -543,7 +568,7 @@ const AdminUser = () => {
     };
 
     const shouldShowDistrictSelect = () => {
-        return selectedUserType === 'District Admin' || selectedUserType === 'Sub-district Admin';
+        return selectedUserType === 'District Admin' || selectedUserType === 'Sub-district Admin' || selectedUserType === 'School Admin';
     };
 
     const shouldShowSubDistrictSelect = () => {
@@ -779,22 +804,22 @@ const AdminUser = () => {
                                                         Loading...
                                                     </td>
                                                 </tr>
-                                            ) : currentItems.length > 0 ? (
-                                                currentItems.map((user, index) => (
-                                                    <tr key={user._id || user.slNo} className="hover:bg-gray-100">
+                                            ) : paginatedItems.length > 0 ? (
+                                                paginatedItems.map((user, index) => (
+                                                    <tr key={user._id} className="hover:bg-gray-100">
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{user.username || user.regNo}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{user.userType || user.code}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{user.username || user.name || "-"}</td>
+                                                        <td className="p-2 md:p-3 whitespace-nowrap">{user.user_type || user.userType || "-"}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">
                                                             <button
                                                                 className="text-blue-500 hover:text-blue-700 focus:outline-none"
-                                                                onClick={() => handleEditRedirect(result)}
+                                                                onClick={() => handleEditRedirect(user)}
                                                             >
                                                                 <i className="fa-solid fa-pen-to-square cursor-pointer"></i>
                                                             </button>
                                                         </td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">
-                                                            <button onClick={() => handleDeleteClick(result.slNo)} className="text-red-600 hover:text-red-800 focus:outline-none">
+                                                            <button onClick={() => handleDeleteClick(user?._id)} className="text-red-600 hover:text-red-800 focus:outline-none">
                                                                 <i className="fa-solid fa-trash cursor-pointer"></i>
                                                             </button>
                                                         </td>
@@ -811,7 +836,46 @@ const AdminUser = () => {
                                             )}
                                         </tbody>
                                     </table>
+                                    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
+                                        <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
+                                            Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, totalItems)} of {totalItems} entries
+                                        </div>
+                                        <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                                            <button
+                                                onClick={() => handlePageChange(currentPage - 1)}
+                                                disabled={currentPage === 1}
+                                                className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
+                                            >
+                                                <i className="fa-solid fa-angle-left"></i>
+                                                <span className="hidden sm:inline">Previous</span>
+                                            </button>
 
+                                            <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+                                                {renderPageNumbers().map((page, index) => (
+                                                    <button
+                                                        key={index}
+                                                        onClick={() => typeof page === 'number' && handlePageChange(page)}
+                                                        className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${currentPage === page
+                                                            ? 'bg-[#305A81] text-white'
+                                                            : 'bg-gray-200 hover:bg-gray-300'
+                                                            } ${page === '...' ? 'pointer-events-none' : ''}`}
+                                                        disabled={page === '...'}
+                                                    >
+                                                        {page}
+                                                    </button>
+                                                ))}
+                                            </div>
+
+                                            <button
+                                                onClick={() => handlePageChange(currentPage + 1)}
+                                                disabled={currentPage === totalPages || totalPages === 0}
+                                                className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
+                                            >
+                                                <span className="hidden sm:inline">Next</span>
+                                                <i className="fa-solid fa-angle-right"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
 
                             </div>
@@ -826,45 +890,3 @@ const AdminUser = () => {
 }
 
 export default AdminUser
-
-
-
-
-//  <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
-//                                         <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
-//                                             {filteredData.length > 0 ? `${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} of ${filteredData.length} rows` : '0 rows'}
-//                                         </div>
-//                                         <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
-//                                             <button
-//                                                 onClick={() => handlePageChange(currentPage - 1)}
-//                                                 disabled={currentPage === 1}
-//                                                 className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
-//                                             >
-//                                                 <i className="fa-solid fa-angle-right transform rotate-180"></i>
-//                                                 <span className="hidden sm:inline p-1">Previous</span>
-//                                             </button>
-
-//                                             <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
-//                                                 {renderPageNumbers().map((page, index) => (
-//                                                     <button
-//                                                         key={index}
-//                                                         onClick={() => page !== '...' && handlePageChange(page)}
-//                                                         className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${currentPage === page ? 'bg-[#305A81] text-white' : 'bg-gray-200 hover:bg-gray-300'
-//                                                             } ${page === '...' ? 'pointer-events-none' : ''}`}
-//                                                     >
-//                                                         {page}
-//                                                     </button>
-//                                                 ))}
-//                                             </div>
-//                                             <button
-//                                                 onClick={() => handlePageChange(currentPage + 1)}
-//                                                 disabled={currentPage === totalPages || totalPages === 0}
-//                                                 className="px-3 py-2 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center"
-//                                             >
-//                                                 <span className="hidden sm:inline p-1">Next</span>
-//                                                 <i className="fa-solid fa-angle-right"></i>
-//                                             </button>
-//                                         </div>
-//                                     </div>
-
-

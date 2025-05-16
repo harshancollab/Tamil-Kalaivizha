@@ -8,6 +8,7 @@ const Header = ({ insideHome }) => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
   const [tempName, setTempName] = useState("");
   const nameInputRef = useRef(null);
   const mobileDropdownRef = useRef(null);
@@ -17,9 +18,11 @@ const Header = ({ insideHome }) => {
     if (sessionStorage.getItem("users")) {
       const userData = JSON.parse(sessionStorage.getItem("users"));
       setUsername(userData.username);
+      setName(userData.name);
       setTempName(userData.name);
     } else {
       setUsername("Username");
+      setName("Username");
       setTempName("Username");
     }
   }, []);
@@ -56,8 +59,8 @@ const Header = ({ insideHome }) => {
     setMobileDropdownOpen(false);
     setIsEditingName(false);
 
-    // Refresh the temp name from the current username
-    setTempName(username);
+    // Refresh the temp name from the current name
+    setTempName(name);
   };
 
   const handleEditName = () => {
@@ -69,12 +72,12 @@ const Header = ({ insideHome }) => {
   };
 
   const handleSaveName = () => {
-    setUsername(tempName);
+    setName(tempName);
 
-    // Update username in session storage
+    // Update name in session storage
     if (sessionStorage.getItem("users")) {
       const userData = JSON.parse(sessionStorage.getItem("users"));
-      userData.username = tempName;
+      userData.name = tempName;
       sessionStorage.setItem("users", JSON.stringify(userData));
     }
 
@@ -82,7 +85,7 @@ const Header = ({ insideHome }) => {
   };
 
   const handleCancelEditName = () => {
-    setTempName(username);
+    setTempName(name);
     setIsEditingName(false);
   };
 
@@ -175,7 +178,7 @@ const Header = ({ insideHome }) => {
                   className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border"
                 />
                 <span className="hidden sm:block text-sm md:text-base truncate max-w-[120px] md:max-w-[200px]">
-                  {username}
+                  {name}
                 </span>
                 <i
                   className={`fas ${dropdownOpen ? "fa-chevron-up" : "fa-chevron-down"} text-lg`}
@@ -261,7 +264,7 @@ const Header = ({ insideHome }) => {
                           <input
                             type="text"
                             className="w-full sm:w-80 border-blue-900 px-4 py-2 border rounded-full"
-                            value={username}
+                            value={name}
                             readOnly
                           />
                           <button

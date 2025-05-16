@@ -18,14 +18,24 @@ export const addAdminAPI = async (reqBody, reqHeader) => {
 
 // get  all Users
 export const getAllAdminuserAPI = async (reqHeader) => {
-  return await commonAPI("GET",`${SERVER_URL}/api/user/get-all?page=1&limit=10`,{}, reqHeader);
+  return await commonAPI("GET", `${SERVER_URL}/api/user/get-all?page=${1}&limit=${10}`, {}, reqHeader);
 };
 
 
 // get  single  Users
-export const getsingleAPI = async (reqHeader) => {
-  return await commonAPI("GET", `${SERVER_URL}/api/user/${userId}/get`,{}, reqHeader);
+export const getsingleAPI = async (userId, reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/api/user/${userId}/get`, {}, reqHeader);
 };
+//  edit a user
+export const editAdminAPI = async (userId, reqBody, reqHeader) => {
+  return await commonAPI("PUT", `${SERVER_URL}api/user/${userId}/update`, reqBody, reqHeader);
+};
+
+// Delete user
+
+export const deleteUserAPI = async (userId, reqHeader) => {
+  return await commonAPI("DELETE", `${SERVER_URL}/api/user/${userId}/delete`, {}, reqHeader)
+}
 
 
 // reset
@@ -36,15 +46,14 @@ export const resetPasswordAPI = async (reqBody) => {
 
 // otp
 export const verifyOtpAPI = async (reqBody) => {
-  return await commonAPI("POST", `${SERVER_URL}//api/user/harshanh60@gmail.com/otp-verification`, reqBody, "");
+  return await commonAPI("POST", `${SERVER_URL}/api/user/${email_address}/otp-verification`, reqBody, "")
 }
 
 
-// resend OTP code
+// resend OTP
 export const resendOtpAPI = async (reqBody) => {
-  return await commonAPI("POST", `${SERVER_URL}/api/user/resend-otp`, reqBody, "");
+  return await commonAPI("POST", `${SERVER_URL}/api/user/${email_address}/resend-otp`, reqBody, "");
 }
-
 
 
 

@@ -82,7 +82,7 @@ const handleSubmit = async (e) => {
   e.preventDefault();
   if (validateForm()) {
     try {
-      setIsLoading(true);
+     
       const reqBody = {
         username: formData.username,
         password: formData.password,
@@ -106,7 +106,7 @@ const handleSubmit = async (e) => {
         
         // Get user type from decoded token
         const userType = userData.user_type;
-        console.log("User type from token:", userType); // Debug: Check the user type
+        console.log("User type from token:", userType); 
         
         // Set user in state
         setUser({

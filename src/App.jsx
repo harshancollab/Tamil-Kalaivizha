@@ -239,7 +239,7 @@ function App() {
         <Route path="/not-authorized" element={<Pnf />} />
 
 
-        <Route element={<ProtectedRoute userType={['District Admin', 'stateAdmin', 'School admin', 'subadmin']} />}>
+        <Route element={<ProtectedRoute userType={['District Admin', 'State Admin', 'School admin', 'Sub-District Admin']} />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/result" element={<Result />} />
           <Route path="/form" element={<MultiStep />} />
@@ -254,13 +254,13 @@ function App() {
         </Route>
 
         {/* Routes ONLY for "school admin" */}
-        <Route element={<ProtectedRoute userType={['School admin', 'subadmin', 'District Admin']} />}>
+        <Route element={<ProtectedRoute userType={['School admin', 'Sub-District Admin', 'District Admin']} />}>
           <Route path="/Schooldetails" element={<SchoolDetails />} />
           <Route path="/participatelist" element={<ParticipateList />} />
         </Route>
 
         {/* Protected Routes for All Authenticated Users */}
-        <Route element={<ProtectedRoute userType={['District Admin', 'stateAdmin', 'School admin', 'subadmin']} />}>
+        <Route element={<ProtectedRoute userType={['District Admin', 'State Admin', 'School admin', 'Sub-District Admin']} />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/result" element={<Result />} />
           <Route path="/form" element={<MultiStep />} />
@@ -281,7 +281,7 @@ function App() {
         </Route>
 
         {/* Routes ONLY for "sub district admin" */}
-        <Route element={<ProtectedRoute userType={['subadmin']} />}>
+        <Route element={<ProtectedRoute userType={['Sub-District Admin']} />}>
           <Route path="/AllKalolsavam" element={<AllKalolsavam />} />
           <Route path="/edit-kalolsavam/:id" element={<EditKalsvmDetails />} />
           <Route path="/schlentry" element={<SchlEntry />} />
@@ -362,7 +362,7 @@ function App() {
 
           <Route path="/admin-panel" element={<AdminUser />} />
           <Route path="/AddUser" element={<AddUser />} />
-          <Route path="/EditUser/:id" element={<EditUser />} />
+          <Route path="/EditUser/:userId" element={<EditUser/>} />
 
 
 
@@ -446,7 +446,7 @@ function App() {
           <Route path="/DParticipateCardlist" element={<DParticipateCardlist />} />
 
         </Route>
-        <Route element={<ProtectedRoute userType={['stateAdmin']} />}>
+        <Route element={<ProtectedRoute userType={['State Admin']} />}>
 
           <Route path="/SDefineKalolsavm" element={<SDefineKalolsavm />} />
           <Route path="/SEditKallosvm/:id" element={<SEditKallosvm />} />
