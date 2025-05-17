@@ -1,11 +1,11 @@
 // It Admin user - edit user
-
 import React, { useState, useRef, useEffect } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import Dash from '../components/Dash'
 import Header from '../components/Header'
 import Alert from '../components/Alert'
 import { editAdminAPI, getsingleAPI } from '../services/allAPI'
+import crypto from 'crypto-js'
 
 const EditUser = () => {
     const navigate = useNavigate();
@@ -13,7 +13,12 @@ const EditUser = () => {
     const [searchParams] = useSearchParams();
     const [loading, setLoading] = useState(true);
 
-    // Debug log for userId
+    // Add state for password visibility
+    const [showPassword, setShowPassword] = useState(false);
+
+    // Secret key for password decryption
+    const Secret_key = import.meta.env.VITE_SECRET_KEY
+
     console.log("User ID from URL params:", userId);
 
     // Alert state
@@ -33,7 +38,6 @@ const EditUser = () => {
         "Sub-District Admin",
         "School Admin",
     ];
-
 
     const kalolsavamsByType = {
         'Select User Type': [{ id: '', name: 'Select Kalolsavam' }],
@@ -102,6 +106,37 @@ const EditUser = () => {
             kalolsavam.name.toLowerCase().includes(searchText.kalolsavam.toLowerCase()))
         : availableKalolsavams;
 
+    // Function to decrypt password
+    const decryptPassword = (encrypted) => {
+        try {
+            if (typeof encrypted === 'string') {
+                return encrypted;
+            }
+
+            if (!encrypted || !encrypted.iv || !encrypted.encryptedData) {
+                console.error("Invalid encrypted password format", encrypted);
+                return '';
+            }
+
+            const { iv, encryptedData } = encrypted;
+            const key = crypto.enc.Utf8.parse(Secret_key);
+            const ivHex = crypto.enc.Hex.parse(iv);
+            const encryptedHexStr = crypto.enc.Hex.parse(encryptedData);
+            const encryptedBase64Str = crypto.enc.Base64.stringify(encryptedHexStr);
+            const decrypted = crypto.AES.decrypt(encryptedBase64Str, key, {
+                iv: ivHex,
+                mode: crypto.mode.CBC,
+                padding: crypto.pad.Pkcs7,
+            });
+
+            const decryptedPassword = decrypted.toString(crypto.enc.Utf8);
+            console.log("Password decryption successful");
+            return decryptedPassword;
+        } catch (error) {
+            console.error("Error decrypting password:", error);
+            return '';
+        }
+    };
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -121,7 +156,7 @@ const EditUser = () => {
                 console.log("Auth token found, proceeding with API call");
 
                 const reqHeader = {
-                    "Authorization": token
+                    "Authorization": token,
                 };
 
                 // Debugging the API request
@@ -133,18 +168,28 @@ const EditUser = () => {
                 console.log("Full API Response:", result);
 
                 if (result.status === 200) {
-
                     const userData = result.data.user;
                     console.log("User data fetched successfully:", userData);
 
+                    // Store original data for comparison later
                     setOriginalData(userData);
-
-
                     console.log("Available fields in user data:", Object.keys(userData));
 
+                    // Decrypt password if available
+                    let decryptedPassword = '';
+                    if (userData.password) {
+                        try {
+                            decryptedPassword = decryptPassword(userData.password);
+                            console.log("Password decryption attempt completed");
+                        } catch (err) {
+                            console.error("Failed to decrypt password:", err);
+                        }
+                    }
+
+                    // Set form data with all user fields including decrypted password
                     setFormData({
                         username: userData.username || '',
-                        password: '',
+                        password: decryptedPassword || '',
                         name: userData.name || '',
                         email: userData.email_address || '',
                         userType: userData.user_type || '',
@@ -152,9 +197,9 @@ const EditUser = () => {
                         kalolsavamId: userData.kalolsavam_id || ''
                     });
 
-                    console.log("Form data set:", {
+                    console.log("Form data set with password:", {
                         username: userData.username || '',
-                        // password omitted for security
+                        password: decryptedPassword || '',
                         name: userData.name || '',
                         email: userData.email_address || '',
                         userType: userData.user_type || '',
@@ -186,9 +231,11 @@ const EditUser = () => {
         }
     }, [userId, navigate]);
 
-
     useEffect(() => {
-        console.log("Current form data:", formData);
+        console.log("Current form data:", {
+            ...formData,
+            password: formData.password
+        });
     }, [formData]);
 
     useEffect(() => {
@@ -207,11 +254,9 @@ const EditUser = () => {
         };
     }, []);
 
-
     useEffect(() => {
         const userType = formData.userType || 'Select User Type';
         setAvailableKalolsavams(kalolsavamsByType[userType] || kalolsavamsByType['Select User Type']);
-
 
         if (formData.kalolsavam) {
             const kalolsavamExists = kalolsavamsByType[userType]?.some(k => k.name === formData.kalolsavam);
@@ -232,6 +277,11 @@ const EditUser = () => {
         }));
     };
 
+    // Toggle password visibility
+    const togglePasswordVisibility = () => {
+        setShowPassword(prevState => !prevState);
+    };
+
     const handleSearchChange = (e, field) => {
         setSearchText(prev => ({
             ...prev,
@@ -248,7 +298,6 @@ const EditUser = () => {
                 return '';
 
             case 'password':
-
                 if (value.trim() && value.trim().length < 6) return 'Password must be at least 6 characters long';
                 return '';
 
@@ -381,24 +430,31 @@ const EditUser = () => {
 
             const reqHeader = {
                 "Authorization": token,
-            };
+                "Content-Type": "application/json"
+            }
 
             const reqBody = {
                 username: formData.username,
                 name: formData.name,
                 email: formData.email,
+                decryptPassword: formData.password,
                 user_type: formData.userType,
                 kalolsavam: formData.kalolsavam,
                 kalolsavam_id: formData.kalolsavamId
             };
 
-            if (formData.password.trim()) {
+            // Include password in request body if it has been changed
+            const originalPasswordDecrypted = originalData.password ? decryptPassword(originalData.password) : '';
+            if (formData.password && formData.password !== originalPasswordDecrypted) {
                 reqBody.password = formData.password;
+                console.log("Password has changed, including in request");
+            } else {
+                console.log("Password unchanged, not including in request");
             }
 
             console.log("Submitting form with data:", {
                 ...reqBody,
-                password: formData.password ? "[PASSWORD ENTERED]" : "[NOT CHANGED]"
+                password: reqBody.password
             });
 
             const result = await editAdminAPI(userId, reqBody, reqHeader);
@@ -510,15 +566,33 @@ const EditUser = () => {
 
                                 <div className="flex flex-col sm:flex-row sm:items-center">
                                     <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Password</label>
-                                    <div className="w-full sm:w-2/3">
+                                    <div className="w-full sm:w-2/3 relative">
                                         <input
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
                                             name="password"
-                                            placeholder="Enter new password (leave blank to keep current)"
-                                            value={formData.password}
+                                            placeholder="Enter password"
+                                            value={formData.password}  // Fixed: removed decryptPassword call
                                             onChange={handleChange}
-                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.password ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
+                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.password ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white pr-10`}
                                         />
+                                        <button
+                                            type="button"
+                                            className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600 cursor-pointer"
+                                            onClick={togglePasswordVisibility}
+                                        >
+                                            {showPassword ? (
+                                                // Eye icon when password is visible
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                </svg>
+                                            ) : (
+                                                // Eye-slash icon when password is hidden
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                                </svg>
+                                            )}
+                                        </button>
                                         {errors.password && <p className="text-red-500 text-xs mt-1 ml-2">{errors.password}</p>}
                                     </div>
                                 </div>

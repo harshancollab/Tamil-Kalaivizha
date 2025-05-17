@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import Header from '../components/Header'
 import Dash from '../components/Dash'
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { getAllResultentryListAPI } from '../services/allAPI';
+// import { getAllDistrictAPI } from '../services/allAPI';
 import html2pdf from 'html2pdf.js'; 
 
 const DistrictList = () => {
@@ -411,3 +411,5 @@ const DistrictList = () => {
 }
 
 export default DistrictList
+
+

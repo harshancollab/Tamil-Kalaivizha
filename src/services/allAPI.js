@@ -16,10 +16,11 @@ export const addAdminAPI = async (reqBody, reqHeader) => {
 }
 
 
-// get  all Users
+// // get  all Users
 export const getAllAdminuserAPI = async (reqHeader) => {
   return await commonAPI("GET", `${SERVER_URL}/api/user/get-all?page=${1}&limit=${10}`, {}, reqHeader);
 };
+
 
 
 // get  single  Users
@@ -36,6 +37,65 @@ export const editAdminAPI = async (userId, reqBody, reqHeader) => {
 export const deleteUserAPI = async (userId, reqHeader) => {
   return await commonAPI("DELETE", `${SERVER_URL}/api/user/${userId}/delete`, {}, reqHeader)
 }
+
+
+// Add district 
+export const addDistrictAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/api/district/create`, reqBody, reqHeader);
+};
+// // get  all district
+export const getAllDistrictAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/api/district/get-all?search=&page=${1}&limit=${10}`, {}, reqHeader);
+};
+
+
+// get  single  district
+export const getSingleDistrictAPI = async (userId, reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/district/${userId}/get`, {}, reqHeader);
+};
+
+// Add festvel 
+export const AddFestivalAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/api/festivel/create`, reqBody, reqHeader);
+};
+
+
+//  get  all festivel
+export const getAllFestivelAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/api/festivel/get-all?page=${1}&limit=${10}`, {}, reqHeader);
+};
+
+// get  single  festivel
+export const getSingleFestAPI = async (userId, reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/api/festivel/${userId}/get`, {}, reqHeader);
+};
+
+
+//  edit a 
+export const updateFestivalAPI = async (userId, reqBody, reqHeader) => {
+  return await commonAPI("PUT", `${SERVER_URL}api/festivel/${userId}/update`, reqBody, reqHeader);
+};
+
+
+// Delete Festivel
+
+export const deleteFestivelAPI = async (userId, reqHeader) => {
+  return await commonAPI("DELETE", `${SERVER_URL}/api/festivel/${userId}/delete`, {}, reqHeader)
+}
+
+
+
+// Add Item  
+export const AddItemAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/api/item/create`, reqBody, reqHeader);
+};
+
+
+// //  get  all item
+export const getAllitemAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/api/festivel/get-all?page=${1}&limit=${10}`, {}, reqHeader);
+};
+
 
 
 // reset

@@ -375,7 +375,7 @@ function App() {
           <Route path="/EditScl/:id" element={<EditScl />} />
 
           <Route path="/AddFestival" element={<AddFestival />} />
-          <Route path="/EditFestival/:id" element={<EditFestival />} />
+          <Route path="/EditFestival/:userId" element={<EditFestival />} />
 
           {/* sub reg */}
 

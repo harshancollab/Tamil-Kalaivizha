@@ -7,6 +7,7 @@ import Dash from '../components/Dash'
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import html2pdf from 'html2pdf.js';
 import Alert from '../components/Alert'
+import { getAllitemAPI } from '../services/allAPI';
 
 const ItemRegistrationList = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -64,7 +65,7 @@ const ItemRegistrationList = () => {
                 "Authorization": `Bearer ${token}`
             }
             try {
-                const result = await getAllItemsListAPI(reqHeader)
+                const result = await getAllitemAPI(reqHeader)
                 if (result.status === 200) {
                     setItems(result.data)
                 }

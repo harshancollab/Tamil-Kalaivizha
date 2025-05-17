@@ -2,50 +2,44 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Dash from '../components/Dash';
 import Header from '../components/Header';
-import Splashscreen from '../components/Splashscreen';
-import Alert from '../components/Alert'
-// import { AddItemAPI } from '../services/allAPI'; 
+import Alert from '../components/Alert';
+import { AddItemAPI, getAllFestivelAPI } from '../services/allAPI';
 
 const AddItem = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
-       const [loading, setLoading] = useState(true);
-        // Alert state
-        const [alert, setAlert] = useState({
-            show: false,
-            message: '',
-            type: 'success'
-        });
+    const [loading, setLoading] = useState(true);
+    // Alert state
+    const [alert, setAlert] = useState({
+        show: false,
+        message: '',
+        type: 'success'
+    });
 
     const festivalDropdownRef = useRef(null);
     const stageDropdownRef = useRef(null);
 
-    const festivalOptions = [
-        "UP Tamilkalaivizha",
-        "LP Tamilkalaivizha",
-        "Hs Tamilkalaivizha",
-        "Hss Tamilkalaivizha"
-    ];
+    const [festivalOptions, setFestivalOptions] = useState([]);
     const stageOptions = [
         "ON Stage",
         "Off Stage",
     ];
 
-
     const [formData, setFormData] = useState({
-        itemCode: '',           // Changed from festivalName for clarity
-        itemName: '',          // Changed from fromClass for clarity
-        festival: '',          
-        itemType: '',          
-        maxStudents: '',    
-        pinnany: '0',          
+        itemCode: '',
+        itemName: '',
+        festival: '',
+        itemType: '',
+        maxStudents: '',
+        pinnany: '0',
         duration: '',
-        stageType: ''         
+        stageType: '',
+        festivel_id: '' // Add festivel_id to the form data
     });
 
     const [errors, setErrors] = useState({
-        itemCode: '',           // Changed from festivalName
-        itemName: '',           // Changed from fromClass
+        itemCode: '',
+        itemName: '',
         festival: '',
         itemType: '',
         maxStudents: '',
@@ -64,8 +58,37 @@ const AddItem = () => {
     });
 
     useEffect(() => {
+        const fetchFestivals = async () => {
+            const token = sessionStorage.getItem("token");
+            if (token) {
+                const reqHeader = {
+                    "Authorization": `Bearer ${token}`
+                };
+                try {
+                    const result = await getAllFestivelAPI(reqHeader);
+                    console.log("API Response:", result); // Log the entire response
+
+                    if (result && result.status === 200 && result.data && result.data.festivel && Array.isArray(result.data.festivel)) {
+                        // Access the 'festivel' array from the 'data' object
+                        setFestivalOptions(result.data.festivel.map(f => ({ name: f.festivel_name, id: f._id }))); // Map to include ID
+                    } else {
+                        showAlert("Failed to load festivals.", 'error');
+                    }
+                } catch (error) {
+                    console.error("Error fetching festivals:", error);
+                    showAlert("Error fetching festivals.", 'error');
+                } finally {
+                    setLoading(false);
+                }
+            } else {
+                showAlert("Authentication token missing. Please log in again.", 'error');
+                setLoading(false);
+            }
+        };
+
+        fetchFestivals();
+
         const festivalParam = searchParams.get('festival');
-        
         if (festivalParam) {
             setFormData(prev => ({
                 ...prev,
@@ -78,9 +101,9 @@ const AddItem = () => {
 
     const filteredFestivals = searchText.festival
         ? festivalOptions.filter(festival =>
-            festival.toLowerCase().includes(searchText.festival.toLowerCase()))
+            festival.name.toLowerCase().includes(searchText.festival.toLowerCase()))
         : festivalOptions;
-        
+
     const filteredStages = searchText.stageType
         ? stageOptions.filter(stage =>
             stage.toLowerCase().includes(searchText.stageType.toLowerCase()))
@@ -119,32 +142,32 @@ const AddItem = () => {
 
     const validateField = (name, value) => {
         switch (name) {
-            case 'itemCode':  // Changed from festivalName
+            case 'itemCode':
                 if (!value.trim()) return 'Item code is required';
                 if (value.trim().length < 3) return 'Item code must be at least 3 characters long';
                 return '';
 
-            case 'itemName':  // Changed from fromClass
+            case 'itemName':
                 if (!value.trim()) return 'Item name is required';
                 return '';
 
             case 'festival':
                 if (!value.trim()) return 'Festival is required';
                 return '';
-                
+
             case 'itemType':
                 if (!value.trim()) return 'Item type is required';
                 return '';
-                
+
             case 'maxStudents':
                 if (!value.trim()) return 'Maximum students is required';
                 if (isNaN(value) || parseInt(value) <= 0) return 'Please enter a valid number';
                 return '';
-                
+
             case 'duration':
                 if (!value.trim()) return 'Duration is required';
                 return '';
-                
+
             case 'stageType':
                 if (!value.trim()) return 'Stage Type is required';
                 return '';
@@ -157,9 +180,9 @@ const AddItem = () => {
     const validateForm = () => {
         const newErrors = {};
         let isValid = true;
-        
+
         const fieldsToValidate = ['itemCode', 'itemName', 'festival', 'itemType', 'maxStudents', 'duration', 'stageType'];
-        
+
         fieldsToValidate.forEach(key => {
             const error = validateField(key, formData[key]);
             newErrors[key] = error;
@@ -183,23 +206,24 @@ const AddItem = () => {
         }
     };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
+    const handleFestivalSelect = (festival) => {
+        setFormData(prev => ({
+            ...prev,
+            festival: festival.name,
+            festivel_id: festival.id // Set the festivel_id
+        }));
+        setSearchParams({ festival: festival.name });
+        setDropdownOpen(prev => ({ ...prev, festival: false }));
+        setSearchText(prev => ({ ...prev, festival: '' }));
+    };
 
-        handleChange({
-            target: { name, value }
-        });
-
-        if (name === 'festival') {
-            setSearchParams({ festival: value });
-            
-            setDropdownOpen(prev => ({ ...prev, festival: false }));
-            setSearchText(prev => ({ ...prev, festival: '' }));
-        }
-        if (name === 'stageType') {
-            setDropdownOpen(prev => ({ ...prev, stageType: false }));
-            setSearchText(prev => ({ ...prev, stageType: '' }));
-        }
+    const handleStageTypeSelect = (stageType) => {
+        setFormData(prev => ({
+            ...prev,
+            stageType: stageType
+        }));
+        setDropdownOpen(prev => ({ ...prev, stageType: false }));
+        setSearchText(prev => ({ ...prev, stageType: '' }));
     };
 
     const handleCancel = () => {
@@ -210,17 +234,28 @@ const AddItem = () => {
         }
     };
 
-    
     useEffect(() => {
         const timer = setTimeout(() => {
             setLoading(false);
         }, 1000);
-
         return () => clearTimeout(timer);
     }, []);
 
     if (loading) {
-        return <Splashscreen />;
+        return (
+            <>
+                <Header />
+                <div className="flex flex-col md:flex-row min-h-screen">
+                    <Dash />
+                    <div className="flex-1 p-4 md:p-6 lg:p-8 flex items-center justify-center">
+                        <div className="text-center">
+                            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-500 border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+                            <p className="mt-2 text-gray-600">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
     }
 
     const showAlert = (message, type = 'success') => {
@@ -238,8 +273,6 @@ const AddItem = () => {
         });
     };
 
-
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setFormSubmitted(true);
@@ -255,24 +288,29 @@ const AddItem = () => {
                 const reqHeader = {
                     "Authorization": `Bearer ${token}`
                 };
-                
-                try {
-                   
-                    const dataToSubmit = {
-                        ...formData,
-                        pinnany: formData.pinnany.trim() === '' ? '0' : formData.pinnany
-                    };
-                    
-                    console.log("Submitting data:", dataToSubmit);
-                    
-                    // const result = await AddItemAPI(dataToSubmit, reqHeader);
-                    
-                    // Simulated response for development
-                    const result = { status: 200 };
-                    
-                    if (result.status === 200) {
-                        showAlert('Item added successfully!');
 
+                try {
+                    const dataToSubmit = {
+                        item_code: formData.itemCode,
+                        item_name: formData.itemName,
+                        item_type: formData.itemType,
+                        stage_type: formData.stageType,
+                        duration: formData.duration,
+                        max_no_of_students: parseInt(formData.maxStudents, 10),
+                        pinnany_limit: parseInt(formData.pinnany, 10),
+                        festivel_id: formData.festivel_id
+                    };
+
+                    console.log("Submitting data:", dataToSubmit);
+
+                    const result = await AddItemAPI(dataToSubmit, reqHeader);
+
+
+                    // Simulated success response for development
+
+
+                    if (result && result.status === 200) {
+                        showAlert('Item added successfully!');
                         setFormData({
                             itemCode: '',
                             itemName: '',
@@ -281,24 +319,24 @@ const AddItem = () => {
                             maxStudents: '',
                             pinnany: '0',
                             duration: '',
-                            stageType: ''
+                            stageType: '',
+                            festivel_id: ''
                         });
                         setFormSubmitted(false);
-
                         if (formData.festival) {
                             navigate(`/ItemRegistrationList?festival=${encodeURIComponent(formData.festival)}`);
                         } else {
                             navigate('/ItemRegistrationList');
                         }
                     } else {
-                        showAlert("Failed to add item");
+                        showAlert(`Failed to add item: ${result?.data?.message || 'Unknown error'}`, 'error');
                     }
                 } catch (err) {
                     console.error("Error adding item:", err);
-                    showAlert("Error adding item. Please try again.");
+                    showAlert("Error adding item. Please try again.", 'error');
                 }
             } else {
-                showAlert("Authentication token missing. Please log in again.");
+                showAlert("Authentication token missing. Please log in again.", 'error');
             }
         } else {
             console.log("Form has errors:", errors);
@@ -311,7 +349,7 @@ const AddItem = () => {
                 <Header />
                 <div className="flex flex-col sm:flex-row">
                     <Dash />
-                     {alert.show && (
+                    {alert.show && (
                         <Alert
                             message={alert.message}
                             type={alert.type}
@@ -364,7 +402,6 @@ const AddItem = () => {
                                             </div>
                                             {dropdownOpen.festival && (
                                                 <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
-                                                    {/* Search input */}
                                                     <div className="p-2 border-b">
                                                         <input
                                                             type="text"
@@ -380,12 +417,10 @@ const AddItem = () => {
                                                             filteredFestivals.map((festival, index) => (
                                                                 <div
                                                                     key={index}
-                                                                    className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.festival === festival ? 'bg-blue-200' : ''}`}
-                                                                    onClick={() => handleInputChange({
-                                                                        target: { name: 'festival', value: festival }
-                                                                    })}
+                                                                    className={`px-4 py-2 cursor-pointer hover:bg-blue-100 ${formData.festival === festival.name ? 'bg-blue-200' : ''}`}
+                                                                    onClick={() => handleFestivalSelect(festival)}
                                                                 >
-                                                                    {festival}
+                                                                    {festival.name}
                                                                 </div>
                                                             ))
                                                         ) : (
@@ -502,7 +537,7 @@ const AddItem = () => {
                                     </div>
                                 </div>
                             </form>
-                            <div className="flex flex-col sm:flex-row justify-center sm:justify-end mt-10 sm:mt-16 sm:mr-10 md:mr-18 lg:mr-40 space-y-4 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">
+                            <div className="flex flex-col sm:flex-row justify-center sm:justify-end mt-32 sm:mt-32 sm:mr-10 md:mr-18 lg:mr-40 space-y-4 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">
                                 <button
                                     type="button"
                                     onClick={handleCancel}

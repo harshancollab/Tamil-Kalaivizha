@@ -118,7 +118,7 @@
 
 //         // Use filtered data for PDF
 //         const filteredData = filteredResultData();
-        
+
 //         filteredData.forEach((result, index) => {
 //             const row = document.createElement('tr');
 
@@ -298,7 +298,7 @@
 //     const handleSearchChange = (e) => {
 //         const value = e.target.value;
 //         setSearchCode(value);
-        
+
 //         // Update URL parameter
 //         if (value) {
 //             setSearchParams({ code: value });
@@ -341,7 +341,7 @@
 //                             </button>
 //                         </div>
 //                     </div>
-                    
+
 //                     {/* Absentee Info Section - Only shown when results are confirmed */}
 //                     {resultsConfirmed && (
 //                         <div className="flex items-center justify-center mb-4">
@@ -369,7 +369,7 @@
 //                             </div>
 //                         </div>
 //                     )}
-                    
+
 //                     <div className="w-full">
 //                         <div ref={printRef} className="overflow-x-auto -mx-4 sm:mx-0">
 //                             <div className="inline-block min-w-full align-middle px-4 sm:px-0">
@@ -542,7 +542,7 @@ const AllResultEntry = () => {
             setSearchCode(codeParam);
             setShowItemPrompt(false); // Hide prompt when code is present
             // Find and set item name based on URL param
-            const foundItem = resultData.find(result => 
+            const foundItem = resultData.find(result =>
                 result.code.toLowerCase().includes(codeParam.toLowerCase())
             );
             setItemName(foundItem ? foundItem.itemname : '');
@@ -821,12 +821,12 @@ const AllResultEntry = () => {
         // Update UI state based on search value
         if (value) {
             setShowItemPrompt(false); // Hide prompt when there's a search term
-            
+
             // Update URL parameter
             setSearchParams({ code: value });
-            
+
             // Find and set item name
-            const foundItem = resultData.find(result => 
+            const foundItem = resultData.find(result =>
                 result.code.toLowerCase().includes(value.toLowerCase())
             );
             setItemName(foundItem ? foundItem.itemname : '');
@@ -859,7 +859,7 @@ const AllResultEntry = () => {
                                         onChange={handleSearchChange}
                                     />
                                 </div>
-                                
+
                                 {/* Item name display - only show when there's an item name */}
                                 {itemName && (
                                     <div className="absolute mt-10 text-sm text-blue-600 mt-1 ml-12 sm:ml-16">
@@ -880,7 +880,7 @@ const AllResultEntry = () => {
                             </button>
                         </div>
                     </div>
-                    
+
                     {/* Absentee Info Section - Only shown when results are confirmed */}
                     {resultsConfirmed && (
                         <div className="flex items-center justify-center mb-4 mt-5">
@@ -983,7 +983,7 @@ const AllResultEntry = () => {
                                                     )}
                                                 </tbody>
                                             </table>
-                                            
+
                                             <div className="flex justify-end gap-4">
                                                 {/* Show Confirm Results button only when not confirmed */}
                                                 {showConfirmButton && (

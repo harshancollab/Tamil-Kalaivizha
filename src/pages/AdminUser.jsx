@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import html2pdf from 'html2pdf.js';
 import Alert from '../components/Alert'
 import { deleteUserAPI, getAllAdminuserAPI } from '../services/allAPI';
+import Pagination from '../components/Pagination';
 
 const AdminUser = () => {
     const [adminUsers, setAdminUsers] = useState([]);
@@ -12,9 +13,8 @@ const AdminUser = () => {
     const printRef = useRef();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // Add missing state variables
+    // Search and filter states
     const [searchCode, setSearchCode] = useState('');
-    const [filterParam, setFilterParam] = useState('');
 
     // Alert state
     const [alert, setAlert] = useState({
@@ -44,7 +44,6 @@ const AdminUser = () => {
     const indexOfLastItem = currentPage * rowsPerPage;
     const indexOfFirstItem = indexOfLastItem - rowsPerPage;
 
-    // Data for dropdowns - full lists
     const allSubDistricts = [
         'Select',
         'Munnar',
@@ -87,15 +86,6 @@ const AdminUser = () => {
         'Kozhikode': ['vatakara'],
         'Wayanad': [],
         'Thrissur': []
-    };
-
-    const userTypeToDistrictAccess = {
-        'State Admin': allDistricts.filter(d => d !== 'Select'),
-        'District Admin': allDistricts.filter(d => d !== 'Select'),
-        'Sub-district Admin': allDistricts.filter(d => d !== 'Select'),
-        'It Admin': allDistricts.filter(d => d !== 'Select'),
-        'School Admin': allDistricts.filter(d => d !== 'Select'),
-        'All Admin': allDistricts.filter(d => d !== 'Select')
     };
 
     // Set loading initially and show splash screen
@@ -171,14 +161,6 @@ const AdminUser = () => {
                 setSelectedSubDistrict(subDistrict);
             }
         }
-
-        // Set general filter param
-        if (pParam) {
-            setFilterParam(pParam);
-        }
-
-        // Call the API with the filter params
-        getAllAdminuser();
     }, [searchParams]);
 
     // Function to update available sub-districts based on selected district
@@ -191,37 +173,24 @@ const AdminUser = () => {
         }
     };
 
-    // Function to update available districts based on selected user type
-    const updateAvailableDistricts = (userType) => {
-        if (userType && userType !== 'Select') {
-            const districts = userTypeToDistrictAccess[userType] || [];
-            setAvailableDistricts(['Select', ...districts]);
-            if (!districts.includes(selectedDistrict) && selectedDistrict !== 'Select') {
-                setSelectedDistrict('Select');
-                updateAvailableSubDistricts('Select');
-            }
-        } else {
-            setAvailableDistricts(allDistricts);
-        }
-    };
-
-    useEffect(() => {
-        getAllAdminuser()
-    }, []);
-
     const getAllAdminuser = async () => {
-
         const token = sessionStorage.getItem("token");
         if (token) {
+            setLoading(true);
             const reqHeader = {
                 "Authorization": token
             };
             try {
                 const result = await getAllAdminuserAPI(reqHeader);
                 if (result.status === 200) {
-
-                    setAdminUsers(result.data.users || result.data);
-                    setTotalCount(result.data.totalItems || (result.data.users ? result.data.users.length : result.data.length));
+                    // Check if response has a users array or is already the users array
+                    if (result.data && result.data.users) {
+                        setAdminUsers(result.data.users);
+                        setTotalCount(result.data.totalItems || result.data.users.length);
+                    } else {
+                        setAdminUsers(result.data);
+                        setTotalCount(result.data.length);
+                    }
                 }
             } catch (err) {
                 console.log(err);
@@ -234,9 +203,6 @@ const AdminUser = () => {
             showAlert("Authentication token not found", "error");
         }
     };
-
-
-    console.log(getAllAdminuser);
 
     const handleEditRedirect = (user) => {
         const params = new URLSearchParams();
@@ -268,33 +234,6 @@ const AdminUser = () => {
         navigate(`/EditUser/${userId}?${params.toString()}`);
     };
 
-
-    // const handleDeleteClick = async (userId) => {
-    //     const token = sessionStorage.getItem("token")
-    //     if (token) {
-    //         // apicall
-    //         const reqHeader = {
-    //             "Authorization": token
-    //         }
-    //         try {
-    //             await deleteUserAPI(userId,reqHeader)
-    //             getAllAdminuser()
-
-    //         } catch (err) {
-    //             console.log(err);
-
-    //         }
-    //     }
-    // }
-
-
-
-
-    // Get filtered users based on all filters
-
-
-
-    // Updated handleDeleteClick function with better error handling
     const handleDeleteClick = async (userId) => {
         if (!userId) {
             showAlert("User ID is missing", "error");
@@ -313,9 +252,7 @@ const AdminUser = () => {
         };
 
         try {
-            console.log("Attempting to delete user with ID:", userId);
             const response = await deleteUserAPI(userId, reqHeader);
-            console.log("Delete API response:", response);
 
             if (response.status === 200) {
                 showAlert("User deleted successfully", "success");
@@ -335,7 +272,6 @@ const AdminUser = () => {
 
         let filtered = [...adminUsers];
 
-        // Apply filters
         if (searchCode) {
             filtered = filtered.filter(user =>
                 (user.username && user.username.toLowerCase().includes(searchCode.toLowerCase())) ||
@@ -382,106 +318,7 @@ const AdminUser = () => {
         }
     };
 
-    const generatePDF = () => {
-        const pdfContent = document.createElement('div');
-
-        const titleElement = document.createElement('h2');
-        titleElement.textContent = "Admin User List";
-        titleElement.style.textAlign = 'center';
-        titleElement.style.margin = '20px 0';
-        titleElement.style.fontWeight = 'bold';
-        pdfContent.appendChild(titleElement);
-
-        if (selectedDistrict !== 'Select' || selectedSubDistrict !== 'Select' || selectedUserType !== 'Select') {
-            const filterInfo = document.createElement('div');
-            filterInfo.style.marginBottom = '15px';
-            filterInfo.style.fontSize = '12px';
-            filterInfo.style.textAlign = 'center';
-
-            const filterDetails = [];
-            if (selectedDistrict !== 'Select') filterDetails.push(`District: ${selectedDistrict}`);
-            if (selectedSubDistrict !== 'Select') filterDetails.push(`Sub District: ${selectedSubDistrict}`);
-            if (selectedUserType !== 'Select') filterDetails.push(`User Type: ${selectedUserType}`);
-
-            filterInfo.textContent = ` ${filterDetails.join(' | ')}`;
-            pdfContent.appendChild(filterInfo);
-        }
-
-        const table = document.createElement('table');
-        table.style.width = '100%';
-        table.style.borderCollapse = 'collapse';
-        table.style.marginBottom = '20px';
-
-        const thead = document.createElement('thead');
-        const headerRow = document.createElement('tr');
-
-        const headers = ['Sl No', 'User Name', 'User Type'];
-        headers.forEach(headerText => {
-            const th = document.createElement('th');
-            th.textContent = headerText;
-            th.style.border = '1px solid #ddd';
-            th.style.padding = '8px';
-            th.style.backgroundColor = '#f2f2f2';
-            th.style.fontWeight = 'bold';
-            headerRow.appendChild(th);
-        });
-
-        thead.appendChild(headerRow);
-        table.appendChild(thead);
-
-        const tbody = document.createElement('tbody');
-
-        const users = filteredAdminUsers();
-
-        users.forEach((user, index) => {
-            const row = document.createElement('tr');
-
-            const cellData = [
-                index + 1,
-                user.username || user.name || '-',  // Use user.name as fallback
-                user.userType || user.user_type || '-'  // Use user.user_type as fallback
-            ];
-
-            cellData.forEach(text => {
-                const td = document.createElement('td');
-                td.textContent = text;
-                td.style.border = '1px solid #ddd';
-                td.style.padding = '8px';
-                td.style.textAlign = 'center';
-                row.appendChild(td);
-            });
-
-            tbody.appendChild(row);
-        });
-
-        table.appendChild(tbody);
-        pdfContent.appendChild(table);
-
-        const footer = document.createElement('div');
-        footer.style.marginTop = '30px';
-        footer.style.fontSize = '10px';
-        footer.style.textAlign = 'right';
-        footer.style.color = '#666';
-
-        const currentDate = new Date();
-        const dateTimeStr = currentDate.toLocaleString();
-        footer.textContent = `Generated on: ${dateTimeStr}`;
-
-        pdfContent.appendChild(footer);
-
-        const fileName = 'Admin_User_List.pdf';
-
-        const options = {
-            margin: 10,
-            filename: fileName,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        html2pdf().from(pdfContent).set(options).save();
-    };
-
+ 
     const showAlert = (message, type = 'success') => {
         setAlert({
             show: true,
@@ -497,55 +334,20 @@ const AdminUser = () => {
         });
     };
 
-    const renderPageNumbers = () => {
-        const pageNumbers = [];
-        const maxVisiblePages = 5; // Adjust this number as needed
 
-        if (totalPages <= maxVisiblePages) {
-            // Show all pages if total pages is less than max visible
-            for (let i = 1; i <= totalPages; i++) {
-                pageNumbers.push(i);
-            }
-        } else {
-            // Always show first page
-            pageNumbers.push(1);
+    const generatePDF = () => {
+        const element = printRef.current;
+        const opt = {
+            margin: 10,
+            filename: 'admin_users.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+        
+        html2pdf().set(opt).from(element).save();
+    }
 
-            // Calculate start and end pages
-            let startPage = Math.max(2, currentPage - 1);
-            let endPage = Math.min(totalPages - 1, currentPage + 1);
-
-            // Adjust if we're at the beginning
-            if (currentPage <= 3) {
-                endPage = Math.min(4, totalPages - 1);
-            }
-            // Adjust if we're at the end
-            else if (currentPage >= totalPages - 2) {
-                startPage = Math.max(totalPages - 3, 2);
-            }
-
-            // Add ellipsis if needed after first page
-            if (startPage > 2) {
-                pageNumbers.push('...');
-            }
-
-            // Add middle pages
-            for (let i = startPage; i <= endPage; i++) {
-                pageNumbers.push(i);
-            }
-
-            // Add ellipsis if needed before last page
-            if (endPage < totalPages - 1) {
-                pageNumbers.push('...');
-            }
-
-            // Always show last page
-            if (totalPages > 1) {
-                pageNumbers.push(totalPages);
-            }
-        }
-
-        return pageNumbers;
-    };
     const handleAddClick = () => {
         const params = new URLSearchParams();
 
@@ -568,7 +370,7 @@ const AdminUser = () => {
     };
 
     const shouldShowDistrictSelect = () => {
-        return selectedUserType === 'District Admin' || selectedUserType === 'Sub-district Admin' || selectedUserType === 'School Admin';
+        return selectedUserType === 'District Admin' || selectedUserType === 'Sub-District Admin' || selectedUserType === 'School Admin';
     };
 
     const shouldShowSubDistrictSelect = () => {
@@ -633,7 +435,6 @@ const AdminUser = () => {
 
         setSelectedDistrict('Select');
         setSelectedSubDistrict('Select');
-        updateAvailableDistricts(value);
 
         const updatedParams = new URLSearchParams(searchParams);
 
@@ -652,7 +453,6 @@ const AdminUser = () => {
         setSearchParams(updatedParams);
     };
 
-    // Show splash screen if loading
     if (loading) {
         return (
             <>
@@ -836,53 +636,16 @@ const AdminUser = () => {
                                             )}
                                         </tbody>
                                     </table>
-                                    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-2">
-                                        <div className="text-sm text-gray-600 text-center md:text-left flex items-center justify-center md:justify-start">
-                                            Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, totalItems)} of {totalItems} entries
-                                        </div>
-                                        <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
-                                            <button
-                                                onClick={() => handlePageChange(currentPage - 1)}
-                                                disabled={currentPage === 1}
-                                                className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
-                                            >
-                                                <i className="fa-solid fa-angle-left"></i>
-                                                <span className="hidden sm:inline">Previous</span>
-                                            </button>
-
-                                            <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
-                                                {renderPageNumbers().map((page, index) => (
-                                                    <button
-                                                        key={index}
-                                                        onClick={() => typeof page === 'number' && handlePageChange(page)}
-                                                        className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded text-xs sm:text-sm ${currentPage === page
-                                                            ? 'bg-[#305A81] text-white'
-                                                            : 'bg-gray-200 hover:bg-gray-300'
-                                                            } ${page === '...' ? 'pointer-events-none' : ''}`}
-                                                        disabled={page === '...'}
-                                                    >
-                                                        {page}
-                                                    </button>
-                                                ))}
-                                            </div>
-
-                                            <button
-                                                onClick={() => handlePageChange(currentPage + 1)}
-                                                disabled={currentPage === totalPages || totalPages === 0}
-                                                className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 rounded-full disabled:opacity-50 hover:bg-gray-300 text-xs sm:text-sm flex items-center gap-1"
-                                            >
-                                                <span className="hidden sm:inline">Next</span>
-                                                <i className="fa-solid fa-angle-right"></i>
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <Pagination
+                                        currentPage={currentPage}
+                                        totalItems={totalItems}
+                                        rowsPerPage={rowsPerPage}
+                                        onPageChange={handlePageChange}
+                                    />
                                 </div>
-
                             </div>
                         </div>
                     </div>
-
-
                 </div>
             </div>
         </>
@@ -890,3 +653,106 @@ const AdminUser = () => {
 }
 
 export default AdminUser
+
+
+
+
+//    const generatePDF = () => {
+//         const pdfContent = document.createElement('div');
+
+//         const titleElement = document.createElement('h2');
+//         titleElement.textContent = "Admin User List";
+//         titleElement.style.textAlign = 'center';
+//         titleElement.style.margin = '20px 0';
+//         titleElement.style.fontWeight = 'bold';
+//         pdfContent.appendChild(titleElement);
+
+//         if (selectedDistrict !== 'Select' || selectedSubDistrict !== 'Select' || selectedUserType !== 'Select') {
+//             const filterInfo = document.createElement('div');
+//             filterInfo.style.marginBottom = '15px';
+//             filterInfo.style.fontSize = '12px';
+//             filterInfo.style.textAlign = 'center';
+
+//             const filterDetails = [];
+//             if (selectedDistrict !== 'Select') filterDetails.push(`District: ${selectedDistrict}`);
+//             if (selectedSubDistrict !== 'Select') filterDetails.push(`Sub District: ${selectedSubDistrict}`);
+//             if (selectedUserType !== 'Select') filterDetails.push(`User Type: ${selectedUserType}`);
+
+//             filterInfo.textContent = ` ${filterDetails.join(' | ')}`;
+//             pdfContent.appendChild(filterInfo);
+//         }
+
+//         const table = document.createElement('table');
+//         table.style.width = '100%';
+//         table.style.borderCollapse = 'collapse';
+//         table.style.marginBottom = '20px';
+
+//         const thead = document.createElement('thead');
+//         const headerRow = document.createElement('tr');
+
+//         const headers = ['Sl No', 'User Name', 'User Type'];
+//         headers.forEach(headerText => {
+//             const th = document.createElement('th');
+//             th.textContent = headerText;
+//             th.style.border = '1px solid #ddd';
+//             th.style.padding = '8px';
+//             th.style.backgroundColor = '#f2f2f2';
+//             th.style.fontWeight = 'bold';
+//             headerRow.appendChild(th);
+//         });
+
+//         thead.appendChild(headerRow);
+//         table.appendChild(thead);
+
+//         const tbody = document.createElement('tbody');
+
+//         const users = filteredAdminUsers();
+
+//         users.forEach((user, index) => {
+//             const row = document.createElement('tr');
+
+//             const cellData = [
+//                 index + 1,
+//                 user.username || user.name || '-',
+//                 user.userType || user.user_type || '-'
+//             ];
+
+//             cellData.forEach(text => {
+//                 const td = document.createElement('td');
+//                 td.textContent = text;
+//                 td.style.border = '1px solid #ddd';
+//                 td.style.padding = '8px';
+//                 td.style.textAlign = 'center';
+//                 row.appendChild(td);
+//             });
+
+//             tbody.appendChild(row);
+//         });
+
+//         table.appendChild(tbody);
+//         pdfContent.appendChild(table);
+
+//         const footer = document.createElement('div');
+//         footer.style.marginTop = '30px';
+//         footer.style.fontSize = '10px';
+//         footer.style.textAlign = 'right';
+//         footer.style.color = '#666';
+
+//         const currentDate = new Date();
+//         const dateTimeStr = currentDate.toLocaleString();
+//         footer.textContent = `Generated on: ${dateTimeStr}`;
+
+//         pdfContent.appendChild(footer);
+
+//         const fileName = 'Admin_User_List.pdf';
+
+//         const options = {
+//             margin: 10,
+//             filename: fileName,
+//             image: { type: 'jpeg', quality: 0.98 },
+//             html2canvas: { scale: 2, useCORS: true },
+//             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+//         };
+
+//         html2pdf().from(pdfContent).set(options).save();
+//     };

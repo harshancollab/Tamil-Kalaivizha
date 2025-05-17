@@ -285,14 +285,14 @@ const Header = ({ insideHome }) => {
                       disabled
                       type="text"
                       value={username}
-                      className="w-full sm:w-80 border-blue-900 px-4 py-2 border rounded-full"
+                      className="w-full sm:w-80 border-blue-900 bg-gray-300 px-4 py-2 border rounded-full"
                     />
                   </div>
                 </div>
               </div>
 
               {isEditingName && (
-                <div className="flex justify-end gap-2 mt-2">
+                <div className="flex justify-end gap-2 mt-2 px-4 mb-3">
                   <button
                     onClick={handleCancelEditName}
                     className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none"
