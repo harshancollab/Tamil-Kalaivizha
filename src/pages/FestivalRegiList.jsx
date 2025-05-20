@@ -738,6 +738,10 @@ const FestivalRegiList = () => {
     const [allFestivals, setAllFestivals] = useState([]); 
     const [loading, setLoading] = useState(true);
 
+    // Add state for delete confirmation
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [festivalToDelete, setFestivalToDelete] = useState(null);
+
     const navigate = useNavigate();
     const printRef = useRef();
 
@@ -813,14 +817,23 @@ const FestivalRegiList = () => {
         });
     };
 
-    const handleDeleteClick = async (id) => {
+    // Modified to show confirmation dialog instead of deleting immediately
+    const handleDeleteClick = (festival) => {
+        setFestivalToDelete(festival);
+        setShowDeleteConfirm(true);
+    };
+
+    // Actual delete function after confirmation
+    const confirmDelete = async () => {
+        if (!festivalToDelete) return;
+        
         const token = sessionStorage.getItem("token")
         if (token) {
             const reqHeader = {
                 "Authorization": token
             }
             try {
-                const result = await deleteFestivelAPI(id, reqHeader)
+                const result = await deleteFestivelAPI(festivalToDelete._id, reqHeader)
                 if (result.status === 200) {
                     showAlert("Festival deleted successfully");
                     getAllresultentry();
@@ -828,9 +841,19 @@ const FestivalRegiList = () => {
             } catch (err) {
                 console.log(err);
                 showAlert("Failed to delete festival", 'error');
+            } finally {
+                // Close the dialog and reset the festival to delete
+                setShowDeleteConfirm(false);
+                setFestivalToDelete(null);
             }
         }
-    }
+    };
+
+    // Cancel delete
+    const cancelDelete = () => {
+        setShowDeleteConfirm(false);
+        setFestivalToDelete(null);
+    };
 
     const showAlert = (message, type = 'success') => {
         setAlert({
@@ -989,8 +1012,6 @@ const FestivalRegiList = () => {
                                             <tr className="text-gray-700">
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Sl No</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">Festival Name</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">From Class</th>
-                                                <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm">To Class</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm no-print">Edit</th>
                                                 <th className="p-2 md:p-3 whitespace-nowrap text-xs sm:text-sm no-print">Delete</th>
                                             </tr>
@@ -1001,8 +1022,6 @@ const FestivalRegiList = () => {
                                                     <tr key={festival._id} className="hover:bg-gray-100">
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{indexOfFirstItem + index + 1}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">{festival.festivel_name}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{festival.from_class}</td>
-                                                        <td className="p-2 md:p-3 whitespace-nowrap">{festival.to_class}</td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">
                                                             <button
                                                                 className="text-blue-500 hover:text-blue-700 focus:outline-none"
@@ -1013,7 +1032,7 @@ const FestivalRegiList = () => {
                                                         </td>
                                                         <td className="p-2 md:p-3 whitespace-nowrap">
                                                             <button
-                                                                onClick={() => handleDeleteClick(festival._id)}
+                                                                onClick={() => handleDeleteClick(festival)}
                                                                 className="text-red-600 hover:text-red-800 focus:outline-none"
                                                             >
                                                                 <i className="fa-solid fa-trash cursor-pointer"></i>
@@ -1072,6 +1091,33 @@ const FestivalRegiList = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+                        <h3 className="text-lg font-semibold mb-4">Confirm Delete</h3>
+                        <p className="mb-6">
+                            Are you sure you want to delete festival "{festivalToDelete?.festivel_name}"? 
+                            This action cannot be undone.
+                        </p>
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={cancelDelete}
+                                className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 text-gray-800"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmDelete}
+                                className="px-4 py-2 bg-red-600 rounded-md hover:bg-red-700 text-white"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     )
 }

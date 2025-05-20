@@ -29,7 +29,7 @@ export const getsingleAPI = async (userId, reqHeader) => {
 };
 //  edit a user
 export const editAdminAPI = async (userId, reqBody, reqHeader) => {
-  return await commonAPI("PUT", `${SERVER_URL}api/user/${userId}/update`, reqBody, reqHeader);
+  return await commonAPI("PUT", `${SERVER_URL}/api/user/${userId}/update`, reqBody, reqHeader);
 };
 
 // Delete user
@@ -43,7 +43,7 @@ export const deleteUserAPI = async (userId, reqHeader) => {
 export const addDistrictAPI = async (reqBody, reqHeader) => {
   return await commonAPI("POST", `${SERVER_URL}/api/district/create`, reqBody, reqHeader);
 };
-// // get  all district
+// get  all district
 export const getAllDistrictAPI = async (reqHeader) => {
   return await commonAPI("GET", `${SERVER_URL}/api/district/get-all?search=&page=${1}&limit=${10}`, {}, reqHeader);
 };
@@ -53,6 +53,25 @@ export const getAllDistrictAPI = async (reqHeader) => {
 export const getSingleDistrictAPI = async (userId, reqHeader) => {
   return await commonAPI("GET", `${SERVER_URL}/district/${userId}/get`, {}, reqHeader);
 };
+
+
+
+// Add subdistrict 
+export const AddSubDistrictAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/api/sub-district/create`, reqBody, reqHeader);
+};
+
+// get  all subdistrict
+export const getAllSubDistrictAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/api/sub-district/get-all?search=&page=${1}&limit=${10}`, {}, reqHeader);
+};
+
+// get  single  district
+export const getSingleSubDistrictAPI = async (userId, reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/api/sub-district/${userId}/get`, {}, reqHeader);
+};
+
+
 
 // Add festvel 
 export const AddFestivalAPI = async (reqBody, reqHeader) => {
@@ -73,7 +92,7 @@ export const getSingleFestAPI = async (userId, reqHeader) => {
 
 //  edit a 
 export const updateFestivalAPI = async (userId, reqBody, reqHeader) => {
-  return await commonAPI("PUT", `${SERVER_URL}api/festivel/${userId}/update`, reqBody, reqHeader);
+  return await commonAPI("PUT", `${SERVER_URL}/api/festivel/${userId}/update`, reqBody, reqHeader);
 };
 
 
@@ -94,6 +113,25 @@ export const AddItemAPI = async (reqBody, reqHeader) => {
 // //  get  all item
 export const getAllitemAPI = async (reqHeader) => {
   return await commonAPI("GET", `${SERVER_URL}/api/festivel/get-all?page=${1}&limit=${10}`, {}, reqHeader);
+};
+
+
+
+// Add School  
+export const AddSchoolListAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/api/school/create`, reqBody, reqHeader);
+};
+
+
+// //  get  all schooll
+export const getAllSchoolAPI = async (reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/api/school/get-all?page=${1}&limit=${10}&district=&sub_district=`, {}, reqHeader);
+};
+
+
+// Add AddKalolsavamAPI  
+export const AddKalolsavamAPI = async (reqBody, reqHeader) => {
+  return await commonAPI("POST", `${SERVER_URL}/api/kalotsavam/create`, reqBody, reqHeader);
 };
 
 

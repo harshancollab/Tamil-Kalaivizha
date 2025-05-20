@@ -1,21 +1,26 @@
+
 // IT admin school Req List - add school 
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Dash from '../components/Dash';
 import Header from '../components/Header';
-import Alert from '../components/Alert'
-
-// import { AddKalolsavamAPI } from '../services/allAPI';
+import Alert from '../components/Alert';
+import { getAllDistrictAPI, getAllSubDistrictAPI, AddSchoolListAPI } from '../services/allAPI';
 
 const AddScl = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const districtParam = searchParams.get('district');
     const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false); // Add submitting state
     const subDistrictParam = searchParams.get('subDistrict');
     const navigate = useNavigate();
-    const location = useLocation();
     const [searchTerm, setSearchTerm] = useState('');
-    const [availableSubDistricts, setAvailableSubDistricts] = useState([]);
+
+    // District and SubDistrict data fetched from API
+    const [allDistricts, setAllDistricts] = useState([]);
+    const [allSubDistricts, setAllSubDistricts] = useState([]);
+    const [districtMap, setDistrictMap] = useState({});
+
     // Alert state
     const [alert, setAlert] = useState({
         show: false,
@@ -48,12 +53,81 @@ const AddScl = () => {
         subDistrict: ''
     });
 
-    useEffect(() => {
-        if (formData.district && formData.district !== 'Select') {
-            setAvailableSubDistricts(districtToSubDistrict[formData.district] || []);
-        }
-    }, [formData.district]);
+    const [formSubmitted, setFormSubmitted] = useState(false);
 
+    const schoolTypes = [
+        'Government',
+        'Aided',
+        'Unaided'
+    ];
+
+    const educationDistricts = [
+        'Idukki',
+        'Ernakulam',
+        'Palakkad',
+        'Kozhikode',
+        'Wayanad',
+        'Thrissur',
+        'Thiruvananthapuram',
+    ];
+
+    // Fetch all districts from API
+    const fetchAllDistricts = async () => {
+        const token = sessionStorage.getItem("token");
+        if (token) {
+            const reqHeader = {
+                "Authorization": token
+            }
+            try {
+                const result = await getAllDistrictAPI(reqHeader);
+                if (result.status === 200) {
+                    setAllDistricts(result.data.district);
+                }
+            } catch (err) {
+                console.log("Error fetching districts:", err);
+                showAlert("Error fetching districts. Please refresh the page.", 'error');
+            }
+        }
+    };
+
+    // Fetch all sub-districts from API
+    const fetchAllSubDistricts = async () => {
+        const token = sessionStorage.getItem("token");
+        if (token) {
+            const reqHeader = {
+                "Authorization": token
+            }
+            try {
+                const result = await getAllSubDistrictAPI(reqHeader);
+                if (result.status === 200) {
+                    setAllSubDistricts(result.data.subDistrict);
+
+                    // Create district to sub-district mapping based on API response
+                    const mapping = {};
+                    result.data.subDistrict.forEach(subDistrict => {
+                        if (subDistrict.district_details && subDistrict.district_details._id) {
+                            const districtId = subDistrict.district_details._id;
+                            if (!mapping[districtId]) {
+                                mapping[districtId] = [];
+                            }
+                            mapping[districtId].push(subDistrict);
+                        }
+                    });
+                    setDistrictMap(mapping);
+                }
+            } catch (err) {
+                console.log("Error fetching sub-districts:", err);
+                showAlert("Error fetching sub-districts. Please refresh the page.", 'error');
+            }
+        }
+    };
+
+    useEffect(() => {
+        fetchAllDistricts();
+        fetchAllSubDistricts();
+    }, []);
+
+    // Update URL params when district or subDistrict changes
     useEffect(() => {
         const params = new URLSearchParams(searchParams);
 
@@ -72,77 +146,12 @@ const AddScl = () => {
         setSearchParams(params);
     }, [formData.district, formData.subDistrict, setSearchParams]);
 
-
-  
-    const [formSubmitted, setFormSubmitted] = useState(false);
-
-    const schoolTypes = [
-        'Government',
-        'Aided',
-        'Unaided'
-    ];
-
-    const allDistricts = [
-        'Idukki',
-        'Ernakulam',
-        'Palakkad',
-        'Kozhikode',
-        'Wayanad',
-        'Thrissur',
-        'Thiruvananthapuram',
-        'Kollam',
-        'Pathanamthitta',
-        'Alappuzha',
-        'Kottayam',
-        'Malappuram',
-        'Kannur',
-        'Kasaragod'
-    ];
-
-    const educationDistricts = [
-        'Idukki',
-        'Ernakulam',
-        'Palakkad',
-        'Kozhikode',
-        'Wayanad',
-        'Thrissur',
-        'Thiruvananthapuram',
-        'Kollam',
-        'Pathanamthitta',
-        'Alappuzha',
-        'Kottayam',
-        'Malappuram',
-        'Kannur',
-        'Kasaragod',
-        'Thiruvallla',
-        'Muvattupuzha',
-        'Kottarakkara',
-        'Ottapalam',
-        'Thamarassery',
-        'Irinjalakuda'
-    ];
-
-    const districtToSubDistrict = {
-        'Idukki': ['Munnar', 'Adimali', 'Kattappana', 'Nedumkandam', 'Devikulam', 'Thodupuzha', 'Idukki'],
-        'Palakkad': ['Chittur', 'Pattambi', 'Kuzhalmannam', 'Nemmara', 'Mannarkkad', 'Ottapalam', 'Palakkad', 'Alathur'],
-        'Ernakulam': ['Kochi', 'Aluva', 'Muvattupuzha', 'Kothamangalam', 'North Paravur', 'Angamaly', 'Perumbavoor'],
-        'Kozhikode': ['Vatakara', 'Kozhikode', 'Balussery', 'Koyilandy', 'Thamarassery', 'Koduvally', 'Feroke'],
-        'Wayanad': ['Kalpetta', 'Mananthavady', 'Sulthan Bathery', 'Vythiri'],
-        'Thrissur': ['Thrissur', 'Kodungallur', 'Chalakudy', 'Irinjalakuda', 'Chavakkad', 'Kunnamkulam', 'Guruvayur'],
-        'Thiruvananthapuram': ['Thiruvananthapuram', 'Attingal', 'Nedumangad', 'Neyyattinkara', 'Varkala'],
-        'Kollam': ['Kollam', 'Karunagappally', 'Kottarakkara', 'Punalur', 'Sasthamcotta'],
-        'Pathanamthitta': ['Pathanamthitta', 'Adoor', 'Konni', 'Ranni', 'Thiruvalla'],
-        'Alappuzha': ['Alappuzha', 'Cherthala', 'Chengannur', 'Kayamkulam', 'Mavelikara'],
-        'Kottayam': ['Kottayam', 'Changanassery', 'Pala', 'Vaikom', 'Ettumanoor'],
-        'Malappuram': ['Malappuram', 'Manjeri', 'Tirur', 'Ponnani', 'Perinthalmanna', 'Nilambur'],
-        'Kannur': ['Kannur', 'Thalassery', 'Payyanur', 'Iritty', 'Thaliparamba'],
-        'Kasaragod': ['Kasaragod', 'Kanhangad', 'Manjeshwar', 'Nileshwaram']
-    };
-
     const validateField = (name, value) => {
         switch (name) {
             case 'schoolCode':
-                return value.trim() ? '' : 'School code is required';
+                if (!value.trim()) return 'School code is required';
+                if (!/^\d+$/.test(value.trim())) return 'School code must be a number';
+                return '';
             case 'schoolName':
                 return value.trim() ? '' : 'School name is required';
             case 'schoolType':
@@ -172,15 +181,13 @@ const AddScl = () => {
         return isValid;
     };
 
-   
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
 
         if (name === 'district') {
             setFormData(prev => ({ ...prev, subDistrict: '' }));
-            setErrors(prev => ({ ...prev, subDistrict: '' })); // Reset sub-district error
+            setErrors(prev => ({ ...prev, subDistrict: '' }));
         }
 
         if (formSubmitted) {
@@ -269,15 +276,15 @@ const AddScl = () => {
         };
     }, []);
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1000);
 
-      useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+        return () => clearTimeout(timer);
+    }, []);
 
-    return () => clearTimeout(timer);
-  }, []);
- if (loading) {
+    if (loading) {
         return (
             <>
                 <Header />
@@ -312,54 +319,118 @@ const AddScl = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setFormSubmitted(true);
+        setSubmitting(true);
 
-        const isValid = validateForm();
+        try {
+            const isValid = validateForm();
 
-        if (isValid) {
-            console.log("Form submitted:", formData);
+            if (!isValid) {
+                setSubmitting(false);
+                showAlert('Please fill all required fields correctly.', 'error');
+                return;
+            }
 
             const token = sessionStorage.getItem("token");
 
-            if (token) {
-                const reqHeader = {
-                    "Authorization": `Bearer ${token}`
-                };
-
-                try {
-
-                    // const result = await AddSchoolAPI(formData, reqHeader);
-
-
-                    const result = { status: 200 };
-
-                    if (result.status === 200) {
-                        showAlert('School added successfully!');
-
-
-                        setFormData({
-                            schoolCode: '',
-                            schoolName: '',
-                            schoolType: '',
-                            district: '',
-                            educationDistrict: '',
-                            subDistrict: ''
-                        });
-
-
-                        navigate('/SchoolRegList');
-                    } else {
-                        showAlert(result.response.data);
-                    }
-                } catch (err) {
-                    console.error("Error adding school:", err);
-                    showAlert("Error adding school. Please try again.");
-                }
-            } else {
-                showAlert("Authentication token missing. Please log in again.");
+            if (!token) {
+                setSubmitting(false);
+                showAlert("Authentication token missing. Please log in again.", 'error');
+                return;
             }
-        } else {
-            console.log("Form has errors:", errors);
+
+            const reqHeader = {
+                "Authorization": token
+            };
+
+            const selectedDistrict = allDistricts.find(d => d.district_name === formData.district);
+            const selectedSubDistrict = allSubDistricts.find(s => s.sub_district_name === formData.subDistrict);
+
+            if (!selectedDistrict) {
+                setSubmitting(false);
+                showAlert("Selected district not found. Please refresh and try again.", 'error');
+                return;
+            }
+
+            if (!selectedSubDistrict) {
+                setSubmitting(false);
+                showAlert("Selected sub-district not found. Please refresh and try again.", 'error');
+                return;
+            }
+
+            const requestBody = {
+                school_details: {
+                    school_name: formData.schoolName,
+                    school_code: parseInt(formData.schoolCode),
+                    school_type: formData.schoolType,
+                    district_id: selectedDistrict._id,
+                    sub_district_id: selectedSubDistrict._id,
+                    education_district: formData.educationDistrict.toLowerCase()
+                }
+            };
+
+            const result = await AddSchoolListAPI(requestBody, reqHeader);
+
+            if (result.status === 200 || result.status === 201) {
+                showAlert('School added successfully!');
+
+                // Reset form
+                setFormData({
+                    schoolCode: '',
+                    schoolName: '',
+                    schoolType: '',
+                    district: '',
+                    educationDistrict: '',
+                    subDistrict: ''
+                });
+
+                setFormSubmitted(false);
+                setErrors({
+                    schoolCode: '',
+                    schoolName: '',
+                    schoolType: '',
+                    district: '',
+                    educationDistrict: '',
+                    subDistrict: ''
+                });
+
+                // Navigate after a short delay to let user see the success message
+                setTimeout(() => {
+                    navigate('/SchoolRegList');
+                }, 1500);
+            } else {
+                const errorMessage = result.response?.data?.message || result.response?.data || 'Error adding school';
+                showAlert(errorMessage, 'error');
+            }
+        } catch (err) {
+            console.error("Error adding school:", err);
+            let errorMessage = "Error adding school. Please try again.";
+
+            if (err.response) {
+                errorMessage = err.response.data?.message || err.response.data || errorMessage;
+            } else if (err.message) {
+                errorMessage = err.message;
+            }
+
+            showAlert(errorMessage, 'error');
+        } finally {
+            setSubmitting(false);
         }
+    };
+
+    // Get the district names from API response
+    const getDistrictNames = () => {
+        return allDistricts.map(district => district.district_name);
+    };
+
+    // Get sub-district names based on selected district
+    const getSubDistrictNames = () => {
+        if (formData.district) {
+            const district = allDistricts.find(d => d.district_name === formData.district);
+            if (district && district._id && districtMap[district._id]) {
+                return districtMap[district._id].map(subDist => subDist.sub_district_name);
+            }
+        }
+        return [];
     };
 
     return (
@@ -381,7 +452,7 @@ const AddScl = () => {
                             <h2 className="text-lg font-bold mb-5 sm:mb-10 text-gray-800">Add School</h2>
 
                             <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 max-w-2xl mx-auto">
-                                {/* Form fields - with validation */}
+                                {/* School Code */}
                                 <div className="flex flex-col sm:flex-row sm:items-center">
                                     <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">School code </label>
                                     <div className="w-full sm:w-2/3">
@@ -391,12 +462,14 @@ const AddScl = () => {
                                             placeholder="Enter School Code"
                                             value={formData.schoolCode}
                                             onChange={handleChange}
-                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.schoolCode ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
+                                            disabled={submitting}
+                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.schoolCode ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         />
                                         {errors.schoolCode && <p className="text-red-500 text-xs mt-1 ml-2">{errors.schoolCode}</p>}
                                     </div>
                                 </div>
 
+                                {/* School Name */}
                                 <div className="flex flex-col sm:flex-row sm:items-center">
                                     <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">School Name</label>
                                     <div className="w-full sm:w-2/3">
@@ -406,18 +479,20 @@ const AddScl = () => {
                                             placeholder="Enter School Name"
                                             value={formData.schoolName}
                                             onChange={handleChange}
-                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.schoolName ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
+                                            disabled={submitting}
+                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.schoolName ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         />
                                         {errors.schoolName && <p className="text-red-500 text-xs mt-1 ml-2">{errors.schoolName}</p>}
                                     </div>
                                 </div>
 
+                                {/* School Type */}
                                 <div className="flex flex-col sm:flex-row sm:items-center">
                                     <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">School Type</label>
                                     <div className="w-full sm:w-2/3 relative" data-dropdown="schoolType">
                                         <div
-                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.schoolType ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-blue-900 flex justify-between items-center cursor-pointer`}
-                                            onClick={() => toggleDropdown('schoolType')}
+                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.schoolType ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-blue-900 flex justify-between items-center cursor-pointer ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            onClick={() => !submitting && toggleDropdown('schoolType')}
                                         >
                                             <span className={formData.schoolType ? "text-blue-900" : "text-gray-400"}>
                                                 {formData.schoolType || "Select Type"}
@@ -428,20 +503,9 @@ const AddScl = () => {
                                         </div>
                                         {errors.schoolType && <p className="text-red-500 text-xs mt-1 ml-2">{errors.schoolType}</p>}
 
-                                        {dropdownOpen.schoolType && (
+                                        {dropdownOpen.schoolType && !submitting && (
                                             <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
-                                                {schoolTypes.length > 7 && (
-                                                    <div className="sticky top-0 bg-white p-2 border-b">
-                                                        <input
-                                                            type="text"
-                                                            className="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                                            placeholder="Search..."
-                                                            value={searchTerm}
-                                                            onChange={(e) => setSearchTerm(e.target.value)}
-                                                        />
-                                                    </div>
-                                                )}
-                                                {filterOptions(schoolTypes).map((type, index) => (
+                                                {schoolTypes.map((type, index) => (
                                                     <div
                                                         key={index}
                                                         className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
@@ -455,12 +519,13 @@ const AddScl = () => {
                                     </div>
                                 </div>
 
+                                {/* District */}
                                 <div className="flex flex-col sm:flex-row sm:items-center">
                                     <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">District </label>
                                     <div className="w-full sm:w-2/3 relative" data-dropdown="district">
                                         <div
-                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.district ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-blue-900 flex justify-between items-center cursor-pointer`}
-                                            onClick={() => toggleDropdown('district')}
+                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.district ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-blue-900 flex justify-between items-center cursor-pointer ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            onClick={() => !submitting && toggleDropdown('district')}
                                         >
                                             <span className={formData.district ? "text-blue-900" : "text-gray-400"}>
                                                 {formData.district || "Select District"}
@@ -471,9 +536,9 @@ const AddScl = () => {
                                         </div>
                                         {errors.district && <p className="text-red-500 text-xs mt-1 ml-2">{errors.district}</p>}
 
-                                        {dropdownOpen.district && (
+                                        {dropdownOpen.district && !submitting && (
                                             <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
-                                                {allDistricts.length > 7 && (
+                                                {getDistrictNames().length > 7 && (
                                                     <div className="sticky top-0 bg-white p-2 border-b">
                                                         <input
                                                             type="text"
@@ -484,7 +549,7 @@ const AddScl = () => {
                                                         />
                                                     </div>
                                                 )}
-                                                {filterOptions(allDistricts).map((district, index) => (
+                                                {filterOptions(getDistrictNames()).map((district, index) => (
                                                     <div
                                                         key={index}
                                                         className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
@@ -498,13 +563,13 @@ const AddScl = () => {
                                     </div>
                                 </div>
 
-                                {/* Education District - Changed to dropdown */}
+                                {/* Education District */}
                                 <div className="flex flex-col sm:flex-row sm:items-center">
                                     <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Education District </label>
                                     <div className="w-full sm:w-2/3 relative" data-dropdown="educationDistrict">
                                         <div
-                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.educationDistrict ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-blue-900 flex justify-between items-center cursor-pointer`}
-                                            onClick={() => toggleDropdown('educationDistrict')}
+                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.educationDistrict ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-blue-900 flex justify-between items-center cursor-pointer ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            onClick={() => !submitting && toggleDropdown('educationDistrict')}
                                         >
                                             <span className={formData.educationDistrict ? "text-blue-900" : "text-gray-400"}>
                                                 {formData.educationDistrict || "Select Education District"}
@@ -515,7 +580,7 @@ const AddScl = () => {
                                         </div>
                                         {errors.educationDistrict && <p className="text-red-500 text-xs mt-1 ml-2">{errors.educationDistrict}</p>}
 
-                                        {dropdownOpen.educationDistrict && (
+                                        {dropdownOpen.educationDistrict && !submitting && (
                                             <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
                                                 {educationDistricts.length > 7 && (
                                                     <div className="sticky top-0 bg-white p-2 border-b">
@@ -542,12 +607,13 @@ const AddScl = () => {
                                     </div>
                                 </div>
 
+                                {/* Sub District */}
                                 <div className="flex flex-col sm:flex-row sm:items-center">
                                     <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Sub District </label>
                                     <div className="w-full sm:w-2/3 relative" data-dropdown="subDistrict">
                                         <div
-                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.subDistrict ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-blue-900 flex justify-between items-center cursor-pointer ${!formData.district ? 'opacity-75' : ''}`}
-                                            onClick={() => formData.district ? toggleDropdown('subDistrict') : null}
+                                            className={`w-full px-3 sm:px-4 py-2 border ${errors.subDistrict ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-blue-900 flex justify-between items-center cursor-pointer ${(!formData.district || submitting) ? 'opacity-75 cursor-not-allowed' : ''}`}
+                                            onClick={() => (formData.district && !submitting) ? toggleDropdown('subDistrict') : null}
                                         >
                                             <span className={formData.subDistrict ? "text-blue-900" : "text-gray-400"}>
                                                 {formData.subDistrict || (formData.district ? "Select Sub District" : "Please select a district first")}
@@ -558,9 +624,9 @@ const AddScl = () => {
                                         </div>
                                         {errors.subDistrict && <p className="text-red-500 text-xs mt-1 ml-2">{errors.subDistrict}</p>}
 
-                                        {dropdownOpen.subDistrict && formData.district && (
+                                        {dropdownOpen.subDistrict && formData.district && !submitting && (
                                             <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
-                                                {districtToSubDistrict[formData.district] && districtToSubDistrict[formData.district].length > 7 && (
+                                                {getSubDistrictNames().length > 7 && (
                                                     <div className="sticky top-0 bg-white p-2 border-b">
                                                         <input
                                                             type="text"
@@ -571,17 +637,15 @@ const AddScl = () => {
                                                         />
                                                     </div>
                                                 )}
-                                                {formData.district && districtToSubDistrict[formData.district] &&
-                                                    filterOptions(districtToSubDistrict[formData.district]).map((subDistrict, index) => (
-                                                        <div
-                                                            key={index}
-                                                            className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
-                                                            onClick={() => handleSelectOption('subDistrict', subDistrict)}
-                                                        >
-                                                            {subDistrict}
-                                                        </div>
-                                                    ))
-                                                }
+                                                {filterOptions(getSubDistrictNames()).map((subDistrict, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
+                                                        onClick={() => handleSelectOption('subDistrict', subDistrict)}
+                                                    >
+                                                        {subDistrict}
+                                                    </div>
+                                                ))}
                                             </div>
                                         )}
                                     </div>
@@ -593,7 +657,8 @@ const AddScl = () => {
                                 <button
                                     type="button"
                                     onClick={handleCancel}
-                                    className="bg-white border border-blue-500 text-blue-500 font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:bg-blue-50 transition-colors duration-300"
+                                    disabled={submitting}
+                                    className={`bg-white border border-blue-500 text-blue-500 font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:bg-blue-50 transition-colors duration-300 ${submitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                     Cancel
                                 </button>

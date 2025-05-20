@@ -3,82 +3,69 @@
 // import { useNavigate, useParams } from 'react-router-dom';
 // import Dash from '../components/Dash';
 // import Header from '../components/Header';
-// // import { getSingleFestAPI, updateFestivalAPI } from '../services/allAPI';
+// import { getSingleFestAPI, updateFestivalAPI } from '../services/allAPI';
+// import Alert from '../components/Alert';
 
 // const EditFestival = () => {
 //     const navigate = useNavigate();
 //     const { id } = useParams();
 
 //     const [formData, setFormData] = useState({
-//         festivalName: '',
-//         fromClass: '',
-//         toClass: ''
+//         festivel_name: '',
+//         from_class: '',
+//         to_class: ''
 //     });
 
 //     const [errors, setErrors] = useState({
-//         festivalName: '',
-//         fromClass: '',
-//         toClass: ''
+//         festivel_name: '',
+//         from_class: '',
+//         to_class: ''
+//     });
+
+//     const [alert, setAlert] = useState({
+//         show: false,
+//         message: '',
+//         type: 'success'
 //     });
 
 //     const [formSubmitted, setFormSubmitted] = useState(false);
 //     const [isLoading, setIsLoading] = useState(true);
 
-//     const mockFestivalData = {
-//         "1": { festivalName: "UP Tamil ", fromClass: "1", toClass: "12" },
-//         "2": { festivalName: "Sports Day", fromClass: "3", toClass: "10" },
-//         "3": { festivalName: "Science Exhibition", fromClass: "5", toClass: "12" },
-//         "4": { festivalName: "Cultural Fest", fromClass: "1", toClass: "8" }
-//     };
-
 //     useEffect(() => {
 //         const fetchFestivalData = async () => {
 //             if (!id) {
-//                 alert("Festival ID not found");
+//                 showAlert("Festival ID not found", "error");
 //                 navigate('/FestivalRegiList');
 //                 return;
 //             }
 
 //             const token = sessionStorage.getItem("token");
 //             if (!token) {
-
-
-//                 // alert("Authentication token not found. Please login again.");
-//                 // navigate('/login');
-//                 // return;
-
-//                 setTimeout(() => {
-//                     if (mockFestivalData[id]) {
-//                         setFormData(mockFestivalData[id]);
-//                         setIsLoading(false);
-//                     } else {
-//                         alert("Festival not found");
-//                         navigate('/FestivalRegiList');
-//                     }
-//                 }, 800);
+//                 showAlert("Authentication token not found. Please log in again.", "error");
+//                 navigate('/login');
 //                 return;
 //             }
 
 //             try {
 //                 const reqHeader = {
-//                     "Authorization": `Bearer ${token}`
+//                     "Authorization": token
 //                 };
-
-
-//                 const result = await getFestivalByIdAPI(id, reqHeader);
-//                 if (result.status === 200) {
-//                     setFormData(result.data);
+//                 const result = await getSingleFestAPI(id, reqHeader);
+                
+//                 if (result.status === 200 && result.data.festivel) {
+//                     setFormData({
+//                         festivel_name: result.data.festivel.festivel_name || '',
+//                         from_class: result.data.festivel.from_class !== undefined ? String(result.data.festivel.from_class) : '',
+//                         to_class: result.data.festivel.to_class !== undefined ? String(result.data.festivel.to_class) : ''
+//                     });
 //                 } else {
-//                     throw new Error("Failed to fetch festival data");
+//                     showAlert("Festival not found", "error");
+//                     navigate('/FestivalRegiList');
 //                 }
 //             } catch (err) {
 //                 console.error("Error fetching festival:", err);
-//                 alert("Error loading festival data. Please try again.");
-
-
-//                 if (mockFestivalData[id]) {
-//                     setFormData(mockFestivalData[id]);
-//                 }
+//                 showAlert("Error loading festival data. Please try again.", "error");
+//                 navigate('/FestivalRegiList');
 //             } finally {
 //                 setIsLoading(false);
 //             }
@@ -89,21 +76,21 @@
 
 //     const validateField = (name, value, allValues = formData) => {
 //         switch (name) {
-//             case 'festivalName':
+//             case 'festivel_name':
 //                 if (!value.trim()) return 'Festival name is required';
 //                 if (value.trim().length < 3) return 'Festival name must be at least 3 characters long';
 //                 return '';
 
-//             case 'fromClass':
+//             case 'from_class':
 //                 if (!value.trim()) return 'From class is required';
 //                 if (isNaN(value)) return 'Class must be a number';
 //                 return '';
 
-//             case 'toClass':
+//             case 'to_class':
 //                 if (!value.trim()) return 'To class is required';
 //                 if (isNaN(value)) return 'Class must be a number';
 
-//                 const fromClassNum = parseInt(allValues.fromClass);
+//                 const fromClassNum = parseInt(allValues.from_class);
 //                 const toClassNum = parseInt(value);
 
 //                 if (!isNaN(fromClassNum) && !isNaN(toClassNum) && toClassNum <= fromClassNum) {
@@ -114,6 +101,36 @@
 //             default:
 //                 return '';
 //         }
+//     };
+
+//     const showAlert = (message, type = 'success') => {
+//         // First hide any existing alert to prevent stacking
+//         setAlert({
+//             show: false,
+//             message: '',
+//             type: 'success'
+//         });
+
+//         // Use timeout to ensure state updates properly before showing new alert
+//         setTimeout(() => {
+//             setAlert({
+//                 show: true,
+//                 message,
+//                 type
+//             });
+
+//             // Auto hide after 3 seconds
+//             setTimeout(() => {
+//                 hideAlert();
+//             }, 3000);
+//         }, 100);
+//     };
+
+//     const hideAlert = () => {
+//         setAlert(prev => ({
+//             ...prev,
+//             show: false
+//         }));
 //     };
 
 //     const validateForm = () => {
@@ -142,10 +159,10 @@
 //                 [name]: validateField(name, value, updatedFormData)
 //             }));
 
-//             if (name === 'fromClass' && updatedFormData.toClass) {
+//             if (name === 'from_class' && updatedFormData.to_class) {
 //                 setErrors(prev => ({
 //                     ...prev,
-//                     toClass: validateField('toClass', updatedFormData.toClass, updatedFormData)
+//                     to_class: validateField('to_class', updatedFormData.to_class, updatedFormData)
 //                 }));
 //             }
 //         }
@@ -155,56 +172,49 @@
 //         navigate('/FestivalRegiList');
 //     };
 
-//     const handleSubmit = async (e) => {
-//         e.preventDefault();
+//     const handleSubmit = async () => {
 //         setFormSubmitted(true);
-
-//         const isValid = validateForm();
-
-//         if (!isValid) {
-//             console.log("Form has errors:", errors);
+        
+//         // Validate the form before submission
+//         if (!validateForm()) {
+//             showAlert("Please fix the errors in the form", "error");
 //             return;
 //         }
+        
+//         const { festivel_name, from_class, to_class } = formData;
 
-//         const { festivalName, fromClass, toClass } = formData;
-
-//         if (festivalName && fromClass && toClass) {
+//         if (festivel_name && from_class && to_class) {
+//             const reqBody = new FormData();
+//             reqBody.append("festivel_name", festivel_name);
+//             reqBody.append("from_class", from_class);
+//             reqBody.append("to_class", to_class);
+            
 //             const token = sessionStorage.getItem("token");
-//             if (!token) {
-//                 // For development without authentication
-//                 console.log("Form submitted for update:", formData);
-//                 setTimeout(() => {
-//                     mockFestivalData[id] = formData;
-//                     alert('Festival updated successfully!');
-//                     navigate('/FestivalList');
-//                 }, 1000);
-//                 return;
-//             }
-
-//             try {
-
-//                 const reqBody = new FormData();
-//                 reqBody.append("festivalName", festivalName);
-//                 reqBody.append("fromClass", fromClass);
-//                 reqBody.append("toClass", toClass);
-
+//             if (token) {
 //                 const reqHeader = {
-//                     "Authorization": `Bearer ${token}`
+//                     "Authorization": token
 //                 };
-
-//                 const result = await updateFestivalAPI(id, reqBody, reqHeader);
-//                 if (result.status === 200) {
-//                     alert('Festival updated successfully!');
-//                     navigate('/FestivalList');
-//                 } else {
-//                     throw new Error("Failed to update festival");
+                
+//                 try {
+//                     const result = await updateFestivalAPI(id, reqBody, reqHeader);
+//                     if (result.status === 200) {
+//                         showAlert('Festival updated successfully!', 'success');
+//                         setTimeout(() => {
+//                             navigate('/FestivalRegiList');
+//                         }, 2000);
+//                     } else {
+//                         showAlert(`Update failed: ${result.data?.message || 'Unknown error'}`, 'error');
+//                     }
+//                 } catch (err) {
+//                     console.error("Error updating festival:", err);
+//                     showAlert(`Error: ${err.response?.data?.message || 'Failed to update festival'}`, 'error');
 //                 }
-//             } catch (err) {
-//                 console.error("Error updating festival:", err);
-//                 alert("Error updating festival. Please try again.");
+//             } else {
+//                 showAlert("Authentication token not found. Please log in again.", "error");
+//                 navigate('/login');
 //             }
 //         } else {
-//             alert("Please fill the form completely!");
+//             showAlert("Please fill the form completely!", "error");
 //         }
 //     };
 
@@ -231,22 +241,29 @@
 //                 <div className="flex flex-col sm:flex-row">
 //                     <Dash />
 //                     <div className="flex-1 p-2 sm:p-4 bg-gray-300">
+//                         {alert.show && (
+//                             <Alert
+//                                 message={alert.message}
+//                                 type={alert.type}
+//                                 onClose={hideAlert}
+//                             />
+//                         )}
 //                         <div className="bg-gray-50 p-3 sm:p-6 pt-4 min-h-screen mx-auto">
 //                             <h2 className="text-lg font-bold mb-5 sm:mb-10 text-gray-800">Edit Festival</h2>
 
-//                             <form className="space-y-3 sm:space-y-4 max-w-2xl mx-auto">
+//                             <form className="space-y-3 sm:space-y-4 max-w-2xl mx-auto" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
 //                                 <div className="flex flex-col sm:flex-row sm:items-center">
-//                                     <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Festival</label>
+//                                     <label className="sm:w-1/3 text-gray-700 font-medium mb-1 sm:mb-0">Festival Name</label>
 //                                     <div className="w-full sm:w-2/3">
 //                                         <input
 //                                             type="text"
-//                                             name="festivalName"
-//                                             placeholder="Enter Festival "
-//                                             value={formData.festivalName}
+//                                             name="festivel_name"
+//                                             placeholder="Enter Festival Name"
+//                                             value={formData.festivel_name}
 //                                             onChange={handleChange}
-//                                             className={`w-full px-3 sm:px-4 py-2 border ${errors.festivalName ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
+//                                             className={`w-full px-3 sm:px-4 py-2 border ${errors.festivel_name ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
 //                                         />
-//                                         {errors.festivalName && <p className="text-red-500 text-xs mt-1 ml-2">{errors.festivalName}</p>}
+//                                         {errors.festivel_name && <p className="text-red-500 text-xs mt-1 ml-2">{errors.festivel_name}</p>}
 //                                     </div>
 //                                 </div>
 //                                 <div className="flex flex-col sm:flex-row sm:items-center">
@@ -254,13 +271,13 @@
 //                                     <div className="w-full sm:w-2/3">
 //                                         <input
 //                                             type="number"
-//                                             name="fromClass"
-//                                             placeholder="Enter Class"
-//                                             value={formData.fromClass}
+//                                             name="from_class"
+//                                             placeholder="Enter From Class"
+//                                             value={formData.from_class}
 //                                             onChange={handleChange}
-//                                             className={`w-full px-3 sm:px-4 py-2 border ${errors.fromClass ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
+//                                             className={`w-full px-3 sm:px-4 py-2 border ${errors.from_class ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
 //                                         />
-//                                         {errors.fromClass && <p className="text-red-500 text-xs mt-1 ml-2">{errors.fromClass}</p>}
+//                                         {errors.from_class && <p className="text-red-500 text-xs mt-1 ml-2">{errors.from_class}</p>}
 //                                     </div>
 //                                 </div>
 //                                 <div className="flex flex-col sm:flex-row sm:items-center">
@@ -268,32 +285,31 @@
 //                                     <div className="w-full sm:w-2/3">
 //                                         <input
 //                                             type="number"
-//                                             name="toClass"
-//                                             placeholder="Enter Class "
-//                                             value={formData.toClass}
+//                                             name="to_class"
+//                                             placeholder="Enter To Class"
+//                                             value={formData.to_class}
 //                                             onChange={handleChange}
-//                                             className={`w-full px-3 sm:px-4 py-2 border ${errors.toClass ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
+//                                             className={`w-full px-3 sm:px-4 py-2 border ${errors.to_class ? 'border-red-500' : 'border-blue-600'} rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white`}
 //                                         />
-//                                         {errors.toClass && <p className="text-red-500 text-xs mt-1 ml-2">{errors.toClass}</p>}
+//                                         {errors.to_class && <p className="text-red-500 text-xs mt-1 ml-2">{errors.to_class}</p>}
 //                                     </div>
 //                                 </div>
+//                                 <div className="flex flex-col sm:flex-row justify-center sm:justify-end mt-16 sm:mt-32 sm:mr-10 md:mr-18 lg:mr-40 space-y-4 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">
+//                                     <button
+//                                         type="button"
+//                                         onClick={handleCancel}
+//                                         className="bg-white border border-blue-500 text-blue-500 font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:bg-blue-50 transition-colors duration-300"
+//                                     >
+//                                         Cancel
+//                                     </button>
+//                                     <button
+//                                         type="submit"
+//                                         className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:opacity-90 transition-opacity duration-300"
+//                                     >
+//                                         Update
+//                                     </button>
+//                                 </div>
 //                             </form>
-//                             <div className="flex flex-col sm:flex-row justify-center sm:justify-end mt-16 sm:mt-32 sm:mr-10 md:mr-18 lg:mr-40 space-y-4 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">
-//                                 <button
-//                                     type="button"
-//                                     onClick={handleCancel}
-//                                     className="bg-white border border-blue-500 text-blue-500 font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:bg-blue-50 transition-colors duration-300"
-//                                 >
-//                                     Cancel
-//                                 </button>
-//                                 <button 
-//                                     onClick={handleSubmit}
-//                                     type="submit"
-//                                     className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full focus:outline-none focus:shadow-outline w-full sm:w-auto hover:opacity-90 transition-opacity duration-300"
-//                                 >
-//                                     Update
-//                                 </button>
-//                             </div>
 //                         </div>
 //                     </div>
 //                 </div>
@@ -302,7 +318,9 @@
 //     );
 // };
 
-// export default EditFestival
+// export default EditFestival;
+
+
 
 
 import React, { useState, useEffect } from 'react';
@@ -482,52 +500,88 @@ const EditFestival = () => {
         navigate('/FestivalRegiList');
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setFormSubmitted(true);
 
-        const isValid = validateForm();
+    // const handleSubmit = async () => {
+    //     const { festivel_name, from_class, to_class } = formData;
 
-        if (!isValid) {
-            console.log("Form has errors:", errors);
+    //     if (festivel_name && from_class && to_class) {
+    //         const reqBody = new FormData()
+    //         reqBody.append("festivel_name", festivel_name)
+    //         reqBody.append("from_class", from_class)
+    //         reqBody.append("to_class", to_class)
+    //         const token = sessionStorage.getItem("token");
+    //         if (token) {
+    //             const reqHeader = {
+    //                 "Authorization": token
+
+    //             }
+    //             try {
+    //                 const result = await updateFestivalAPI(id, reqBody, reqHeader)
+    //                 if (result.status == 200) {
+    //                     showAlert('Festival updated successfully!')
+    //                     navigate('/FestivalRegiList')
+    //                 }
+
+    //             } catch (err) {
+    //                 console.log(err);
+
+    //             }
+
+    //         }
+
+    //     } else {
+    //         showAlert("Please fill the form completely!")
+
+    //     }
+    // }
+
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    setFormSubmitted(true);
+
+    const isValid = validateForm();
+
+    if (!isValid) {
+        console.log("Form has errors:", errors);
+        return;
+    }
+
+    const { festivel_name, from_class, to_class } = formData;
+
+    if (festivel_name && from_class && to_class) {
+        const token = sessionStorage.getItem("token");
+        if (!token) {
+            showAlert("Authentication token not found. Please log in again.");
+            navigate('/login');
             return;
         }
 
-        const { festivel_name, from_class, to_class } = formData;
+        try {
+            const reqBody = {
+                festivel_name: festivel_name,
+                from_class: parseInt(from_class),
+                to_class: parseInt(to_class)
+            };
+            const reqHeader = {
+                "Authorization": token
+            };
 
-        if (festivel_name && from_class && to_class) {
-            const token = sessionStorage.getItem("token");
-            if (!token) {
-                showAlert("Authentication token not found. Please log in again.");
-                navigate('/login');
-                return;
+            const result = await updateFestivalAPI(id, reqBody, reqHeader);
+            if (result.status === 200) {
+                showAlert('Festival updated successfully!');
+                navigate('/FestivalRegiList');
+            } else {
+                throw new Error("Failed to update festival");
             }
-
-            try {
-                const reqBody = {
-                    festivel_name: festivel_name,
-                    from_class: parseInt(from_class),
-                    to_class: parseInt(to_class)
-                };
-                const reqHeader = {
-                    "Authorization": token
-                };
-
-                const result = await updateFestivalAPI(id, reqBody, reqHeader);
-                if (result.status === 200) {
-                    showAlert('Festival updated successfully!');
-                    navigate('/FestivalRegiList');
-                } else {
-                    throw new Error("Failed to update festival");
-                }
-            } catch (err) {
-                console.error("Error updating festival:", err);
-                showAlert("Error updating festival. Please try again.");
-            }
-        } else {
-            showAlert("Please fill the form completely!");
+        } catch (err) {
+            console.error("Error updating festival:", err);
+            showAlert("Error updating festival. Please try again.");
         }
-    };
+    } else {
+        showAlert("Please fill the form completely!");
+    }
+};
+
 
     if (isLoading) {
         return (
@@ -631,3 +685,7 @@ const EditFestival = () => {
 };
 
 export default EditFestival;
+
+
+
+

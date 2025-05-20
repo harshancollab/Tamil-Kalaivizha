@@ -1,21 +1,22 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContex.jsx'
+import React from 'react'
+
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  <React.Fragment>
     <BrowserRouter>
-   <AuthProvider> <App /></AuthProvider>
+      <AuthProvider> <App /></AuthProvider>
     </BrowserRouter>
-  </StrictMode>,
+  </React.Fragment>
 )
 // This should be in your main.jsx or a separate registration file
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js', { 
-    scope: '/', 
-    type: 'module' 
+  navigator.serviceWorker.register('/sw.js', {
+    scope: '/',
+    type: 'module'
   });
 }

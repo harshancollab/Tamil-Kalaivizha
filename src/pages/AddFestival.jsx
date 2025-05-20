@@ -686,21 +686,24 @@ function AddFestival() {
                                     {errors.toClass && <p className="text-red-500 text-xs italic">{errors.toClass}</p>}
                                 </div>
                             </div>
-                            <div className="flex flex-col sm:flex-row justify-center sm:justify-end mt-16 sm:mt-32 sm:mr-10 md:mr-18 lg:mr-40 space-y-4 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">
-                                <button
-                                    type="button"
-                                    onClick={handleCancel}
-                                    className="bg-white border border-blue-500 text-blue-500 font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full hover:bg-blue-50 transition-colors duration-300"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleSubmit}
-                                    type="submit"
-                                    className="bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 sm:py-3 sm:px-10 md:px-14 rounded-full hover:from-[#002244] hover:to-[#049ccf] transition-colors duration-300"
-                                >
-                                    Submit
-                                </button>
+
+                            <div className="mt-16 sm:mt-24 md:mt-32">
+                                <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 px-4 sm:px-0">
+                                    <button
+                                        type="button"
+                                        onClick={handleCancel}
+                                        className="w-full sm:w-auto bg-white border border-blue-500 text-blue-500 font-bold py-2 px-6 sm:py-3 sm:px-8 md:px-12 rounded-full hover:bg-blue-50 transition-colors duration-300"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleSubmit}
+                                        type="submit"
+                                        className="w-full sm:w-auto bg-gradient-to-r from-[#003566] to-[#05B9F4] text-white font-bold py-2 px-6 sm:py-3 sm:px-8 md:px-12 rounded-full hover:from-[#002244] hover:to-[#049ccf] transition-colors duration-300"
+                                    >
+                                        Add
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </div>
