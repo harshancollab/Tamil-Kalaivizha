@@ -17,8 +17,8 @@ export const addAdminAPI = async (reqBody, reqHeader) => {
 
 
 // // get  all Users
-export const getAllAdminuserAPI = async (reqHeader) => {
-  return await commonAPI("GET", `${SERVER_URL}/api/user/get-all?page=${1}&limit=${10}`, {}, reqHeader);
+export const getAllAdminuserAPI = async (page,limit,reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/api/user/get-all?page=${page}&limit=${limit}`, {}, reqHeader);
 };
 
 
@@ -80,14 +80,14 @@ export const AddFestivalAPI = async (reqBody, reqHeader) => {
 
 
 //  get  all festivel
-export const getAllFestivelAPI = async (reqHeader) => {
-  return await commonAPI("GET", `${SERVER_URL}/api/festivel/get-all?page=${1}&limit=${10}`, {}, reqHeader);
-};
+export const getAllFestivelAPI = async (page, limit, reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/api/festivel/get-all?page=${page}&limit=${limit}`, {}, reqHeader);
+}
 
 // get  single  festivel
 export const getSingleFestAPI = async (userId, reqHeader) => {
   return await commonAPI("GET", `${SERVER_URL}/api/festivel/${userId}/get`, {}, reqHeader);
-};
+}
 
 
 //  edit a 
@@ -111,8 +111,8 @@ export const AddItemAPI = async (reqBody, reqHeader) => {
 
 
 // //  get  all item
-export const getAllitemAPI = async (reqHeader) => {
-  return await commonAPI("GET", `${SERVER_URL}/api/festivel/get-all?page=${1}&limit=${10}`, {}, reqHeader);
+export const getAllitemAPI = async (page, limit,reqHeader) => {
+  return await commonAPI("GET", `${SERVER_URL}/api/item/get-all?page=${page}&limit=${limit}`, {}, reqHeader);
 };
 
 
