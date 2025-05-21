@@ -8,16 +8,11 @@ A beautifully designed web-based event portal built with **Vite**, **Tailwind CS
 
 | Role              | Privileges                                                                                   |
 |-------------------|----------------------------------------------------------------------------------------------|
-| 🛠 **IT Admin**       | Create/manage other admins with roles: State, District, Subdistrict, School                  |
-| 🧭 **State Admin**    | View/manage District Admins                                                                |
+| 🛠 **IT Admin**       | Create/manage other admins with roles: State, District, Subdistrict, School               |
+| 🧭 **State Admin**    | View/manage District Admins                                                               |
 | 🏙️ **District Admin** | View/manage Subdistrict Admins                                                            |
+| 📍 **Subdistrict Admin**| View/manage school-level event entries                                                  |
 | 🏫 **School Admin**   | View/manage school-level event entries                                                    |
-
----
-
-## 🖼️ Screenshots
-
-📸 Screenshots coming soon...
 
 ---
 
